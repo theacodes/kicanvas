@@ -1,83 +1,7 @@
 import * as types from "./types.js";
 import { convert_arc_to_center_and_angles } from "./arc.js";
 import { TransformStack } from "./transform_stack.js";
-
-class BBox {
-    constructor(
-        x = 0,
-        y = 0,
-        w = 0,
-        h = 0,
-        mat = undefined,
-        context = undefined
-    ) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-
-        if (mat) {
-            this.transform(mat);
-        }
-
-        this.context = context;
-    }
-
-    static from_points(x1, y1, x2, y2, mat, context) {
-        return new BBox(x1, y1, x2 - x1, y2 - y1, mat, context);
-    }
-
-    static combine(r1, r2, context) {
-        if (!r1.valid) {
-            return new BBox(r2.x, r2.y, r2.w, r2.h, null, context);
-        }
-        if (!r2.valid) {
-            return new BBox(r1.x, r1.y, r1.w, r1.h, null, context);
-        }
-
-        const x = Math.min(r1.x, r2.x);
-        const y = Math.min(r1.y, r2.y);
-        const x2 = Math.max(r1.x2, r2.x2);
-        const y2 = Math.max(r1.y2, r2.y2);
-
-        return BBox.from_points(x, y, x2, y2, null, context);
-    }
-
-    get valid() {
-        return this.w !== 0 && this.h !== 0;
-    }
-
-    get x2() {
-        return this.x + this.w;
-    }
-
-    set x2(v) {
-        if (v < this.x) {
-            [v, this.x] = [this.x, v];
-        }
-        this.w = v - this.x;
-    }
-
-    get y2() {
-        return this.y + this.h;
-    }
-
-    set y2(v) {
-        if (v < this.y) {
-            [v, this.y] = [this.y, v];
-        }
-        this.h = v - this.y;
-    }
-
-    transform(mat) {
-        const p1 = mat.transformPoint(new DOMPoint(this.x, this.y));
-        const p2 = mat.transformPoint(new DOMPoint(this.x2, this.y2));
-        this.x = p1.x;
-        this.y = p1.y;
-        this.x2 = p2.x;
-        this.y2 = p2.y;
-    }
-}
+import { BBox } from "./bbox.js";
 
 export class Renderer {
     constructor(canvas) {
@@ -229,7 +153,7 @@ export class Renderer {
         }
     }
 
-    draw_text_normalized(text, effects = null) {
+    text_normalized_impl(text, effects, callback) {
         if (effects?.hide) {
             return;
         }
@@ -255,65 +179,49 @@ export class Renderer {
             this.transforms.abs.flip_y
         );
 
-        // this.ctx.beginPath();
-        // this.ctx.fillStyle = "pink";
-        // this.ctx.arc(0, 0, 1, 0, 360);
-        // this.ctx.fill();
-
         this.apply_Effects(new_effects);
-        this.ctx.fillText(text, 0, 0);
+
+        callback();
 
         this.pop();
     }
 
+    draw_text_normalized(text, effects = null) {
+        this.text_normalized_impl(text, effects, () => {
+            // this.ctx.beginPath();
+            // this.ctx.fillStyle = "pink";
+            // this.ctx.arc(0, 0, 1, 0, 360);
+            // this.ctx.fill();
+            this.ctx.fillText(text, 0, 0);
+        });
+    }
+
     bbox_text_normalized(text, effects = null) {
-        if (effects?.hide) {
-            return new BBox();
-        }
+        let bb = null;
 
-        const new_effects = window.structuredClone(effects);
-        const transform = this.transforms.abs;
-        let new_rotation = 0;
-
-        if (transform.rotation == 180) {
-            new_rotation = -180;
-            if (new_effects?.h_align == "left") {
-                new_effects.h_align = "right";
-            } else if (new_effects?.h_align == "right") {
-                new_effects.h_align = "left";
-            }
-        }
-
-        this.push(
-            0,
-            0,
-            new_rotation,
-            this.transforms.abs.flip_x,
-            this.transforms.abs.flip_y
-        );
-
-        this.apply_Effects(new_effects);
-
-        const metrics = this.ctx.measureText(text);
-        const bb = BBox.from_points(
-            -metrics.actualBoundingBoxLeft,
-            -metrics.actualBoundingBoxAscent,
-            metrics.actualBoundingBoxRight,
-            metrics.actualBoundingBoxDescent,
-            this.transforms.mat,
-            text
-        );
-
-        this.pop();
+        this.text_normalized_impl(text, effects, () => {
+            const metrics = this.ctx.measureText(text);
+            bb = BBox.from_points(
+                -metrics.actualBoundingBoxLeft,
+                -metrics.actualBoundingBoxAscent,
+                metrics.actualBoundingBoxRight,
+                metrics.actualBoundingBoxDescent,
+                this.transforms.mat,
+                text
+            );
+        });
 
         return bb;
     }
 
     draw_BBox(b, color = undefined) {
+        this.push();
         this.ctx.lineWidth = 0.2;
         this.ctx.beginPath();
         this.ctx.rect(b.x, b.y, b.w, b.h);
-        this.ctx.strokeStyle = color || "orange";
+        this.ctx.strokeStyle = color || "rgb(255, 213, 126)";
+        this.ctx.fillStyle = color || "rgb(255, 213, 126, 0.1)";
+        this.ctx.fill();
         this.ctx.stroke();
 
         if (b.w == 0 && b.h == 0) {
@@ -321,8 +229,9 @@ export class Renderer {
             this.ctx.arc(b.x, b.y, 5, 0, 360);
             this.ctx.strokeStyle = "red";
             this.ctx.stroke();
-            console.log(b);
         }
+
+        this.pop();
     }
 
     draw_Rectangle(r) {
@@ -486,9 +395,8 @@ export class Renderer {
         }
 
         this.push(l.at.x, l.at.y, l.at.rotation);
-        this.apply_Effects(l.effects);
         this.ctx.fillStyle = this.style.label.color;
-        this.ctx.fillText(l.name, 0, 0);
+        this.draw_text_normalized(l.name, l.effects);
         this.pop();
     }
 
@@ -499,18 +407,11 @@ export class Renderer {
 
         this.push(l.at.x, l.at.y, l.at.rotation);
 
-        this.apply_Effects(l.effects);
-        const metrics = this.ctx.measureText(l.name);
-        const bb = BBox.from_points(
-            -metrics.actualBoundingBoxLeft,
-            -metrics.actualBoundingBoxAscent,
-            metrics.actualBoundingBoxRight,
-            metrics.actualBoundingBoxDescent,
-            this.transforms.mat,
-            l
-        );
+        const bb = this.bbox_text_normalized(l.name, l.effects);
+        bb.context = l;
 
         this.pop();
+
         return bb;
     }
 
@@ -519,15 +420,16 @@ export class Renderer {
             return;
         }
 
-        this.apply_Effects(t.effects);
         this.ctx.fillStyle = this.style.fill;
 
         const lines = t.text.split("\n");
         let y = t.at.y;
         for (const line of lines.reverse()) {
-            const metrics = this.ctx.measureText(line);
-            this.ctx.fillText(line, t.at.x, y);
-            y -= metrics.actualBoundingBoxAscent * this.style.line_spacing;
+            this.text_normalized_impl(line, t.effects, () => {
+                const metrics = this.ctx.measureText(line);
+                this.ctx.fillText(line, t.at.x, y);
+                y -= metrics.actualBoundingBoxAscent * this.style.line_spacing;
+            });
         }
     }
 
@@ -536,31 +438,30 @@ export class Renderer {
             return new BBox();
         }
 
-        let bb = new BBox();
-
-        this.apply_Effects(t.effects);
-
-        this.push(t.at.x, t.at.y, t.at.rotation);
+        this.push(t.at.x, 0, t.at.rotation);
 
         const lines = t.text.split("\n");
-        let y = 0;
+        let y = t.at.y;
+        let bb = new BBox();
+
         for (const line of lines.reverse()) {
-            const metrics = this.ctx.measureText(line);
+            this.text_normalized_impl(line, t.effects, () => {
+                const metrics = this.ctx.measureText(line);
 
-            bb = BBox.combine(bb, BBox.from_points(
-                -metrics.actualBoundingBoxLeft,
-                y - metrics.actualBoundingBoxAscent,
-                metrics.actualBoundingBoxRight,
-                y + metrics.actualBoundingBoxDescent,
-                this.transforms.mat,
-                t
-            ));
+                bb = BBox.combine(bb, BBox.from_points(
+                    -metrics.actualBoundingBoxLeft,
+                    y - metrics.actualBoundingBoxAscent,
+                    metrics.actualBoundingBoxRight,
+                    y + metrics.actualBoundingBoxDescent,
+                    this.transforms.mat,
+                    t
+                ));
 
-            y -= metrics.actualBoundingBoxAscent * this.style.line_spacing;
+                y -= metrics.actualBoundingBoxAscent * this.style.line_spacing;
+            });
         }
 
         this.pop();
-
         return bb;
     }
 
