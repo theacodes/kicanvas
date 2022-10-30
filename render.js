@@ -449,14 +449,24 @@ export class Renderer {
 
         this.pop();
 
-        /* Pin names */
+        /* Pin names & numbers */
         this.push(p.at.x, p.at.y, p.at.rotation);
+
         this.ctx.textBaseline = "middle";
         this.ctx.fillStyle = this.style.pin.name.color;
         p.name_effects.h_align = "left";
         if (!hide_name && p.name !== "~") {
             this.push(p.length + pin_name_offset);
             this.draw_text_normalized(p.name, p.name_effects);
+            this.pop();
+        }
+
+        this.ctx.textBaseline = "bottom";
+        this.ctx.fillStyle = this.style.pin.number.color;
+        p.number_effects.h_align = "center";
+        if (!hide_number) {
+            this.push(p.length / 2);
+            this.draw_text_normalized(p.number, p.number_effects);
             this.pop();
         }
         this.pop();
@@ -504,18 +514,18 @@ export class Renderer {
         return bb;
     }
 
-    draw_LibrarySymbol_Pins(s, hide_pin_names) {
+    draw_LibrarySymbol_Pins(s, hide_pin_names, hide_pin_numbers) {
         for (const p of Object.values(s.pins)) {
             this.draw_Pin(
                 p,
                 s.pin_name_offset,
                 s.hide_pin_names || hide_pin_names,
-                s.hide_pin_numbers
+                s.hide_pin_numbers || hide_pin_numbers,
             );
         }
 
         for (const c of Object.values(s.children)) {
-            this.draw_LibrarySymbol_Pins(c, s.hide_pin_names);
+            this.draw_LibrarySymbol_Pins(c, s.hide_pin_names, s.hide_pin_numbers);
         }
     }
 
