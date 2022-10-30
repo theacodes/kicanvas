@@ -12,6 +12,14 @@ class Transform {
         ctx.scale(this.flip_x ? -1 : 1, this.flip_y ? -1 : 1);
         ctx.rotate((this.rotation * Math.PI) / 180);
     }
+
+    get mat() {
+        const mat = new DOMMatrix();
+        mat.translateSelf(this.x, this.y);
+        mat.scaleSelf(this.flip_x ? -1 : 1, this.flip_y ? -1 : 1);
+        mat.rotateSelf(this.rotation);
+        return mat;
+    }
 }
 
 export class TransformStack {
@@ -46,5 +54,13 @@ export class TransformStack {
             }
         }
         return atx;
+    }
+
+    get mat() {
+        const mat = new DOMMatrix();
+        for (const tx of this.t_stack) {
+            mat.multiplySelf(tx.mat);
+        }
+        return mat;
     }
 }

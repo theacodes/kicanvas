@@ -13,6 +13,11 @@ async function main() {
     for (const g of sch.iter_graphics()) {
         renderer.draw(g);
     }
+
+
+    for (const g of sch.iter_graphics()) {
+        renderer.draw_BBox(renderer.bbox(g));
+    }
 }
 
 (main());
