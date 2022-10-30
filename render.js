@@ -82,6 +82,15 @@ export class Renderer {
 
         this.ctx.scale(scale, scale);
         this.ctx.translate(-bb.x + x_offset, -bb.y + y_offset);
+        console.log(-bb.x + x_offset, -bb.y + y_offset);
+    }
+
+    screen_space_to_world_space(x, y) {
+        const dpr = window.devicePixelRatio;
+        const rect = this.cvs.getBoundingClientRect();
+        const ss_pt = new DOMPoint(x - rect.left, y - rect.top);
+        const mat = this.ctx.getTransform().inverse().scale(dpr, dpr);
+        return mat.transformPoint(ss_pt);
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
@@ -100,6 +109,16 @@ export class Renderer {
 
     bbox(v) {
         return this[`bbox_${v.constructor.name}`](v);
+    }
+
+    interactive_bboxes(v) {
+        const out = [];
+        for(const g of v.iter_graphics()) {
+            if ([types.SymbolInstance].includes(g.constructor)) {
+                out.push(this.bbox(g));
+            }
+        }
+        return out;
     }
 
     text_normalized_impl(text, effects, callback) {
