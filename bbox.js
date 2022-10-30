@@ -40,7 +40,7 @@ export class BBox {
     }
 
     get valid() {
-        return this.w !== 0 && this.h !== 0;
+        return this.w !== 0 || this.h !== 0;
     }
 
     get x2() {

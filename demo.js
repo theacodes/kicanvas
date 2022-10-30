@@ -10,14 +10,8 @@ async function main() {
     const sch_parsed = parser.parse(sch_text);
     const sch = new types.KicadSch(sch_parsed);
 
-    for (const g of sch.iter_graphics()) {
-        renderer.draw(g);
-    }
-
-
-    for (const g of sch.iter_graphics()) {
-        renderer.draw_BBox(renderer.bbox(g));
-    }
+    renderer.draw(sch);
+    renderer.draw_BBox(renderer.bbox(sch));
 }
 
 (main());

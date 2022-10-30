@@ -69,8 +69,6 @@ export class Renderer {
         this.ctx.fillStyle = this.style.fill;
         this.ctx.strokeStyle = this.style.stroke;
         this.ctx.lineWidth = 0.254;
-
-        this.bboxes = [];
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
@@ -83,74 +81,12 @@ export class Renderer {
         this.ctx.restore();
     }
 
-    draw(gfx) {
-        switch (gfx.constructor) {
-            case types.Rectangle:
-                this.draw_Rectangle(gfx);
-                this.bboxes.push(this.bbox_Rectangle(gfx));
-                break;
-            case types.Polyline:
-                this.draw_Polyline(gfx);
-                this.bboxes.push(this.bbox_Polyline(gfx));
-                break;
-            case types.Circle:
-                this.draw_Circle(gfx);
-                this.bboxes.push(this.bbox_Circle(gfx));
-                break;
-            case types.Arc:
-                this.draw_Arc(gfx);
-                this.bboxes.push(this.bbox_Arc(gfx));
-                break;
-            case types.LibrarySymbol:
-                this.draw_LibrarySymbol(gfx);
-                break;
-            case types.SymbolInstance:
-                this.draw_SymbolInstance(gfx);
-                break;
-            case types.Wire:
-                this.draw_Wire(gfx);
-                break;
-            case types.Junction:
-                this.draw_Junction(gfx);
-                break;
-            case types.Label:
-                this.draw_Label(gfx);
-                break;
-            case types.Text:
-                this.draw_Text(gfx);
-                break;
-            default:
-                console.log("Don't know how to draw", gfx);
-                break;
-        }
+    draw(v) {
+        return this[`draw_${v.constructor.name}`](v);
     }
 
-    bbox(gfx) {
-        switch (gfx.constructor) {
-            case types.Rectangle:
-                return this.bbox_Rectangle(gfx);
-            case types.Polyline:
-                return this.bbox_Polyline(gfx);
-            case types.Circle:
-                return this.bbox_Circle(gfx);
-            case types.Arc:
-                return this.bbox_Arc(gfx);
-            case types.LibrarySymbol:
-                return this.bbox_LibrarySymbol(gfx);
-            case types.SymbolInstance:
-                return this.bbox_SymbolInstance(gfx);
-            case types.Wire:
-                return this.bbox_Wire(gfx);
-            case types.Junction:
-                return this.bbox_Junction(gfx);
-            case types.Label:
-                return this.bbox_Label(gfx);
-            case types.Text:
-                return this.bbox_Text(gfx);
-            default:
-                console.log("Don't know how to bbox", gfx);
-                return;
-        }
+    bbox(v) {
+        return this[`bbox_${v.constructor.name}`](v);
     }
 
     text_normalized_impl(text, effects, callback) {
@@ -232,6 +168,21 @@ export class Renderer {
         }
 
         this.pop();
+    }
+
+    draw_KicadSch(sch) {
+        for(const g of sch.iter_graphics()) {
+            this.draw(g);
+        }
+    }
+
+    bbox_KicadSch(sch) {
+        let bb = new BBox();
+        for(const g of sch.iter_graphics()) {
+            const gbb = this.bbox(g);
+            bb = BBox.combine(bb, gbb);
+        }
+        return bb;
     }
 
     draw_Rectangle(r) {
