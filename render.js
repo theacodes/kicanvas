@@ -16,8 +16,6 @@ export class Renderer {
         this.cvs.style.height = `${rect.height}px`;
         this.ctx.scale(dpr, dpr);
 
-        this.ctx.scale(4, 4);
-
         this.style = {
             typeface: "Overpass",
             font_size: 2.54,
@@ -69,6 +67,21 @@ export class Renderer {
         this.ctx.fillStyle = this.style.fill;
         this.ctx.strokeStyle = this.style.stroke;
         this.ctx.lineWidth = 0.254;
+    }
+
+    fit_to_bbox(bb) {
+        const canvas_rect = canvas.getBoundingClientRect();
+        const w_scale = canvas_rect.width / bb.w;
+        const h_scale = canvas_rect.height / bb.h;
+        const scale = Math.min(w_scale, h_scale);
+
+        const scaled_canvas_w = canvas_rect.width / scale;
+        const scaled_canvas_h = canvas_rect.height / scale;
+        const x_offset = (scaled_canvas_w - bb.w) / 2;
+        const y_offset = (scaled_canvas_h - bb.h) / 2;
+
+        this.ctx.scale(scale, scale);
+        this.ctx.translate(-bb.x + x_offset, -bb.y + y_offset);
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
