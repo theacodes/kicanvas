@@ -51,6 +51,8 @@ export class Renderer {
         this.ctx.fillStyle = this.style.fill;
         this.ctx.strokeStyle = this.style.stroke;
         this.ctx.lineWidth = this.style.stroke_width;
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
     }
 
     fit_to_bbox(bb) {
