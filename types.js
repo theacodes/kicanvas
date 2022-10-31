@@ -48,7 +48,8 @@ class TitleBlock {
 }
 
 export class Property {
-    constructor(e) {
+    constructor(e, n) {
+        this.n = n;
         this.key = e.expect_string();
         this.value = e.expect_string();
         this.id = e.expect_pair_number("id");
@@ -203,7 +204,7 @@ export class LibrarySymbol {
         while (e.element) {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
-                const p = new Property(se);
+                const p = new Property(se, Object.values(this.properties).length);
                 this.properties[p.key] = p;
                 continue;
             }
@@ -263,7 +264,7 @@ export class SymbolInstance {
         while (e.element) {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
-                const p = new Property(se);
+                const p = new Property(se, Object.values(this.properties).length);
                 this.properties[p.key] = p;
                 continue;
             }

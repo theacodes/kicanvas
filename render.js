@@ -16,6 +16,8 @@ export class Renderer {
         this.cvs.style.height = `${rect.height}px`;
         this.ctx.scale(dpr, dpr);
 
+        this.transforms = new TransformStack(this.ctx);
+
         this.style = {
             typeface: "Overpass",
             font_size: 2.54,
@@ -60,9 +62,7 @@ export class Renderer {
             },
         };
 
-        this.ctx.fillStyle = this.style.background;
-        this.ctx.fillRect(0, 0, rect.width, rect.height);
-        this.transforms = new TransformStack(this.ctx);
+        this.clear();
 
         this.ctx.fillStyle = this.style.fill;
         this.ctx.strokeStyle = this.style.stroke;
@@ -101,6 +101,11 @@ export class Renderer {
     pop() {
         this.transforms.pop();
         this.ctx.restore();
+    }
+
+    clear() {
+        this.ctx.fillStyle = this.style.background;
+        this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
     }
 
     draw(v) {
@@ -204,6 +209,8 @@ export class Renderer {
 
     draw_KicadSch(sch) {
         for(const g of sch.iter_graphics()) {
+            this.ctx.fillStyle = this.style.fill;
+            this.ctx.strokeStyle = this.style.stroke;
             this.draw(g);
         }
     }

@@ -1973,7 +1973,7 @@
   )
 
   (symbol (lib_id "Device:LED_Filled") (at 207.645 48.26 90) (unit 1)
-    (in_bom yes) (on_board yes) (fields_autoplaced)
+    (in_bom yes) (on_board yes)
     (uuid 6bbb5d26-a0c1-4406-8a29-08dcd7ae79d3)
     (property "Reference" "D203" (id 0) (at 210.82 47.3074 90)
       (effects (font (size 1.27 1.27)) (justify right))
