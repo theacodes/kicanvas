@@ -3,10 +3,40 @@ import { convert_arc_to_center_and_angles } from "./arc.js";
 import { TransformStack } from "./transform_stack.js";
 import { BBox } from "./bbox.js";
 
+
+class Style {
+    constructor(e) {
+        const css = window.getComputedStyle(e);
+        this.font_family = css.getPropertyValue("--font-family").trim() || "Overpass";
+        this.font_size = parseFloat(css.getPropertyValue("--font-size").trim() || 2.54);
+        this.line_spacing = parseFloat(css.getPropertyValue("--line-spacing").trim() || 1.5);
+        this.background = css.getPropertyValue("--background").trim() || "#131218";
+        this.stroke = css.getPropertyValue("--stroke").trim() || "#F8F8F0";
+        this.stroke_width = parseFloat(css.getPropertyValue("--stroke-width").trim() || 0.254);
+        this.fill = css.getPropertyValue("--fill").trim() || "#F8F8F0";
+        this.highlight = css.getPropertyValue("--highlight").trim() || "#C8FFE3";
+        this.symbol_fill = css.getPropertyValue("--symbol-fill").trim() || "#433E56";
+        this.symbol_stroke = css.getPropertyValue("--symbol-stroke").trim() || "#C5A3FF";
+        this.symbol_field = css.getPropertyValue("--symbol-field").trim() || "#AE81FF";
+        this.symbol_ref = css.getPropertyValue("--symbol-ref").trim() || "#81EEFF";
+        this.symbol_value = css.getPropertyValue("--symbol-value").trim() || "#81EEFF";
+        this.wire = css.getPropertyValue("--wire").trim() || "#AE81FF";
+        this.junction = css.getPropertyValue("--junction").trim() || "#DCC8FF";
+        this.no_connect = css.getPropertyValue("--no-connect").trim() || "#FF81AD";
+        this.pin_radius = parseFloat(css.getPropertyValue("--pin-radius").trim() || 0.254);
+        this.pin_color = css.getPropertyValue("--pin-color").trim() || "#81FFBE";
+        this.pin_name = css.getPropertyValue("--pin-name").trim() || "#81FFBE";
+        this.pin_number = css.getPropertyValue("--pin-number").trim() || "#64CB96";
+        this.label = css.getPropertyValue("--label").trim() || "#DCC8FF";
+        this.hierarchical = css.getPropertyValue("--hierarchical-label").trim() || "#A3FFCF";
+    }
+}
+
 export class Renderer {
     constructor(canvas) {
         this.cvs = canvas;
         this.ctx = canvas.getContext("2d");
+        this.style = new Style(this.cvs);
 
         const dpr = window.devicePixelRatio;
         const rect = canvas.getBoundingClientRect();
@@ -18,55 +48,9 @@ export class Renderer {
 
         this.transforms = new TransformStack(this.ctx);
 
-        this.style = {
-            typeface: "Overpass",
-            font_size: 2.54,
-            line_spacing: 1.5,
-            background: "#131218",
-            stroke: "#F8F8F0",
-            fill: "#F8F8F0",
-            highlight: "#C8FFE3",
-            symbol: {
-                body: {
-                    fill: "#433E56",
-                    stroke: "#C5A3FF",
-                },
-                field: {
-                    color: "#AE81FF",
-                },
-                ref: {
-                    color: "#81EEFF",
-                },
-                value: {
-                    color: "#81EEFF",
-                },
-            },
-            wire: "#AE81FF",
-            junction: "#DCC8FF",
-            nc_color: "#FF81AD",
-            pin: {
-                radius: 0.254,
-                color: "#81FFBE",
-                name: {
-                    color: "#81FFBE",
-                },
-                number: {
-                    color: "#64CB96",
-                },
-            },
-            label: {
-                color: "#DCC8FF",
-            },
-            hier_label: {
-                color: "#A3FFCF",
-            },
-        };
-
-        this.clear();
-
         this.ctx.fillStyle = this.style.fill;
         this.ctx.strokeStyle = this.style.stroke;
-        this.ctx.lineWidth = 0.254;
+        this.ctx.lineWidth = this.style.stroke_width;
     }
 
     fit_to_bbox(bb) {
@@ -103,8 +87,11 @@ export class Renderer {
     }
 
     clear() {
+        this.ctx.save();
+        this.ctx.setTransform();
         this.ctx.fillStyle = this.style.background;
         this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
+        this.ctx.restore();
     }
 
     draw(v) {
@@ -369,12 +356,12 @@ export class Renderer {
 
     apply_Effects(e) {
         if (!e) {
-            this.ctx.font = `${this.style.font_size}px "${this.style.typeface}"`;
+            this.ctx.font = `${this.style.font_size}px "${this.style.font_family}"`;
             this.ctx.textAlign = "center";
             return;
         }
 
-        this.ctx.font = `${e.size.y * 1.5}px "${this.style.typeface}"`;
+        this.ctx.font = `${e.size.y * 1.5}px "${this.style.font_family}"`;
         this.ctx.textAlign = e.h_align;
     }
 
@@ -384,7 +371,7 @@ export class Renderer {
         }
 
         this.push(l.at.x, l.at.y, l.at.rotation);
-        this.ctx.fillStyle = this.style.label.color;
+        this.ctx.fillStyle = this.style.label;
         this.draw_text_normalized(l.name, l.effects);
         this.pop();
     }
@@ -462,12 +449,12 @@ export class Renderer {
         this.push(p.at.x, p.at.y, p.at.rotation);
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = this.style.pin.color;
-        this.ctx.arc(0, 0, this.style.pin.radius, 0, 360);
+        this.ctx.fillStyle = this.style.pin_color;
+        this.ctx.arc(0, 0, this.style.pin_radius, 0, 360);
         this.ctx.fill();
 
         this.ctx.beginPath();
-        this.ctx.strokeStyle = this.style.pin.color;
+        this.ctx.strokeStyle = this.style.pin_color;
         this.ctx.moveTo(0, 0);
         this.ctx.lineTo(p.length, 0);
         this.ctx.stroke();
@@ -478,7 +465,7 @@ export class Renderer {
         this.push(p.at.x, p.at.y, p.at.rotation);
 
         this.ctx.textBaseline = "middle";
-        this.ctx.fillStyle = this.style.pin.name.color;
+        this.ctx.fillStyle = this.style.pin_name;
         p.name_effects.h_align = "left";
         if (!hide_name && p.name !== "~") {
             this.push(p.length + pin_name_offset);
@@ -487,7 +474,7 @@ export class Renderer {
         }
 
         this.ctx.textBaseline = "bottom";
-        this.ctx.fillStyle = this.style.pin.number.color;
+        this.ctx.fillStyle = this.style.pin_number;
         p.number_effects.h_align = "center";
         if (!hide_number) {
             this.push(p.length / 2);
@@ -516,11 +503,11 @@ export class Renderer {
 
         for (const g of s.graphics) {
             if (g.fill == "outline") {
-                this.ctx.fillStyle = this.style.symbol.body.stroke;
+                this.ctx.fillStyle = this.style.symbol_stroke;
             } else {
-                this.ctx.fillStyle = this.style.symbol.body.fill;
+                this.ctx.fillStyle = this.style.symbol_fill;
             }
-            this.ctx.strokeStyle = this.style.symbol.body.stroke;
+            this.ctx.strokeStyle = this.style.symbol_stroke;
             this.draw(g);
         }
     }
@@ -616,11 +603,11 @@ export class Renderer {
 
         this.push(p.at.x, p.at.y, si.at.rotation + p.at.rotation);
         if (p.key == "Reference") {
-            this.ctx.fillStyle = this.style.symbol.ref.color;
+            this.ctx.fillStyle = this.style.symbol_ref;
         } else if (p.key == "Value") {
-            this.ctx.fillStyle = this.style.symbol.value.color;
+            this.ctx.fillStyle = this.style.symbol_value;
         } else {
-            this.ctx.fillStyle = this.style.symbol.field.color;
+            this.ctx.fillStyle = this.style.symbol_field;
         }
         this.draw_text_normalized(p.value, p.effects);
         this.pop();

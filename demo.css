@@ -1,0 +1,79 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Nunito";
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+[data-kicanvas] {
+    --font-family: Overpass;
+    --font-size: 2.54;
+    --line-spacing: 1.5;
+    --background: #131218;
+    --stroke: #F8F8F0;
+    --stroke-width: 0.254;
+    --fill: #F8F8F0;
+    --highlight: #C8FFE3;
+    --symbol-fill: #433E56;
+    --symbol-stroke: #C5A3FF;
+    --symbol-field: #AE81FF;
+    --symbol-ref: #81EEFF;
+    --symbol-value: #81EEFF;
+    --wire: #AE81FF;
+    --junction: #DCC8FF;
+    --no-connect: #FF81AD;
+    --pin-radius: 0.254;
+    --pin-color: #81FFBE;
+    --pin-name: #81FFBE;
+    --pin-number: #64CB96;
+    --label: #DCC8FF;
+    --hierarchical-label: #A3FFCF;
+}
+
+[data-kicanvas] canvas {
+  width: 100%;
+  height: 100vh;
+}
+
+.kicanvas-dialog {
+  font-size: 1.2rem;
+  margin: auto;
+  width: 30rem;
+  max-width: 80vw;
+}
+
+.kicanvas-dialog .property {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.kicanvas-dialog .property input {
+  font-size: 1.1rem;
+}
+
+.kicanvas-dialog button {
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  display: block;
+  width: 100%;
+}
