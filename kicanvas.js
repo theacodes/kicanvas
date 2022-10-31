@@ -29,6 +29,7 @@ export class KiCanvas {
         this.sch = new types.KicadSch(parsed);
 
         const sch_bb = this.renderer.bbox(this.sch);
+        sch_bb.grow(2);
         this.renderer.fit_to_bbox(sch_bb);
 
         this.bboxes = this.renderer.interactive_bboxes(this.sch);
