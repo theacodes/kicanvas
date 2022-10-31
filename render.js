@@ -70,7 +70,7 @@ export class Renderer {
     }
 
     fit_to_bbox(bb) {
-        const canvas_rect = canvas.getBoundingClientRect();
+        const canvas_rect = this.cvs.getBoundingClientRect();
         const w_scale = canvas_rect.width / bb.w;
         const h_scale = canvas_rect.height / bb.h;
         const scale = Math.min(w_scale, h_scale);
@@ -82,7 +82,6 @@ export class Renderer {
 
         this.ctx.scale(scale, scale);
         this.ctx.translate(-bb.x + x_offset, -bb.y + y_offset);
-        console.log(-bb.x + x_offset, -bb.y + y_offset);
     }
 
     screen_space_to_world_space(x, y) {

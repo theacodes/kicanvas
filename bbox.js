@@ -74,6 +74,13 @@ export class BBox {
         this.y2 = p2.y;
     }
 
+    grow(v) {
+        this.x -= v;
+        this.y -= v;
+        this.w += v * 2;
+        this.h += v * 2;
+    }
+
     contains_point(x, y) {
         return (x >= this.x && x <= this.x2 && y >= this.y && y <= this.y2);
     }
