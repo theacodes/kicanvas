@@ -44,7 +44,7 @@ export class Parser {
         return token;
     }
 
-    parse(expect_open = true) {
+    _parse(expect_open = true) {
         const elements = [];
 
         if (expect_open) {
@@ -62,7 +62,7 @@ export class Parser {
             if (element === null) {
                 break;
             } else if (element.type === Tokenizer.Token.OPEN) {
-                elements.push(this.parse((expect_open = false)));
+                elements.push(this._parse((expect_open = false)));
             } else {
                 elements.push(element);
             }
@@ -71,6 +71,24 @@ export class Parser {
         this.expect(Tokenizer.Token.CLOSE);
 
         return new SExprParser(elements);
+    }
+
+    parse() {
+        const sexpr = this._parse();
+
+        // A full document has one top-level s-expression.
+        if(!this.token) {
+            return sexpr;
+        }
+
+        // A document fragment has many top-level s-expressions, so keep parsing until it's done.
+        const elements = [sexpr];
+
+        while(this.token) {
+            elements.push(this._parse());
+        }
+
+        return new SExprParser(elements)
     }
 }
 

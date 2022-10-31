@@ -316,13 +316,16 @@ export class Text {
 
 export class KicadSch {
     constructor(e) {
-        e.expect_atom("kicad_sch");
+        // This can either be a full schematic or a "fragment" from copying and
+        // pasting.
 
-        this.version = e.expect_pair_number("version");
-        this.generator = e.expect_pair_atom("generator");
-        this.uuid = e.expect_pair_atom("uuid");
-        this.paper = new Paper(e.expect_expr("paper"));
-        this.title_block = new TitleBlock(e.expect_expr("title_block"));
+        if(e.maybe_atom("kicad_sch")) {
+            this.version = e.expect_pair_number("version");
+            this.generator = e.expect_pair_atom("generator");
+            this.uuid = e.expect_pair_atom("uuid");
+            this.paper = new Paper(e.expect_expr("paper"));
+            this.title_block = new TitleBlock(e.expect_expr("title_block"));
+        }
 
         this.lib_symbols = {};
         const lib_symbols_list = e.maybe_expr("lib_symbols");
@@ -367,6 +370,14 @@ export class KicadSch {
                 const symbol = new SymbolInstance(se);
                 symbol.lib_symbol = this.lib_symbols[symbol.lib_id];
                 this.symbols[symbol.id] = symbol;
+                continue;
+            }
+            if ((se = e.maybe_expr("sheet_instances")) !== null) {
+                // TODO: Ignored for now
+                continue;
+            }
+            if ((se = e.maybe_expr("symbol_instances")) !== null) {
+                // TODO: Ignored for now
                 continue;
             }
             console.log("unknown", e.element);
