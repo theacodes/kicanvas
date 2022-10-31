@@ -38,16 +38,15 @@ export class Renderer {
         this.ctx = canvas.getContext("2d");
         this.style = new Style(this.cvs);
 
-        const dpr = window.devicePixelRatio;
-        const rect = canvas.getBoundingClientRect();
-        this.cvs.width = rect.width * dpr;
-        this.cvs.height = rect.height * dpr;
-        this.cvs.style.width = `${rect.width}px`;
-        this.cvs.style.height = `${rect.height}px`;
-        this.ctx.scale(dpr, dpr);
+        this.scale_for_device_pixel_ratio();
+
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
 
         this.transforms = new TransformStack(this.ctx);
+    }
 
+    set_default_styles() {
         this.ctx.fillStyle = this.style.fill;
         this.ctx.strokeStyle = this.style.stroke;
         this.ctx.lineWidth = this.style.stroke_width;
@@ -55,11 +54,35 @@ export class Renderer {
         this.ctx.lineJoin = "round";
     }
 
-    fit_to_bbox(bb) {
-        const canvas_rect = this.cvs.getBoundingClientRect();
+    scale_for_device_pixel_ratio() {
+        const dpr = window.devicePixelRatio;
+        const rect = this.cvs.getBoundingClientRect();
+        this.cvs.width = Math.round(rect.width * dpr);
+        this.cvs.height = Math.round(rect.height * dpr);
+        this.cvs.style.width = `${Math.round(rect.width)}px`;
+        this.cvs.style.height = `${Math.round(rect.height)}px`;
+        this.ctx.setTransform();
+        this.ctx.scale(dpr, dpr);
+
+        /* These must be set after setTransform, otherwise weird shit happens. */
+        this.set_default_styles();
+    }
+
+    fit_to_bbox(bb, crop = false) {
+        let canvas_rect = this.cvs.getBoundingClientRect();
+
         const w_scale = canvas_rect.width / bb.w;
         const h_scale = canvas_rect.height / bb.h;
         const scale = Math.min(w_scale, h_scale);
+
+        // crop height
+        if (crop) {
+            const new_height = scale * bb.h;
+            this.cvs.height = Math.round(new_height * window.devicePixelRatio);
+            this.cvs.style.height = `${new_height}px`;
+            this.scale_for_device_pixel_ratio();
+            canvas_rect = this.cvs.getBoundingClientRect();
+        }
 
         const scaled_canvas_w = canvas_rect.width / scale;
         const scaled_canvas_h = canvas_rect.height / scale;

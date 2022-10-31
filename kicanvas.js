@@ -30,7 +30,10 @@ export class KiCanvas {
 
         const sch_bb = this.renderer.bbox(this.sch);
         sch_bb.grow(2);
-        this.renderer.fit_to_bbox(sch_bb);
+
+        const crop = this.ui.container.dataset.crop !== undefined || false;
+
+        this.renderer.fit_to_bbox(sch_bb, crop);
 
         this.bboxes = this.renderer.interactive_bboxes(this.sch);
         for (const bb of this.bboxes) {
