@@ -60,16 +60,16 @@ export class KiCanvas {
             }
         }
 
-        if (!selected) {
-            return;
-        }
-
         window.requestAnimationFrame(() => {
             this.draw();
-            this.renderer.draw_BBox(selected, this.renderer.style.highlight);
+            if(selected) {
+                this.renderer.draw_BBox(selected, this.renderer.style.highlight);
+            }
         });
 
-        this.show_dialog(selected.context);
+        if (selected) {
+            this.show_dialog(selected.context);
+        }
     }
 
     show_dialog(sym) {
