@@ -7,7 +7,7 @@ import { BBox } from "./bbox.js";
 class Style {
     constructor(e) {
         const css = window.getComputedStyle(e);
-        this.font_family = css.getPropertyValue("--font-family").trim() || "Overpass";
+        this.font_family = css.getPropertyValue("--font-family").trim() || "sans";
         this.font_size = parseFloat(css.getPropertyValue("--font-size").trim() || 2.54);
         this.line_spacing = parseFloat(css.getPropertyValue("--line-spacing").trim() || 1.5);
         this.background = css.getPropertyValue("--background").trim() || "#131218";
@@ -174,12 +174,13 @@ export class Renderer {
     }
 
     draw_BBox(b, color = undefined) {
+        color = color || this.style.highlight;
         this.push();
         this.ctx.lineWidth = 0.2;
         this.ctx.beginPath();
         this.ctx.rect(b.x, b.y, b.w, b.h);
-        this.ctx.strokeStyle = color || "rgb(255, 213, 126)";
-        this.ctx.fillStyle = color || "rgb(255, 213, 126, 0.1)";
+        this.ctx.strokeStyle = color;
+        this.ctx.fillStyle = color;
         this.ctx.fill();
         this.ctx.stroke();
 

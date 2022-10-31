@@ -66,7 +66,7 @@ export class KiCanvas {
 
         window.requestAnimationFrame(() => {
             this.draw();
-            this.renderer.draw_BBox(selected);
+            this.renderer.draw_BBox(selected, this.renderer.style.highlight);
         });
 
         this.show_dialog(selected.context);

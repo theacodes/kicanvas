@@ -29,9 +29,9 @@ svg {
     --line-spacing: 1.5;
     --background: #131218;
     --stroke: #F8F8F0;
-    --stroke-width: 0.254;
+    --stroke-width: 0.3;
     --fill: #F8F8F0;
-    --highlight: #C8FFE3;
+    --highlight: rgba(200, 255, 227, 0.5);
     --symbol-fill: #433E56;
     --symbol-stroke: #C5A3FF;
     --symbol-field: #AE81FF;
@@ -45,6 +45,31 @@ svg {
     --pin-name: #81FFBE;
     --pin-number: #64CB96;
     --label: #DCC8FF;
+    --hierarchical-label: #A3FFCF;
+}
+
+[data-kicanvas].light {
+    --font-family: Overpass;
+    --font-size: 2.54;
+    --line-spacing: 1.5;
+    --background: #F8F8F0;
+    --stroke: #282634;
+    --stroke-width: 0.3;
+    --fill: #131218;
+    --highlight: rgba(200, 255, 227, 0.5);
+    --symbol-fill: #DCC8FF;
+    --symbol-stroke: #433E56;
+    --symbol-field: #4E896B;
+    --symbol-ref: #716799;
+    --symbol-value: #716799;
+    --wire: ##433E56;
+    --junction: ##433E56;
+    --no-connect: #FF81AD;
+    --pin-radius: 0.254;
+    --pin-color: #634E89;
+    --pin-name: #433E56;
+    --pin-number: #716799;
+    --label: #CB6488;
     --hierarchical-label: #A3FFCF;
 }
 
