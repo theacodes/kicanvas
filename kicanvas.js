@@ -106,7 +106,6 @@ export class KiCanvas {
                     }
                     target = target.slice(4);
                     target = target.slice(0, 1).toLowerCase() + target.slice(1);
-                    console.log(target, source);
                     b[target] = p[source];
                 }
             }
