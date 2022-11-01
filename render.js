@@ -192,7 +192,6 @@ export class Renderer {
 
         if (transform.flip_y && transform.flip_x && transform.rotation == 90) {
             new_rotation = 180;
-            //console.log(text, effects, new_effects, transform);
         }
 
         this.push(
@@ -472,7 +471,7 @@ export class Renderer {
         this.ctx.textAlign = e.h_align;
         this.ctx.textBaseline = {
             top: "top",
-            center: "center",
+            center: "middle",
             bottom: "bottom",
         }[e.v_align];
     }
@@ -541,8 +540,8 @@ export class Renderer {
         this.ctx.closePath();
         this.ctx.stroke();
 
-        this.push(s + 0.254, 0);
-        this.ctx.textBaseline = "middle";
+        this.push(s + 0.254, 0, -l.at.rotation);
+        this.apply_Effects(l.effects);
         this.draw_text_normalized(l.name, l.effects);
         this.pop();
         this.pop();
@@ -662,7 +661,7 @@ export class Renderer {
     }
 
     draw_LibrarySymbol(s) {
-        for (const c of Object.values(s.children).slice().reverse()) {
+        for (const c of s.children.slice().reverse()) {
             this.draw_LibrarySymbol(c);
         }
 
@@ -680,7 +679,7 @@ export class Renderer {
     bbox_LibrarySymbol(s) {
         let bb = new BBox(0, 0, 0, 0, null, s);
 
-        for (const c of Object.values(s.children)) {
+        for (const c of s.children) {
             bb = BBox.combine(bb, this.bbox_LibrarySymbol(c), s);
         }
 
@@ -701,7 +700,7 @@ export class Renderer {
             );
         }
 
-        for (const c of Object.values(s.children)) {
+        for (const c of s.children) {
             this.draw_LibrarySymbol_Pins(
                 c,
                 s.hide_pin_names,
@@ -725,7 +724,7 @@ export class Renderer {
             }
         }
 
-        for (const c of Object.values(s.children)) {
+        for (const c of s.children) {
             bb = BBox.combine(
                 bb,
                 this.bbox_LibrarySymbol_Pins(c, s.hide_pin_names)
