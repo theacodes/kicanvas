@@ -128,6 +128,8 @@ function parse_points(e) {
 }
 
 export class Rectangle {
+    static sort_order = 48;
+
     constructor(e) {
         const start = e.expect_expr("start");
         this.start = { x: start.expect_number(), y: start.expect_number() };
@@ -139,6 +141,8 @@ export class Rectangle {
 }
 
 export class Polyline {
+    static sort_order = 47;
+
     constructor(e) {
         this.pts = parse_points(e);
         this.stroke = new Stroke(e.expect_expr("stroke"));
@@ -147,6 +151,8 @@ export class Polyline {
 }
 
 export class Circle {
+    static sort_order = 48;
+
     constructor(e) {
         const center = e.expect_expr("center");
         this.center = { x: center.expect_number(), y: center.expect_number() };
@@ -157,6 +163,8 @@ export class Circle {
 }
 
 export class Arc {
+    static sort_order = 48;
+
     constructor(e) {
         const start = e.expect_expr("start");
         this.start = { x: start.expect_number(), y: start.expect_number() };
@@ -197,7 +205,7 @@ export class LibrarySymbol {
         this.on_board = e.maybe_pair_atom("on_board") === "yes";
 
         this.properties = {};
-        this.children = {};
+        this.children = [];
         this.graphics = [];
         this.pins = {};
 
@@ -210,7 +218,7 @@ export class LibrarySymbol {
             }
             if ((se = e.maybe_expr("symbol")) !== null) {
                 const s = new LibrarySymbol(se);
-                this.children[s.id] = s;
+                this.children.push(s);
                 continue;
             }
             if ((se = e.maybe_expr("rectangle")) !== null) {
@@ -241,6 +249,17 @@ export class LibrarySymbol {
             console.log("unknown", e.element);
             break;
         }
+
+        this.graphics.sort((a, b) => {
+            // see EDA_SHAPE::Compare
+            const type_sort = a.constructor.sort_order - b.constructor.sort_order;
+            if(type_sort !== 0) {
+                return type_sort;
+            }
+            const a_bg = a.fill === "background" ? 1 : 0;
+            const b_bg = b.fill === "background" ? 1 : 0;
+            return a_bg - b_bg;
+        }).reverse();
     }
 }
 
@@ -252,6 +271,8 @@ export class PinInstance {
 }
 
 export class SymbolInstance {
+    static sort_order = 57;
+
     constructor(e) {
         this.lib_name = e.maybe_pair_string("lib_name");
         this.lib_id = e.expect_pair_string("lib_id");
@@ -285,6 +306,8 @@ export class SymbolInstance {
 }
 
 export class Wire {
+    static sort_order = 45;
+
     constructor(e) {
         this.pts = parse_points(e);
         this.stroke = new Stroke(e.expect_expr("stroke"));
@@ -293,6 +316,8 @@ export class Wire {
 }
 
 export class Junction {
+    static sort_order = 43;
+
     constructor(e) {
         this.at = new At(e.expect_expr("at"));
         this.diameter = e.expect_pair_number("diameter");
@@ -302,6 +327,8 @@ export class Junction {
 }
 
 export class Label {
+    static sort_order = 53;
+
     constructor(e) {
         this.name = e.expect_string();
         this.at = new At(e.expect_expr("at"));
@@ -311,6 +338,8 @@ export class Label {
 }
 
 export class HierarchicalLabel {
+    static sort_order = 54;
+
     constructor(e) {
         this.name = e.expect_string();
         this.shape = e.expect_pair_atom("shape");
@@ -321,6 +350,8 @@ export class HierarchicalLabel {
 }
 
 export class Text {
+    static sort_order = 51;
+
     constructor(e) {
         this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
@@ -335,6 +366,8 @@ export class Text {
 }
 
 export class NoConnect {
+    static sort_order = 44;
+
     constructor(e) {
         this.at = new At(e.expect_expr("at"));
         this.id = e.expect_pair_atom("uuid");
@@ -406,7 +439,7 @@ export class KicadSch {
             }
             if ((se = e.maybe_expr("symbol")) !== null) {
                 const symbol = new SymbolInstance(se);
-                symbol.lib_symbol = this.lib_symbols[symbol.lib_id];
+                symbol.lib_symbol = this.lib_symbols[symbol.lib_id] || this.lib_symbols[symbol.lib_name];
                 this.symbols[symbol.id] = symbol;
                 continue;
             }
