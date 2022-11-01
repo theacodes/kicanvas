@@ -26,7 +26,7 @@ svg {
 [data-kicanvas] {
     --font-family: Overpass;
     --font-size: 2.54;
-    --line-spacing: 1.5;
+    --line-spacing: 1.1;
     --background: #131218;
     --stroke: #F8F8F0;
     --stroke-width: 0.3;
@@ -49,9 +49,6 @@ svg {
 }
 
 [data-kicanvas].light {
-    --font-family: Overpass;
-    --font-size: 2.54;
-    --line-spacing: 1.5;
     --background: #F8F8F0;
     --stroke: #282634;
     --stroke-width: 0.3;
