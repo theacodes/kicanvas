@@ -19,20 +19,25 @@ const default_dialog_template = `
 `;
 
 export class KiCanvas {
-    static init() {
+    static async init() {
         for (const e of document.querySelectorAll("[data-kicanvas]")) {
             const kicanvas = new KiCanvas(e);
-            kicanvas.load_schematic();
+            try {
+                await kicanvas.load_schematic();
+            } catch(e) {
+                console.trace("Couldn't load schematic", e);
+            }
         }
     }
 
     constructor(container) {
+        this.selected = [];
+
         this.ui = {
             container: container,
             dialog_template: document.getElementById(
                 container.dataset.dialogTemplate
             ),
-            canvas: document.createElement("canvas"),
             highlight_all_button: container.querySelector(
                 "[data-highlight-all]"
             ),
@@ -43,16 +48,11 @@ export class KiCanvas {
             this.ui.dialog_template.innerHTML = default_dialog_template;
         }
 
-        this.ui.container.appendChild(this.ui.canvas);
-        this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
         if (this.ui.highlight_all_button) {
             this.ui.highlight_all_button.addEventListener("click", () => {
                 this.highlight_all();
             });
         }
-
-        this.renderer = new render.Renderer(this.ui.canvas);
-        this.selected = [];
     }
 
     async load_schematic(src) {
@@ -61,10 +61,18 @@ export class KiCanvas {
         const parsed = parser.parse(text);
         this.sch = new types.KicadSch(parsed);
 
+        this.ui.canvas = document.createElement("canvas");
+
+        this.ui.container.appendChild(this.ui.canvas);
+        this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
+
+        this.renderer = new render.Renderer(this.ui.canvas);
+
         const sch_bb = this.renderer.bbox(this.sch);
         sch_bb.grow(2);
 
         this.renderer.fit_to_bbox(sch_bb);
+        this.ui.container.classList.add("loaded");
 
         this.bboxes = this.renderer.interactive_bboxes(this.sch);
         for (const bb of this.bboxes) {
