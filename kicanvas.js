@@ -26,7 +26,7 @@ export class KiCanvas {
             const kicanvas = new KiCanvas(e);
             try {
                 await kicanvas.load_schematic();
-            } catch(e) {
+            } catch (e) {
                 console.trace("Couldn't load schematic", e);
             }
         }
@@ -54,6 +54,16 @@ export class KiCanvas {
             this.ui.highlight_all_button.addEventListener("click", () => {
                 this.highlight_all();
             });
+        }
+
+        if (this.ui.container.id) {
+            for (const el of document.querySelectorAll(
+                `a[href^="#${this.ui.container.id}:"]`
+            )) {
+                el.addEventListener("click", (e) => {
+                    this.onlink(e);
+                });
+            }
         }
     }
 
@@ -121,6 +131,23 @@ export class KiCanvas {
         if (this.selected) {
             this.show_dialog(this.selected[0].context);
         }
+    }
+
+    onlink(e) {
+        const [id, ref] = e.target.hash.split(":");
+        console.log(id, ref);
+
+        this.selected = [];
+        for (const b of this.bboxes) {
+            console.log(b.context?.properties?.Reference);
+            if (b.context?.properties?.Reference?.value == ref) {
+                this.selected = [b];
+            }
+        }
+
+        this.draw();
+
+        this.ui.container.scrollIntoView();
     }
 
     show_dialog(sym) {
