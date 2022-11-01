@@ -666,7 +666,7 @@ export class Renderer {
             this.draw_LibrarySymbol(c);
         }
 
-        for (const g of s.graphics.slice().reverse()) {
+        for (const g of s.graphics) {
             if (g.fill == "outline") {
                 this.ctx.fillStyle = this.style.symbol_stroke;
             } else {
