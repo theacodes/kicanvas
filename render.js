@@ -228,12 +228,14 @@ export class Renderer {
 
     draw_text_normalized(text, effects = null) {
         this.text_normalized_impl(text, effects, () => {
-            // this.ctx.save();
-            // this.ctx.beginPath();
-            // this.ctx.fillStyle = "pink";
-            // this.ctx.arc(0, 0, 0.2, 0, 360);
-            // this.ctx.fill();
-            // this.ctx.restore();
+            if(this.style.show_text_origin) {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.fillStyle = "pink";
+                this.ctx.arc(0, 0, 0.2, 0, 360);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
             this.ctx.fillText(text, 0, 0);
         });
     }
@@ -464,13 +466,13 @@ export class Renderer {
 
     apply_Effects(e) {
         if (!e) {
-            this.ctx.font = `${this.style.font_size}px "${this.style.font_family}"`;
+            this.ctx.font = `${1.27 * this.style.font_size}px "${this.style.font_family}"`;
             this.ctx.textAlign = "center";
             this.ctx.textBaseline = "center";
             return;
         }
 
-        this.ctx.font = `${e.size.y * 1.5}px "${this.style.font_family}"`;
+        this.ctx.font = `${e.size.y * this.style.font_size}px "${this.style.font_family}"`;
         this.ctx.textAlign = e.h_align;
         this.ctx.textBaseline = {
             top: "top",
@@ -755,7 +757,7 @@ export class Renderer {
     }
 
     draw_SymbolInstance(si) {
-        this.push(si.at.x, si.at.y, si.at.rotation, si.mirror === "y", true);
+        this.push(si.at.x, si.at.y, si.at.rotation, si.mirror === "y", si.mirror !== "x");
 
         this.draw_LibrarySymbol(si.lib_symbol);
         this.draw_LibrarySymbol_Pins(si.lib_symbol);
@@ -770,7 +772,7 @@ export class Renderer {
     bbox_SymbolInstance(si) {
         let bb = new BBox(0, 0, 0, 0, undefined, si);
 
-        this.push(si.at.x, si.at.y, si.at.rotation, si.mirror === "y", true);
+        this.push(si.at.x, si.at.y, si.at.rotation, si.mirror === "y", si.mirror !== "x")
 
         bb = BBox.combine(bb, this.bbox_LibrarySymbol(si.lib_symbol));
         bb = BBox.combine(bb, this.bbox_LibrarySymbol_Pins(si.lib_symbol));
