@@ -20,6 +20,7 @@ export class KiCanvas {
         this.ui.container.appendChild(this.ui.canvas);
         this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
         this.renderer = new render.Renderer(this.ui.canvas);
+        this.selected = null;
     }
 
     async load_schematic(src) {
@@ -44,8 +45,16 @@ export class KiCanvas {
     }
 
     draw() {
-        this.renderer.clear();
-        this.renderer.draw(this.sch);
+        window.requestAnimationFrame(() => {
+            this.renderer.clear();
+            this.renderer.draw(this.sch);
+            if(this.selected) {
+                this.renderer.ctx.shadowColor = this.renderer.style.highlight;
+                this.renderer.ctx.shadowBlur = 10;
+                this.renderer.draw(this.selected.context);
+                this.renderer.ctx.shadowColor = "transparent";
+            }
+        });
     }
 
     onclick(e) {
@@ -54,23 +63,18 @@ export class KiCanvas {
             e.clientY
         );
 
-        let selected;
+        this.selected = null;
         for (const b of this.bboxes) {
             if (b.contains_point(p.x, p.y)) {
-                selected = b;
+                this.selected = b;
                 break;
             }
         }
 
-        window.requestAnimationFrame(() => {
-            this.draw();
-            if(selected) {
-                this.renderer.draw_BBox(selected, this.renderer.style.highlight);
-            }
-        });
+        this.draw();
 
-        if (selected) {
-            this.show_dialog(selected.context);
+        if (this.selected) {
+            this.show_dialog(this.selected.context);
         }
     }
 
