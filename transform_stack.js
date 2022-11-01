@@ -7,10 +7,28 @@ class Transform {
         this.flip_y = flip_y;
     }
 
+    copy() {
+        return new Transform(this.x, this.y, this.rotation, this.flip_x, this.flip_y);
+    }
+
     apply(ctx) {
         ctx.translate(this.x, this.y);
         ctx.scale(this.flip_x ? -1 : 1, this.flip_y ? -1 : 1);
         ctx.rotate((this.rotation * Math.PI) / 180);
+    }
+
+    transform_point(x, y) {
+        const p = this.mat.transformPoint(new DOMPoint(x, y));
+        return {x: p.x, y: p.y};
+    }
+
+    normalize_rotation() {
+        while(this.rotation > 360) {
+            this.rotation -= 360;
+        }
+        while(this.rotation < 0) {
+            this.rotation += 360;
+        }
     }
 
     get mat() {
@@ -43,8 +61,11 @@ export class TransformStack {
     }
 
     get abs() {
-        const atx = new Transform();
-        for (const tx of this.t_stack) {
+        if (this.t_stack.length == 0) {
+            return new Transform();
+        }
+        const atx = this.t_stack[0].copy();
+        for (const tx of this.t_stack.slice(1)) {
             atx.rotation += tx.rotation;
             if (tx.flip_x) {
                 atx.flip_x = !atx.flip_x;
