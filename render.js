@@ -48,6 +48,10 @@ class Style {
         this.label = css.getPropertyValue("--label").trim() || "#DCC8FF";
         this.hierarchical_label =
             css.getPropertyValue("--hierarchical-label").trim() || "#A3FFCF";
+        this.crop_height = ![undefined, null, "", "false", "no", "0"].includes(
+            css.getPropertyValue("--crop-height").trim()
+        );
+        this.min_page_width = parseFloat(css.getPropertyValue("--min-page-width").trim()) || 0;
     }
 }
 
@@ -87,15 +91,15 @@ export class Renderer {
         this.set_default_styles();
     }
 
-    fit_to_bbox(bb, crop = false) {
+    fit_to_bbox(bb) {
         let canvas_rect = this.cvs.getBoundingClientRect();
+        const page_width = Math.max(this.style.min_page_width || 0, bb.w);
 
-        const w_scale = canvas_rect.width / bb.w;
+        const w_scale = canvas_rect.width / page_width;
         const h_scale = canvas_rect.height / bb.h;
         let scale = Math.min(w_scale, h_scale);
 
-        // crop height
-        if (crop) {
+        if (this.style.crop_height) {
             scale = w_scale;
             const new_height = scale * bb.h;
             this.cvs.height = Math.round(new_height * window.devicePixelRatio);
