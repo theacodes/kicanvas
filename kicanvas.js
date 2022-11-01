@@ -20,6 +20,8 @@ const default_dialog_template = `
 
 export class KiCanvas {
     static async init() {
+        await document.fonts.ready;
+
         for (const e of document.querySelectorAll("[data-kicanvas]")) {
             const kicanvas = new KiCanvas(e);
             try {
