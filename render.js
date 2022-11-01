@@ -241,9 +241,8 @@ export class Renderer {
             bb = BBox.from_points(
                 -metrics.actualBoundingBoxLeft,
                 -metrics.actualBoundingBoxAscent,
-                metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft,
-                metrics.actualBoundingBoxDescent +
-                    metrics.actualBoundingBoxAscent,
+                metrics.actualBoundingBoxRight,
+                metrics.actualBoundingBoxDescent,
                 this.transforms.mat,
                 text
             );
@@ -548,7 +547,23 @@ export class Renderer {
     }
 
     bbox_HierarchicalLabel(l) {
-        return this.bbox_Label(l);
+        if (l.effects?.hide) {
+            return new BBox();
+        }
+
+        this.push(l.at.x, l.at.y, l.at.rotation);
+
+        const s = 1.5;
+        const bb_shape = new BBox(-s, -s, s * 2, s * 2, this.transforms.mat);
+
+        this.push(s + 0.254, 0, -l.at.rotation);
+        this.apply_Effects(l.effects);
+        const bb_text = this.bbox_text_normalized(l.name, l.effects);
+        this.pop();
+
+        this.pop();
+
+        return BBox.combine(bb_shape, bb_text, l);
     }
 
     draw_Text(t) {
@@ -602,6 +617,7 @@ export class Renderer {
         }
 
         this.pop();
+
         return bb;
     }
 
@@ -758,7 +774,7 @@ export class Renderer {
         this.pop();
 
         for (const p of Object.values(si.properties)) {
-            bb = BBox.combine(bb, this.bbox_Property(si, p), si);
+            bb = BBox.combine(bb, this.bbox_Property(si, p, si.mirror), si);
         }
 
         return bb;
@@ -789,12 +805,17 @@ export class Renderer {
         this.pop();
     }
 
-    bbox_Property(si, p) {
+    bbox_Property(si, p, mirror) {
         if (p.hide || p.effects?.hide) {
             return new BBox();
         }
 
-        this.push(p.at.x, p.at.y, si.at.rotation + p.at.rotation);
+        this.push(
+            p.at.x,
+            p.at.y,
+            si.at.rotation + p.at.rotation,
+            mirror == "y"
+        );
         const bb = this.bbox_text_normalized(p.value, p.effects);
         this.pop();
 
