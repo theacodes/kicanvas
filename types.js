@@ -229,6 +229,10 @@ export class LibrarySymbol {
                 this.graphics.push(new Arc(se));
                 continue;
             }
+            if ((se = e.maybe_expr("text")) !== null) {
+                this.graphics.push(new Text(se));
+                continue;
+            }
             if ((se = e.maybe_expr("pin")) !== null) {
                 const p = new PinDefinition(se);
                 this.pins[p.number] = p;
@@ -249,6 +253,7 @@ export class PinInstance {
 
 export class SymbolInstance {
     constructor(e) {
+        this.lib_name = e.maybe_pair_string("lib_name");
         this.lib_id = e.expect_pair_string("lib_id");
         this.at = new At(e.expect_expr("at"));
         this.mirror = e.maybe_pair_atom("mirror");
@@ -305,11 +310,33 @@ export class Label {
     }
 }
 
+export class HierarchicalLabel {
+    constructor(e) {
+        this.name = e.expect_string();
+        this.shape = e.expect_pair_atom("shape");
+        this.at = new At(e.expect_expr("at"));
+        this.effects = new Effects(e.expect_expr("effects"));
+        this.id = e.expect_pair_atom("uuid");
+    }
+}
+
 export class Text {
     constructor(e) {
         this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
         this.effects = new Effects(e.expect_expr("effects"));
+        this.id = e.maybe_pair_atom("uuid");
+
+        // From sch_sexpr_parser.cpp:1598:
+        // "Yes, LIB_TEXT is really decidegrees even though all the others are degrees. :("
+        // motherfuck.
+        this.at.rotation = this.at.rotation / 10;
+    }
+}
+
+export class NoConnect {
+    constructor(e) {
+        this.at = new At(e.expect_expr("at"));
         this.id = e.expect_pair_atom("uuid");
     }
 }
@@ -339,6 +366,7 @@ export class KicadSch {
         this.junctions = {};
         this.graphics = [];
         this.labels = {};
+        this.hierarchical_labels = {};
         this.symbols = {};
 
         while (e.element) {
@@ -361,9 +389,19 @@ export class KicadSch {
                 this.labels[label.id] = label;
                 continue;
             }
+            if ((se = e.maybe_expr("hierarchical_label")) !== null) {
+                const label = new HierarchicalLabel(se);
+                this.hierarchical_labels[label.id] = label;
+                continue;
+            }
             if ((se = e.maybe_expr("text")) !== null) {
                 const text = new Text(se);
                 this.graphics.push(text);
+                continue;
+            }
+            if ((se = e.maybe_expr("no_connect")) !== null) {
+                const nc = new NoConnect(se);
+                this.graphics.push(nc);
                 continue;
             }
             if ((se = e.maybe_expr("symbol")) !== null) {
@@ -386,8 +424,8 @@ export class KicadSch {
     }
 
     *iter_graphics() {
-        for (const g of this.graphics) {
-            yield g;
+        for (const s of Object.values(this.symbols)) {
+            yield s;
         }
         for (const w of Object.values(this.wires)) {
             yield w;
@@ -398,8 +436,11 @@ export class KicadSch {
         for (const l of Object.values(this.labels)) {
             yield l;
         }
-        for (const s of Object.values(this.symbols)) {
-            yield s;
+        for (const l of Object.values(this.hierarchical_labels)) {
+            yield l;
+        }
+        for (const g of this.graphics) {
+            yield g;
         }
     }
 }
