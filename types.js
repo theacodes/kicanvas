@@ -48,14 +48,14 @@ class TitleBlock {
 }
 
 export class Property {
-    constructor(e, n) {
+    constructor(e, n, parent_props = undefined) {
         this.n = n;
         this.key = e.expect_string();
         this.value = e.expect_string();
         this.id = e.expect_pair_number("id");
         this.at = new At(e.expect_expr("at"));
         const effects = e.maybe_expr("effects");
-        this.effects = effects ? new Effects(effects) : null;
+        this.effects = effects ? new Effects(effects) : Effects.default();
     }
 }
 
@@ -72,7 +72,10 @@ export class Stroke {
 }
 
 export class Effects {
-    constructor(e) {
+    constructor(e = undefined) {
+        if (!e) {
+            return;
+        }
         const font = e.expect_expr("font");
         const font_size = font.expect_expr("size");
         this.size = {
@@ -80,8 +83,8 @@ export class Effects {
             y: font_size.expect_number(),
         };
         this.thickness = font.maybe_pair_number("thickness");
-        this.bold = font.maybe_atom("bold");
-        this.italic = font.maybe_atom("italic");
+        this.bold = font.maybe_atom("bold") || false;
+        this.italic = font.maybe_atom("italic") || false;
 
         this.h_align = "center";
         this.v_align = "center";
@@ -114,6 +117,23 @@ export class Effects {
         }
 
         this.hide = e.maybe_atom("hide") ? true : false;
+    }
+
+    static default() {
+        const e = new Effects();
+        e.size = {x: 1.27, y: 1.27};
+        e.bold = false;
+        e.italic = false;
+        e.h_align = "center";
+        e.v_align = "center";
+        e.mirror = false;
+        e.hide = false;
+    }
+
+    copy() {
+        const e = new Effects();
+        Object.assign(e, window.structuredClone(this));
+        return e;
     }
 }
 
@@ -200,7 +220,9 @@ export class LibrarySymbol {
         this.hide_pin_numbers = e.maybe_pair_atom("pin_numbers") === "hide";
         const pin_names = e.maybe_expr("pin_names");
         this.pin_name_offset = pin_names?.maybe_pair_number("offset") || 0.508;
-        this.hide_pin_names = pin_names ? pin_names.maybe_atom("hide") !== null : false;
+        this.hide_pin_names = pin_names
+            ? pin_names.maybe_atom("hide") !== null
+            : false;
         this.in_bom = e.maybe_pair_atom("in_bom") === "yes";
         this.on_board = e.maybe_pair_atom("on_board") === "yes";
 
@@ -212,7 +234,10 @@ export class LibrarySymbol {
         while (e.element) {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
-                const p = new Property(se, Object.values(this.properties).length);
+                const p = new Property(
+                    se,
+                    Object.values(this.properties).length
+                );
                 this.properties[p.key] = p;
                 continue;
             }
@@ -250,16 +275,19 @@ export class LibrarySymbol {
             break;
         }
 
-        this.graphics.sort((a, b) => {
-            // see EDA_SHAPE::Compare
-            const type_sort = a.constructor.sort_order - b.constructor.sort_order;
-            if(type_sort !== 0) {
-                return type_sort;
-            }
-            const a_bg = a.fill === "background" ? 1 : 0;
-            const b_bg = b.fill === "background" ? 1 : 0;
-            return a_bg - b_bg;
-        }).reverse();
+        this.graphics
+            .sort((a, b) => {
+                // see EDA_SHAPE::Compare
+                const type_sort =
+                    a.constructor.sort_order - b.constructor.sort_order;
+                if (type_sort !== 0) {
+                    return type_sort;
+                }
+                const a_bg = a.fill === "background" ? 1 : 0;
+                const b_bg = b.fill === "background" ? 1 : 0;
+                return a_bg - b_bg;
+            })
+            .reverse();
     }
 }
 
@@ -273,9 +301,13 @@ export class PinInstance {
 export class SymbolInstance {
     static sort_order = 57;
 
-    constructor(e) {
+    constructor(e, lib_symbols) {
         this.lib_name = e.maybe_pair_string("lib_name");
         this.lib_id = e.expect_pair_string("lib_id");
+        this.lib_symbol =
+            lib_symbols[this.lib_id] ||
+            lib_symbols[this.lib_name];
+
         this.at = new At(e.expect_expr("at"));
         this.mirror = e.maybe_pair_atom("mirror");
         this.unit = e.maybe_pair_any("unit");
@@ -290,7 +322,11 @@ export class SymbolInstance {
         while (e.element) {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
-                const p = new Property(se, Object.values(this.properties).length);
+                const p = new Property(
+                    se,
+                    Object.values(this.properties).length,
+                    this.lib_symbol.properties,
+                );
                 this.properties[p.key] = p;
                 continue;
             }
@@ -379,7 +415,7 @@ export class KicadSch {
         // This can either be a full schematic or a "fragment" from copying and
         // pasting.
 
-        if(e.maybe_atom("kicad_sch")) {
+        if (e.maybe_atom("kicad_sch")) {
             this.version = e.expect_pair_number("version");
             this.generator = e.expect_pair_atom("generator");
             this.uuid = e.expect_pair_atom("uuid");
@@ -438,8 +474,7 @@ export class KicadSch {
                 continue;
             }
             if ((se = e.maybe_expr("symbol")) !== null) {
-                const symbol = new SymbolInstance(se);
-                symbol.lib_symbol = this.lib_symbols[symbol.lib_id] || this.lib_symbols[symbol.lib_name];
+                const symbol = new SymbolInstance(se, this.lib_symbols);
                 this.symbols[symbol.id] = symbol;
                 continue;
             }
