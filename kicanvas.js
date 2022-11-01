@@ -2,9 +2,25 @@ import * as parser from "./parser.js";
 import * as types from "./types.js";
 import * as render from "./render.js";
 
+const default_dialog_template = `
+<dialog class="kicanvas-dialog">
+    <form method="dialog">
+        <div class="properties">
+            <template>
+                <div class="property">
+                    <label data-bind data-bind-inner-text="key" data-bind-html-for="key"></label>
+                    <input type="text" readonly data-bind data-bind-id="key" data-bind-name="key" data-bind-value="value" />
+                </div>
+            </template>
+        </div>
+        <button>Close</button>
+    </form>
+</dialog>
+`;
+
 export class KiCanvas {
     static init() {
-        for(const e of document.querySelectorAll("[data-kicanvas]")) {
+        for (const e of document.querySelectorAll("[data-kicanvas]")) {
             const kicanvas = new KiCanvas(e);
             kicanvas.load_schematic();
         }
@@ -13,14 +29,30 @@ export class KiCanvas {
     constructor(container) {
         this.ui = {
             container: container,
-            dialog_template: document.getElementById(container.dataset.dialogTemplate),
+            dialog_template: document.getElementById(
+                container.dataset.dialogTemplate
+            ),
             canvas: document.createElement("canvas"),
+            highlight_all_button: container.querySelector(
+                "[data-highlight-all]"
+            ),
         };
+
+        if (!this.ui.dialog_template) {
+            this.ui.dialog_template = document.createElement("template");
+            this.ui.dialog_template.innerHTML = default_dialog_template;
+        }
 
         this.ui.container.appendChild(this.ui.canvas);
         this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
+        if (this.ui.highlight_all_button) {
+            this.ui.highlight_all_button.addEventListener("click", () => {
+                this.highlight_all();
+            });
+        }
+
         this.renderer = new render.Renderer(this.ui.canvas);
-        this.selected = null;
+        this.selected = [];
     }
 
     async load_schematic(src) {
@@ -39,22 +71,25 @@ export class KiCanvas {
             bb.grow(2);
         }
 
-        window.requestAnimationFrame(() => {
-            this.draw();
-        });
+        this.draw();
     }
 
     draw() {
         window.requestAnimationFrame(() => {
             this.renderer.clear();
             this.renderer.draw(this.sch);
-            if(this.selected) {
-                this.renderer.ctx.shadowColor = this.renderer.style.highlight;
-                this.renderer.ctx.shadowBlur = 10;
-                this.renderer.draw(this.selected.context);
-                this.renderer.ctx.shadowColor = "transparent";
+            this.renderer.ctx.shadowColor = this.renderer.style.highlight;
+            this.renderer.ctx.shadowBlur = 10;
+            for (const selected of this.selected) {
+                this.renderer.draw(selected.context);
             }
+            this.renderer.ctx.shadowColor = "transparent";
         });
+    }
+
+    highlight_all() {
+        this.selected = this.bboxes.slice();
+        this.draw();
     }
 
     onclick(e) {
@@ -63,10 +98,10 @@ export class KiCanvas {
             e.clientY
         );
 
-        this.selected = null;
+        this.selected = [];
         for (const b of this.bboxes) {
             if (b.contains_point(p.x, p.y)) {
-                this.selected = b;
+                this.selected = [b];
                 break;
             }
         }
@@ -74,17 +109,18 @@ export class KiCanvas {
         this.draw();
 
         if (this.selected) {
-            this.show_dialog(this.selected.context);
+            this.show_dialog(this.selected[0].context);
         }
     }
 
     show_dialog(sym) {
         // create an empty dialog
-        if(this.ui.dialog) {
+        if (this.ui.dialog) {
             this.ui.dialog.remove();
         }
 
-        const dialog = this.ui.dialog_template.content.firstElementChild.cloneNode(true);
+        const dialog =
+            this.ui.dialog_template.content.firstElementChild.cloneNode(true);
         this.ui.dialog = dialog;
         window.document.body.appendChild(dialog);
 
@@ -101,9 +137,9 @@ export class KiCanvas {
         for (const p of props) {
             // Behold, the dumbest databinding ever.
             const e = prop_tmpl.content.cloneNode(true);
-            for(const b of e.querySelectorAll("[data-bind]")) {
-                for(let [target, source] of Object.entries(b.dataset)) {
-                    if(!target.startsWith("bind") || target == "bind") {
+            for (const b of e.querySelectorAll("[data-bind]")) {
+                for (let [target, source] of Object.entries(b.dataset)) {
+                    if (!target.startsWith("bind") || target == "bind") {
                         continue;
                     }
                     target = target.slice(4);
