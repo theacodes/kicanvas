@@ -100,7 +100,7 @@ export function* tokenize(input) {
             if (!escaping && c === '"') {
                 yield new Token(
                     Token.STRING,
-                    input.substring(start_idx + 1, i).replace("\\n", "\n"),
+                    input.substring(start_idx + 1, i).replaceAll("\\n", "\n"),
                 );
                 state = null;
                 escaping = false;
