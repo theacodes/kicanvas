@@ -117,6 +117,10 @@ export class Effects {
         }
 
         this.hide = e.maybe_atom("hide") ? true : false;
+
+        if(this.size.x == 0 || this.size.y == 0) {
+            this.hide = true;
+        }
     }
 
     static default() {
