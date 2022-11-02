@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Overpass:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 *,
 *::before,
 *::after {
@@ -70,9 +72,14 @@ svg {
     --hierarchical-label: #4E896B;
 }
 
-[data-kicanvas] canvas {
+[data-kicanvas] {
   width: 100%;
   height: 100vh;
+}
+
+[data-kicanvas] canvas {
+  width: 100%;
+  height: 100%;
 }
 
 .kicanvas-dialog {
