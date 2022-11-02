@@ -19,17 +19,17 @@ const default_dialog_template = `
 `;
 
 export class KiCanvas {
-    static async init() {
-        await document.fonts.ready;
-
-        for (const e of document.querySelectorAll("[data-kicanvas]")) {
-            const kicanvas = new KiCanvas(e);
-            try {
-                await kicanvas.load_schematic();
-            } catch (e) {
-                console.trace("Couldn't load schematic", e);
+    static init() {
+        window.addEventListener("load", async () => {
+            for (const e of document.querySelectorAll("[data-kicanvas]")) {
+                const kicanvas = new KiCanvas(e);
+                try {
+                    await kicanvas.load_schematic();
+                } catch (e) {
+                    console.trace("Couldn't load schematic", e);
+                }
             }
-        }
+        });
     }
 
     constructor(container) {
@@ -75,10 +75,12 @@ export class KiCanvas {
 
         this.ui.canvas = document.createElement("canvas");
 
-        this.ui.container.appendChild(this.ui.canvas);
+        this.ui.container.prepend(this.ui.canvas);
         this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
 
         this.renderer = new render.Renderer(this.ui.canvas);
+
+        await wait_for_font(this.renderer.style.font_family);
 
         const sch_bb = this.renderer.bbox(this.sch);
         sch_bb.grow(2);
@@ -128,7 +130,7 @@ export class KiCanvas {
 
         this.draw();
 
-        if (this.selected) {
+        if (this.selected.length) {
             this.show_dialog(this.selected[0].context);
         }
     }
@@ -147,7 +149,7 @@ export class KiCanvas {
 
         this.draw();
 
-        this.ui.container.scrollIntoView();
+        this.ui.container.scrollIntoView({ block: "nearest" });
     }
 
     show_dialog(sym) {
@@ -190,4 +192,23 @@ export class KiCanvas {
         // show the dialog
         dialog.showModal();
     }
+}
+
+async function wait_ms(s) {
+    return new Promise((resolve) => {
+        window.setTimeout(() => resolve(), s);
+    });
+}
+
+async function wait_for_font(name) {
+    const css_font_string = `24px ${name}`;
+    for(let i = 0; i < 20; i++) {
+        const fonts = await document.fonts.load(css_font_string);
+        if(fonts.length) {
+            return;
+        }
+        await wait_ms(100);
+    }
+
+    throw `unable to load font ${name}`;
 }
