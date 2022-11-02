@@ -1,3 +1,3 @@
-import { KiCanvas } from "./kicanvas.js";
+import { KiCanvas } from "./src/kicanvas.js";
 
 KiCanvas.init();
