@@ -82,8 +82,6 @@ export class Renderer {
         const rect = this.cvs.getBoundingClientRect();
         this.cvs.width = Math.round(rect.width * dpr);
         this.cvs.height = Math.round(rect.height * dpr);
-        this.cvs.style.width = `${Math.round(rect.width)}px`;
-        this.cvs.style.height = `${Math.round(rect.height)}px`;
         this.ctx.setTransform();
         this.ctx.scale(dpr, dpr);
 
@@ -103,10 +101,10 @@ export class Renderer {
             scale = w_scale;
             const new_height = scale * bb.h;
             this.cvs.height = Math.round(new_height * window.devicePixelRatio);
-            this.cvs.style.height = `${new_height}px`;
-            this.scale_for_device_pixel_ratio();
-            canvas_rect = this.cvs.getBoundingClientRect();
         }
+
+        this.scale_for_device_pixel_ratio();
+        canvas_rect = this.cvs.getBoundingClientRect();
 
         const scaled_canvas_w = canvas_rect.width / scale;
         const scaled_canvas_h = canvas_rect.height / scale;
@@ -255,6 +253,23 @@ export class Renderer {
         });
 
         return bb;
+    }
+
+    apply_Effects(e) {
+        if (!e) {
+            this.ctx.font = `${1.27 * this.style.font_size}px "${this.style.font_family}"`;
+            this.ctx.textAlign = "center";
+            this.ctx.textBaseline = "center";
+            return;
+        }
+
+        this.ctx.font = `${e.size.y * this.style.font_size}px "${this.style.font_family}"`;
+        this.ctx.textAlign = e.h_align;
+        this.ctx.textBaseline = {
+            top: "top",
+            center: "middle",
+            bottom: "bottom",
+        }[e.v_align];
     }
 
     draw_BBox(b, color = undefined) {
@@ -462,23 +477,6 @@ export class Renderer {
             this.transforms.mat,
             j
         );
-    }
-
-    apply_Effects(e) {
-        if (!e) {
-            this.ctx.font = `${1.27 * this.style.font_size}px "${this.style.font_family}"`;
-            this.ctx.textAlign = "center";
-            this.ctx.textBaseline = "center";
-            return;
-        }
-
-        this.ctx.font = `${e.size.y * this.style.font_size}px "${this.style.font_family}"`;
-        this.ctx.textAlign = e.h_align;
-        this.ctx.textBaseline = {
-            top: "top",
-            center: "middle",
-            bottom: "bottom",
-        }[e.v_align];
     }
 
     draw_Label(l) {
