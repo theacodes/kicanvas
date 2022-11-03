@@ -1,4 +1,10 @@
 /*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
+/*
     References:
     - https://dev-docs.kicad.org/en/file-formats/sexpr-intro/
     - https://gitlab.com/edea-dev/edea/-/tree/main/edea

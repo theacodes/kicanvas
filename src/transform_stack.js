@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 class Transform {
     constructor(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
         this.x = x;

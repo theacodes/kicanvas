@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 /* Ported from KiCAD's KiMATH trigo */
 
 function euclidean_norm(x, y) {

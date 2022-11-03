@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 import * as types from "./types.js";
 import { convert_arc_to_center_and_angles } from "./arc.js";
 import { TransformStack } from "./transform_stack.js";

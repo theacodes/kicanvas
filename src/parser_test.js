@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 import * as Parser from "./parser.js";
 

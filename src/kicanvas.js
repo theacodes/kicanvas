@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 import * as parser from "./parser.js";
 import * as types from "./types.js";
 import * as render from "./render.js";
