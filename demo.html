@@ -2,11 +2,14 @@
 <html>
 
 <head>
+  <link rel="preload" as="style" href="demo.css">
   <link rel="stylesheet" href="demo.css">
 </head>
 
 <body>
-  <div data-kicanvas class="" data-src="./example-schematics/fragment.kicad_sch"></div>
+  <kicad-schematic id="example" src="./example-schematics/fragment.kicad_sch">
+  </kicad-schematic>
+  <a href="#example:Y301">Y301</a>
 </body>
 
 <script type="module" src="./demo.js"></script>

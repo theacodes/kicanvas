@@ -67,12 +67,6 @@ export function $on(elem, event, callback, strict = true) {
     elem.addEventListener(event, callback);
 }
 
-export async function wait_ms(s) {
-    return new Promise((resolve) => {
-        window.setTimeout(() => resolve(), s);
-    });
-}
-
 /* Helper for working with template elements with simple interpolation. */
 export class TemplateElement {
     constructor(id) {
@@ -154,19 +148,6 @@ export const ObjectHelpers = {
 };
 
 export const CanvasHelpers = {
-    wait_for_font: async (name, timeout = 2) => {
-        const css_font_string = `24px ${name}`;
-        for (let i = 0; i < timeout * 10; i++) {
-            const fonts = await document.fonts.load(css_font_string);
-            if (fonts.length) {
-                return;
-            }
-            await wait_ms(100);
-        }
-
-        throw `unable to load font ${name}`;
-    },
-
     scale_for_device_pixel_ratio: (canvas, context) => {
         const dpr = window.devicePixelRatio;
         const rect = canvas.getBoundingClientRect();

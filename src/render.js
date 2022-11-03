@@ -66,7 +66,7 @@ export class Renderer {
     constructor(canvas) {
         this.cvs = canvas;
         this.ctx = canvas.getContext("2d");
-        this.style = new Style(this.cvs);
+        this.style = new Style(this.cvs.parentNode);
 
         this.scale_for_device_pixel_ratio();
 
