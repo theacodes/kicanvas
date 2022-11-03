@@ -1,35 +1,29 @@
 import * as parser from "./parser.js";
 import * as types from "./types.js";
 import * as render from "./render.js";
-
-const default_dialog_template = `
-<dialog class="kicanvas-dialog">
-    <form method="dialog">
-        <div class="properties">
-            <template>
-                <div class="property">
-                    <label data-bind data-bind-inner-text="key" data-bind-html-for="key"></label>
-                    <input type="text" readonly data-bind data-bind-id="key" data-bind-name="key" data-bind-value="value" />
-                </div>
-            </template>
-        </div>
-        <button>Close</button>
-    </form>
-</dialog>
-`;
+import {
+    $e,
+    $s,
+    $q,
+    $on,
+    $onload,
+    $make,
+    $draw,
+    CanvasHelpers,
+    TemplateElement,
+} from "./utils.js";
 
 export class KiCanvas {
-    static init() {
-        window.addEventListener("load", async () => {
-            for (const e of document.querySelectorAll("[data-kicanvas]")) {
-                const kicanvas = new KiCanvas(e);
-                try {
-                    await kicanvas.load_schematic();
-                } catch (e) {
-                    console.trace("Couldn't load schematic", e);
-                }
+    static async init() {
+        await $onload();
+        for (const e of $s("[data-kicanvas]")) {
+            const kicanvas = new KiCanvas(e);
+            try {
+                await kicanvas.load_schematic();
+            } catch (e) {
+                console.trace("Couldn't load schematic", e);
             }
-        });
+        }
     }
 
     constructor(container) {
@@ -37,30 +31,25 @@ export class KiCanvas {
 
         this.ui = {
             container: container,
-            dialog_template: document.getElementById(
-                container.dataset.dialogTemplate
-            ),
-            highlight_all_button: container.querySelector(
-                "[data-highlight-all]"
-            ),
+            dialog_template: $e(container.dataset.dialogTemplate),
+            highlight_all_button: $q(container, "[data-highlight-all]"),
         };
 
         if (!this.ui.dialog_template) {
-            this.ui.dialog_template = document.createElement("template");
-            this.ui.dialog_template.innerHTML = default_dialog_template;
+            this.ui.dialog_template = $make("template", {
+                innerHTML: default_dialog_template,
+            });
         }
 
         if (this.ui.highlight_all_button) {
-            this.ui.highlight_all_button.addEventListener("click", () => {
+            $on(this.ui.highlight_all_button, "click", () => {
                 this.highlight_all();
             });
         }
 
         if (this.ui.container.id) {
-            for (const el of document.querySelectorAll(
-                `a[href^="#${this.ui.container.id}:"]`
-            )) {
-                el.addEventListener("click", (e) => {
+            for (const el of $s(`a[href^="#${this.ui.container.id}:"]`)) {
+                $on(el, "click", (e) => {
                     this.onlink(e);
                 });
             }
@@ -73,14 +62,12 @@ export class KiCanvas {
         const parsed = parser.parse(text);
         this.sch = new types.KicadSch(parsed);
 
-        this.ui.canvas = document.createElement("canvas");
-
+        this.ui.canvas = $make("canvas");
         this.ui.container.prepend(this.ui.canvas);
-        this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
 
         this.renderer = new render.Renderer(this.ui.canvas);
 
-        await wait_for_font(this.renderer.style.font_family);
+        await CanvasHelpers.wait_for_font(this.renderer.style.font_family);
 
         const sch_bb = this.renderer.bbox(this.sch);
         sch_bb.grow(2);
@@ -93,11 +80,13 @@ export class KiCanvas {
             bb.grow(2);
         }
 
+        this.ui.canvas.addEventListener("mousedown", (e) => this.onclick(e));
+
         this.draw();
     }
 
     draw() {
-        window.requestAnimationFrame(() => {
+        $draw(() => {
             this.renderer.clear();
             this.renderer.draw(this.sch);
             this.renderer.ctx.shadowColor = this.renderer.style.highlight;
@@ -137,11 +126,9 @@ export class KiCanvas {
 
     onlink(e) {
         const [id, ref] = e.target.hash.split(":");
-        console.log(id, ref);
 
         this.selected = [];
         for (const b of this.bboxes) {
-            console.log(b.context?.properties?.Reference);
             if (b.context?.properties?.Reference?.value == ref) {
                 this.selected = [b];
             }
@@ -158,57 +145,45 @@ export class KiCanvas {
             this.ui.dialog.remove();
         }
 
-        const dialog =
-            this.ui.dialog_template.content.firstElementChild.cloneNode(true);
-        this.ui.dialog = dialog;
-        window.document.body.appendChild(dialog);
+        const dialog_tmpl = new TemplateElement(this.ui.dialog_template);
 
-        console.log(dialog);
-        dialog.dataset.for = this.ui.container.id;
+        const dialog = dialog_tmpl.render_to(
+            document.body,
+            {
+                for: this.ui.container.id,
+                /* A hack to get around inner templates getting rendered. */
+                key: "${key}",
+                value: "${value}",
+            },
+            false
+        );
+
+        const prop_tmpl = new TemplateElement($q(dialog, "template"));
 
         // get all the properties and sort them
         const props = Object.values(sym.properties);
         props.sort((a, b) => a.n - b.n);
 
         // add them to the dialog
-        const prop_tmpl = dialog.querySelector("template");
-
-        for (const p of props) {
-            // Behold, the dumbest databinding ever.
-            const e = prop_tmpl.content.cloneNode(true);
-            for (const b of e.querySelectorAll("[data-bind]")) {
-                for (let [target, source] of Object.entries(b.dataset)) {
-                    if (!target.startsWith("bind") || target == "bind") {
-                        continue;
-                    }
-                    target = target.slice(4);
-                    target = target.slice(0, 1).toLowerCase() + target.slice(1);
-                    b[target] = p[source];
-                }
-            }
-            prop_tmpl.parentNode.appendChild(e);
-        }
+        prop_tmpl.render_all_to_parent(props);
 
         // show the dialog
         dialog.showModal();
     }
 }
 
-async function wait_ms(s) {
-    return new Promise((resolve) => {
-        window.setTimeout(() => resolve(), s);
-    });
-}
-
-async function wait_for_font(name) {
-    const css_font_string = `24px ${name}`;
-    for(let i = 0; i < 20; i++) {
-        const fonts = await document.fonts.load(css_font_string);
-        if(fonts.length) {
-            return;
-        }
-        await wait_ms(100);
-    }
-
-    throw `unable to load font ${name}`;
-}
+const default_dialog_template = `
+<dialog class="kicanvas-dialog" for="\${for}">
+    <form method="dialog">
+        <div class="properties">
+            <template>
+                <div class="property">
+                    <label for="\${key}">\${key}</label>
+                    <input type="text" readonly id="\${key}" name="\${key}" value="\${value}" />
+                </div>
+            </template>
+        </div>
+        <button>Close</button>
+    </form>
+</dialog>
+`;
