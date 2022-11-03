@@ -8,6 +8,7 @@ import * as types from "./types.js";
 import { convert_arc_to_center_and_angles } from "./arc.js";
 import { TransformStack } from "./transform_stack.js";
 import { BBox } from "./bbox.js";
+import { CanvasHelpers } from "./utils.js";
 
 class Style {
     constructor(e) {
@@ -84,13 +85,7 @@ export class Renderer {
     }
 
     scale_for_device_pixel_ratio() {
-        const dpr = window.devicePixelRatio;
-        const rect = this.cvs.getBoundingClientRect();
-        this.cvs.width = Math.round(rect.width * dpr);
-        this.cvs.height = Math.round(rect.height * dpr);
-        this.ctx.setTransform();
-        this.ctx.scale(dpr, dpr);
-
+        CanvasHelpers.scale_for_device_pixel_ratio(this.cvs, this.ctx);
         /* These must be set after setTransform, otherwise weird shit happens. */
         this.set_default_styles();
     }
@@ -122,11 +117,7 @@ export class Renderer {
     }
 
     screen_space_to_world_space(x, y) {
-        const dpr = window.devicePixelRatio;
-        const rect = this.cvs.getBoundingClientRect();
-        const ss_pt = new DOMPoint(x - rect.left, y - rect.top);
-        const mat = this.ctx.getTransform().inverse().scale(dpr, dpr);
-        return mat.transformPoint(ss_pt);
+        return CanvasHelpers.screen_space_to_world_space(this.cvs, this.ctx, x, y);
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {

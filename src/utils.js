@@ -166,4 +166,21 @@ export const CanvasHelpers = {
 
         throw `unable to load font ${name}`;
     },
+
+    scale_for_device_pixel_ratio: (canvas, context) => {
+        const dpr = window.devicePixelRatio;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        context.setTransform();
+        context.scale(dpr, dpr);
+    },
+
+    screen_space_to_world_space: (canvas, context, x, y) => {
+        const dpr = window.devicePixelRatio;
+        const rect = canvas.getBoundingClientRect();
+        const ss_pt = new DOMPoint(x - rect.left, y - rect.top);
+        const mat = context.getTransform().inverse().scale(dpr, dpr);
+        return mat.transformPoint(ss_pt);
+    },
 };
