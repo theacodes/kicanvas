@@ -57,7 +57,7 @@ class KicadSchematicElement extends HTMLElement {
     }
 
     setup_events() {
-        this.canvas.addEventListener("mousedown", (e) => {
+        $on(this.canvas, "mousedown", (e) => {
             const p = this.renderer.screen_space_to_world_space(
                 e.clientX,
                 e.clientY
@@ -72,7 +72,7 @@ class KicadSchematicElement extends HTMLElement {
             }
         });
 
-        window.addEventListener("popstate", (e) => {
+        $on(window, "popstate", (e) => {
             this.select_from_location_hash();
         });
     }
