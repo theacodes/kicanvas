@@ -13,52 +13,44 @@ import { CanvasHelpers } from "./utils.js";
 class Style {
     constructor(e) {
         const css = window.getComputedStyle(e);
-        this.font_family =
-            css.getPropertyValue("--font-family").trim() || "sans";
-        this.font_size = parseFloat(
-            css.getPropertyValue("--font-size").trim() || 2.54
-        );
-        this.line_spacing = parseFloat(
-            css.getPropertyValue("--line-spacing").trim() || 1.5
-        );
-        this.background =
-            css.getPropertyValue("--background").trim() || "#131218";
-        this.stroke = css.getPropertyValue("--stroke").trim() || "#F8F8F0";
-        this.stroke_width = parseFloat(
-            css.getPropertyValue("--stroke-width").trim() || 0.254
-        );
-        this.fill = css.getPropertyValue("--fill").trim() || "#F8F8F0";
-        this.highlight =
-            css.getPropertyValue("--highlight").trim() || "#C8FFE3";
-        this.symbol_fill =
-            css.getPropertyValue("--symbol-fill").trim() || "#433E56";
-        this.symbol_stroke =
-            css.getPropertyValue("--symbol-stroke").trim() || "#C5A3FF";
-        this.symbol_field =
-            css.getPropertyValue("--symbol-field").trim() || "#AE81FF";
-        this.symbol_ref =
-            css.getPropertyValue("--symbol-ref").trim() || "#81EEFF";
-        this.symbol_value =
-            css.getPropertyValue("--symbol-value").trim() || "#81EEFF";
-        this.wire = css.getPropertyValue("--wire").trim() || "#AE81FF";
-        this.junction = css.getPropertyValue("--junction").trim() || "#DCC8FF";
-        this.no_connect =
-            css.getPropertyValue("--no-connect").trim() || "#FF81AD";
-        this.pin_radius = parseFloat(
-            css.getPropertyValue("--pin-radius").trim() || 0.254
-        );
-        this.pin_color =
-            css.getPropertyValue("--pin-color").trim() || "#81FFBE";
-        this.pin_name = css.getPropertyValue("--pin-name").trim() || "#81FFBE";
-        this.pin_number =
-            css.getPropertyValue("--pin-number").trim() || "#64CB96";
-        this.label = css.getPropertyValue("--label").trim() || "#DCC8FF";
-        this.hierarchical_label =
-            css.getPropertyValue("--hierarchical-label").trim() || "#A3FFCF";
+
+        const p = (n) => {
+            return css
+                .getPropertyValue(n)
+                .trim()
+                .replace(/^"(.*)"$/, "$1");
+        };
+
+        const pf = (n) => {
+            return parseFloat(p(n));
+        };
+
+        this.font_family = p("--font-family") || "Arial";
+        this.font_size = pf("--font-size") || 2;
+        this.line_spacing = pf("--line-spacing") || 1.5;
+        this.background = p("--background") || "white";
+        this.stroke = p("--stroke") || "black";
+        this.stroke_width = pf("--stroke-width") || 0.254;
+        this.fill = p("--fill") || "black";
+        this.highlight = p("--highlight") || "cyan";
+        this.symbol_fill = p("--symbol-fill") || "gray";
+        this.symbol_stroke = p("--symbol-stroke") || "black";
+        this.symbol_field = p("--symbol-field") || "gray";
+        this.symbol_ref = p("--symbol-ref") || "black";
+        this.symbol_value = p("--symbol-value") || "black";
+        this.wire = p("--wire") || "black";
+        this.junction = p("--junction") || "green";
+        this.no_connect = p("--no-connect") || "red";
+        this.pin_radius = pf("--pin-radius") || 0.254;
+        this.pin_color = p("--pin-color") || "black";
+        this.pin_name = p("--pin-name") || "black";
+        this.pin_number = p("--pin-number") || "gray";
+        this.label = p("--label") || "black";
+        this.hierarchical_label = p("--hierarchical-label") || "black";
         this.crop_height = ![undefined, null, "", "false", "no", "0"].includes(
-            css.getPropertyValue("--crop-height").trim()
+            p("--crop-height")
         );
-        this.min_page_width = parseFloat(css.getPropertyValue("--min-page-width").trim()) || 0;
+        this.min_page_width = pf("--min-page-width") || 0;
     }
 }
 
@@ -117,7 +109,12 @@ export class Renderer {
     }
 
     screen_space_to_world_space(x, y) {
-        return CanvasHelpers.screen_space_to_world_space(this.cvs, this.ctx, x, y);
+        return CanvasHelpers.screen_space_to_world_space(
+            this.cvs,
+            this.ctx,
+            x,
+            y
+        );
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
@@ -223,7 +220,7 @@ export class Renderer {
 
     draw_text_normalized(text, effects = null) {
         this.text_normalized_impl(text, effects, () => {
-            if(this.style.show_text_origin) {
+            if (this.style.show_text_origin) {
                 this.ctx.save();
                 this.ctx.beginPath();
                 this.ctx.fillStyle = "pink";
@@ -254,13 +251,17 @@ export class Renderer {
 
     apply_Effects(e) {
         if (!e) {
-            this.ctx.font = `${1.27 * this.style.font_size}px "${this.style.font_family}"`;
+            this.ctx.font = `${1.27 * this.style.font_size}px "${
+                this.style.font_family
+            }"`;
             this.ctx.textAlign = "center";
             this.ctx.textBaseline = "center";
             return;
         }
 
-        this.ctx.font = `${e.size.y * this.style.font_size}px "${this.style.font_family}"`;
+        this.ctx.font = `${e.size.y * this.style.font_size}px "${
+            this.style.font_family
+        }"`;
         this.ctx.textAlign = e.h_align;
         this.ctx.textBaseline = {
             top: "top",
@@ -752,7 +753,13 @@ export class Renderer {
     }
 
     draw_SymbolInstance(si) {
-        this.push(si.at.x, si.at.y, si.at.rotation, si.mirror === "y", si.mirror !== "x");
+        this.push(
+            si.at.x,
+            si.at.y,
+            si.at.rotation,
+            si.mirror === "y",
+            si.mirror !== "x"
+        );
 
         this.draw_LibrarySymbol(si.lib_symbol);
         this.draw_LibrarySymbol_Pins(si.lib_symbol);
@@ -767,7 +774,13 @@ export class Renderer {
     bbox_SymbolInstance(si) {
         let bb = new BBox(0, 0, 0, 0, undefined, si);
 
-        this.push(si.at.x, si.at.y, si.at.rotation, si.mirror === "y", si.mirror !== "x")
+        this.push(
+            si.at.x,
+            si.at.y,
+            si.at.rotation,
+            si.mirror === "y",
+            si.mirror !== "x"
+        );
 
         bb = BBox.combine(bb, this.bbox_LibrarySymbol(si.lib_symbol));
         bb = BBox.combine(bb, this.bbox_LibrarySymbol_Pins(si.lib_symbol));
