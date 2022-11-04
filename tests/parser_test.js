@@ -5,7 +5,7 @@
 */
 
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
-import * as Parser from "./parser.js";
+import * as Parser from "../src/parser.js";
 
 Deno.test("Basic types", () => {
     Parser.parse("(abc)").expect_atom("abc");

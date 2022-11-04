@@ -5,14 +5,15 @@
 */
 
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
-import * as parser from "./parser.js";
-import * as items from "./items.js";
+import * as path from "https://deno.land/std/path/mod.ts";
+import * as parser from "../src/parser.js";
+import * as items from "../src/items.js";
 
 Deno.test("At", () => {
     const at = new items.At(parser.parse("(1 2)"));
     assertEquals(at.x, 1);
     assertEquals(at.y, 2);
-    assertEquals(at.rotation, null);
+    assertEquals(at.rotation, 0);
 
     const at2 = new items.At(parser.parse("(1 2 180)"));
     assertEquals(at2.x, 1);
@@ -21,11 +22,14 @@ Deno.test("At", () => {
 });
 
 Deno.test("Full KicadSch", async () => {
-    const kicad_sch_text = await Deno.readTextFile("./example1.kicad_sch");
+    const test_sch_location = path.join(
+        path.dirname(path.fromFileUrl(import.meta.url)),
+        "./test.kicad_sch"
+    );
+    const kicad_sch_text = await Deno.readTextFile(test_sch_location);
     const sexpr = parser.parse(kicad_sch_text);
-    const sch = new items.KicadSch(sexpr);
-    //console.log(Deno.inspect(sch.lib_symbols, {depth: 10, colors: true}));
+    const sch = new items.KicadSch(sexpr);;
     for (const g of sch.iter_graphics()) {
-        console.log(g);
+        console.log(g.constructor);
     }
 });
