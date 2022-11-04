@@ -25,10 +25,7 @@ svg {
   max-width: 100%;
 }
 
-[data-kicanvas] {
-    --font-family: Overpass;
-    --font-size: 1.5;
-    --line-spacing: 1.1;
+kicad-schematic.dark {
     --background: #131218;
     --stroke: #F8F8F0;
     --stroke-width: 0.3;
@@ -50,67 +47,31 @@ svg {
     --hierarchical-label: #A3FFCF;
 }
 
-[data-kicanvas].light {
-    --background: #F8F8F0;
-    --stroke: #282634;
-    --stroke-width: 0.3;
-    --fill: #131218;
-    --highlight: rgba(200, 255, 227, 0.5);
-    --symbol-fill: #DCC8FF;
-    --symbol-stroke: #433E56;
-    --symbol-field: #4E896B;
-    --symbol-ref: #716799;
-    --symbol-value: #716799;
-    --wire: ##433E56;
-    --junction: ##433E56;
-    --no-connect: #FF81AD;
-    --pin-radius: 0.254;
-    --pin-color: #634E89;
-    --pin-name: #433E56;
-    --pin-number: #716799;
-    --label: #CB6488;
-    --hierarchical-label: #4E896B;
+kicad-schematic, kicad-schematic.light {
+  --background: white;
+  --stroke: #282634;
+  --stroke-width: 0.3;
+  --fill: #131218;
+  --highlight: #19e0ff;
+  --symbol-fill: #dcc8ff;
+  --symbol-stroke: #433e56;
+  --symbol-field: #4e896b;
+  --symbol-ref: #716799;
+  --symbol-value: #716799;
+  --wire: ##433e56;
+  --junction: ##433e56;
+  --no-connect: #ff81ad;
+  --pin-radius: 0.254;
+  --pin-color: #634e89;
+  --pin-name: #433e56;
+  --pin-number: #716799;
+  --label: #cb6488;
+  --hierarchical-label: #4e896b;
 }
-
-[data-kicanvas] {
-  width: 100%;
-  height: 100vh;
-}
-
-[data-kicanvas] canvas {
-  width: 100%;
-  height: 100%;
-}
-
-.kicanvas-dialog {
-  font-size: 1.2rem;
-  margin: auto;
-  width: 30rem;
-  max-width: 80vw;
-}
-
-.kicanvas-dialog .property {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.kicanvas-dialog .property input {
-  font-size: 1.1rem;
-}
-
-.kicanvas-dialog button {
-  margin-top: 1rem;
-  margin-bottom: 0.25rem;
-  display: block;
-  width: 100%;
-}
-
-/* Custom element version */
 
 kicad-schematic {
-  font-family: Overpass;
+  --crop-height: yes;
+  --min-page-width: 100;
   --font-family: Overpass;
   width: 100%;
   height: 100vh;
@@ -119,4 +80,37 @@ kicad-schematic {
 kicad-schematic canvas {
   width: 100%;
   height: 100%;
+}
+
+kicad-schematic-dialog dialog {
+  font-size: 1.2rem;
+  margin: auto;
+  width: 30rem;
+  max-width: 80vw;
+  border: none;
+  box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 1.6rem;
+}
+
+kicad-schematic-dialog .property {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+kicad-schematic-dialog .property input {
+  font-size: 1.1rem;
+}
+
+kicad-schematic-dialog button {
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  display: block;
+  width: 100%;
+  border: 1px solid transparent;
+  background: #17a2b8;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
 }

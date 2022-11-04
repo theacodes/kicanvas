@@ -67,85 +67,14 @@ export function $on(elem, event, callback, strict = true) {
     elem.addEventListener(event, callback);
 }
 
-/* Helper for working with template elements with simple interpolation. */
-export class TemplateElement {
-    constructor(id) {
-        this._elem = $e(id);
-        this._parent = this._elem.parentNode;
-    }
-
-    render(ctx) {
-        let content = this._elem.innerHTML;
-        content = content.replace(/\${(.*?)}/g, (_, g) => {
-            return ObjectHelpers.get_property_by_path(ctx, g) || "";
-        });
-        const temp = $make("template", { innerHTML: content });
-        return temp.content.firstElementChild.cloneNode(true);
-    }
-
-    render_to(elem, ctx, empty_target = true) {
-        const target = $e(elem);
-        if (empty_target) {
-            DOMHelpers.remove_all_children(target);
-        }
-        const result = this.render(ctx);
-        target.append(result);
-        return result;
-    }
-
-    render_to_parent(ctx, empty_parent = true) {
-        return this.render_to(this._parent, ctx, empty_parent);
-    }
-
-    render_all_to_parent(ctxes) {
-        DOMHelpers.remove_all_children(this._parent);
-        for (const [n, ctx] of ctxes.entries()) {
-            ctx.$index = n;
-            this._parent.append(this.render(ctx));
-        }
-    }
+export function $event(e, name, detail, bubble = true) {
+    e.dispatchEvent(
+        new CustomEvent(name, {
+            detail: detail,
+            bubbles: bubble,
+        })
+    );
 }
-
-export const DOMHelpers = {
-    remove_all_children: (node) => {
-        var range = document.createRange();
-        range.selectNodeContents(node);
-        range.deleteContents();
-    },
-};
-
-export const ObjectHelpers = {
-    /* Why is it so hard to check if something is a string in JavaScript? */
-    is_string(val) {
-        return typeof val === "string" || val instanceof String;
-    },
-
-    /* Access nested object properties using a string, e.g. "order.email" */
-    get_property_by_path: (obj, key, strict = true) => {
-        const key_parts = key.split(".");
-        let value = obj;
-        for (const part of key_parts) {
-            if (!strict && (value === undefined || value == null)) {
-                return undefined;
-            }
-            value = value[part];
-        }
-        return value;
-    },
-
-    set_property_by_path: (obj, key, value, strict = true) => {
-        const key_parts = key.split(".");
-        let current_obj = obj;
-        for (const part of key_parts.slice(0, -1)) {
-            if (!strict && (part === undefined || part == null)) {
-                return;
-            }
-            current_obj = current_obj[part];
-        }
-
-        current_obj[key_parts.pop()] = value;
-    },
-};
 
 export const CanvasHelpers = {
     scale_for_device_pixel_ratio: (canvas, context) => {

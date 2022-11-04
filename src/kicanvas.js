@@ -7,7 +7,7 @@
 import * as parser from "./parser.js";
 import * as types from "./types.js";
 import * as render from "./render.js";
-import { $make, $draw } from "./utils.js";
+import { $make, $draw, $on, $event, $q } from "./utils.js";
 
 class KicadSchematicElement extends HTMLElement {
     constructor() {
@@ -90,7 +90,7 @@ class KicadSchematicElement extends HTMLElement {
         });
     }
 
-    select(items = []) {
+    select(items = [], event = true) {
         this.selected = items;
 
         if (this.hasAttribute("id") && this.selected.length == 1) {
@@ -100,6 +100,10 @@ class KicadSchematicElement extends HTMLElement {
             window.history.pushState({}, "", url);
         }
 
+        if (event && items.length) {
+            $event(this, "kicad-schematic:item-selected", items[0].context);
+        }
+
         this.draw();
     }
 
@@ -107,12 +111,12 @@ class KicadSchematicElement extends HTMLElement {
         this.select(this.selectable_items);
     }
 
-    select_by_reference(ref) {
+    select_by_reference(ref, event = true) {
         this.select();
         for (const i of this.selectable_items) {
             if (i.context?.properties?.Reference?.value == ref) {
-                this.select([i]);
-                break;
+                this.select([i], event);
+                return;
             }
         }
     }
@@ -123,10 +127,68 @@ class KicadSchematicElement extends HTMLElement {
             return;
         }
 
-        this.select_by_reference(ref);
+        this.select_by_reference(ref, false);
 
         this.scrollIntoView({ block: "nearest" });
     }
 }
 
 window.customElements.define("kicad-schematic", KicadSchematicElement);
+
+class KicadSchematicDialogElement extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    get dialog() {
+        return $q(this, "dialog");
+    }
+
+    async connectedCallback() {
+        this.render();
+        $on(document, "kicad-schematic:item-selected", (e) => {
+            this.on_item_selected(e.target, e.detail);
+        });
+    }
+
+    on_item_selected(sch, detail) {
+        console.log(sch, detail);
+        this.render_properties(detail.properties);
+        this.dialog.showModal();
+    }
+
+    render() {
+        const template = $make("template", {
+            innerHTML: `
+                <dialog>
+                    <form method="dialog">
+                        <div class="properties"></div>
+                        <button>Close</button>
+                    </form>
+                </dialog>`,
+        });
+
+        this.append(template.content.cloneNode(true));
+    }
+
+    render_properties(properties) {
+        const parent = $q(this, ".properties");
+        parent.innerHTML = "";
+
+        for (const [_, prop] of Object.entries(properties)) {
+            const template = $make("template", {
+                innerHTML: `
+                    <div class="property">
+                        <label for="${prop.key}">${prop.key}</label>
+                        <input type="text" readonly id="${prop.key}" name="${prop.key}" value="${prop.value}" />
+                    </div>`,
+            });
+            parent.append(template.content.cloneNode(true));
+        }
+    }
+}
+
+window.customElements.define(
+    "kicad-schematic-dialog",
+    KicadSchematicDialogElement
+);
