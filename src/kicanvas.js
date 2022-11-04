@@ -5,7 +5,7 @@
 */
 
 import * as parser from "./parser.js";
-import * as types from "./types.js";
+import * as items from "./items.js";
 import * as render from "./render.js";
 import { $make, $draw, $on, $event, $q } from "./utils.js";
 
@@ -31,7 +31,7 @@ class KicadSchematicElement extends HTMLElement {
         try {
             const sch_text = await (await window.fetch(src)).text();
             const sch_parsed = parser.parse(sch_text);
-            this.sch = new types.KicadSch(sch_parsed);
+            this.sch = new items.KicadSch(sch_parsed);
         } catch (e) {
             throw new Error(`Couldn't load schematic ${src}`);
         }

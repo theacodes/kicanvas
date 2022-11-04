@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as types from "./types.js";
+import * as items from "./items.js";
 import { convert_arc_to_center_and_angles } from "./arc.js";
 import { TransformStack } from "./transform_stack.js";
 import { BBox } from "./bbox.js";
@@ -149,7 +149,7 @@ export class Renderer {
     interactive_bboxes(v) {
         const out = [];
         for (const g of v.iter_graphics()) {
-            if ([types.SymbolInstance].includes(g.constructor)) {
+            if ([items.SymbolInstance].includes(g.constructor)) {
                 if (g.lib_symbol?.power) {
                     continue;
                 }
