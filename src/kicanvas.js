@@ -100,8 +100,8 @@ class KicadSchematicElement extends HTMLElement {
             window.history.pushState({}, "", url);
         }
 
-        if (event && items.length) {
-            $event(this, "kicad-schematic:item-selected", items[0].context);
+        if (event && this.selected.length == 1) {
+            $event(this, "kicad-schematic:item-selected", this.selected[0].context);
         }
 
         this.draw();
