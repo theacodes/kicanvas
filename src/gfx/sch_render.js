@@ -140,7 +140,8 @@ export class Renderer {
     }
 
     bbox(v) {
-        return this[`bbox_${v.constructor.name}`](v);
+        const bb = this[`bbox_${v.constructor.name}`](v);
+        return bb;
     }
 
     interactive_bboxes(v) {
@@ -236,7 +237,7 @@ export class Renderer {
         let bb = null;
 
         this.text_normalized_impl(text, effects, (_, metrics) => {
-            bb = BBox.from_points(
+            bb = BBox.from_corners(
                 -metrics.actualBoundingBoxLeft,
                 -metrics.actualBoundingBoxAscent,
                 metrics.actualBoundingBoxRight,
@@ -244,6 +245,8 @@ export class Renderer {
                 this.transforms.mat,
                 text
             );
+
+            bb.transform(this.transforms.mat);
         });
 
         return bb;
@@ -303,7 +306,7 @@ export class Renderer {
         let bb = new BBox();
         for (const g of sch.iter_graphics()) {
             const gbb = this.bbox(g);
-            bb = BBox.combine(bb, gbb);
+            bb = BBox.combine([bb, gbb]);
         }
         return bb;
     }
@@ -325,14 +328,9 @@ export class Renderer {
     }
 
     bbox_Rectangle(r) {
-        return BBox.from_points(
-            r.start.x,
-            r.start.y,
-            r.end.x,
-            r.end.y,
-            this.transforms.mat,
-            r
-        );
+        const bb = BBox.from_corners(r.start.x, r.start.y, r.end.x, r.end.y, r);
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_Polyline(pl) {
@@ -363,14 +361,9 @@ export class Renderer {
             max_y = Math.max(pt.y, max_y);
         }
 
-        return BBox.from_points(
-            min_x,
-            min_y,
-            max_x,
-            max_y,
-            this.transforms.mat,
-            pl
-        );
+        const bb = BBox.from_corners(min_x, min_y, max_x, max_y, pl);
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_Circle(c) {
@@ -384,14 +377,15 @@ export class Renderer {
     }
 
     bbox_Circle(c) {
-        return BBox.from_points(
+        const bb = BBox.from_corners(
             c.center.x - c.radius,
             c.center.y - c.radius,
             c.center.x + c.radius,
             c.center.y + c.radius,
-            this.transforms.mat,
             c
         );
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_Arc(a) {
@@ -402,14 +396,15 @@ export class Renderer {
     }
 
     bbox_Arc(a) {
-        return BBox.from_points(
+        const bb = BBox.from_corners(
             Math.min(a.start.x, a.mid.x, a.end.x),
             Math.min(a.start.y, a.mid.y, a.end.y),
             Math.max(a.start.x, a.mid.x, a.end.x),
             Math.max(a.start.y, a.mid.y, a.end.y),
-            this.transforms.mat,
             a
         );
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_Wire(w) {
@@ -423,14 +418,15 @@ export class Renderer {
     }
 
     bbox_Wire(w) {
-        return BBox.from_points(
+        const bb = BBox.from_corners(
             w.pts[0].x,
             w.pts[0].y,
             w.pts[1].x,
             w.pts[1].y,
-            this.transforms.mat,
             w
         );
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_Junction(j) {
@@ -442,14 +438,15 @@ export class Renderer {
 
     bbox_Junction(j) {
         const r = (j.diameter || 1) / 2;
-        return BBox.from_points(
+        const bb = BBox.from_corners(
             j.at.x - r,
             j.at.y - r,
             j.at.x + r,
             j.at.y + r,
-            this.transforms.mat,
             j
         );
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_NoConnect(nc) {
@@ -467,14 +464,15 @@ export class Renderer {
 
     bbox_NoConnect(j) {
         const r = 1;
-        return BBox.from_points(
+        const bb = BBox.from_corners(
             j.at.x - r,
             j.at.y - r,
             j.at.x + r,
             j.at.y + r,
-            this.transforms.mat,
             j
         );
+        bb.transform(this.transforms.mat);
+        return bb;
     }
 
     draw_Label(l) {
@@ -556,7 +554,9 @@ export class Renderer {
         this.push(l.at.x, l.at.y, l.at.rotation);
 
         const s = 1.5;
-        const bb_shape = new BBox(-s, -s, s * 2, s * 2, this.transforms.mat);
+        const bb_shape = new BBox(-s, -s, s * 2, s * 2).transform(
+            this.transforms.mat
+        );
 
         this.push(s + 0.254, 0, -l.at.rotation);
         this.apply_Effects(l.effects);
@@ -565,7 +565,7 @@ export class Renderer {
 
         this.pop();
 
-        return BBox.combine(bb_shape, bb_text, l);
+        return BBox.combine([bb_shape, bb_text], l);
     }
 
     draw_Text(t) {
@@ -602,17 +602,16 @@ export class Renderer {
             this.text_normalized_impl(line, t.effects, () => {
                 const metrics = this.ctx.measureText(line);
 
-                bb = BBox.combine(
-                    bb,
-                    BBox.from_points(
-                        -metrics.actualBoundingBoxLeft,
-                        y - metrics.actualBoundingBoxAscent,
-                        metrics.actualBoundingBoxRight,
-                        y + metrics.actualBoundingBoxDescent,
-                        this.transforms.mat,
-                        t
-                    )
+                const line_bb = BBox.from_corners(
+                    -metrics.actualBoundingBoxLeft,
+                    y - metrics.actualBoundingBoxAscent,
+                    metrics.actualBoundingBoxRight,
+                    y + metrics.actualBoundingBoxDescent,
+                    t
                 );
+                line_bb.transform(this.transforms.mat);
+
+                bb = BBox.combine([bb, line_bb], t);
 
                 y -= metrics.actualBoundingBoxAscent * this.style.line_spacing;
             });
@@ -672,7 +671,9 @@ export class Renderer {
         }
 
         this.push(p.at.x, p.at.y, p.at.rotation);
-        const bbox = new BBox(0, 0, p.length, 0.254, this.transforms.mat, p);
+        const bbox = new BBox(0, 0, p.length, 0.254, p).transform(
+            this.transforms.mat
+        );
         this.pop();
         // TODO: Include name and number
         return bbox;
@@ -695,16 +696,17 @@ export class Renderer {
     }
 
     bbox_LibrarySymbol(s) {
-        let bb = new BBox(0, 0, 0, 0, null, s);
+        let bb = new BBox(0, 0, 0, 0, s);
 
         for (const c of s.children) {
-            bb = BBox.combine(bb, this.bbox_LibrarySymbol(c), s);
+            const child_bb = this.bbox_LibrarySymbol(c);
+            bb = BBox.combine([bb, child_bb], s);
         }
 
         for (const g of s.graphics) {
-            bb = BBox.combine(bb, this.bbox(g), s);
+            const g_bb = this.bbox(g);
+            bb = BBox.combine([bb, g_bb], s);
         }
-
         return bb;
     }
 
@@ -738,15 +740,15 @@ export class Renderer {
                 s.hide_pin_numbers
             );
             if (pin_bb) {
-                bb = BBox.combine(bb, pin_bb);
+                bb = BBox.combine([bb, pin_bb]);
             }
         }
 
         for (const c of s.children) {
-            bb = BBox.combine(
+            bb = BBox.combine([
                 bb,
-                this.bbox_LibrarySymbol_Pins(c, s.hide_pin_names)
-            );
+                this.bbox_LibrarySymbol_Pins(c, s.hide_pin_names),
+            ]);
         }
 
         return bb;
@@ -772,7 +774,7 @@ export class Renderer {
     }
 
     bbox_SymbolInstance(si) {
-        let bb = new BBox(0, 0, 0, 0, undefined, si);
+        let bb = new BBox(0, 0, 0, 0, si);
 
         this.push(
             si.at.x,
@@ -782,13 +784,16 @@ export class Renderer {
             si.mirror !== "x"
         );
 
-        bb = BBox.combine(bb, this.bbox_LibrarySymbol(si.lib_symbol));
-        bb = BBox.combine(bb, this.bbox_LibrarySymbol_Pins(si.lib_symbol));
+        bb = BBox.combine([
+            bb,
+            this.bbox_LibrarySymbol(si.lib_symbol),
+            this.bbox_LibrarySymbol_Pins(si.lib_symbol),
+        ]);
 
         this.pop();
 
         for (const p of Object.values(si.properties)) {
-            bb = BBox.combine(bb, this.bbox_Property(si, p, si.mirror), si);
+            bb = BBox.combine([bb, this.bbox_Property(si, p, si.mirror)], si);
         }
 
         return bb;

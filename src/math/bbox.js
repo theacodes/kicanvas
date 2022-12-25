@@ -5,48 +5,85 @@
 */
 
 export class BBox {
-    constructor(
-        x = 0,
-        y = 0,
-        w = 0,
-        h = 0,
-        mat = undefined,
-        context = undefined
-    ) {
+    constructor(x = 0, y = 0, w = 0, h = 0, context = undefined) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-
-        if (mat) {
-            this.transform(mat);
-        }
-
         this.context = context;
     }
 
-    static from_points(x1, y1, x2, y2, mat, context) {
-        return new BBox(x1, y1, x2 - x1, y2 - y1, mat, context);
+    copy() {
+        return new BBox(this.x, this.y, this.w, this.h, this.context);
     }
 
-    static combine(r1, r2, context) {
-        if (!r1.valid) {
-            return new BBox(r2.x, r2.y, r2.w, r2.h, null, context);
+    static from_corners(x1, y1, x2, y2, context) {
+        if (x2 < x1) {
+            [x1, x2] = [x2, x1];
         }
-        if (!r2.valid) {
-            return new BBox(r1.x, r1.y, r1.w, r1.h, null, context);
+        if (y2 < y1) {
+            [y1, y2] = [y2, y1];
+        }
+        return new BBox(x1, y1, x2 - x1, y2 - y1, context);
+    }
+
+    static from_points(points, context) {
+        const start = points[0].copy();
+        const end = points[0].copy();
+
+        for (const p of points) {
+            start.x = Math.min(start.x, p.x);
+            start.y = Math.min(start.y, p.y);
+            end.x = Math.max(end.x, p.x);
+            end.y = Math.max(end.y, p.y);
         }
 
-        const x = Math.min(r1.x, r2.x);
-        const y = Math.min(r1.y, r2.y);
-        const x2 = Math.max(r1.x2, r2.x2);
-        const y2 = Math.max(r1.y2, r2.y2);
+        return BBox.from_corners(start.x, start.y, end.x, end.y, context);
+    }
 
-        return BBox.from_points(x, y, x2, y2, null, context);
+    static combine(boxes, context) {
+        let min_x = Number.MAX_VALUE;
+        let min_y = Number.MAX_VALUE;
+        let max_x = Number.MIN_VALUE;
+        let max_y = Number.MIN_VALUE;
+
+        for (const box of boxes) {
+            if (!box.valid) {
+                continue;
+            }
+
+            min_x = Math.min(min_x, box.x);
+            min_y = Math.min(min_y, box.y);
+            max_x = Math.max(max_x, box.x2);
+            max_y = Math.max(max_y, box.y2);
+        }
+
+        if (
+            min_x == Number.MAX_VALUE ||
+            min_y == Number.MAX_VALUE ||
+            max_x == Number.MIN_VALUE ||
+            max_y == Number.MIN_VALUE
+        ) {
+            return new BBox(0, 0, 0, 0, context);
+        }
+
+        return BBox.from_corners(min_x, min_y, max_x, max_y, context);
     }
 
     get valid() {
-        return this.w !== 0 || this.h !== 0;
+        return (
+            (this.w !== 0 || this.h !== 0) &&
+            this.w !== undefined &&
+            this.h !== undefined
+        );
+    }
+
+    get start() {
+        return new Vec2(this.x, this.y);
+    }
+
+    get end() {
+        return new Vec2(this.x + this.w, this.y + this.h);
     }
 
     get x2() {
@@ -72,12 +109,14 @@ export class BBox {
     }
 
     transform(mat) {
+        // TODO: Make this use Matrix3
         const p1 = mat.transformPoint(new DOMPoint(this.x, this.y));
         const p2 = mat.transformPoint(new DOMPoint(this.x2, this.y2));
         this.x = p1.x;
         this.y = p1.y;
         this.x2 = p2.x;
         this.y2 = p2.y;
+        return this;
     }
 
     grow(v) {
@@ -85,9 +124,10 @@ export class BBox {
         this.y -= v;
         this.w += v * 2;
         this.h += v * 2;
+        return this;
     }
 
     contains_point(x, y) {
-        return (x >= this.x && x <= this.x2 && y >= this.y && y <= this.y2);
+        return x >= this.x && x <= this.x2 && y >= this.y && y <= this.y2;
     }
 }
