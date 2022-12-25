@@ -10,6 +10,8 @@
     - https://gitlab.com/edea-dev/edea/-/tree/main/edea
 */
 
+import { Vec2 } from "../math/vec2.js";
+
 export class At {
     constructor(e) {
         this.x = e.expect_number();
@@ -84,10 +86,10 @@ export class Effects {
         }
         const font = e.expect_expr("font");
         const font_size = font.expect_expr("size");
-        this.size = {
-            x: font_size.expect_number(),
-            y: font_size.expect_number(),
-        };
+        this.size = new Vec2(
+            font_size.expect_number(),
+            font_size.expect_number()
+        );
         this.thickness = font.maybe_pair_number("thickness");
         this.bold = font.maybe_atom("bold") || false;
         this.italic = font.maybe_atom("italic") || false;
@@ -124,14 +126,14 @@ export class Effects {
 
         this.hide = e.maybe_atom("hide") ? true : false;
 
-        if(this.size.x == 0 || this.size.y == 0) {
+        if (this.size.x == 0 || this.size.y == 0) {
             this.hide = true;
         }
     }
 
     static default() {
         const e = new Effects();
-        e.size = {x: 1.27, y: 1.27};
+        e.size = new Vec2(1.27, 1.27);
         e.bold = false;
         e.italic = false;
         e.h_align = "center";
@@ -152,7 +154,7 @@ function parse_points(e) {
     e = e.expect_expr("pts");
     let c;
     while ((c = e.maybe_expr("xy")) !== null) {
-        pts.push({ x: c.expect_number(), y: c.expect_number() });
+        pts.push(new Vec2(c.expect_number(), c.expect_number()));
     }
     return pts;
 }
@@ -162,9 +164,9 @@ export class Rectangle {
 
     constructor(e) {
         const start = e.expect_expr("start");
-        this.start = { x: start.expect_number(), y: start.expect_number() };
+        this.start = new Vec2(start.expect_number(), start.expect_number());
         const end = e.expect_expr("end");
-        this.end = { x: end.expect_number(), y: end.expect_number() };
+        this.end = new Vec2(end.expect_number(), end.expect_number());
         this.stroke = new Stroke(e.expect_expr("stroke"));
         this.fill = e.expect_expr("fill").expect_pair_atom("type");
     }
@@ -185,7 +187,7 @@ export class Circle {
 
     constructor(e) {
         const center = e.expect_expr("center");
-        this.center = { x: center.expect_number(), y: center.expect_number() };
+        this.center = new Vec2(center.expect_number(), center.expect_number());
         this.radius = e.expect_pair_number("radius");
         this.stroke = new Stroke(e.expect_expr("stroke"));
         this.fill = e.expect_expr("fill").expect_pair_atom("type");
@@ -197,11 +199,11 @@ export class Arc {
 
     constructor(e) {
         const start = e.expect_expr("start");
-        this.start = { x: start.expect_number(), y: start.expect_number() };
+        this.start = new Vec2(start.expect_number(), start.expect_number());
         const mid = e.expect_expr("mid");
-        this.mid = { x: mid.expect_number(), y: mid.expect_number() };
+        this.mid = new Vec2(mid.expect_number(), mid.expect_number());
         const end = e.expect_expr("end");
-        this.end = { x: end.expect_number(), y: end.expect_number() };
+        this.end = new Vec2(end.expect_number(), end.expect_number());
         this.stroke = new Stroke(e.expect_expr("stroke"));
         this.fill = e.expect_expr("fill").expect_pair_atom("type");
     }
@@ -315,8 +317,7 @@ export class SymbolInstance {
         this.lib_name = e.maybe_pair_string("lib_name");
         this.lib_id = e.expect_pair_string("lib_id");
         this.lib_symbol =
-            lib_symbols[this.lib_id] ||
-            lib_symbols[this.lib_name];
+            lib_symbols[this.lib_id] || lib_symbols[this.lib_name];
 
         this.at = new At(e.expect_expr("at"));
         this.mirror = e.maybe_pair_atom("mirror");
@@ -335,7 +336,7 @@ export class SymbolInstance {
                 const p = new Property(
                     se,
                     Object.values(this.properties).length,
-                    this.lib_symbol.properties,
+                    this.lib_symbol.properties
                 );
                 this.properties[p.key] = p;
                 continue;
