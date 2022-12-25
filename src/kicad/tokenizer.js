@@ -32,7 +32,7 @@ function is_alpha(c) {
 }
 
 function is_whitespace(c) {
-    return (c === " " || c === "\n" || c === "\r" || c === "\t");
+    return c === " " || c === "\n" || c === "\r" || c === "\t";
 }
 
 export function* tokenize(input) {
@@ -59,7 +59,7 @@ export function* tokenize(input) {
                 state = "number";
                 start_idx = i;
                 continue;
-            } else if (is_alpha(c)) {
+            } else if (is_alpha(c) || c == "*") {
                 state = "atom";
                 start_idx = i;
                 continue;
@@ -69,7 +69,11 @@ export function* tokenize(input) {
                 throw `Unexpected character at index ${i}: ${c}`;
             }
         } else if (state === "atom") {
-            if (is_alpha(c) || is_digit(c) || c === "-" || c === "_") {
+            if (
+                is_alpha(c) ||
+                is_digit(c) ||
+                ["-", "_", ".", "*", "&"].includes(c)
+            ) {
                 continue;
             } else if (c === ")" || is_whitespace(c)) {
                 yield new Token(Token.ATOM, input.substring(start_idx, i));
@@ -78,10 +82,16 @@ export function* tokenize(input) {
                     yield close_token;
                 }
             } else {
-                throw `Unexpected character at index ${i}: ${c}, expected alphanumeric.`;
+                throw new Error(
+                    `Unexpected character while tokenizing atom at index ${i}: ${c}.`
+                );
             }
         } else if (state === "number") {
             if (c === "." || is_digit(c)) {
+                continue;
+            } else if (c.toLowerCase() === "x") {
+                /* Hex number */
+                state = "hex";
                 continue;
             } else if (
                 ["-", "a", "b", "c", "d", "e", "f"].includes(c.toLowerCase())
@@ -102,11 +112,28 @@ export function* tokenize(input) {
             } else {
                 throw `Unexpected character at index ${i}: ${c}, expected numeric.`;
             }
+        } else if (state === "hex") {
+            if (
+                is_digit(c) ||
+                ["a", "b", "c", "d", "e", "f", "_"].includes(c.toLowerCase())
+            ) {
+                continue;
+            } else if (c === ")" || is_whitespace(c)) {
+                const hexstr = input.substring(start_idx, i).replace("_", "");
+                yield new Token(Token.NUMBER, Number.parseInt(hexstr, 16));
+                state = null;
+                if (c === ")") {
+                    yield close_token;
+                }
+                continue;
+            } else {
+                throw `Unexpected character at index ${i}: ${c}, expected hexadecimal.`;
+            }
         } else if (state === "string") {
             if (!escaping && c === '"') {
                 yield new Token(
                     Token.STRING,
-                    input.substring(start_idx + 1, i).replaceAll("\\n", "\n"),
+                    input.substring(start_idx + 1, i).replaceAll("\\n", "\n")
                 );
                 state = null;
                 escaping = false;
