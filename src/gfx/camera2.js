@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Vec2 } from "./vec2.js";
-import { Matrix3 } from "./matrix3.js";
+import { Vec2 } from "../math/vec2.js";
+import { Matrix3 } from "../math/matrix3.js";
 
 class Camera2 {
     viewport_size;
