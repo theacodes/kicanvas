@@ -4,11 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as items from "./items.js";
-import { convert_arc_to_center_and_angles } from "./arc.js";
-import { TransformStack } from "./transform_stack.js";
-import { BBox } from "./bbox.js";
-import { CanvasHelpers } from "./utils.js";
+import * as items from "../kicad/sch_items.js";
+import { convert_arc_to_center_and_angles } from "../math/arc.js";
+import { TransformStack } from "../math/transform_stack.js";
+import { BBox } from "../math/bbox.js";
+import { CanvasHelpers } from "../utils.js";
 
 class Style {
     constructor(e) {

@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as parser from "./parser.js";
-import * as items from "./items.js";
-import * as render from "./render.js";
+import * as parser from "./kicad/parser.js";
+import * as items from "./kicad/sch_items.js";
+import * as render from "./gfx/sch_render.js";
 import { $make, $draw, $on, $event, $q } from "./utils.js";
 
 class KicadSchematicElement extends HTMLElement {
