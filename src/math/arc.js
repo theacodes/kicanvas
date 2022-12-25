@@ -4,15 +4,90 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-/* Ported from KiCAD's KiMATH trigo */
+import { Vec2 } from "./vec2.js";
 
-function euclidean_norm(x, y) {
-    return Math.sqrt(x * x + y * y);
+export class Arc {
+    constructor(center, radius, start_angle, end_angle, width) {
+        this.center = center;
+        this.radius = radius;
+        this.start_angle = start_angle;
+        this.end_angle = end_angle;
+        this.width = width;
+    }
+
+    static from_three_points(start, mid, end, width = 1) {
+        const u = 1000000;
+        const center = arc_center_from_three_points(
+            new Vec2(start.x * u, start.y * u),
+            new Vec2(mid.x * u, mid.y * u),
+            new Vec2(end.x * u, end.y * u)
+        );
+        center.x /= u;
+        center.y /= u;
+        const radius = center.sub(mid).length;
+        const start_radial = start.sub(center);
+        const mid_radial = mid.sub(center);
+        const end_radial = end.sub(center);
+        let start_angle = start_radial.angle.normalize();
+        let mid_angle = mid_radial.angle.normalize();
+        let end_angle = end_radial.angle.normalize();
+
+        if (start_angle.degrees > mid_angle.degrees) {
+            start_angle.degrees -= 360;
+        }
+
+        if (start_angle.degrees > end_angle.degrees) {
+            [start_angle, end_angle] = [end_angle, start_angle];
+        }
+
+        if (end_angle.degrees < mid_angle.degrees) {
+            [start_angle, end_angle] = [end_angle, start_angle];
+            end_angle.degrees += 360;
+        }
+
+        return new Arc(center, radius, start_angle, end_angle, width);
+    }
+
+    to_polyline() {
+        let start = this.start_angle.radians;
+        let end = this.end_angle.radians;
+        const points = [];
+
+        if (start > end) {
+            throw new Error(
+                `Invalid arc, starts at ${start} and ends at ${end}`
+            );
+        }
+
+        // TODO: Pull KiCAD's logic for this
+        for (let theta = start; theta < end; theta += Math.PI / 32) {
+            points.push(
+                new Vec2(
+                    this.center.x + Math.cos(theta) * this.radius,
+                    this.center.y + Math.sin(theta) * this.radius
+                )
+            );
+        }
+
+        // Add the last point explicity
+        points.push(
+            new Vec2(
+                this.center.x + Math.cos(end) * this.radius,
+                this.center.y + Math.sin(end) * this.radius
+            )
+        );
+
+        return {
+            points: points,
+            width: this.width,
+        };
+    }
 }
 
-function calc_arc_center(start, mid, end) {
+/* Ported from KiCAD's KiMATH trigo */
+function arc_center_from_three_points(start, mid, end) {
     const sqrt_1_2 = 0.7071067811865475244;
-    let center = { x: 0, y: 0 };
+    let center = new Vec2(0, 0);
     let y_delta_21 = mid.y - start.y;
     let x_delta_21 = mid.x - start.x;
     let y_delta_32 = end.y - mid.y;
@@ -41,9 +116,9 @@ function calc_arc_center(start, mid, end) {
     let slope_b = y_delta_32 / x_delta_32;
 
     const d_slope_a =
-        slope_a * euclidean_norm(0.5 / y_delta_21, 0.5 / x_delta_21);
+        slope_a * new Vec2(0.5 / y_delta_21, 0.5 / x_delta_21).length;
     const d_slope_b =
-        slope_b * euclidean_norm(0.5 / y_delta_32, 0.5 / x_delta_32);
+        slope_b * new Vec2(0.5 / y_delta_32, 0.5 / x_delta_32).length;
 
     if (slope_a == slope_b) {
         if (start == end) {
@@ -80,7 +155,7 @@ function calc_arc_center(start, mid, end) {
         Math.sqrt(
             ((d_slope_a / slope_a) * d_slope_a) / slope_a +
                 ((d_slope_b / slope_b) * d_slope_b) / slope_b +
-                ((sqrt_1_2 / (start.y - end.y)) * sqrt_1_2) / (start.y - end.y)
+                (sqrt_1_2 / (start.y - end.y)) * (sqrt_1_2 / (start.y - end.y))
         );
 
     const slope_b_start_mid_x = slope_b * (start.x + mid.x);
@@ -171,50 +246,4 @@ function calc_arc_center(start, mid, end) {
     }
 
     return center;
-}
-
-function vec_diff(a, b) {
-    return { x: a.x - b.x, y: a.y - b.y };
-}
-
-function vec_angle(v) {
-    return Math.atan2(v.y, v.x);
-}
-
-function normalize_angle(a) {
-    while(a < 0) {
-        a += 2 * Math.PI;
-    }
-    while (a > 2 * Math.PI) {
-        a -= 2 * Math.PI;
-    }
-    return a;
-}
-
-function calc_arc_angles(start, center, end) {
-    const start_radial = vec_diff(start, center);
-    const end_radial = vec_diff(end, center);
-
-    let start_angle = vec_angle(start_radial);
-    let end_angle = vec_angle(end_radial);
-
-    if (end_angle == start_angle) end_angle = start_angle + (2 * Math.PI); // ring, not null
-
-    if (start_angle > end_angle) {
-        if (end_angle < 0) {
-            end_angle = normalize_angle(end_angle);
-        } else {
-            start_angle = normalize_angle(start_angle) - 2 * Math.PI;
-        }
-    }
-
-    return [start_angle, end_angle];
-}
-
-export function convert_arc_to_center_and_angles(start, mid, end) {
-    const center = calc_arc_center(start, mid, end);
-    const radial_vec = vec_diff(center, mid);
-    const radius = euclidean_norm(radial_vec.x, radial_vec.y);
-    const [new_start, new_end] = calc_arc_angles(start, center, end);
-    return {center: center, start: new_start, end: new_end, radius: radius};
 }

@@ -5,7 +5,7 @@
 */
 
 import * as items from "../kicad/sch_items.js";
-import { convert_arc_to_center_and_angles } from "../math/arc.js";
+import { Arc } from "../math/arc.js";
 import { TransformStack } from "../math/transform_stack.js";
 import { BBox } from "../math/bbox.js";
 import { CanvasHelpers } from "../utils.js";
@@ -395,7 +395,7 @@ export class Renderer {
     }
 
     draw_Arc(a) {
-        const a2 = convert_arc_to_center_and_angles(a.start, a.mid, a.end);
+        const a2 = Arc.from_three_points(a.start, a.mid, a.end);
         this.ctx.beginPath();
         this.ctx.arc(a2.center.x, a2.center.y, a2.radius, a2.start, a2.end);
         this.ctx.stroke();
