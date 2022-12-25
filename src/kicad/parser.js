@@ -355,7 +355,7 @@ export class SExprParser {
 
     expect_vec2_list(name = "pts", point_name = "xy") {
         const pts = [];
-        e = this.expect_expr(name);
+        let e = this.expect_expr(name);
         let c;
         while ((c = e.maybe_expr(point_name)) !== null) {
             pts.push(new Vec2(c.expect_number(), c.expect_number()));
