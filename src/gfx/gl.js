@@ -6,19 +6,19 @@
 
 class Uniform {
     static _function_map = {
-        "f1": "uniform1f",
-        "f1v": "uniform1fv",
-        "f2": "uniform2f",
-        "f2v": "uniform2fv",
-        "f3": "uniform3f",
-        "f3v": "uniform3fv",
-        "f4": "uniform4f",
-        "f4v": "uniform4fv",
-        "mat3f": "uniformMatrix3fv",
-        "mat3fv": "uniformMatrix3fv",
+        f1: "uniform1f",
+        f1v: "uniform1fv",
+        f2: "uniform2f",
+        f2v: "uniform2fv",
+        f3: "uniform3f",
+        f3v: "uniform3fv",
+        f4: "uniform4f",
+        f4v: "uniform4fv",
+        mat3f: "uniformMatrix3fv",
+        mat3fv: "uniformMatrix3fv",
         // TODO: This is incomplete
         // TODO: I can also figure this out from the type
-    }
+    };
 
     constructor(gl, name, location, type) {
         this.gl = gl;
@@ -26,7 +26,9 @@ class Uniform {
         this.location = location;
         this.type = type;
 
-        for(const [dst, src] of Object.entries(this.constructor._function_map)) {
+        for (const [dst, src] of Object.entries(
+            this.constructor._function_map
+        )) {
             this[dst] = (...args) => {
                 this.gl[src](this.location, ...args);
             };
@@ -35,20 +37,18 @@ class Uniform {
 }
 
 export class ShaderProgram {
+    static #shader_cache;
+
     constructor(gl, vertex, fragment) {
         this.gl = gl;
 
         if (typeof vertex === "string") {
-            vertex = this.constructor.compile_shader(
-                gl,
-                gl.VERTEX_SHADER,
-                vertex
-            );
+            vertex = this.constructor.compile(gl, gl.VERTEX_SHADER, vertex);
         }
         this.vertex = vertex;
 
         if (typeof fragment === "string") {
-            fragment = this.constructor.compile_shader(
+            fragment = this.constructor.compile(
                 gl,
                 gl.FRAGMENT_SHADER,
                 fragment
@@ -56,13 +56,27 @@ export class ShaderProgram {
         }
         this.fragment = fragment;
 
-        this.program = this.constructor.link_program(gl, vertex, fragment);
+        this.program = this.constructor.link(gl, vertex, fragment);
 
         this.discover_uniforms();
         this.discover_attribs();
     }
 
-    static compile_shader(gl, type, source) {
+    static async load(gl, name, vert_url, frag_url) {
+        if (!this.#shader_cache[name]) {
+            const vert = await (
+                await fetch(new URL(vert_url, import.meta.url))
+            ).text();
+            const frag = await (
+                await fetch(new URL(frag_url, import.meta.url))
+            ).text();
+            this.#shader_cache[name] = new ShaderProgram(gl, vert, frag);
+        }
+
+        return this.#shader_cache[name];
+    }
+
+    static compile(gl, type, source) {
         const shader = gl.createShader(type);
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
@@ -77,7 +91,7 @@ export class ShaderProgram {
         throw new Error(`Error compiling ${type} shader: ${info}`);
     }
 
-    static link_program(gl, vertex, fragment) {
+    static link(gl, vertex, fragment) {
         const program = gl.createProgram();
         gl.attachShader(program, vertex);
         gl.attachShader(program, fragment);
@@ -106,7 +120,12 @@ export class ShaderProgram {
             info.location = this.gl.getUniformLocation(this.program, info.name);
 
             this.uniforms[info.name] = info;
-            this[info.name] = new Uniform(this.gl, info.name, info.location, info.type);
+            this[info.name] = new Uniform(
+                this.gl,
+                info.name,
+                info.location,
+                info.type
+            );
         }
     }
 
@@ -159,7 +178,14 @@ export class VertexArray {
         const b = new Buffer(this.gl);
 
         b.bind();
-        this.gl.vertexAttribPointer(attrib, size, type, normalized, stride, offset);
+        this.gl.vertexAttribPointer(
+            attrib,
+            size,
+            type,
+            normalized,
+            stride,
+            offset
+        );
         this.gl.enableVertexAttribArray(attrib);
 
         return b;

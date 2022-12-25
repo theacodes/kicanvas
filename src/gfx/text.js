@@ -128,7 +128,7 @@ export class TextShaper {
 
     static async default() {
         const font = new Font();
-        await font.load(new URL("./font/glyphs.json", import.meta.url));
+        await font.load(new URL("../kicad/font/glyphs.json", import.meta.url));
         return new TextShaper(font);
     }
 
