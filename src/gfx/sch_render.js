@@ -8,7 +8,7 @@ import * as items from "../kicad/sch_items.js";
 import { Arc } from "../math/arc.js";
 import { TransformStack } from "../math/transform_stack.js";
 import { BBox } from "../math/bbox.js";
-import { CanvasHelpers } from "../utils.js";
+import { CanvasHelper } from "../gfx/canvas_helper.js";
 
 class Style {
     constructor(e) {
@@ -58,6 +58,7 @@ export class Renderer {
     constructor(canvas) {
         this.cvs = canvas;
         this.ctx = canvas.getContext("2d");
+        this.cvs_helper = new CanvasHelper(this.cvs, this.ctx);
         this.style = new Style(this.cvs.parentNode);
 
         this.scale_for_device_pixel_ratio();
@@ -77,7 +78,7 @@ export class Renderer {
     }
 
     scale_for_device_pixel_ratio() {
-        CanvasHelpers.scale_for_device_pixel_ratio(this.cvs, this.ctx);
+        this.cvs_helper.scale_for_device_pixel_ratio();
         /* These must be set after setTransform, otherwise weird shit happens. */
         this.set_default_styles();
     }
@@ -109,12 +110,7 @@ export class Renderer {
     }
 
     screen_space_to_world_space(x, y) {
-        return CanvasHelpers.screen_space_to_world_space(
-            this.cvs,
-            this.ctx,
-            x,
-            y
-        );
+        this.cvs_helper.screen_space_to_world_space(x, y);
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {

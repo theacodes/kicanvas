@@ -7,7 +7,7 @@
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 
-class Camera2 {
+export class Camera2 {
     viewport_size;
     center;
     zoom;

@@ -6,7 +6,7 @@
 
 import { Vec2 } from "../math/vec2.js";
 
-class PanAndZoom {
+export class PanAndZoom {
     #target;
     #camera;
     #callback;

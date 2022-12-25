@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-class CanvasHelper {
+export class CanvasHelper {
     #cvs;
     #ctx;
 
@@ -28,5 +28,13 @@ class CanvasHelper {
         this.#cvs.height = Math.round(rect.height * dpr);
         this.#ctx.setTransform();
         this.#ctx.scale(dpr, dpr);
+    }
+
+    screen_space_to_world_space(x, y) {
+        const dpr = window.devicePixelRatio;
+        const rect = this.#cvs.getBoundingClientRect();
+        const ss_pt = new DOMPoint(x - rect.left, y - rect.top);
+        const mat = this.#ctx.getTransform().inverse().scale(dpr, dpr);
+        return mat.transformPoint(ss_pt);
     }
 }
