@@ -478,7 +478,7 @@ export class GeometryBuilder {
                 const pad_start = pad_pos.sub(half_len);
                 const pad_end = pad_pos.add(half_len);
 
-                if (pad_start.eql(pad_end)) {
+                if (pad_start.equals(pad_end)) {
                     result.circle = {
                         point: pad_pos,
                         radius: half_width,
