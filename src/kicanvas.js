@@ -6,7 +6,7 @@
 
 import * as parser from "./kicad/parser.js";
 import * as items from "./kicad/sch_items.js";
-import * as render from "./gfx/sch_render.js";
+import * as render from "./rendering/sch_render.js";
 import { $make, $draw, $on, $event, $q } from "./utils.js";
 
 class KicadSchematicElement extends HTMLElement {
