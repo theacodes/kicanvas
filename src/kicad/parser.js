@@ -45,7 +45,7 @@ export class Parser {
     expect(type) {
         const token = this.accept(type);
         if (token === null) {
-            throw `Unexpected token ${JSON.stringify(this.token)}`;
+            throw new Error(`Unexpected token ${JSON.stringify(this.token)}`);
         }
         return token;
     }
@@ -83,18 +83,18 @@ export class Parser {
         const sexpr = this._parse();
 
         // A full document has one top-level s-expression.
-        if(!this.token) {
+        if (!this.token) {
             return sexpr;
         }
 
         // A document fragment has many top-level s-expressions, so keep parsing until it's done.
         const elements = [sexpr];
 
-        while(this.token) {
+        while (this.token) {
             elements.push(this._parse());
         }
 
-        return new SExprParser(elements)
+        return new SExprParser(elements);
     }
 }
 
@@ -132,12 +132,19 @@ export class SExprParser {
             ) {
                 return value.value;
             } else {
-                throw `Can not unbox token type ${value.type}`;
+                throw new Error(`Can not unbox token type ${value.type}`);
             }
         } else if (value instanceof SExprParser) {
             return value;
         } else {
-            throw `Can not unbox value ${JSON.stringify(value)}`;
+            throw new Error(`Can not unbox value ${JSON.stringify(value)}`);
+        }
+    }
+
+    *rest() {
+        while (this.element) {
+            yield this.unbox(this.element);
+            this.next();
         }
     }
 
@@ -188,7 +195,9 @@ export class SExprParser {
         const val = this.maybe(type, match);
 
         if (val === null) {
-            throw `Expected ${type} found ${JSON.stringify(this.element)}`;
+            throw new Error(
+                `Expected ${type} found ${JSON.stringify(this.element)}`
+            );
         }
 
         return val;
@@ -231,7 +240,11 @@ export class SExprParser {
     expect_expr(name) {
         const e = this.maybe_expr(name);
         if (e === null) {
-            throw `Expected expression ${name}, have ${JSON.stringify(this.element)}`;
+            throw new Error(
+                `Expected expression ${name}, have ${JSON.stringify(
+                    this.element
+                )}`
+            );
         }
         return e;
     }
@@ -303,7 +316,9 @@ export class SExprParser {
     expect_pair(name, type) {
         const v = this.maybe_pair(name, type);
         if (v === null) {
-            throw `Expected pair ${name}, found ${JSON.stringify(this.element)}`;
+            throw new Error(
+                `Expected pair ${name}, found ${JSON.stringify(this.element)}`
+            );
         }
         return v;
     }
@@ -322,6 +337,29 @@ export class SExprParser {
 
     expect_pair_list(name) {
         return this.expect_pair(name, "list");
+    }
+
+    maybe_vec2(name, def = new Vec2(0, 0)) {
+        const v = this.maybe_expr(name);
+        if (!v) {
+            return def;
+        }
+        return new Vec2(v.expect_number(), v.expect_number());
+    }
+
+    expect_vec2(name) {
+        const v = this.expect_expr(name);
+        return new Vec2(v.expect_number(), v.expect_number());
+    }
+
+    expect_vec2_list(name = "pts", point_name = "xy") {
+        const pts = [];
+        e = this.expect_expr(name);
+        let c;
+        while ((c = e.maybe_expr(point_name)) !== null) {
+            pts.push(new Vec2(c.expect_number(), c.expect_number()));
+        }
+        return pts;
     }
 }
 
