@@ -143,7 +143,7 @@ export class Polyline {
     static tesselate_segment(p1, p2, width) {
         const line = p2.sub(p1);
         const norm = line.normal.normalize();
-        const n = norm.mul_scalar(width / 2);
+        const n = norm.multiply(width / 2);
         const n2 = n.normal;
 
         let a = p1.add(n).add(n2);
