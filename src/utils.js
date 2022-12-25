@@ -75,3 +75,10 @@ export function $event(e, name, detail, bubble = true) {
         })
     );
 }
+
+export function $template(content) {
+    const template = $make("template", {
+        innerHTML: content,
+    });
+    return template.content.cloneNode(true).firstElementChild;
+}
