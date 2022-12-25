@@ -10,6 +10,7 @@
     - https://gitlab.com/edea-dev/edea/-/tree/main/edea
 */
 
+import { Vec2 } from "../math/vec2.js";
 import * as Tokenizer from "./tokenizer.js";
 
 export class Parser {
