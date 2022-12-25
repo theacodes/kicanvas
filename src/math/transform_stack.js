@@ -14,7 +14,13 @@ class Transform {
     }
 
     copy() {
-        return new Transform(this.x, this.y, this.rotation, this.flip_x, this.flip_y);
+        return new Transform(
+            this.x,
+            this.y,
+            this.rotation,
+            this.flip_x,
+            this.flip_y
+        );
     }
 
     apply(ctx) {
@@ -25,14 +31,14 @@ class Transform {
 
     transform_point(x, y) {
         const p = this.mat.transformPoint(new DOMPoint(x, y));
-        return {x: p.x, y: p.y};
+        return { x: p.x, y: p.y };
     }
 
     normalize_rotation() {
-        while(this.rotation > 360) {
+        while (this.rotation > 360) {
             this.rotation -= 360;
         }
-        while(this.rotation < 0) {
+        while (this.rotation < 0) {
             this.rotation += 360;
         }
     }

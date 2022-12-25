@@ -22,17 +22,22 @@ export function rgba_hex_to_f4(rgba) {
     }
 
     if (rgba.length == 6) {
-        rgba = `${rgba}FF`
+        rgba = `${rgba}FF`;
     }
 
-    let components = [rgba.slice(0, 2), rgba.slice(2, 4), rgba.slice(4, 6), rgba.slice(6, 8)];
+    let components = [
+        rgba.slice(0, 2),
+        rgba.slice(2, 4),
+        rgba.slice(4, 6),
+        rgba.slice(6, 8),
+    ];
     components = components.map((v) => parseInt(v, 16) / 255);
 
     return components;
 }
 
 export function rgba_to_f4(rgba) {
-    if(!rgba.startsWith("rgba")) {
+    if (!rgba.startsWith("rgba")) {
         rgba = `rgba(${rgba.slice(4, -1)}, 1)`;
     }
     rgba = rgba.trim().slice(5, -1);

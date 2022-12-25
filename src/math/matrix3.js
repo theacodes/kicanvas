@@ -1,4 +1,8 @@
-
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
 
 export class Matrix3 {
     constructor(elements) {
@@ -15,8 +19,8 @@ export class Matrix3 {
     }
 
     to_DOMMatrix() {
-        // prettier-ignore
         const e = this.elements;
+        // prettier-ignore
         return new DOMMatrix([
             e[0], e[3],
             e[1], e[4],
@@ -25,8 +29,8 @@ export class Matrix3 {
     }
 
     to_4x4_DOMMatrix() {
-        // prettier-ignore
         const e = this.elements;
+        // prettier-ignore
         return new DOMMatrix([
             e[0], e[1],  0, e[2],
             e[3], e[4],  0, e[5],
