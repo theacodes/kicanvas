@@ -37,7 +37,7 @@ class Uniform {
 }
 
 export class ShaderProgram {
-    static #shader_cache;
+    static #shader_cache = {};
 
     constructor(gl, vertex, fragment) {
         this.gl = gl;
