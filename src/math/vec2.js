@@ -4,6 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Angle } from "./angle.js";
+import { Matrix3 } from "./matrix3.js";
+
 export class Vec2 {
     constructor(x_or_other = 0, y = undefined) {
         this.set(x_or_other, y);

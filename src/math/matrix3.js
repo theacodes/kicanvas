@@ -4,6 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Vec2 } from "./vec2.js";
+import { Angle } from "./angle.js";
+
 export class Matrix3 {
     constructor(elements) {
         this.elements = new Float32Array(elements);
