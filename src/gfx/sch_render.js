@@ -110,7 +110,7 @@ export class Renderer {
     }
 
     screen_space_to_world_space(x, y) {
-        this.cvs_helper.screen_space_to_world_space(x, y);
+        return this.cvs_helper.screen_space_to_world_space(x, y);
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
