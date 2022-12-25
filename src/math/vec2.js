@@ -5,17 +5,19 @@
 */
 
 export class Vec2 {
-    constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
+    constructor(x_or_other = 0, y = undefined) {
+        this.set(x_or_other, y);
     }
 
     copy() {
         return new Vec2(...this);
     }
 
-    set(x_or_other, y = null) {
-        if (x_or_other instanceof this.constructor) {
+    set(x_or_other, y = undefined) {
+        if (
+            x_or_other instanceof this.constructor ||
+            Object.hasOwn(x_or_other, "x")
+        ) {
             this.x = x_or_other.x;
             this.y = x_or_other.y;
         } else {
