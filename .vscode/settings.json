@@ -1,0 +1,8 @@
+{
+    "editor.formatOnSave": true,
+    "css.format.spaceAroundSelectorSeparator": true,
+    "css.lint.float": "warning",
+    "css.lint.ieHack": "error",
+    "css.lint.important": "warning",
+    "eslint.alwaysShowStatus": false
+}
