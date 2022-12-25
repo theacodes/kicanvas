@@ -165,7 +165,7 @@ export class TextShaper {
                     super_sup_depth = brace_depth;
                     brace_depth++;
 
-                    current_size = size.mul_scalar(0.8);
+                    current_size = size.multiply(0.8);
                     char_offset.y = -size.y * 0.3;
 
                     i++;
@@ -176,7 +176,7 @@ export class TextShaper {
                     super_sup_depth = brace_depth;
                     brace_depth++;
 
-                    current_size = size.mul_scalar(0.8);
+                    current_size = size.multiply(0.8);
                     char_offset.y = size.y * 0.1;
 
                     i++;
