@@ -8,7 +8,8 @@ import { parse } from "./kicad/parser.js";
 import { CircleSet, PolygonSet, PolylineSet } from "./gfx/vg.js";
 import * as pcb_items from "./kicad/pcb_items.js";
 import * as pcb_geometry from "./rendering/pcb_geometry.js";
-import { PanAndZoom, Scene } from "./gfx/scene.js";
+import { Scene } from "./gfx/scene.js";
+import { PanAndZoom } from "./gfx/pan_and_zoom.js";
 import { TextShaper } from "./gfx/text.js";
 import { rgba_to_f4 } from "./gfx/colorspace.js";
 import { $q, $on, $template } from "./utils.js";
@@ -25,7 +26,10 @@ async function main() {
     const canvas = document.querySelector("canvas");
     const gl = canvas.getContext("webgl2");
     const scene = new Scene(gl);
-    new PanAndZoom(scene);
+    new PanAndZoom(canvas, scene.camera, () => {}, {
+        minZoom: 0.5,
+        maxZoom: 100,
+    });
 
     await PolygonSet.load_shader(gl);
     await PolylineSet.load_shader(gl);

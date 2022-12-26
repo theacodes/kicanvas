@@ -20,7 +20,7 @@ export class PanAndZoom {
     constructor(
         target,
         camera,
-        callback,
+        callback = () => {},
         options = { minZoom: 0.5, maxZoom: 10 }
     ) {
         this.#target = target;
@@ -55,7 +55,7 @@ export class PanAndZoom {
     }
 
     #start_pan(mouse) {
-        const mouse_world = this.#camera.screenToWorld(mouse);
+        const mouse_world = this.#camera.screen_to_world(mouse);
         this.#pan_mouse.set(mouse_world);
         this.#pan_center.set(this.#camera.center);
         this.#pan_inv_matrix = this.#camera.matrix.inverse();
@@ -70,13 +70,13 @@ export class PanAndZoom {
     }
 
     #handle_zoom(delta, mouse) {
-        const mouse_world = this.#camera.screenToWorld(mouse);
+        const mouse_world = this.#camera.screen_to_world(mouse);
         this.#camera.zoom *= Math.exp(delta * -0.001);
         this.#camera.zoom = Math.min(
             this.#max_zoom,
             Math.max(this.#camera.zoom, this.#min_zoom)
         );
-        const new_world = this.#camera.screenToWorld(mouse);
+        const new_world = this.#camera.screen_to_world(mouse);
         const center_delta = mouse_world.sub(new_world);
         this.#camera.move(center_delta);
         this.#callback();
