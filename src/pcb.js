@@ -14,6 +14,7 @@ import { TextShaper } from "./gfx/text.js";
 import { rgba_to_f4 } from "./gfx/colorspace.js";
 import { $q, $on, $template } from "./utils.js";
 import { Style } from "./rendering/pcb_style.js";
+import { CanvasSizeObserver } from "./gfx/resize.js";
 
 async function main() {
     const pcb_src = await (
@@ -25,11 +26,32 @@ async function main() {
 
     const canvas = document.querySelector("canvas");
     const gl = canvas.getContext("webgl2");
+
     const scene = new Scene(gl);
-    new PanAndZoom(canvas, scene.camera, () => {}, {
-        minZoom: 0.5,
-        maxZoom: 100,
+    let draw = null;
+
+    new CanvasSizeObserver(canvas, (_, ...args) => {
+        scene.resize(...args);
+        window.requestAnimationFrame(() => {
+            if (draw) {
+                draw();
+            }
+        });
     });
+
+    new PanAndZoom(
+        canvas,
+        scene.camera,
+        () => {
+            window.requestAnimationFrame(() => {
+                draw();
+            });
+        },
+        {
+            minZoom: 0.5,
+            maxZoom: 100,
+        }
+    );
 
     await PolygonSet.load_shader(gl);
     await PolylineSet.load_shader(gl);
@@ -156,7 +178,7 @@ async function main() {
     const board_bbox = layers["Edge.Cuts"].geometry.bbox;
     scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
 
-    const draw = () => {
+    draw = () => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         const now = Date.now();
 
@@ -174,8 +196,6 @@ async function main() {
         // debug_geom.shader.u_matrix.mat3f(false, matrix.elements);
         // debug_geom.shader.u_color.f4(0, 1, 1, 0.3);
         // debug_geom.draw();
-
-        window.requestAnimationFrame(draw);
     };
 
     window.requestAnimationFrame(draw);

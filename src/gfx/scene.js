@@ -16,37 +16,26 @@ export class Scene {
 
     constructor(gl) {
         this.gl = gl;
+
         this.camera = new Camera2(new Vec2(0, 0), new Vec2(0, 0), 1, 0);
-        this.resize();
 
-        new ResizeObserver(() => {
-            this.resize();
-        }).observe(this.gl.canvas);
+        this.resize(
+            this.gl.canvas.clientWidth,
+            this.gl.canvas.clientWeight,
+            this.gl.canvas.width,
+            this.gl.canvas.height
+        );
     }
 
-    get canvas() {
-        return this.gl.canvas;
-    }
+    resize(logical_w, logical_h, display_w, display_h) {
+        this.gl.viewport(0, 0, display_w, display_h);
 
-    resize() {
-        const canvas = this.canvas;
-        canvas.width = canvas.clientWidth * window.devicePixelRatio;
-        canvas.height = canvas.clientHeight * window.devicePixelRatio;
-        this.gl.viewport(0, 0, canvas.width, canvas.height);
-
-        if (
-            this.width != canvas.clientWidth ||
-            this.height != canvas.clientHeight
-        ) {
-            this.width = canvas.clientWidth;
-            this.height = canvas.clientHeight;
+        if (this.width != logical_w || this.height != logical_h) {
+            this.width = logical_w;
+            this.height = logical_h;
             this.projection = Matrix3.orthographic(this.width, this.height);
             this.camera.viewport_size = new Vec2(this.width, this.height);
         }
-    }
-
-    get canvas() {
-        return this.gl.canvas;
     }
 
     get view_matrix() {
