@@ -182,7 +182,6 @@ export class GeometryBuilder {
     }
 
     static Dimension(d, layer = null, matrix = null, mode = null) {
-        console.log(d);
         let [start, end] = this.apply_matrix(matrix, [d.start, d.end]);
 
         // swap start/end if the dimension is going the wrong direction
