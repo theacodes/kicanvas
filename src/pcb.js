@@ -16,144 +16,203 @@ import { $q, $on, $template } from "./utils.js";
 import { Style } from "./rendering/pcb_style.js";
 import { CanvasSizeObserver } from "./gfx/resize.js";
 
-async function main() {
-    const pcb_src = await (
-        await window.fetch("../example-boards/simple.kicad_pcb")
-    ).text();
-    const pcb = new pcb_items.KicadPCB(parse(pcb_src));
+const layers_ordered_by_visibility = [
+    "B.Fab",
+    "B.CrtYd",
+    "B.Cu:pads",
+    "B.SilkS",
+    "B.Paste",
+    "B.Mask",
+    "B.Cu",
+    "In1.Cu",
+    "In2.Cu",
+    "F.Cu",
+    "F.Mask",
+    "F.Paste",
+    "F.SilkS",
+    "F.Cu:pads",
+    "F.CrtYd",
+    "F.Fab",
+    "ThroughHoles",
+    "Edge.Cuts",
+    "Margin",
+    "Cmts.User",
+    "Dwgs.User",
+];
 
-    const style = new Style($q("kicad-pcb"));
+const layers_ordered_for_controls = [
+    "F.Cu",
+    "In1.Cu",
+    "In2.Cu",
+    "B.Cu",
+    "F.Paste",
+    "B.Paste",
+    "F.SilkS",
+    "B.SilkS",
+    "F.Mask",
+    "B.Mask",
+    "Dwgs.User",
+    "Cmts.User",
+    "Edge.Cuts",
+    "Margin",
+    "F.CrtYd",
+    "B.CrtYd",
+    "F.Fab",
+    "B.Fab",
+];
 
-    const canvas = document.querySelector("canvas");
-    const gl = canvas.getContext("webgl2");
+const special_layers_info = [
+    {
+        name: "ThroughHoles",
+        geometry_class: pcb_geometry.ThroughHoleLayer,
+        colors: [
+            [1, 0.75, 0, 1],
+            [0.3, 0.3, 0.3, 1],
+        ],
+    },
+    {
+        name: "F.Cu:pads",
+        source_name: "F.Cu",
+        geometry_class: pcb_geometry.SurfaceMountLayer,
+        colors: [
+            [1, 0.75, 0, 1],
+            [0.3, 0.3, 0.3, 1],
+        ],
+    },
+    {
+        name: "B.Cu:pads",
+        source_name: "B.Cu",
+        geometry_class: pcb_geometry.SurfaceMountLayer,
+        colors: [
+            [1, 0.75, 0, 1],
+            [0.3, 0.3, 0.3, 1],
+        ],
+    },
+];
 
-    const scene = new Scene(gl);
-    let draw = null;
+class PCBViewer {
+    #cvs;
+    #gl;
+    #scene;
+    #layers = {};
+    pcb;
 
-    new CanvasSizeObserver(canvas, (_, ...args) => {
-        scene.resize(...args);
-        window.requestAnimationFrame(() => {
-            if (draw) {
-                draw();
-            }
-        });
-    });
-
-    new PanAndZoom(
-        canvas,
-        scene.camera,
-        () => {
-            window.requestAnimationFrame(() => {
-                draw();
-            });
-        },
-        {
-            minZoom: 0.5,
-            maxZoom: 100,
-        }
-    );
-
-    await PolygonSet.load_shader(gl);
-    await PolylineSet.load_shader(gl);
-    await CircleSet.load_shader(gl);
-
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    pcb_geometry.GeometryBuilder.text_shaper = await TextShaper.default();
-
-    const layers = {
-        ThroughHoles: {
-            name: "ThroughHoles",
-            geometry: new pcb_geometry.ThroughHoleLayer(gl),
-            colors: [
-                [1, 0.75, 0, 1],
-                [0.3, 0.3, 0.3, 1],
-            ],
-            visible: true,
-        },
-        "F.Cu:pads": {
-            name: "F.Cu:pads",
-            geometry: new pcb_geometry.SurfaceMountLayer(gl),
-            colors: [
-                [1, 0.75, 0, 1],
-                [0.3, 0.3, 0.3, 1],
-            ],
-            visible: true,
-        },
-        "B.Cu:pads": {
-            name: "B.Cu:pads",
-            geometry: new pcb_geometry.SurfaceMountLayer(gl),
-            colors: [
-                [1, 0.75, 0, 1],
-                [0.3, 0.3, 0.3, 1],
-            ],
-            visible: true,
-        },
-    };
-
-    layers["ThroughHoles"].geometry.set(pcb);
-    layers["F.Cu:pads"].geometry.set(pcb, "F.Cu");
-    layers["B.Cu:pads"].geometry.set(pcb, "B.Cu");
-
-    for (const layer_info of Object.values(pcb.layers)) {
-        const layer = {
-            name: layer_info.name,
-            info: layer_info,
-            geometry: new pcb_geometry.Layer(gl),
-            colors: [rgba_to_f4(style.color_for_layer(layer_info.name))],
-            visible: true,
-        };
-        layer.geometry.set(pcb, layer.name);
-        layers[layer.name] = layer;
+    constructor(canvas) {
+        this.#cvs = canvas;
     }
 
-    const layers_ordered_by_visibility = [
-        layers["B.Fab"],
-        layers["B.CrtYd"],
-        layers["B.Cu:pads"],
-        layers["B.SilkS"],
-        layers["B.Paste"],
-        layers["B.Mask"],
-        layers["B.Cu"],
-        layers["In1.Cu"],
-        layers["In2.Cu"],
-        layers["F.Cu"],
-        layers["F.Mask"],
-        layers["F.Paste"],
-        layers["F.SilkS"],
-        layers["F.Cu:pads"],
-        layers["F.CrtYd"],
-        layers["F.Fab"],
-        layers["ThroughHoles"],
-        layers["Edge.Cuts"],
-        layers["Margin"],
-        layers["Cmts.User"],
-        layers["Dwgs.User"],
-    ];
+    async setup() {
+        await this.#setup_gl();
+        await this.#setup_scene();
+    }
 
-    const layers_ordered_for_controls = [
-        layers["F.Cu"],
-        layers["In1.Cu"],
-        layers["In2.Cu"],
-        layers["B.Cu"],
-        layers["F.Paste"],
-        layers["B.Paste"],
-        layers["F.SilkS"],
-        layers["B.SilkS"],
-        layers["F.Mask"],
-        layers["B.Mask"],
-        layers["Dwgs.User"],
-        layers["Cmts.User"],
-        layers["Edge.Cuts"],
-        layers["Margin"],
-        layers["F.CrtYd"],
-        layers["B.CrtYd"],
-        layers["F.Fab"],
-        layers["B.Fab"],
-    ];
+    async #setup_gl() {
+        const gl = this.#cvs.getContext("webgl2");
+        this.#gl = gl;
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        await PolygonSet.load_shader(gl);
+        await PolylineSet.load_shader(gl);
+        await CircleSet.load_shader(gl);
+        pcb_geometry.GeometryBuilder.text_shaper = await TextShaper.default();
+    }
+
+    async #setup_scene() {
+        this.#scene = new Scene(this.#gl);
+
+        new CanvasSizeObserver(this.#cvs, (_, ...args) => {
+            this.#scene.resize(...args);
+            this.draw_soon();
+        });
+
+        new PanAndZoom(
+            this.#cvs,
+            this.#scene.camera,
+            () => {
+                this.draw_soon();
+            },
+            {
+                minZoom: 0.5,
+                maxZoom: 100,
+            }
+        );
+    }
+
+    async load(url) {
+        const pcb_src = await (await window.fetch(url)).text();
+        this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
+        this.#setup_layers();
+        this.#look_at_board();
+        this.draw_soon();
+    }
+
+    #setup_layers() {
+        const style = new Style($q("kicad-pcb"));
+
+        const layer_infos = special_layers_info.concat(
+            Object.values(this.pcb.layers)
+        );
+
+        for (const layer_info of layer_infos) {
+            const geometry_class =
+                layer_info.geometry_class ?? pcb_geometry.Layer;
+            const colors = layer_info.colors ?? [
+                rgba_to_f4(style.color_for_layer(layer_info.name)),
+            ];
+
+            const layer = {
+                name: layer_info.name,
+                info: layer_info,
+                geometry: new geometry_class(this.#gl),
+                colors: colors,
+                visible: true,
+            };
+
+            layer.geometry.set(this.pcb, layer_info.source_name ?? layer.name);
+
+            this.#layers[layer.name] = layer;
+        }
+    }
+
+    #look_at_board() {
+        const board_bbox = this.#layers["Edge.Cuts"].geometry.bbox;
+        this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
+    }
+
+    draw_soon() {
+        window.requestAnimationFrame(() => {
+            this.draw();
+        });
+    }
+
+    draw() {
+        this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
+
+        let matrix = this.#scene.view_projection_matrix;
+
+        for (const layer_name of layers_ordered_by_visibility) {
+            const layer = this.#layers[layer_name];
+
+            if (!layer || !layer.visible) {
+                continue;
+            }
+
+            layer.geometry.draw(matrix, ...layer.colors);
+        }
+    }
+}
+
+async function main() {
+    const pcb_url = "../example-boards/simple.kicad_pcb";
+    const canvas = document.querySelector("canvas");
+
+    const pcb_viewer = new PCBViewer(canvas);
+    await pcb_viewer.setup();
+    await pcb_viewer.load(pcb_url);
 
     // const debug_polys = [
     //     PolygonSet.triangulate([new Vec2(-1, -1000), new Vec2(1, -1000), new Vec2(1, 1000), new Vec2(-1, 1000)]),
@@ -170,52 +229,25 @@ async function main() {
     //     ];
     //     debug_polys.push(PolygonSet.triangulate(points));
     // }
-    const debug_geom = new PolygonSet(gl);
+    // const debug_geom = new PolygonSet(gl);
     // debug_geom.set(debug_polys);
 
-    const start = Date.now();
+    // const aside = $q("kicad-pcb aside");
 
-    const board_bbox = layers["Edge.Cuts"].geometry.bbox;
-    scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
-
-    draw = () => {
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        const now = Date.now();
-
-        let matrix = scene.view_projection_matrix;
-
-        for (const layer of layers_ordered_by_visibility) {
-            if (!layer.visible) {
-                continue;
-            }
-
-            layer.geometry.draw(matrix, ...layer.colors);
-        }
-
-        // debug_geom.shader.bind();
-        // debug_geom.shader.u_matrix.mat3f(false, matrix.elements);
-        // debug_geom.shader.u_color.f4(0, 1, 1, 0.3);
-        // debug_geom.draw();
-    };
-
-    window.requestAnimationFrame(draw);
-
-    const aside = $q("kicad-pcb aside");
-
-    for (const layer of layers_ordered_for_controls) {
-        const button = $template(`
-        <button type="button" name="${layer.name}" data-visible="${
-            layer.visible ? "yes" : "no"
-        }">
-            <span class="color"></span><span class="name">${layer.name}</name>
-        </button>
-        `);
-        aside.append(button);
-        $on(button, "click", (e) => {
-            layer.visible = !layer.visible;
-            button.dataset.visible = layer.visible ? "yes" : "no";
-        });
-    }
+    // for (const layer of layers_ordered_for_controls) {
+    //     const button = $template(`
+    //     <button type="button" name="${layer.name}" data-visible="${
+    //         layer.visible ? "yes" : "no"
+    //     }">
+    //         <span class="color"></span><span class="name">${layer.name}</name>
+    //     </button>
+    //     `);
+    //     aside.append(button);
+    //     $on(button, "click", (e) => {
+    //         layer.visible = !layer.visible;
+    //         button.dataset.visible = layer.visible ? "yes" : "no";
+    //     });
+    // }
 }
 
 main();

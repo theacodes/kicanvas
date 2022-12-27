@@ -41,7 +41,7 @@ export class Style {
         this.color_b_fab = p("--color-b-fab");
     }
 
-    color_for_layer(layer_name) {
+    color_for_layer(layer_name = "unknown") {
         const prop_name = "color_" + layer_name.toLowerCase().replace(".", "_");
         const color = this[prop_name];
         return color ?? "#fff";
