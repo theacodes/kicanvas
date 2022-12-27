@@ -13,6 +13,7 @@ export class PanAndZoom {
     #min_zoom;
     #max_zoom;
     #panning = false;
+    #rect;
     #pan_inv_matrix;
     #pan_center = new Vec2(0, 0);
     #pan_mouse = new Vec2(0, 0);
@@ -31,6 +32,7 @@ export class PanAndZoom {
 
         this.#target.addEventListener("mousedown", (e) => {
             e.preventDefault();
+            this.#rect = this.#target.getBoundingClientRect();
             this.#start_pan(this.#relative_mouse_pos(e));
         });
 
@@ -45,13 +47,16 @@ export class PanAndZoom {
 
         this.#target.addEventListener("wheel", (e) => {
             e.preventDefault();
+            this.#rect = this.#target.getBoundingClientRect();
             this.#handle_zoom(e.deltaY, this.#relative_mouse_pos(e));
         });
     }
 
     #relative_mouse_pos(e) {
-        const rect = this.#target.getBoundingClientRect();
-        return new Vec2(e.clientX - rect.left, e.clientY - rect.top);
+        return new Vec2(
+            e.clientX - this.#rect.left,
+            e.clientY - this.#rect.top
+        );
     }
 
     #start_pan(mouse) {
