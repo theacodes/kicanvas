@@ -57,7 +57,7 @@ class KicadSchematicElement extends HTMLElement {
     }
 
     setup_events() {
-        $on(this.canvas, "mousedown", (e) => {
+        $on(this.canvas, "mouseup", (e) => {
             const p = this.renderer.screen_space_to_world_space(
                 e.clientX,
                 e.clientY
