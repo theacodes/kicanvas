@@ -61,6 +61,21 @@ const layers_ordered_for_controls = [
     "B.Fab",
 ];
 
+// TODO: Hack, remove later
+const default_visible_layers = [
+    "ThroughHoles",
+    "F.Cu:pads",
+    "B.Cu:pads",
+    "F.Cu",
+    "F.Paste",
+    "F.SilkS",
+    "F.Mask",
+    "Dwgs.User",
+    "Edge.Cuts",
+    "Margin",
+    "F.CrtYd",
+];
+
 const special_layers_info = [
     {
         name: "ThroughHoles",
@@ -94,7 +109,7 @@ class PCBViewer {
     #cvs;
     #gl;
     #scene;
-    #layers = {};
+    layers = {};
     pcb;
 
     constructor(canvas) {
@@ -174,12 +189,12 @@ class PCBViewer {
 
             layer.geometry.set(this.pcb, layer_info.source_name ?? layer.name);
 
-            this.#layers[layer.name] = layer;
+            this.layers[layer.name] = layer;
         }
     }
 
     #look_at_board() {
-        const board_bbox = this.#layers["Edge.Cuts"].geometry.bbox;
+        const board_bbox = this.layers["Edge.Cuts"].geometry.bbox;
         this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
     }
 
@@ -195,7 +210,7 @@ class PCBViewer {
         let matrix = this.#scene.view_projection_matrix;
 
         for (const layer_name of layers_ordered_by_visibility) {
-            const layer = this.#layers[layer_name];
+            const layer = this.layers[layer_name];
 
             if (!layer || !layer.visible) {
                 continue;
@@ -207,47 +222,36 @@ class PCBViewer {
 }
 
 async function main() {
-    const pcb_url = "../example-boards/simple.kicad_pcb";
+    const pcb_url = "../example-boards/starfish.kicad_pcb";
     const canvas = document.querySelector("canvas");
 
     const pcb_viewer = new PCBViewer(canvas);
     await pcb_viewer.setup();
     await pcb_viewer.load(pcb_url);
 
-    // const debug_polys = [
-    //     PolygonSet.triangulate([new Vec2(-1, -1000), new Vec2(1, -1000), new Vec2(1, 1000), new Vec2(-1, 1000)]),
-    //     PolygonSet.triangulate([new Vec2(-1000, -1), new Vec2(-1000, 1), new Vec2(1000, 1), new Vec2(1000, -1)]),
-    // ];
+    for (const layer of Object.values(pcb_viewer.layers)) {
+        layer.visible = default_visible_layers.includes(layer.name);
+    }
+    pcb_viewer.draw_soon();
 
-    // for(const bb of fcu_layer.bboxes) {
-    //     const points = [
-    //         bb.start,
-    //         new Vec2(bb.start.x, bb.end.y),
-    //         bb.end,
-    //         new Vec2(bb.end.x, bb.start.y),
-    //         bb.start,
-    //     ];
-    //     debug_polys.push(PolygonSet.triangulate(points));
-    // }
-    // const debug_geom = new PolygonSet(gl);
-    // debug_geom.set(debug_polys);
+    const aside = $q("kicad-pcb aside");
 
-    // const aside = $q("kicad-pcb aside");
-
-    // for (const layer of layers_ordered_for_controls) {
-    //     const button = $template(`
-    //     <button type="button" name="${layer.name}" data-visible="${
-    //         layer.visible ? "yes" : "no"
-    //     }">
-    //         <span class="color"></span><span class="name">${layer.name}</name>
-    //     </button>
-    //     `);
-    //     aside.append(button);
-    //     $on(button, "click", (e) => {
-    //         layer.visible = !layer.visible;
-    //         button.dataset.visible = layer.visible ? "yes" : "no";
-    //     });
-    // }
+    for (const layer_name of layers_ordered_for_controls) {
+        const layer = pcb_viewer.layers[layer_name];
+        const button = $template(`
+        <button type="button" name="${layer.name}" data-visible="${
+            layer.visible ? "yes" : "no"
+        }">
+            <span class="color"></span><span class="name">${layer.name}</name>
+        </button>
+        `);
+        aside.append(button);
+        $on(button, "click", (e) => {
+            layer.visible = !layer.visible;
+            button.dataset.visible = layer.visible ? "yes" : "no";
+            pcb_viewer.draw_soon();
+        });
+    }
 }
 
 main();
