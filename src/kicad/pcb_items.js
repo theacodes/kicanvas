@@ -471,18 +471,16 @@ export class Model {
     constructor(e) {
         this.filename = e.expect_string();
         for (const name in ["at", "scale", "rotation"]) {
-            const se = e.maybe_expr(name);
+            let se = e.maybe_expr(name);
             if (!se) {
                 this[name] = { x: 0, y: 0, z: 0 };
             } else {
                 se = se.expect_expr("xyz");
-                this[
-                    (name = {
-                        x: se.expect_number(),
-                        y: se.expect_number(),
-                        z: se.expect_number(),
-                    })
-                ];
+                this[name] = {
+                    x: se.expect_number(),
+                    y: se.expect_number(),
+                    z: se.expect_number(),
+                };
             }
         }
     }
