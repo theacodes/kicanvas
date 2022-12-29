@@ -11,6 +11,7 @@
 html,
 body {
     height: 100%;
+    width: 100%;
     font-family: "Nunito";
 }
 
@@ -65,11 +66,18 @@ kicad-pcb {
     --color-worksheet: rgb(99, 78, 137);
 }
 
-kicad-pcb {
+.kicad-pcb-container {
     display: flex;
     flex-direction: row;
     width: 100%;
     height: 100vh;
+    overflow: hidden;
+}
+
+kicad-pcb {
+    flex: 1;
+    height: 100%;
+    width: 100%;
 }
 
 kicad-pcb canvas {
@@ -80,93 +88,11 @@ kicad-pcb canvas {
     flex-grow: 1;
 }
 
-kicad-pcb aside {
+kicad-pcb-layer-controls {
     flex-shrink: 1;
     display: flex;
     flex-direction: column;
     background-color: #222;
     padding: 0.5rem 0rem;
     overflow-y: scroll;
-}
-
-kicad-pcb aside button {
-    color: white;
-    background: transparent;
-    padding: 0.5rem 1rem;
-    text-align: left;
-    border: 0 none;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
-
-kicad-pcb aside button[data-visible="no"] {
-    color: #aaa;
-}
-
-kicad-pcb aside button:hover {
-    background-color: #333;
-}
-
-kicad-pcb aside button .color {
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    background-color: orange;
-    margin-right: 0.5rem;
-}
-
-kicad-pcb aside button[name="F.Cu"] .color {
-    background-color: var(--color-f-cu);
-}
-kicad-pcb aside button[name="In1.Cu"] .color {
-    background-color: var(--color-in1-cu);
-}
-kicad-pcb aside button[name="In2.Cu"] .color {
-    background-color: var(--color-in2-cu);
-}
-kicad-pcb aside button[name="B.Cu"] .color {
-    background-color: var(--color-b-cu);
-}
-kicad-pcb aside button[name="F.Paste"] .color {
-    background-color: var(--color-f-paste);
-}
-kicad-pcb aside button[name="B.Paste"] .color {
-    background-color: var(--color-b-paste);
-}
-kicad-pcb aside button[name="F.SilkS"] .color {
-    background-color: var(--color-f-silks);
-}
-kicad-pcb aside button[name="B.SilkS"] .color {
-    background-color: var(--color-b-silks);
-}
-kicad-pcb aside button[name="F.Mask"] .color {
-    background-color: var(--color-f-mask);
-}
-kicad-pcb aside button[name="B.Mask"] .color {
-    background-color: var(--color-b-mask);
-}
-kicad-pcb aside button[name="Dwgs.User"] .color {
-    background-color: var(--color-dwgs-user);
-}
-kicad-pcb aside button[name="Cmts.User"] .color {
-    background-color: var(--color-cmts-user);
-}
-kicad-pcb aside button[name="Edge.Cuts"] .color {
-    background-color: var(--color-edge-cuts);
-}
-kicad-pcb aside button[name="Margin"] .color {
-    background-color: var(--color-margin);
-}
-kicad-pcb aside button[name="F.CrtYd"] .color {
-    background-color: var(--color-f-crtyd);
-}
-kicad-pcb aside button[name="B.CrtYd"] .color {
-    background-color: var(--color-b-crtyd);
-}
-kicad-pcb aside button[name="F.Fab"] .color {
-    background-color: var(--color-f-fab);
-}
-kicad-pcb aside button[name="B.Fab"] .color {
-    background-color: var(--color-b-fab);
 }

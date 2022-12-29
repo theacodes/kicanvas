@@ -141,18 +141,18 @@ class PCBViewer {
 
         new CanvasSizeObserver(this.#cvs, (_, ...args) => {
             this.#scene.resize(...args);
-            this.draw_soon();
+            this.draw();
         });
 
         new PanAndZoom(
             this.#cvs,
             this.#scene.camera,
             () => {
-                this.draw_soon();
+                this.draw();
             },
             {
                 minZoom: 0.5,
-                maxZoom: 100,
+                maxZoom: 130,
             }
         );
     }
@@ -162,7 +162,7 @@ class PCBViewer {
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
         this.#setup_layers();
         this.#look_at_board();
-        this.draw_soon();
+        this.draw();
     }
 
     #setup_layers() {
@@ -184,7 +184,7 @@ class PCBViewer {
                 info: layer_info,
                 geometry: new geometry_class(this.#gl),
                 colors: colors,
-                visible: true,
+                visible: default_visible_layers.includes(layer_info.name),
             };
 
             layer.geometry.set(this.pcb, layer_info.source_name ?? layer.name);
@@ -198,60 +198,174 @@ class PCBViewer {
         this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
     }
 
-    draw_soon() {
+    draw() {
         window.requestAnimationFrame(() => {
-            this.draw();
+            this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
+
+            let matrix = this.#scene.view_projection_matrix;
+
+            for (const layer_name of layers_ordered_by_visibility) {
+                const layer = this.layers[layer_name];
+
+                if (!layer || !layer.visible) {
+                    continue;
+                }
+
+                layer.geometry.draw(matrix, ...layer.colors);
+            }
         });
     }
+}
 
-    draw() {
-        this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
+class KicadPCBElement extends HTMLElement {
+    #canvas;
+    viewer;
 
-        let matrix = this.#scene.view_projection_matrix;
+    constructor() {
+        super();
+        this.selected = [];
+    }
 
-        for (const layer_name of layers_ordered_by_visibility) {
-            const layer = this.layers[layer_name];
+    get loaded() {
+        return this.hasAttribute("loaded");
+    }
 
-            if (!layer || !layer.visible) {
-                continue;
-            }
-
-            layer.geometry.draw(matrix, ...layer.colors);
+    set loaded(value) {
+        if (value) {
+            this.setAttribute("loaded", "");
+        } else {
+            this.removeAttribute("loaded");
         }
     }
+
+    async connectedCallback() {
+        this.#renderShadowDOM();
+
+        this.viewer = new PCBViewer(this.#canvas);
+        await this.viewer.setup();
+        await this.viewer.load(this.getAttribute("src"));
+
+        this.loaded = true;
+        this.dispatchEvent(new CustomEvent("kicad-pcb:loaded"));
+
+        this.viewer.draw();
+    }
+
+    #renderShadowDOM() {
+        const template = document.createElement("template");
+        template.innerHTML = `
+            <style>
+                :host {
+                    display: block;
+                }
+
+                canvas {
+                    width: 100%;
+                    height: 100%;
+                }
+            </style>
+            <canvas></canvas>
+        `;
+
+        this.attachShadow({ mode: "open" });
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.#canvas = this.shadowRoot.querySelector("canvas");
+    }
 }
 
-async function main() {
-    const pcb_url = "../example-boards/starfish.kicad_pcb";
-    const canvas = document.querySelector("canvas");
+window.customElements.define("kicad-pcb", KicadPCBElement);
 
-    const pcb_viewer = new PCBViewer(canvas);
-    await pcb_viewer.setup();
-    await pcb_viewer.load(pcb_url);
+class KicadPCBLayerControls extends HTMLElement {
+    #target;
 
-    for (const layer of Object.values(pcb_viewer.layers)) {
-        layer.visible = default_visible_layers.includes(layer.name);
+    constructor() {
+        super();
     }
-    pcb_viewer.draw_soon();
 
-    const aside = $q("kicad-pcb aside");
+    async connectedCallback() {
+        this.#target = document.querySelector(`#${this.getAttribute("for")}`);
 
-    for (const layer_name of layers_ordered_for_controls) {
-        const layer = pcb_viewer.layers[layer_name];
-        const button = $template(`
-        <button type="button" name="${layer.name}" data-visible="${
-            layer.visible ? "yes" : "no"
-        }">
-            <span class="color"></span><span class="name">${layer.name}</name>
-        </button>
-        `);
-        aside.append(button);
-        $on(button, "click", (e) => {
-            layer.visible = !layer.visible;
-            button.dataset.visible = layer.visible ? "yes" : "no";
-            pcb_viewer.draw_soon();
+        if (this.#target.loaded) {
+            this.#renderShadowDOM();
+        } else {
+            this.#target.addEventListener("kicad-pcb:loaded", () => {
+                this.#renderShadowDOM();
+            });
+        }
+    }
+
+    #renderShadowDOM() {
+        const viewer = this.#target.viewer;
+        const buttons = [];
+
+        for (const layer_name of layers_ordered_for_controls) {
+            const layer = viewer.layers[layer_name];
+            const visible = layer.visible ? "yes" : "no";
+            const color = layer.colors[0];
+            const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
+                color[2] * 255
+            })`;
+            buttons.push(`
+                <button type="button" name="${layer.name}" visible="${visible}">
+                    <span class="color" style="background-color: ${css_color};"></span>
+                    <span class="name">${layer.name}</name>
+                </button>`);
+        }
+
+        const template = document.createElement("template");
+        template.innerHTML = `
+            <style>
+                :host {
+                    display: block;
+                }
+
+                button {
+                    color: white;
+                    background: transparent;
+                    padding: 0.5rem 1rem;
+                    text-align: left;
+                    border: 0 none;
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                }
+
+                button:hover {
+                    background-color: #333;
+                }
+
+                button[visible="no"] {
+                    color: #aaa;
+                }
+
+                .color {
+                    display: inline-block;
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.5rem;
+                }
+            </style>
+            ${buttons.join("\n")}
+        `;
+
+        this.attachShadow({ mode: "open" });
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.shadowRoot.addEventListener("click", (e) => {
+            this.#on_click(e);
         });
     }
+
+    #on_click(e) {
+        const button = e.target.closest("button");
+        if (!button) {
+            return;
+        }
+
+        const layer = this.#target.viewer.layers[button.getAttribute("name")];
+        layer.visible = !layer.visible;
+        button.setAttribute("visible", layer.visible ? "yes" : "no");
+        this.#target.viewer.draw();
+    }
 }
 
-main();
+window.customElements.define("kicad-pcb-layer-controls", KicadPCBLayerControls);
