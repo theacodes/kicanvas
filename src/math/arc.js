@@ -69,13 +69,15 @@ export class Arc {
             );
         }
 
-        // Add the last point explicity
-        points.push(
-            new Vec2(
-                this.center.x + Math.cos(end) * this.radius,
-                this.center.y + Math.sin(end) * this.radius
-            )
+        // Add the last point if needed.
+        const last_point = new Vec2(
+            this.center.x + Math.cos(end) * this.radius,
+            this.center.y + Math.sin(end) * this.radius
         );
+
+        if (!last_point.equals(points[points.length - 1])) {
+            points.push(last_point);
+        }
 
         return {
             points: points,
