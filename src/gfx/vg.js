@@ -9,11 +9,8 @@ import { Vec2 } from "../math/vec2.js";
 import earcut from "../math/earcut/earcut.js";
 
 class Tesselator {
-    // Each line segment is a two-triangle quad.
-    static vertices_per_segment = 2 * 3;
-
-    // Each circle is represented by a two-triangle quad.
-    static vertices_per_circle = 2 * 3;
+    // Each line segment or circle is a two-triangle quad.
+    static vertices_per_quad = 2 * 3;
 
     static quad_to_triangles(quad) {
         const positions = [
@@ -51,7 +48,7 @@ class Tesselator {
         width = width || 0;
 
         const segment_count = points.length - 1;
-        const vertex_count = segment_count * this.vertices_per_segment;
+        const vertex_count = segment_count * this.vertices_per_quad;
         const position_data = new Float32Array(vertex_count * 2);
         // const color_data = new Float32Array(vertex_count * 4);
         const cap_data = new Float32Array(vertex_count);
@@ -77,7 +74,7 @@ class Tesselator {
                 vertex_index
             );
 
-            vertex_index += this.vertices_per_segment;
+            vertex_index += this.vertices_per_quad;
         }
 
         return [
@@ -99,20 +96,20 @@ class Tesselator {
     }
 
     static tesselate_circles(circles) {
-        const vertex_count = circles.length * this.vertices_per_circle;
+        const vertex_count = circles.length * this.vertices_per_quad;
         const position_data = new Float32Array(vertex_count * 2);
         const cap_data = new Float32Array(vertex_count);
 
         for (let i = 0; i < circles.length; i++) {
             const c = circles[i];
-            const vertex_index = i * this.vertices_per_circle;
+            const vertex_index = i * this.vertices_per_quad;
             const cap_region = 1.0;
             const quad = this.tesselate_circle(c);
 
             position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
 
             cap_data.set(
-                Array(this.vertices_per_circle).fill(cap_region),
+                Array(this.vertices_per_quad).fill(cap_region),
                 vertex_index
             );
         }
@@ -205,7 +202,7 @@ export class PolylineSet {
         }
 
         const vertex_count = lines.reduce((v, e) => {
-            return v + (e.points.length - 1) * Tesselator.vertices_per_segment;
+            return v + (e.points.length - 1) * Tesselator.vertices_per_quad;
         }, 0);
 
         const position_data = new Float32Array(vertex_count * 2);
