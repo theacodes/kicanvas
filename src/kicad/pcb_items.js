@@ -97,6 +97,8 @@ export class Via {
             this.type = "blind";
         } else if (e.maybe_atom("buried")) {
             this.type = "buried";
+        } else if (e.maybe_atom("micro")) {
+            this.type = "micro";
         } else {
             this.type = "through-hole";
         }
@@ -411,6 +413,7 @@ export class Pad {
         const drill = e.maybe_expr("drill");
         this.drill = drill ? new Drill(drill) : null;
 
+        this.rect_delta = e.maybe_vec2("rect_delta");
         this.layers = Array.from(e.expect_expr("layers").rest());
         this.roundrect_rratio = e.maybe_pair_number("roundrect_rratio");
         this.chamfer_ratio = e.maybe_pair_number("chamfer_ratio");
@@ -590,7 +593,7 @@ class TitleBlock {
 
         this.title = e.expect_pair_string("title");
         this.date = e.expect_pair_string("date");
-        this.rev = e.expect_pair_string("rev");
+        this.rev = e.maybe_pair_string("rev");
         this.company = e.expect_pair_string("company");
         this.comment_1 = maybe_comment();
         this.comment_2 = maybe_comment();
@@ -671,6 +674,8 @@ class PcbPlotParams {
                 : false;
         this.creategerberjobfile =
             e.expect_pair_atom("creategerberjobfile") == "true" ? true : false;
+        this.gerberprecision =
+            e.expect_pair_number("gerberprecision") == "true" ? true : false;
         this.svguseinch =
             e.expect_pair_atom("svguseinch") == "true" ? true : false;
         this.svgprecision = e.expect_pair_number("svgprecision");
