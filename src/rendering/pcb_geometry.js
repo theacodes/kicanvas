@@ -754,21 +754,17 @@ export class ThroughHoleLayer {
 
         this.polylines.shader.bind();
         this.polylines.shader.u_matrix.mat3f(false, matrix.elements);
-        this.polylines.shader.u_color.f4(...pad_color);
         this.polylines.draw();
 
         this.ring_circles.shader.bind();
         this.ring_circles.shader.u_matrix.mat3f(false, matrix.elements);
 
-        this.ring_circles.shader.u_color.f4(...pad_color);
         this.ring_circles.draw();
 
-        this.drill_circles.shader.u_color.f4(...drill_color);
         this.drill_circles.draw();
 
         this.drill_slots.shader.bind();
         this.drill_slots.shader.u_matrix.mat3f(false, matrix.elements);
-        this.drill_slots.shader.u_color.f4(...drill_color);
         this.drill_slots.draw();
     }
 

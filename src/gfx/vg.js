@@ -23,11 +23,21 @@ class Tesselator {
         ];
 
         // check for degenerate quads
+        // TODO: this can eventually be removed.
         if (positions.filter((v) => Number.isNaN(v)).length) {
             throw new Error("Degenerate quad");
         }
 
         return positions;
+    }
+
+    static populate_color_data(dest, color, offset, length) {
+        if (!color) {
+            color = [1, 0, 0, 1];
+        }
+        for (let i = 0; i < length; i++) {
+            dest[offset + i] = color[i % color.length];
+        }
     }
 
     static tesselate_segment(p1, p2, width) {
@@ -44,13 +54,13 @@ class Tesselator {
         return [a, b, c, d];
     }
 
-    static tesselate_line(points, width) {
+    static tesselate_line(points, width, color) {
         width = width || 0;
 
         const segment_count = points.length - 1;
         const vertex_count = segment_count * this.vertices_per_quad;
         const position_data = new Float32Array(vertex_count * 2);
-        // const color_data = new Float32Array(vertex_count * 4);
+        const color_data = new Float32Array(vertex_count * 4);
         const cap_data = new Float32Array(vertex_count);
         let vertex_index = 0;
 
@@ -70,8 +80,14 @@ class Tesselator {
 
             position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
             cap_data.set(
-                Array(this.vertices_per_circle).fill(cap_region),
+                Array(this.vertices_per_quad).fill(cap_region),
                 vertex_index
+            );
+            this.populate_color_data(
+                color_data,
+                color,
+                vertex_index * 4,
+                this.vertices_per_quad * 4
             );
 
             vertex_index += this.vertices_per_quad;
@@ -80,6 +96,7 @@ class Tesselator {
         return [
             position_data.slice(0, vertex_index * 2),
             cap_data.slice(0, vertex_index),
+            color_data.slice(0, vertex_index * 4),
         ];
     }
 
@@ -99,6 +116,7 @@ class Tesselator {
         const vertex_count = circles.length * this.vertices_per_quad;
         const position_data = new Float32Array(vertex_count * 2);
         const cap_data = new Float32Array(vertex_count);
+        const color_data = new Float32Array(vertex_count * 4);
 
         for (let i = 0; i < circles.length; i++) {
             const c = circles[i];
@@ -112,9 +130,16 @@ class Tesselator {
                 Array(this.vertices_per_quad).fill(cap_region),
                 vertex_index
             );
+
+            this.populate_color_data(
+                color_data,
+                c.color,
+                vertex_index * 4,
+                this.vertices_per_quad
+            );
         }
 
-        return [position_data, cap_data];
+        return [position_data, color_data, cap_data];
     }
 }
 
@@ -138,6 +163,7 @@ export class CircleSet {
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
+        this.color_buf = this.vao.buffer(this.shader.a_color, 4);
         this.vertex_count = 0;
     }
 
@@ -145,13 +171,16 @@ export class CircleSet {
         this.vao.dispose();
         this.position_buf.dispose();
         this.cap_region_buf.dispose();
+        this.color_buf.dispose();
     }
 
     set(circles) {
-        const [position_data, cap_data] = Tesselator.tesselate_circles(circles);
+        const [position_data, cap_data, color_data] =
+            Tesselator.tesselate_circles(circles);
         this.position_buf.set(position_data);
         this.cap_region_buf.set(cap_data);
-        this.vertex_count = position_data.length;
+        this.color_buf.set(color_data);
+        this.vertex_count = position_data.length / 2;
     }
 
     draw() {
@@ -159,7 +188,7 @@ export class CircleSet {
             return;
         }
         this.vao.bind();
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count / 2);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count);
     }
 }
 
@@ -180,13 +209,8 @@ export class PolylineSet {
         this.shader = shader ?? this.constructor.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.cap_region_buf = this.vao.buffer(
-            this.shader.a_cap_region,
-            1,
-            this.gl.FLOAT,
-            false,
-            0
-        );
+        this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
+        this.color_buf = this.vao.buffer(this.shader.a_color, 4);
         this.vertex_count = 0;
     }
 
@@ -194,6 +218,7 @@ export class PolylineSet {
         this.vao.dispose();
         this.position_buf.dispose();
         this.cap_region_buf.dispose();
+        this.color_buf.dispose();
     }
 
     set(lines) {
@@ -207,23 +232,31 @@ export class PolylineSet {
 
         const position_data = new Float32Array(vertex_count * 2);
         const cap_data = new Float32Array(vertex_count);
+        const color_data = new Float32Array(vertex_count * 4);
 
-        let line_offset = 0;
-        let cap_offset = 0;
+        let position_idx = 0;
+        let cap_idx = 0;
+        let color_idx = 0;
+
         for (const line of lines) {
-            const [line_position_data, line_cap_data] =
-                Tesselator.tesselate_line(line.points, line.width);
+            const [line_position_data, line_cap_data, line_color_data] =
+                Tesselator.tesselate_line(line.points, line.width, line.color);
 
-            position_data.set(line_position_data, line_offset);
-            cap_data.set(line_cap_data, cap_offset);
-            cap_offset += line_cap_data.length;
-            line_offset += line_position_data.length;
+            position_data.set(line_position_data, position_idx);
+            position_idx += line_position_data.length;
+
+            cap_data.set(line_cap_data, cap_idx);
+            cap_idx += line_cap_data.length;
+
+            color_data.set(line_color_data, color_idx);
+            color_idx += line_color_data.length;
         }
 
         this.position_buf.set(position_data);
         this.cap_region_buf.set(cap_data);
-        // console.log(cap_data);
-        this.vertex_count = line_offset / 2;
+        this.color_buf.set(color_data);
+
+        this.vertex_count = position_idx / 2;
     }
 
     draw() {
@@ -372,14 +405,12 @@ export class GeometrySet {
         if (this.#circles) {
             this.#circles.shader.bind();
             this.#circles.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#circles.shader.u_color.f4(...color);
             this.#circles.draw();
         }
 
         if (this.#polylines) {
             this.#polylines.shader.bind();
             this.#polylines.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#polylines.shader.u_color.f4(...color);
             this.#polylines.draw();
         }
     }

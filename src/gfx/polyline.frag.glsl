@@ -2,9 +2,9 @@
 
 precision highp float;
 
-uniform vec4 u_color;
 in vec2 v_linespace;
 in float v_cap_region;
+in vec4 v_color;
 
 out vec4 outColor;
 
@@ -17,7 +17,7 @@ void main() {
         float a = (1.0 + x) / v_cap_region;
         x = mix(-1.0, 0.0, a);
         if(x * x + y * y < 1.0) {
-            outColor = u_color;
+            outColor = v_color;
         } else {
             discard;
         }
@@ -25,11 +25,11 @@ void main() {
         float a = (x - (1.0 - v_cap_region)) / v_cap_region;
         x = mix(0.0, 1.0, a);
         if(x * x + y * y < 1.0) {
-            outColor = u_color;
+            outColor = v_color;
         } else {
             discard;
         }
     } else {
-        outColor = u_color;
+        outColor = v_color;
     }
 }
