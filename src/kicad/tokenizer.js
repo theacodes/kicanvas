@@ -35,6 +35,14 @@ function is_whitespace(c) {
     return c === " " || c === "\n" || c === "\r" || c === "\t";
 }
 
+function error_context(input, index) {
+    let start = input.slice(0, index).lastIndexOf("\n");
+    if (start < 0) start = 0;
+    let end = input.slice(index).indexOf("\n");
+    if (end < 0) end = 20;
+    return input.slice(start, index + end);
+}
+
 export function* tokenize(input) {
     const open_token = new Token(Token.OPEN);
     const close_token = new Token(Token.CLOSE);
@@ -59,20 +67,35 @@ export function* tokenize(input) {
                 state = "number";
                 start_idx = i;
                 continue;
-            } else if (is_alpha(c) || c == "*") {
+            } else if (is_alpha(c) || ["*", "&", "$", "/", "%"].includes(c)) {
                 state = "atom";
                 start_idx = i;
                 continue;
             } else if (is_whitespace(c)) {
                 continue;
             } else {
-                throw `Unexpected character at index ${i}: ${c}`;
+                throw `Unexpected character at index ${i}: ${c}\nContext: ${error_context(
+                    input,
+                    i
+                )}`;
             }
         } else if (state === "atom") {
             if (
                 is_alpha(c) ||
                 is_digit(c) ||
-                ["-", "_", ".", "*", "&"].includes(c)
+                [
+                    "-",
+                    "_",
+                    ".",
+                    "*",
+                    "&",
+                    "$",
+                    "{",
+                    "}",
+                    "/",
+                    ":",
+                    "%",
+                ].includes(c)
             ) {
                 continue;
             } else if (c === ")" || is_whitespace(c)) {
@@ -83,7 +106,10 @@ export function* tokenize(input) {
                 }
             } else {
                 throw new Error(
-                    `Unexpected character while tokenizing atom at index ${i}: ${c}.`
+                    `Unexpected character while tokenizing atom at index ${i}: ${c}\nContext: ${error_context(
+                        input,
+                        i
+                    )}`
                 );
             }
         } else if (state === "number") {
@@ -99,6 +125,10 @@ export function* tokenize(input) {
                 /* Special case of UUID value */
                 state = "atom";
                 continue;
+            } else if (is_alpha(c)) {
+                /* It's actually an atom, e.g. +3V3 */
+                state = "atom";
+                continue;
             } else if (c === ")" || is_whitespace(c)) {
                 yield new Token(
                     Token.NUMBER,
@@ -110,7 +140,12 @@ export function* tokenize(input) {
                 }
                 continue;
             } else {
-                throw `Unexpected character at index ${i}: ${c}, expected numeric.`;
+                throw new Error(
+                    `Unexpected character at index ${i}: ${c}, expected numeric.\nContext: ${error_context(
+                        input,
+                        i
+                    )}`
+                );
             }
         } else if (state === "hex") {
             if (
