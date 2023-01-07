@@ -8,143 +8,29 @@ import { VertexArray, ShaderProgram } from "./gl.js";
 import { Vec2 } from "../math/vec2.js";
 import earcut from "../math/earcut/earcut.js";
 
-export class CircleSet {
-    static shader;
-
-    // Each circle is represented by a two-triangle quad.
-    static vertices_per_point = 2 * 3;
-
-    static async load_shader(gl) {
-        // This re-uses the same shader that polyline uses, since the polyline
-        // is pill-shaped, circle is just a special case of a zero-length polyline.
-        this.shader = await ShaderProgram.load(
-            gl,
-            "polyline",
-            "./polyline.vert.glsl",
-            "./polyline.frag.glsl"
-        );
-    }
-
-    static tesselate_circle(circle) {
-        const n = new Vec2(circle.radius, 0);
-        const n2 = n.normal;
-
-        let a = circle.point.add(n).add(n2);
-        let b = circle.point.sub(n).add(n2);
-        let c = circle.point.add(n).sub(n2);
-        let d = circle.point.sub(n).sub(n2);
-
-        return [a, b, c, d];
-    }
-
-    static tesselate_circles(circles) {
-        const vertex_count = circles.length * this.vertices_per_point;
-        const position_data = new Float32Array(vertex_count * 2);
-        const linespace_data = new Float32Array(vertex_count * 2);
-        const cap_data = new Float32Array(vertex_count);
-
-        for (let i = 0; i < circles.length; i++) {
-            const c = circles[i];
-            const vertex_index = i * this.vertices_per_point;
-            const cap_region = 1.0;
-            const quad = this.tesselate_circle(c);
-
-            position_data.set(
-                [
-                    ...quad[0],
-                    ...quad[2],
-                    ...quad[1],
-                    ...quad[1],
-                    ...quad[2],
-                    ...quad[3],
-                ],
-                vertex_index * 2
-            );
-
-            linespace_data.set(
-                [
-                    // first triangle
-                    -1,
-                    -1, //
-                    1,
-                    -1, //
-                    -1,
-                    1, //
-                    // second triangle
-                    -1,
-                    1, //
-                    1,
-                    -1, //
-                    1,
-                    1, //
-                ],
-                vertex_index * 2
-            );
-
-            cap_data.set(
-                [
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                ],
-                vertex_index
-            );
-        }
-
-        return [position_data, linespace_data, cap_data];
-    }
-
-    constructor(gl, shader = null) {
-        this.gl = gl;
-        this.shader = shader ?? this.constructor.shader;
-        this.vao = new VertexArray(gl);
-        this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.linespace_buf = this.vao.buffer(this.shader.a_linespace, 2);
-        this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
-        this.vertex_count = 0;
-    }
-
-    dispose() {
-        this.vao.dispose();
-        this.position_buf.dispose();
-        this.linespace_buf.dispose();
-        this.cap_region_buf.dispose();
-    }
-
-    set(circles) {
-        const [position_data, space_data, cap_data] =
-            this.constructor.tesselate_circles(circles);
-        this.position_buf.set(position_data);
-        this.linespace_buf.set(space_data);
-        this.cap_region_buf.set(cap_data);
-        this.vertex_count = position_data.length;
-    }
-
-    draw() {
-        if (!this.vertex_count) {
-            return;
-        }
-        this.vao.bind();
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count / 2);
-    }
-}
-
-export class Polyline {
-    static shader;
-
+class Tesselator {
     // Each line segment is a two-triangle quad.
     static vertices_per_segment = 2 * 3;
 
-    static async load_shader(gl) {
-        this.shader = await ShaderProgram.load(
-            gl,
-            "polyline",
-            "./polyline.vert.glsl",
-            "./polyline.frag.glsl"
-        );
+    // Each circle is represented by a two-triangle quad.
+    static vertices_per_circle = 2 * 3;
+
+    static quad_to_triangles(quad) {
+        const positions = [
+            ...quad[0],
+            ...quad[2],
+            ...quad[1],
+            ...quad[1],
+            ...quad[2],
+            ...quad[3],
+        ];
+
+        // check for degenerate quads
+        if (positions.filter((v) => Number.isNaN(v)).length) {
+            throw new Error("Degenerate quad");
+        }
+
+        return positions;
     }
 
     static tesselate_segment(p1, p2, width) {
@@ -164,64 +50,30 @@ export class Polyline {
     static tesselate_line(points, width) {
         width = width || 0;
 
-        const vertex_count = (points.length - 1) * this.vertices_per_segment;
+        const segment_count = points.length - 1;
+        const vertex_count = segment_count * this.vertices_per_segment;
         const position_data = new Float32Array(vertex_count * 2);
-        const linespace_data = new Float32Array(vertex_count * 2);
+        // const color_data = new Float32Array(vertex_count * 4);
         const cap_data = new Float32Array(vertex_count);
         let vertex_index = 0;
 
-        for (let i = 1; i < points.length; i++) {
-            const p1 = points[i - 1];
-            const p2 = points[i];
+        for (let segment_num = 1; segment_num < points.length; segment_num++) {
+            const p1 = points[segment_num - 1];
+            const p2 = points[segment_num];
 
             const length = p2.sub(p1).length;
-            const quad = this.tesselate_segment(p1, p2, width);
-            const cap_region = width / (length + width);
 
-            const positions = [
-                ...quad[0],
-                ...quad[2],
-                ...quad[1],
-                ...quad[1],
-                ...quad[2],
-                ...quad[3],
-            ];
-
-            if (positions.filter((v) => Number.isNaN(v)).length) {
+            // skip zero-length segments
+            if (length == 0) {
                 continue;
             }
 
-            position_data.set(positions, vertex_index * 2);
+            const quad = this.tesselate_segment(p1, p2, width);
+            const cap_region = width / (length + width);
 
-            linespace_data.set(
-                [
-                    // first triangle
-                    -1,
-                    -1, //
-                    1,
-                    -1, //
-                    -1,
-                    1, //
-                    // second triangle
-                    -1,
-                    1, //
-                    1,
-                    -1, //
-                    1,
-                    1, //
-                ],
-                vertex_index * 2
-            );
-
+            position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
             cap_data.set(
-                [
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                    cap_region,
-                ],
+                Array(this.vertices_per_circle).fill(cap_region),
                 vertex_index
             );
 
@@ -230,9 +82,57 @@ export class Polyline {
 
         return [
             position_data.slice(0, vertex_index * 2),
-            linespace_data.slice(0, vertex_index * 2),
             cap_data.slice(0, vertex_index),
         ];
+    }
+
+    static tesselate_circle(circle) {
+        const n = new Vec2(circle.radius, 0);
+        const n2 = n.normal;
+
+        let a = circle.point.add(n).add(n2);
+        let b = circle.point.sub(n).add(n2);
+        let c = circle.point.add(n).sub(n2);
+        let d = circle.point.sub(n).sub(n2);
+
+        return [a, b, c, d];
+    }
+
+    static tesselate_circles(circles) {
+        const vertex_count = circles.length * this.vertices_per_circle;
+        const position_data = new Float32Array(vertex_count * 2);
+        const cap_data = new Float32Array(vertex_count);
+
+        for (let i = 0; i < circles.length; i++) {
+            const c = circles[i];
+            const vertex_index = i * this.vertices_per_circle;
+            const cap_region = 1.0;
+            const quad = this.tesselate_circle(c);
+
+            position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
+
+            cap_data.set(
+                Array(this.vertices_per_circle).fill(cap_region),
+                vertex_index
+            );
+        }
+
+        return [position_data, cap_data];
+    }
+}
+
+export class CircleSet {
+    static shader;
+
+    static async load_shader(gl) {
+        // This re-uses the same shader that polyline uses, since the polyline
+        // is pill-shaped, circle is just a special case of a zero-length polyline.
+        this.shader = await ShaderProgram.load(
+            gl,
+            "polyline",
+            "./polyline.vert.glsl",
+            "./polyline.frag.glsl"
+        );
     }
 
     constructor(gl, shader = null) {
@@ -240,22 +140,19 @@ export class Polyline {
         this.shader = shader ?? this.constructor.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.linespace_buf = this.vao.buffer(this.shader.a_linespace, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
+        this.vertex_count = 0;
     }
 
     dispose() {
         this.vao.dispose();
         this.position_buf.dispose();
-        this.linespace_buf.dispose();
         this.cap_region_buf.dispose();
     }
 
-    set(points, width) {
-        const [position_data, space_data, cap_data] =
-            this.constructor.tesselate_line(points, width);
+    set(circles) {
+        const [position_data, cap_data] = Tesselator.tesselate_circles(circles);
         this.position_buf.set(position_data);
-        this.linespace_buf.set(space_data);
         this.cap_region_buf.set(cap_data);
         this.vertex_count = position_data.length;
     }
@@ -286,42 +183,50 @@ export class PolylineSet {
         this.shader = shader ?? this.constructor.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.linespace_buf = this.vao.buffer(this.shader.a_linespace, 2);
-        this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
+        this.cap_region_buf = this.vao.buffer(
+            this.shader.a_cap_region,
+            1,
+            this.gl.FLOAT,
+            false,
+            0
+        );
         this.vertex_count = 0;
     }
 
     dispose() {
         this.vao.dispose();
         this.position_buf.dispose();
-        this.linespace_buf.dispose();
         this.cap_region_buf.dispose();
     }
 
     set(lines) {
+        if (!lines.length) {
+            return false;
+        }
+
         const vertex_count = lines.reduce((v, e) => {
-            return v + (e.points.length - 1) * Polyline.vertices_per_segment;
+            return v + (e.points.length - 1) * Tesselator.vertices_per_segment;
         }, 0);
 
         const position_data = new Float32Array(vertex_count * 2);
-        const space_data = new Float32Array(vertex_count * 2);
         const cap_data = new Float32Array(vertex_count);
 
         let line_offset = 0;
+        let cap_offset = 0;
         for (const line of lines) {
-            const [line_position_data, line_space_data, line_cap_data] =
-                Polyline.tesselate_line(line.points, line.width);
+            const [line_position_data, line_cap_data] =
+                Tesselator.tesselate_line(line.points, line.width);
 
             position_data.set(line_position_data, line_offset);
-            space_data.set(line_space_data, line_offset);
-            cap_data.set(line_cap_data, line_offset / 2);
+            cap_data.set(line_cap_data, cap_offset);
+            cap_offset += line_cap_data.length;
             line_offset += line_position_data.length;
         }
 
         this.position_buf.set(position_data);
-        this.linespace_buf.set(space_data);
         this.cap_region_buf.set(cap_data);
-        this.vertex_count = line_offset;
+        // console.log(cap_data);
+        this.vertex_count = line_offset / 2;
     }
 
     draw() {
@@ -329,7 +234,7 @@ export class PolylineSet {
             return;
         }
         this.vao.bind();
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count / 2);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count);
     }
 }
 
