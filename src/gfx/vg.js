@@ -107,6 +107,13 @@ export class CircleSet {
         this.vertex_count = 0;
     }
 
+    dispose() {
+        this.vao.dispose();
+        this.position_buf.dispose();
+        this.linespace_buf.dispose();
+        this.cap_region_buf.dispose();
+    }
+
     set(circles) {
         const [position_data, space_data, cap_data] =
             this.constructor.tesselate_circles(circles);
@@ -237,6 +244,13 @@ export class Polyline {
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
     }
 
+    dispose() {
+        this.vao.dispose();
+        this.position_buf.dispose();
+        this.linespace_buf.dispose();
+        this.cap_region_buf.dispose();
+    }
+
     set(points, width) {
         const [position_data, space_data, cap_data] =
             this.constructor.tesselate_line(points, width);
@@ -275,6 +289,13 @@ export class PolylineSet {
         this.linespace_buf = this.vao.buffer(this.shader.a_linespace, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
         this.vertex_count = 0;
+    }
+
+    dispose() {
+        this.vao.dispose();
+        this.position_buf.dispose();
+        this.linespace_buf.dispose();
+        this.cap_region_buf.dispose();
     }
 
     set(lines) {
@@ -330,6 +351,11 @@ export class PolygonSet {
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.vertex_count = 0;
+    }
+
+    dispose() {
+        this.vao.dispose();
+        this.position_buf.dispose();
     }
 
     static triangulate(points) {
@@ -389,5 +415,70 @@ export class PolygonSet {
         }
         this.vao.bind();
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count);
+    }
+}
+
+/**
+ * Represents a single set of vector objects (lines, circles, etc.) that are
+ * all rendered at the same time with the same colors.
+ */
+export class GeometrySet {
+    gl;
+    #polygons;
+    #circles;
+    #polylines;
+
+    constructor(gl) {
+        this.gl = gl;
+        this.polygons = new PolygonSet(gl);
+        this.circles = new CircleSet(gl);
+        this.polylines = new PolylineSet(gl);
+    }
+
+    set_polygons(polys) {
+        if (this.#polygons) {
+            this.#polygons.dispose();
+        }
+        this.#polygons = new PolygonSet(this.gl);
+        this.#polygons.set(polys);
+    }
+
+    set_circles(circles) {
+        if (this.#circles) {
+            this.#circles.dispose();
+        }
+        this.#circles = new CircleSet(this.gl);
+        this.#circles.set(circles);
+    }
+
+    set_polylines(polylines) {
+        if (this.#polylines) {
+            this.#polylines.dispose();
+        }
+        this.#polylines = new PolylineSet(this.gl);
+        this.#polylines.set(polylines);
+    }
+
+    draw(matrix, color) {
+        if (this.#polygons) {
+            this.#polygons.shader.bind();
+            this.#polygons.shader.u_matrix.mat3f(false, matrix.elements);
+            this.#polygons.shader.u_color.f4(...color);
+            this.#polygons.draw();
+        }
+
+        if (this.#circles) {
+            this.#circles.shader.bind();
+            this.#circles.shader.u_matrix.mat3f(false, matrix.elements);
+            this.#circles.shader.u_color.f4(...color);
+            this.#circles.draw();
+        }
+
+        if (this.#polylines) {
+            this.#polylines.shader.bind();
+            this.#polylines.shader.u_matrix.mat3f(false, matrix.elements);
+            this.#polylines.shader.u_color.f4(...color);
+            this.#polylines.draw();
+        }
     }
 }

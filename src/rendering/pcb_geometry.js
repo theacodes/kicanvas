@@ -9,7 +9,7 @@ import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Arc } from "../math/arc.js";
 import { BBox } from "../math/bbox.js";
-import { CircleSet, PolygonSet, PolylineSet } from "../gfx/vg.js";
+import { CircleSet, PolygonSet, PolylineSet, GeometrySet } from "../gfx/vg.js";
 import * as pcb_items from "../kicad/pcb_items.js";
 
 export class GeometryBuilder {
@@ -597,27 +597,12 @@ export class GeometryBuilder {
 
 export class Layer {
     constructor(gl) {
-        this.polygons = new PolygonSet(gl);
-        this.circles = new CircleSet(gl);
-        this.polylines = new PolylineSet(gl);
+        this.geometry = new GeometrySet(gl);
         this.bboxes = [];
     }
 
     draw(matrix, color) {
-        this.polygons.shader.bind();
-        this.polygons.shader.u_matrix.mat3f(false, matrix.elements);
-        this.polygons.shader.u_color.f4(...color);
-        this.polygons.draw();
-
-        this.polylines.shader.bind();
-        this.polylines.shader.u_matrix.mat3f(false, matrix.elements);
-        this.polylines.shader.u_color.f4(...color);
-        this.polylines.draw();
-
-        this.circles.shader.bind();
-        this.circles.shader.u_matrix.mat3f(false, matrix.elements);
-        this.circles.shader.u_color.f4(...color);
-        this.circles.draw();
+        this.geometry.draw(matrix, color);
     }
 
     set(pcb, layer, mode = null) {
@@ -679,9 +664,9 @@ export class Layer {
         }
 
         this.bbox = BBox.combine(this.bboxes, this);
-        this.polylines.set(lines);
-        this.circles.set(circles);
-        this.polygons.set(polys);
+        this.geometry.set_polylines(lines);
+        this.geometry.set_circles(circles);
+        this.geometry.set_polygons(polys);
     }
 }
 

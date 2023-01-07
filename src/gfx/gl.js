@@ -162,6 +162,10 @@ export class VertexArray {
         this.bind();
     }
 
+    dispose() {
+        this.gl.deleteVertexArray(this.vao);
+    }
+
     bind() {
         this.gl.bindVertexArray(this.vao);
     }
@@ -196,6 +200,10 @@ export class Buffer {
     constructor(gl) {
         this.gl = gl;
         this.buf = gl.createBuffer();
+    }
+
+    dispose() {
+        this.gl.deleteBuffer(this.buf);
     }
 
     bind(target = null) {
