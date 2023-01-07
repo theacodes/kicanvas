@@ -434,6 +434,7 @@ export class GeometryBuilder {
                 }
                 break;
             case "roundrect":
+            case "trapezoid":
                 // KiCAD approximates rounded rectangle using four line segments
                 // with their width set to the round radius. Clever bastards.
                 // Since our polylines aren't filled, we'll add both a polygon
@@ -444,11 +445,28 @@ export class GeometryBuilder {
                     let half_size = new Vec2(p.size.x / 2, p.size.y / 2);
                     half_size = half_size.sub(new Vec2(rounding, rounding));
 
+                    let trap_delta = p.rect_delta
+                        ? p.rect_delta.copy()
+                        : new Vec2(0, 0);
+                    trap_delta = trap_delta.multiply(0.5);
+
                     const rect_points = [
-                        new Vec2(-half_size.x, -half_size.y),
-                        new Vec2(half_size.x, -half_size.y),
-                        new Vec2(half_size.x, half_size.y),
-                        new Vec2(-half_size.x, half_size.y),
+                        new Vec2(
+                            -half_size.x - trap_delta.y,
+                            half_size.y + trap_delta.x
+                        ),
+                        new Vec2(
+                            half_size.x + trap_delta.y,
+                            half_size.y - trap_delta.x
+                        ),
+                        new Vec2(
+                            half_size.x - trap_delta.y,
+                            -half_size.y + trap_delta.x
+                        ),
+                        new Vec2(
+                            -half_size.x + trap_delta.y,
+                            -half_size.y - trap_delta.x
+                        ),
                     ].map((v) => offset_mat.transform(v));
 
                     result.fill = PolygonSet.triangulate(rect_points);
