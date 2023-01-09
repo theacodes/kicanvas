@@ -355,63 +355,75 @@ export class PolygonSet {
 
 /**
  * Represents a single set of vector objects (lines, circles, etc.) that are
- * all rendered at the same time with the same colors.
+ * all rendered at the same time (on the same "layer").
  */
 export class GeometrySet {
     gl;
-    #polygons;
-    #circles;
-    #polylines;
+
+    #polygons = [];
+    #circles = [];
+    #lines = [];
+
+    #polygon_set;
+    #circle_set;
+    #polyline_set;
 
     constructor(gl) {
         this.gl = gl;
-        this.polygons = new PolygonSet(gl);
-        this.circles = new CircleSet(gl);
-        this.polylines = new PolylineSet(gl);
+        this.#polygon_set = new PolygonSet(gl);
+        this.#circle_set = new CircleSet(gl);
+        this.#polyline_set = new PolylineSet(gl);
     }
 
-    set_polygons(polys) {
-        if (this.#polygons) {
-            this.#polygons.dispose();
-        }
-        this.#polygons = new PolygonSet(this.gl);
-        this.#polygons.set(polys);
+    dispose() {
+        this.#polygon_set.dispose();
+        this.#circle_set.dispose();
+        this.#polyline_set.dispose();
     }
 
-    set_circles(circles) {
-        if (this.#circles) {
-            this.#circles.dispose();
-        }
-        this.#circles = new CircleSet(this.gl);
-        this.#circles.set(circles);
+    add_circle(point, radius, color) {
+        this.#circles.push({
+            point: point,
+            radius: radius,
+            color: color,
+        });
     }
 
-    set_polylines(polylines) {
-        if (this.#polylines) {
-            this.#polylines.dispose();
-        }
-        this.#polylines = new PolylineSet(this.gl);
-        this.#polylines.set(polylines);
+    add_polygon(points, color) {
+        let triangles = PolygonSet.triangulate(points);
+        // TODO: Colors
+        this.#polygons.push(triangles);
     }
 
-    draw(matrix, color) {
-        if (this.#polygons) {
-            this.#polygons.shader.bind();
-            this.#polygons.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#polygons.shader.u_color.f4(...color);
-            this.#polygons.draw();
-        }
+    add_line(points, width, color) {
+        this.#lines.push({
+            points: points,
+            width: width,
+            color: color,
+        });
+    }
 
-        if (this.#circles) {
-            this.#circles.shader.bind();
-            this.#circles.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#circles.draw();
-        }
+    commit() {
+        this.#polygon_set.set(this.#polygons);
+        this.#polygons = null;
+        this.#polyline_set.set(this.#lines);
+        this.#lines = null;
+        this.#circle_set.set(this.#circles);
+        this.#circles = null;
+    }
 
-        if (this.#polylines) {
-            this.#polylines.shader.bind();
-            this.#polylines.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#polylines.draw();
-        }
+    draw(matrix) {
+        this.#polygon_set.shader.bind();
+        this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
+        this.#polygon_set.shader.u_color.f4(0, 1, 0, 1);
+        this.#polygon_set.draw();
+
+        this.#circle_set.shader.bind();
+        this.#circle_set.shader.u_matrix.mat3f(false, matrix.elements);
+        this.#circle_set.draw();
+
+        this.#polyline_set.shader.bind();
+        this.#polyline_set.shader.u_matrix.mat3f(false, matrix.elements);
+        this.#polyline_set.draw();
     }
 }

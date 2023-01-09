@@ -91,6 +91,13 @@ export class Matrix3 {
         }
     }
 
+    static transform_all(mat, vecs) {
+        if (!mat) {
+            return vecs;
+        }
+        return Array.from(mat.transform_all(vecs));
+    }
+
     multiply(b) {
         const a00 = this.elements[0 * 3 + 0];
         const a01 = this.elements[0 * 3 + 1];

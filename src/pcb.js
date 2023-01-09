@@ -69,7 +69,7 @@ const default_visible_layers = [
     "F.Cu",
     "F.Paste",
     "F.SilkS",
-    "F.Mask",
+    // "F.Mask",
     "Dwgs.User",
     "Edge.Cuts",
     "Margin",
@@ -77,38 +77,40 @@ const default_visible_layers = [
 ];
 
 const special_layers_info = [
-    {
-        name: "ThroughHoles",
-        geometry_class: pcb_geometry.ThroughHoleLayer,
-        colors: [
-            [1, 0.75, 0, 1],
-            [0.3, 0.3, 0.3, 1],
-        ],
-    },
+    // {
+    //     name: "ThroughHoles",
+    //     geometry_class: pcb_geometry.ThroughHoleLayer,
+    //     colors: [
+    //         [1, 0.75, 0, 1],
+    //         [0.3, 0.3, 0.3, 1],
+    //     ],
+    // },
     {
         name: "F.Cu:pads",
         source_name: "F.Cu",
-        geometry_class: pcb_geometry.SurfaceMountLayer,
+        geometry_class: pcb_geometry.Layer,
+        mode: "surfacemount",
         colors: [
             [1, 0.75, 0, 1],
             [0.3, 0.3, 0.3, 1],
         ],
     },
-    {
-        name: "B.Cu:pads",
-        source_name: "B.Cu",
-        geometry_class: pcb_geometry.SurfaceMountLayer,
-        colors: [
-            [1, 0.75, 0, 1],
-            [0.3, 0.3, 0.3, 1],
-        ],
-    },
+    // {
+    //     name: "B.Cu:pads",
+    //     source_name: "B.Cu",
+    //     geometry_class: pcb_geometry.SurfaceMountLayer,
+    //     colors: [
+    //         [1, 0.75, 0, 1],
+    //         [0.3, 0.3, 0.3, 1],
+    //     ],
+    // },
 ];
 
 class PCBViewer {
     #cvs;
     #gl;
     #scene;
+    #painter;
     layers = {};
     pcb;
 
@@ -133,7 +135,7 @@ class PCBViewer {
         await PolygonSet.load_shader(gl);
         await PolylineSet.load_shader(gl);
         await CircleSet.load_shader(gl);
-        pcb_geometry.GeometryBuilder.text_shaper = await TextShaper.default();
+        pcb_geometry.PCBPainter.text_shaper = await TextShaper.default();
     }
 
     async #setup_scene() {
@@ -167,6 +169,9 @@ class PCBViewer {
 
     #setup_layers() {
         const style = new Style($q("kicad-pcb"));
+        const gfx = new pcb_geometry.CanvasBackend(this.#gl);
+
+        this.#painter = new pcb_geometry.PCBPainter(gfx, style);
 
         const layer_infos = special_layers_info.concat(
             Object.values(this.pcb.layers)
@@ -182,12 +187,17 @@ class PCBViewer {
             const layer = {
                 name: layer_info.name,
                 info: layer_info,
-                geometry: new geometry_class(this.#gl),
+                geometry: new geometry_class(this.#gl, gfx, this.#painter),
+                mode: layer_info.mode,
                 colors: colors,
                 visible: default_visible_layers.includes(layer_info.name),
             };
 
-            layer.geometry.set(this.pcb, layer_info.source_name ?? layer.name);
+            layer.geometry.set(
+                this.pcb,
+                layer_info.source_name ?? layer.name,
+                layer.mode
+            );
 
             this.layers[layer.name] = layer;
         }
