@@ -7,38 +7,13 @@
 import { parse } from "./kicad/parser.js";
 import { CircleSet, PolygonSet, PolylineSet } from "./gfx/vg.js";
 import * as pcb_items from "./kicad/pcb_items.js";
-import * as pcb_geometry from "./rendering/pcb_geometry.js";
 import { Scene } from "./gfx/scene.js";
 import { PanAndZoom } from "./gfx/pan_and_zoom.js";
 import { TextShaper } from "./gfx/text.js";
-import { rgba_to_f4 } from "./gfx/colorspace.js";
-import { $q, $on, $template } from "./utils.js";
-import { Style } from "./rendering/pcb_style.js";
 import { CanvasSizeObserver } from "./gfx/resize.js";
-
-const layers_ordered_by_visibility = [
-    "B.Fab",
-    "B.CrtYd",
-    "B.Cu:pads",
-    "B.SilkS",
-    "B.Paste",
-    "B.Mask",
-    "B.Cu",
-    "In1.Cu",
-    "In2.Cu",
-    "F.Cu",
-    "F.Mask",
-    "F.Paste",
-    "F.SilkS",
-    "F.Cu:pads",
-    "F.CrtYd",
-    "F.Fab",
-    "ThroughHoles",
-    "Edge.Cuts",
-    "Margin",
-    "Cmts.User",
-    "Dwgs.User",
-];
+import * as pcb_view from "./pcb/view.js";
+import * as pcb_painter from "./pcb/painter.js";
+import { BBox } from "./math/bbox.js";
 
 const layers_ordered_for_controls = [
     "F.Cu",
@@ -59,42 +34,6 @@ const layers_ordered_for_controls = [
     "B.CrtYd",
     "F.Fab",
     "B.Fab",
-];
-
-// TODO: Hack, remove later
-const default_visible_layers = [
-    "ThroughHoles",
-    "F.Cu:pads",
-    "B.Cu:pads",
-    "F.Cu",
-    "F.Paste",
-    "F.SilkS",
-    // "F.Mask",
-    "Dwgs.User",
-    "Edge.Cuts",
-    "Margin",
-    "F.CrtYd",
-];
-
-const special_layers_info = [
-    // {
-    //     name: "ThroughHoles",
-    //     source_name: "F.Cu",
-    //     geometry_class: pcb_geometry.Layer,
-    //     mode: "throughhole",
-    // },
-    {
-        name: "F.Cu:pads",
-        source_name: "F.Cu",
-        geometry_class: pcb_geometry.Layer,
-        mode: "surfacemount",
-    },
-    {
-        name: "B.Cu:pads",
-        source_name: "B.Cu",
-        geometry_class: pcb_geometry.Layer,
-        mode: "surfacemount",
-    },
 ];
 
 class PCBViewer {
@@ -126,7 +65,7 @@ class PCBViewer {
         await PolygonSet.load_shader(gl);
         await PolylineSet.load_shader(gl);
         await CircleSet.load_shader(gl);
-        pcb_geometry.PCBPainter.text_shaper = await TextShaper.default();
+        // pcb_geometry.PCBPainter.text_shaper = await TextShaper.default();
     }
 
     async #setup_scene() {
@@ -153,67 +92,29 @@ class PCBViewer {
     async load(url) {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
-        this.#setup_layers();
+        this.#setup_board();
         this.#look_at_board();
         this.draw();
     }
 
-    #setup_layers() {
-        const style = new Style($q("kicad-pcb"));
-        const gfx = new pcb_geometry.CanvasBackend(this.#gl);
-
-        this.#painter = new pcb_geometry.PCBPainter(gfx, style);
-
-        const layer_infos = special_layers_info.concat(
-            Object.values(this.pcb.layers)
-        );
-
-        for (const layer_info of layer_infos) {
-            const geometry_class =
-                layer_info.geometry_class ?? pcb_geometry.Layer;
-            const colors = layer_info.colors ?? [
-                rgba_to_f4(style.color_for_layer(layer_info.name)),
-            ];
-
-            const layer = {
-                name: layer_info.name,
-                info: layer_info,
-                geometry: new geometry_class(this.#gl, gfx, this.#painter),
-                mode: layer_info.mode,
-                colors: colors,
-                visible: default_visible_layers.includes(layer_info.name),
-            };
-
-            layer.geometry.set(
-                this.pcb,
-                layer_info.source_name ?? layer.name,
-                layer.mode
-            );
-
-            this.layers[layer.name] = layer;
-        }
+    #setup_board() {
+        this.view = new pcb_view.View(this.#gl, this.pcb);
     }
 
     #look_at_board() {
-        const board_bbox = this.layers["Edge.Cuts"].geometry.bbox;
-        this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
+        this.#scene.lookat(new BBox(0, 0, 400, 400));
+        // const board_bbox = this.layers["Edge.Cuts"].geometry.bbox;
+        // this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
     }
 
     draw() {
+        if (!this.view) return;
+
         window.requestAnimationFrame(() => {
             this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
 
             let matrix = this.#scene.view_projection_matrix;
-
-            for (const layer_name of layers_ordered_by_visibility) {
-                const layer = this.layers[layer_name];
-
-                if (!layer || !layer.visible) {
-                    continue;
-                }
-
-                layer.geometry.draw(matrix, ...layer.colors);
-            }
+            this.view.draw(matrix);
         });
     }
 }
@@ -299,19 +200,19 @@ class KicadPCBLayerControls extends HTMLElement {
         const viewer = this.#target.viewer;
         const buttons = [];
 
-        for (const layer_name of layers_ordered_for_controls) {
-            const layer = viewer.layers[layer_name];
-            const visible = layer.visible ? "yes" : "no";
-            const color = layer.colors[0];
-            const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
-                color[2] * 255
-            })`;
-            buttons.push(`
-                <button type="button" name="${layer.name}" visible="${visible}">
-                    <span class="color" style="background-color: ${css_color};"></span>
-                    <span class="name">${layer.name}</name>
-                </button>`);
-        }
+        // for (const layer_name of layers_ordered_for_controls) {
+        //     const layer = viewer.layers[layer_name];
+        //     const visible = layer.visible ? "yes" : "no";
+        //     const color = layer.colors[0];
+        //     const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
+        //         color[2] * 255
+        //     })`;
+        //     buttons.push(`
+        //         <button type="button" name="${layer.name}" visible="${visible}">
+        //             <span class="color" style="background-color: ${css_color};"></span>
+        //             <span class="name">${layer.name}</name>
+        //         </button>`);
+        // }
 
         const template = document.createElement("template");
         template.innerHTML = `
