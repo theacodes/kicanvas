@@ -79,31 +79,22 @@ const default_visible_layers = [
 const special_layers_info = [
     // {
     //     name: "ThroughHoles",
-    //     geometry_class: pcb_geometry.ThroughHoleLayer,
-    //     colors: [
-    //         [1, 0.75, 0, 1],
-    //         [0.3, 0.3, 0.3, 1],
-    //     ],
+    //     source_name: "F.Cu",
+    //     geometry_class: pcb_geometry.Layer,
+    //     mode: "throughhole",
     // },
     {
         name: "F.Cu:pads",
         source_name: "F.Cu",
         geometry_class: pcb_geometry.Layer,
         mode: "surfacemount",
-        colors: [
-            [1, 0.75, 0, 1],
-            [0.3, 0.3, 0.3, 1],
-        ],
     },
-    // {
-    //     name: "B.Cu:pads",
-    //     source_name: "B.Cu",
-    //     geometry_class: pcb_geometry.SurfaceMountLayer,
-    //     colors: [
-    //         [1, 0.75, 0, 1],
-    //         [0.3, 0.3, 0.3, 1],
-    //     ],
-    // },
+    {
+        name: "B.Cu:pads",
+        source_name: "B.Cu",
+        geometry_class: pcb_geometry.Layer,
+        mode: "surfacemount",
+    },
 ];
 
 class PCBViewer {

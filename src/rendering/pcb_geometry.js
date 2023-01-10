@@ -44,10 +44,28 @@ export class CanvasBackend {
 
 export class PCBPainter {
     static text_shaper;
+    current_layer = null;
 
     constructor(gfx, style) {
         this.gfx = gfx;
         this.style = style;
+
+        const parent = this;
+        this.colors = {
+            get primary() {
+                switch (parent.current_layer) {
+                    case "F.Cu":
+                        return [1, 0, 0, 0.7];
+                    case "B.Cu":
+                        return [0, 0, 1, 0.7];
+                    default:
+                        return [1, 1, 1, 0.7];
+                }
+            },
+
+            pad: [1, 1, 0, 0.7],
+            drill: [0, 1, 0, 0.7],
+        };
     }
 
     Any(item, layer = null, matrix = null, mode = null) {
@@ -67,7 +85,7 @@ export class PCBPainter {
             bbox.h = s.width;
         }
 
-        this.gfx.line(points, s.width, [0, 0, 1, 1]);
+        this.gfx.line(points, s.width, this.colors.primary);
 
         return { bbox: bbox };
     }
@@ -90,7 +108,7 @@ export class PCBPainter {
             start,
         ];
 
-        this.gfx.line(points, r.width, [0, 1, 0, 1]);
+        this.gfx.line(points, r.width, this.colors.primary);
         if (r.fill) {
             this.gfx.polygon(points);
         }
@@ -113,7 +131,7 @@ export class PCBPainter {
         const polyline = arc.to_polyline();
         polyline.points = Matrix3.transform_all(matrix, polyline.points);
 
-        this.gfx.line(polyline.points, polyline.width, (1, 0, 0, 1));
+        this.gfx.line(polyline.points, polyline.width, this.colors.primary);
 
         return {
             bbox: BBox.from_points(polyline.points, a).grow(a.width / 2),
@@ -147,7 +165,7 @@ export class PCBPainter {
             );
         } else {
             const polyline = arc.to_polyline();
-            this.gfx.line(polyline.points, polyline.width, [0, 1, 0, 1]);
+            this.gfx.line(polyline.points, polyline.width, this.colors.primary);
         }
 
         return {
@@ -173,11 +191,11 @@ export class PCBPainter {
         const pts = Matrix3.transform_all(matrix, p.pts);
 
         if (p.width) {
-            this.gfx.line([...pts, pts[0]], p.width, [1, 0, 1, 1]);
+            this.gfx.line([...pts, pts[0]], p.width, this.colors.primary);
         }
 
         if (p.fill) {
-            this.gfx.polygon(pts, [1, 0, 1, 1]);
+            this.gfx.polygon(pts, this.colors.primary);
         }
 
         let bbox;
@@ -279,10 +297,10 @@ export class PCBPainter {
         // TODO: Deal with soldermask clearance
 
         // outer circle
-        this.gfx.circle(at, v.size / 2, [1, 1, 0, 1]);
+        this.gfx.circle(at, v.size / 2, this.colors.pad);
 
         // drill circle
-        this.gfx.circle(at, v.drill / 2, [0.3, 0.3, 0.3, 1]);
+        this.gfx.circle(at, v.drill / 2, this.colors.drill);
 
         const bbox = BBox.from_corners(
             at.x - v.size / 2,
@@ -302,14 +320,13 @@ export class PCBPainter {
             return {};
         }
 
-        let triangles = new Float32Array();
         for (const p of z.filled_polygons) {
             if (p.layer !== layer) {
                 continue;
             }
 
             const pts = Matrix3.transform_all(matrix, p.pts);
-            this.gfx.polygon(pts, [1, 0, 1, 1]);
+            this.gfx.polygon(pts, this.colors.primary);
         }
 
         const area_pts = Matrix3.transform_all(matrix, z.polygon.pts);
@@ -350,7 +367,7 @@ export class PCBPainter {
         for (const stroke of shaped) {
             const points = Matrix3.transform_all(matrix, Array.from(stroke));
             bbox = BBox.combine([bbox, BBox.from_points(points, t)], t);
-            this.gfx.line(points, t.effects.thickness, [1, 1, 1, 1]);
+            this.gfx.line(points, t.effects.thickness, this.colors.primary);
         }
 
         return {
@@ -399,7 +416,7 @@ export class PCBPainter {
 
         switch (shape) {
             case "circle":
-                this.gfx.circle(center, p.size.x / 2, [1, 1, 0, 1]);
+                this.gfx.circle(center, p.size.x / 2, this.colors.pad);
                 result.bbox = BBox.from_corners(
                     center.x - p.size.x / 2,
                     center.y - p.size.y / 2,
@@ -417,7 +434,7 @@ export class PCBPainter {
                         new Vec2(-p.size.x / 2, p.size.y / 2),
                     ].map((v) => offset_mat.transform(v));
 
-                    this.gfx.polygon(rect_points, [1, 1, 0, 1]);
+                    this.gfx.polygon(rect_points, this.colors.pad);
                     result.bbox = BBox.from_points(rect_points, p);
                 }
                 break;
@@ -457,11 +474,11 @@ export class PCBPainter {
                         ),
                     ].map((v) => offset_mat.transform(v));
 
-                    this.gfx.polygon(rect_points, [1, 1, 0, 1]);
+                    this.gfx.polygon(rect_points, this.colors.pad);
                     this.gfx.line(
                         [...rect_points, rect_points[0]],
                         rounding * 2,
-                        [1, 1, 0, 1]
+                        this.colors.pad
                     );
 
                     result.bbox = BBox.from_points(rect_points, p).grow(
@@ -487,12 +504,12 @@ export class PCBPainter {
                 const pad_end = pad_pos.add(half_len);
 
                 if (pad_start.equals(pad_end)) {
-                    this.gfx.circle(pad_pos, half_width, [1, 1, 0, 1]);
+                    this.gfx.circle(pad_pos, half_width, this.colors.pad);
                 } else {
                     this.gfx.line(
                         [pad_start, pad_end],
                         half_width * 2,
-                        [1, 1, 0, 1]
+                        this.colors.pad
                     );
                 }
 
@@ -524,11 +541,7 @@ export class PCBPainter {
         if (!p.drill.oval) {
             const drill_pos = center.add(p.drill.offset);
 
-            this.gfx.circle(
-                drill_pos,
-                p.drill.diameter / 2,
-                [0.3, 0.3, 0.3, 1]
-            );
+            this.gfx.circle(drill_pos, p.drill.diameter / 2, this.colors.drill);
         } else {
             const half_size = new Vec2(p.drill.diameter / 2, p.drill.width / 2);
             const half_width = Math.min(half_size.x, half_size.y);
@@ -548,7 +561,7 @@ export class PCBPainter {
             this.gfx.line(
                 [drill_start, drill_end],
                 half_width * 2,
-                [0.3, 0.3, 0.3, 1]
+                this.colors.drill
             );
         }
 
@@ -600,8 +613,9 @@ export class Layer {
     }
 
     set(pcb, layer, mode = null) {
-        console.log(layer, mode);
         this.gfx.start_layer();
+
+        this.painter.current_layer = layer;
 
         mode = mode ?? pcb.layers[layer].type;
 

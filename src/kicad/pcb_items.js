@@ -675,7 +675,7 @@ class PcbPlotParams {
         this.creategerberjobfile =
             e.expect_pair_atom("creategerberjobfile") == "true" ? true : false;
         this.gerberprecision =
-            e.expect_pair_number("gerberprecision") == "true" ? true : false;
+            e.maybe_pair_number("gerberprecision") == "true" ? true : false;
         this.svguseinch =
             e.expect_pair_atom("svguseinch") == "true" ? true : false;
         this.svgprecision = e.expect_pair_number("svgprecision");

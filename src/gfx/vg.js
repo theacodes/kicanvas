@@ -285,12 +285,14 @@ export class PolygonSet {
         this.shader = shader || this.constructor.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
+        this.color_buf = this.vao.buffer(this.shader.a_color, 4);
         this.vertex_count = 0;
     }
 
     dispose() {
         this.vao.dispose();
         this.position_buf.dispose();
+        this.color_buf.dispose();
     }
 
     static triangulate(points) {
@@ -329,19 +331,35 @@ export class PolygonSet {
     }
 
     set(polygons) {
-        const total_triangles = polygons.reduce((p, c) => {
-            return p + c.length;
+        const total_vertex_data_length = polygons.reduce((p, c) => {
+            return p + c.vertices.length;
         }, 0);
-        const triangles = new Float32Array(total_triangles);
 
-        let offset = 0;
+        const total_vertices = total_vertex_data_length / 2;
+
+        const vertex_data = new Float32Array(total_vertex_data_length);
+        const color_data = new Float32Array(total_vertices * 4);
+
+        let vertex_data_idx = 0;
+        let color_data_idx = 0;
         for (const polygon of polygons) {
-            triangles.set(polygon, offset);
-            offset += polygon.length;
+            const polygon_vertex_count = polygon.vertices.length / 2;
+
+            vertex_data.set(polygon.vertices, vertex_data_idx);
+            vertex_data_idx += polygon.vertices.length;
+
+            Tesselator.populate_color_data(
+                color_data,
+                polygon.color,
+                color_data_idx,
+                polygon_vertex_count * 4
+            );
+            color_data_idx += polygon_vertex_count * 4;
         }
 
-        this.position_buf.set(triangles);
-        this.vertex_count = triangles.length / 2;
+        this.position_buf.set(vertex_data);
+        this.color_buf.set(color_data);
+        this.vertex_count = vertex_data_idx / 2;
     }
 
     draw() {
@@ -391,8 +409,10 @@ export class GeometrySet {
 
     add_polygon(points, color) {
         let triangles = PolygonSet.triangulate(points);
-        // TODO: Colors
-        this.#polygons.push(triangles);
+        this.#polygons.push({
+            vertices: triangles,
+            color: color,
+        });
     }
 
     add_line(points, width, color) {
@@ -415,7 +435,6 @@ export class GeometrySet {
     draw(matrix) {
         this.#polygon_set.shader.bind();
         this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
-        this.#polygon_set.shader.u_color.f4(0, 1, 0, 1);
         this.#polygon_set.draw();
 
         this.#circle_set.shader.bind();
