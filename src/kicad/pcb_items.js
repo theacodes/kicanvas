@@ -125,7 +125,8 @@ export class GrLine {
 }
 
 export class FpLine {
-    constructor(e) {
+    constructor(parent, e) {
+        this.parent = parent;
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
         this.layer = e.expect_pair_string("layer");
@@ -145,7 +146,8 @@ export class GrRect {
 }
 
 export class FpRect {
-    constructor(e) {
+    constructor(parent, e) {
+        this.parent = parent;
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
         this.layer = e.expect_pair_string("layer");
@@ -165,7 +167,8 @@ export class GrArc {
 }
 
 export class FpArc {
-    constructor(e) {
+    constructor(parent, e) {
+        this.parent = parent;
         this.start = e.expect_vec2("start");
         this.mid = e.expect_vec2("mid");
         this.end = e.expect_vec2("end");
@@ -177,7 +180,8 @@ export class FpArc {
 }
 
 export class FpPoly {
-    constructor(e) {
+    constructor(parent, e) {
+        this.parent = parent;
         this.pts = e.expect_vec2_list("pts");
         this.layer = e.expect_pair_string("layer");
         this.width = e.expect_pair_number("width");
@@ -211,7 +215,8 @@ export class GrCircle {
 }
 
 export class FpCircle {
-    constructor(e) {
+    constructor(parent, e) {
+        this.parent = parent;
         this.center = e.expect_vec2("center");
         this.end = e.expect_vec2("end");
         this.layer = e.expect_pair_string("layer");
@@ -303,8 +308,8 @@ export class GrText {
 }
 
 export class FpText {
-    constructor(fp, e) {
-        this.footprint = fp;
+    constructor(parent, e) {
+        this.parent = parent;
         this.type = e.expect_atom();
         this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
@@ -402,7 +407,8 @@ export class PadOptions {
 }
 
 export class Pad {
-    constructor(e) {
+    constructor(parent, e) {
+        this.parent = parent;
         this.number = e.expect_string();
         this.type = e.expect_atom();
         this.shape = e.expect_atom();
@@ -522,17 +528,15 @@ export class Footprint {
         this.thermal_gap = e.maybe_pair_number("thermal_gap");
         this.attr = Array.from(e.expect_expr("attr").rest());
 
-        this.graphics = [];
-        this.pads = [];
         this.models = [];
-        this.zones = [];
+        this.items = [];
 
         let se;
         while (e.element) {
             if ((se = e.maybe_expr("fp_text")) !== null) {
                 const text = new FpText(this, se);
                 text.text = pcb.expand_text_vars(text.text, this);
-                this.graphics.push(text);
+                this.items.push(text);
 
                 if (text.type == "reference") {
                     this.properties["reference"] = text.text;
@@ -542,28 +546,28 @@ export class Footprint {
 
                 continue;
             } else if ((se = e.maybe_expr("fp_poly")) !== null) {
-                this.graphics.push(new FpPoly(se));
+                this.items.push(new FpPoly(this, se));
                 continue;
             } else if ((se = e.maybe_expr("fp_line")) !== null) {
-                this.graphics.push(new FpLine(se));
+                this.items.push(new FpLine(this, se));
                 continue;
             } else if ((se = e.maybe_expr("fp_rect")) !== null) {
-                this.graphics.push(new FpRect(se));
+                this.items.push(new FpRect(this, se));
                 continue;
             } else if ((se = e.maybe_expr("fp_circle")) !== null) {
-                this.graphics.push(new FpCircle(se));
+                this.items.push(new FpCircle(this, se));
                 continue;
             } else if ((se = e.maybe_expr("fp_arc")) !== null) {
-                this.graphics.push(new FpArc(se));
+                this.items.push(new FpArc(this, se));
                 continue;
             } else if ((se = e.maybe_expr("pad")) !== null) {
-                this.pads.push(new Pad(se));
+                this.items.push(new Pad(this, se));
                 continue;
             } else if ((se = e.maybe_expr("model")) !== null) {
                 this.models.push(new Model(se));
                 continue;
             } else if ((se = e.maybe_expr("zone")) !== null) {
-                this.zones.push(new Zone(se));
+                this.items.push(new Zone(se));
                 continue;
             }
             console.log("unknown", e.element);
