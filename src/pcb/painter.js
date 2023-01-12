@@ -4,47 +4,26 @@ import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
 import layers from "./layers.js";
+import { board as board_colors } from "./colors.js";
 
-function color_for_layer(layer) {
+function get_color(layer) {
     switch (layer.name) {
-        case "F.Cu":
-        case "Board:F.Cu":
-        case "Virtual:F.Cu:Zones":
-            return [1, 0.1, 0.5, 0.5];
-        // case "B.Cu":
-        // case "Board:B.Cu":
-        // case "Virtual:B.Cu:Zones":
-        //     return [0, 0, 1, 0.5];
-        // case "In1.Cu":
-        // case "Board:In1.Cu":
-        // case "Virtual:In1.Cu:Zones":
-        //     return [1, 1, 0, 0];
-        // case "In2.Cu":
-        // case "Board:In2.Cu":
-        // case "Virtual:In2.Cu:Zones":
-        //     return [0, 1, 1, 0];
-        case "Board:F.SilkS":
-        case "Board:B.SilkS":
-            return [0, 1, 0, 1];
-        case "Board:Dwgs.User":
-        case "Board:Cmts.User":
-        case "Board:Eco1.User":
-        case "Board:Eco2.User":
-        case "Board:F.CrtYd":
-        case "Board:B.CrtYd":
-            return [0, 1, 1, 1];
-        // case "Board:F.Paste":
-        // case "Board:B.Paste":
-        // case "Board:F.Adhes":
-        // case "Board:B.Adhes":
-        //     return [0.5, 0.5, 0.5, 1];
-        case "Board:Edge.Cuts":
-            return [1, 0, 0, 1];
-        case "Virtual:Pad:PlatedHoles":
-            return [1, 0, 1, 1];
-        default:
-            return [1, 1, 1, 0];
+        case "Virtual:Via:Holes":
+            return board_colors.via_hole;
+        case "Virtual:Via:Through":
+            return board_colors.via_through;
+        case "Virtual:Pad:Holes":
+            return board_colors.background;
+        case "Virtual:Pad:HoleWalls":
+            return board_colors.pad_through_hole;
     }
+
+    let name = layer.name.replace("Board:", "").replace(".", "_").toLowerCase();
+    if (name.endsWith("_cu")) {
+        name = name.replace("_cu", "");
+        return board_colors.copper[name] ?? [0, 1, 0, 1];
+    }
+    return board_colors[name] ?? [1, 0, 0, 1];
 }
 
 export class ItemVisitors {
@@ -70,7 +49,7 @@ export class ItemVisitors {
 
     static paint_Line(gfx, layer, s) {
         const points = [s.start, s.end];
-        gfx.line(points, s.width, color_for_layer(layer));
+        gfx.line(points, s.width, get_color(layer));
     }
 
     static layers_FpLine(l) {
@@ -90,7 +69,7 @@ export class ItemVisitors {
     }
 
     static paint_Rect(gfx, layer, r) {
-        const color = color_for_layer(layer);
+        const color = get_color(layer);
         const points = [
             r.start,
             new Vec2(r.start.x, r.end.y),
@@ -123,7 +102,7 @@ export class ItemVisitors {
     }
 
     static paint_Poly(gfx, layer, p) {
-        const color = color_for_layer(layer);
+        const color = get_color(layer);
 
         if (p.width) {
             gfx.line([...p.pts, p.pts[0]], p.width, color);
@@ -157,7 +136,7 @@ export class ItemVisitors {
     static paint_GrArc(gfx, layer, a) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const polyline = arc.to_polyline();
-        gfx.line(polyline.points, polyline.width, color_for_layer(layer));
+        gfx.line(polyline.points, polyline.width, get_color(layer));
     }
 
     static layers_FpArc(p) {
@@ -169,7 +148,7 @@ export class ItemVisitors {
     }
 
     static paint_Circle(gfx, layer, c) {
-        const color = color_for_layer(layer);
+        const color = get_color(layer);
 
         const radius = c.center.sub(c.end).length;
         const arc = new Arc(
@@ -211,7 +190,7 @@ export class ItemVisitors {
     static paint_Segment(gfx, layer, s) {
         if (layer.name.startsWith("Board:")) {
             const points = [s.start, s.end];
-            gfx.line(points, s.width, color_for_layer(layer));
+            gfx.line(points, s.width, get_color(layer));
         }
     }
 
@@ -220,9 +199,11 @@ export class ItemVisitors {
     }
 
     static paint_Arc(gfx, layer, a) {
-        const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
-        const polyline = arc.to_polyline();
-        gfx.line(polyline.points, polyline.width, color_for_layer(layer));
+        if (layer.name.startsWith("Board:")) {
+            const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
+            const polyline = arc.to_polyline();
+            gfx.line(polyline.points, polyline.width, get_color(layer));
+        }
     }
 
     static layers_Via(v) {
@@ -230,10 +211,11 @@ export class ItemVisitors {
     }
 
     static paint_Via(gfx, layer, v) {
+        const color = get_color(layer);
         if (layer.name == "Virtual:Via:Through") {
-            gfx.circle(v.at, v.size / 2, [1, 1, 1, 1]);
+            gfx.circle(v.at, v.size / 2, color);
         } else if (layer.name == "Virtual:Via:Holes") {
-            gfx.circle(v.at, v.drill / 2, [0.6, 0.6, 0.6, 1]);
+            gfx.circle(v.at, v.drill / 2, color);
         }
     }
 
@@ -245,17 +227,16 @@ export class ItemVisitors {
     }
 
     static paint_Zone(gfx, layer, z) {
-        if (!z.filled_polygons) {
-            return;
-        }
-
-        for (const p of z.filled_polygons) {
-            if (!layer.name.includes(p.layer)) {
-                continue;
-            }
-            let color = color_for_layer({ name: p.layer });
-            gfx.polygon(p.pts, color);
-        }
+        // if (!z.filled_polygons) {
+        //     return;
+        // }
+        // for (const p of z.filled_polygons) {
+        //     if (!layer.name.includes(p.layer)) {
+        //         continue;
+        //     }
+        //     let color = color_for_layer({ name: p.layer });
+        //     gfx.polygon(p.pts, color);
+        // }
     }
 
     static layers_Pad(pad) {
@@ -279,8 +260,9 @@ export class ItemVisitors {
 
         switch (pad.type) {
             case "thru_hole":
+                layers.push("Virtual:Pad:HoleWalls");
             case "np_thru_hole":
-                layers.push("Virtual:Pad:PlatedHoles");
+                layers.push("Virtual:Pad:Holes");
                 break;
             case "smd":
                 break;
@@ -293,7 +275,7 @@ export class ItemVisitors {
     }
 
     static paint_Pad(gfx, layer, pad) {
-        const color = color_for_layer(layer);
+        const color = get_color(layer);
 
         const position_mat = Matrix3.translation(
             pad.at.position.x,
@@ -306,7 +288,7 @@ export class ItemVisitors {
 
         const center = new Vec2(0, 0);
 
-        if (layer.name == "Virtual:Pad:PlatedHoles") {
+        if (layer.name == "Virtual:Pad:Holes") {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 gfx.circle(drill_pos, pad.drill.diameter / 2, color);
@@ -434,7 +416,9 @@ export class ItemVisitors {
             }
 
             if (pad.shape == "custom") {
-                // TODO
+                for (const prim of pad.primitives) {
+                    this.paint(gfx, layer, prim);
+                }
             }
         }
 
