@@ -7,17 +7,17 @@ import { board as board_colors } from "./colors.js";
 
 function get_color(layer) {
     switch (layer.name) {
-        case "Virtual:Via:Holes":
+        case ":Via:Holes":
             return board_colors.via_hole;
-        case "Virtual:Via:Through":
+        case ":Via:Through":
             return board_colors.via_through;
-        case "Virtual:Pad:Holes":
+        case ":Pad:Holes":
             return board_colors.background;
-        case "Virtual:Pad:HoleWalls":
+        case ":Pad:HoleWalls":
             return board_colors.pad_through_hole;
     }
 
-    let name = layer.name.replace("Board:", "").replace(".", "_").toLowerCase();
+    let name = layer.name.replace(".", "_").toLowerCase();
     if (name.endsWith("_cu")) {
         name = name.replace("_cu", "");
         return board_colors.copper[name] ?? [0, 1, 0, 1];
@@ -29,7 +29,7 @@ class GenericPainter {
     static items = [];
 
     static layers(item) {
-        return [`Board:${item.layer}`];
+        return [item.layer];
     }
 
     static paint(gfx, layer, item) {}
@@ -118,10 +118,6 @@ class CirclePainter extends GenericPainter {
 class TraceSegmentPainter extends GenericPainter {
     static items = [pcb_items.Segment];
 
-    static layers(s) {
-        return [`Board:${s.layer}`, `Virtual:${s.layer}:NetNames`];
-    }
-
     static paint(gfx, layer, s) {
         if (layer.name.startsWith("Board:")) {
             const points = [s.start, s.end];
@@ -133,16 +129,10 @@ class TraceSegmentPainter extends GenericPainter {
 class TraceArcPainter extends GenericPainter {
     static items = [pcb_items.Arc];
 
-    static layers(a) {
-        return [`Board:${a.layer}`, `Virtual:${a.layer}:NetNames`];
-    }
-
     static paint(gfx, layer, a) {
-        if (layer.name.startsWith("Board:")) {
-            const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
-            const polyline = arc.to_polyline();
-            gfx.line(polyline.points, polyline.width, get_color(layer));
-        }
+        const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
+        const polyline = arc.to_polyline();
+        gfx.line(polyline.points, polyline.width, get_color(layer));
     }
 }
 
@@ -150,14 +140,14 @@ class ViaPainter extends GenericPainter {
     static items = [pcb_items.Via];
 
     static layers(v) {
-        return ["Virtual:Via:Holes", "Virtual:Via:Through"];
+        return [":Via:Holes", ":Via:Through"];
     }
 
     static paint(gfx, layer, v) {
         const color = get_color(layer);
-        if (layer.name == "Virtual:Via:Through") {
+        if (layer.name == ":Via:Through") {
             gfx.circle(v.at, v.size / 2, color);
-        } else if (layer.name == "Virtual:Via:Holes") {
+        } else if (layer.name == ":Via:Holes") {
             gfx.circle(v.at, v.drill / 2, color);
         }
     }
@@ -167,10 +157,7 @@ class ZonePainter extends GenericPainter {
     static items = [pcb_items.Zone];
 
     static layers(z) {
-        const layers = z.layers.map((name) => {
-            return `Board:${name}`;
-        });
-        return layers;
+        return z.layers;
     }
 
     static paint(gfx, layer, z) {
@@ -197,25 +184,25 @@ class PadPainter extends GenericPainter {
 
         for (let layer of pad.layers) {
             if (layer == "*.Cu") {
-                layers.push("Board:F.Cu");
-                layers.push("Board:B.Cu");
+                layers.push("F.Cu");
+                layers.push("B.Cu");
             } else if (layer == "*.Mask") {
-                layers.push("Board:F.Mask");
-                layers.push("Board:B.Mask");
+                layers.push("F.Mask");
+                layers.push("B.Mask");
             } else if (layer == "*.Paste") {
-                layers.push("Board:F.Paste");
-                layers.push("Board:B.Paste");
+                layers.push("F.Paste");
+                layers.push("B.Paste");
             } else {
-                layers.push(`Board:${layer}`);
+                layers.push(layer);
             }
         }
 
         switch (pad.type) {
             case "thru_hole":
-                layers.push("Virtual:Pad:HoleWalls");
+                layers.push(":Pad:HoleWalls");
             // falls through
             case "np_thru_hole":
-                layers.push("Virtual:Pad:Holes");
+                layers.push(":Pad:Holes");
                 break;
             case "smd":
                 break;
@@ -241,7 +228,7 @@ class PadPainter extends GenericPainter {
 
         const center = new Vec2(0, 0);
 
-        if (layer.name == "Virtual:Pad:Holes") {
+        if (layer.name == ":Pad:Holes") {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 gfx.circle(drill_pos, pad.drill.diameter / 2, color);
