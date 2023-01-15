@@ -119,10 +119,8 @@ class TraceSegmentPainter extends GenericPainter {
     static items = [pcb_items.Segment];
 
     static paint(gfx, layer, s) {
-        if (layer.name.startsWith("Board:")) {
-            const points = [s.start, s.end];
-            gfx.line(points, s.width, get_color(layer));
-        }
+        const points = [s.start, s.end];
+        gfx.line(points, s.width, get_color(layer));
     }
 }
 
@@ -467,7 +465,7 @@ export class Painter {
         for (const item of layer.items) {
             this.paint_item(layer, item);
         }
-        this.gfx.end_layer();
+        return this.gfx.end_layer();
     }
 
     paint_item(layer, item) {

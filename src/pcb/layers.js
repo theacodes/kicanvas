@@ -6,6 +6,8 @@ class Layer {
     }
 }
 
+const max_inner_copper_layers = 30;
+
 export class Layers {
     #layer_list = [];
     #layer_map = new Map();
@@ -48,8 +50,13 @@ export class Layers {
             new Layer("F.Paste"),
             new Layer("F.CrtYd"),
             new Layer("F.Fab"),
+        ];
 
-            new Layer("In1.Cu"),
+        for (let i = 0; i <= max_inner_copper_layers; i++) {
+            this.#layer_list.push(new Layer(`In${i}.Cu`));
+        }
+
+        this.#layer_list = this.#layer_list.concat([
             new Layer("In2.Cu"),
             new Layer("In3.Cu"),
             new Layer("In4.Cu"),
@@ -88,7 +95,7 @@ export class Layers {
             new Layer("B.Paste"),
             new Layer("B.CrtYd"),
             new Layer("B.Fab"),
-        ];
+        ]);
 
         for (const l of this.#layer_list) {
             this.#layer_map.set(l.name, l);
@@ -101,7 +108,57 @@ export class Layers {
         }
     }
 
-    *in_ui_order() {}
+    *in_ui_order() {
+        const order = [
+            "F.Cu",
+            Symbol.inner_copper,
+            "B.Cu",
+            "F.Adhes",
+            "B.Adhes",
+            "F.Paste",
+            "B.Paste",
+            "F.SilkS",
+            "B.SilkS",
+            "F.Mask",
+            "B.Mask",
+            "Dwgs.User",
+            "Cmts.User",
+            "Eco1.User",
+            "Eco2.User",
+            "Edge.Cuts",
+            "Margin",
+            "F.CrtYd",
+            "B.CrtYd",
+            "F.Fab",
+            "B.Fab",
+            "User.1",
+            "User.2",
+            "User.3",
+            "User.4",
+            "User.5",
+            "User.6",
+            "User.7",
+            "User.8",
+            "User.9",
+        ];
+
+        for (const name of order) {
+            if (name == Symbol.inner_copper) {
+                for (let i = 1; i <= max_inner_copper_layers; i++) {
+                    const layer = this.by_name(`In${i}.Cu`);
+                    if (layer.items.length) {
+                        yield layer;
+                    }
+                }
+            } else {
+                const layer = this.by_name(name);
+
+                if (layer.items.length) {
+                    yield layer;
+                }
+            }
+        }
+    }
 
     by_name(name) {
         return this.#layer_map.get(name);

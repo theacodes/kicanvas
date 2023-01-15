@@ -4,6 +4,8 @@ import { GeometrySet } from "../gfx/vg.js";
 import { Matrix3 } from "../math/matrix3.js";
 
 export class View {
+    #gfx_layers = new Map();
+
     constructor(gl, board) {
         this.gfx = new CanvasBackend(gl);
         this.painter = new Painter(this.gfx);
@@ -23,14 +25,17 @@ export class View {
 
     #paint() {
         for (const layer of this.layers.in_display_order()) {
-            this.painter.paint_layer(layer);
+            const gfx_layer = this.painter.paint_layer(layer);
+            this.#gfx_layers.set(layer.name, gfx_layer);
         }
     }
 
     draw(matrix) {
-        const gfx_layers = Array.from(this.gfx.layers()).reverse();
-        for (const gfx_layer of gfx_layers) {
-            gfx_layer.draw(matrix);
+        const gfx_layers = Array.from(this.#gfx_layers.entries()).reverse();
+        for (const [pcb_layer_name, gfx_layer] of gfx_layers) {
+            if (this.layers.by_name(pcb_layer_name).visible) {
+                gfx_layer.draw(matrix);
+            }
         }
     }
 }

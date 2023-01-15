@@ -9,10 +9,8 @@ import { CircleSet, PolygonSet, PolylineSet } from "./gfx/vg.js";
 import * as pcb_items from "./kicad/pcb_items.js";
 import { Scene } from "./gfx/scene.js";
 import { PanAndZoom } from "./gfx/pan_and_zoom.js";
-import { TextShaper } from "./gfx/text.js";
 import { CanvasSizeObserver } from "./gfx/resize.js";
 import * as pcb_view from "./pcb/view.js";
-import * as pcb_painter from "./pcb/painter.js";
 import { BBox } from "./math/bbox.js";
 
 const layers_ordered_for_controls = [
@@ -40,8 +38,7 @@ class PCBViewer {
     #cvs;
     #gl;
     #scene;
-    #painter;
-    layers = {};
+    #view;
     pcb;
 
     constructor(canvas) {
@@ -98,7 +95,7 @@ class PCBViewer {
     }
 
     #setup_board() {
-        this.view = new pcb_view.View(this.#gl, this.pcb);
+        this.#view = new pcb_view.View(this.#gl, this.pcb);
     }
 
     #look_at_board() {
@@ -108,14 +105,18 @@ class PCBViewer {
     }
 
     draw() {
-        if (!this.view) return;
+        if (!this.#view) return;
 
         window.requestAnimationFrame(() => {
             this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
 
             let matrix = this.#scene.view_projection_matrix;
-            this.view.draw(matrix);
+            this.#view.draw(matrix);
         });
+    }
+
+    get layers() {
+        return this.#view.layers;
     }
 }
 
@@ -200,19 +201,19 @@ class KicadPCBLayerControls extends HTMLElement {
         const viewer = this.#target.viewer;
         const buttons = [];
 
-        // for (const layer_name of layers_ordered_for_controls) {
-        //     const layer = viewer.layers[layer_name];
-        //     const visible = layer.visible ? "yes" : "no";
-        //     const color = layer.colors[0];
-        //     const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
-        //         color[2] * 255
-        //     })`;
-        //     buttons.push(`
-        //         <button type="button" name="${layer.name}" visible="${visible}">
-        //             <span class="color" style="background-color: ${css_color};"></span>
-        //             <span class="name">${layer.name}</name>
-        //         </button>`);
-        // }
+        for (const layer of viewer.layers.in_ui_order()) {
+            const visible = layer.visible ? "yes" : "no";
+            // TODO: Get actual layer color
+            const color = [1, 0, 0, 1];
+            const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
+                color[2] * 255
+            })`;
+            buttons.push(`
+                <button type="button" name="${layer.name}" visible="${visible}">
+                    <span class="color" style="background-color: ${css_color};"></span>
+                    <span class="name">${layer.name}</name>
+                </button>`);
+        }
 
         const template = document.createElement("template");
         template.innerHTML = `
@@ -263,7 +264,9 @@ class KicadPCBLayerControls extends HTMLElement {
             return;
         }
 
-        const layer = this.#target.viewer.layers[button.getAttribute("name")];
+        const layer = this.#target.viewer.layers.by_name(
+            button.getAttribute("name")
+        );
         layer.visible = !layer.visible;
         button.setAttribute("visible", layer.visible ? "yes" : "no");
         this.#target.viewer.draw();
