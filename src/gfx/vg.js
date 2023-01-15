@@ -117,11 +117,9 @@ class Tesselator {
         const position_data = new Float32Array(vertex_count * 2);
         const cap_data = new Float32Array(vertex_count);
         const color_data = new Float32Array(vertex_count * 4);
+        let vertex_index = 0;
 
-        let vertex_index;
         for (let i = 0; i < circles.length; i++) {
-            vertex_index = i * this.vertices_per_quad;
-
             const c = circles[i];
             const cap_region = 1.0;
             const quad = this.tesselate_circle(c);
@@ -139,6 +137,8 @@ class Tesselator {
                 vertex_index * 4,
                 this.vertices_per_quad * 4
             );
+
+            vertex_index += this.vertices_per_quad;
         }
 
         return [
