@@ -1,0 +1,28 @@
+{
+  "name": "kicanvas",
+  "version": "0.0.0",
+  "description": "",
+  "main": "build.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "esbuild": "^0.16.12"
+  },
+  "devDependencies": {
+    "eslint": "^8.31.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theacodes/kicanvas.js.git"
+  },
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/theacodes/kicanvas.js/issues"
+  },
+  "homepage": "https://github.com/theacodes/kicanvas.js#readme"
+}
