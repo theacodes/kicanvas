@@ -1,5 +1,5 @@
 import { default as layers } from "./layers.js";
-import { ItemVisitors, Painter } from "./painter.js";
+import { Painter } from "./painter.js";
 import { GeometrySet } from "../gfx/vg.js";
 import { Matrix3 } from "../math/matrix3.js";
 
@@ -15,7 +15,7 @@ export class View {
 
     #assign_items_to_layers() {
         for (const item of this.board.items) {
-            for (const layer_name of ItemVisitors.layers_for(item)) {
+            for (const layer_name of this.painter.get_layers_for(item)) {
                 this.layers.get(layer_name).items.push(item);
             }
         }

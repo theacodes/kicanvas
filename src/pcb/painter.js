@@ -3,7 +3,6 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
-import layers from "./layers.js";
 import { board as board_colors } from "./colors.js";
 
 function get_color(layer) {
@@ -26,49 +25,29 @@ function get_color(layer) {
     return board_colors[name] ?? [1, 0, 0, 1];
 }
 
-export class ItemVisitors {
-    static layers_for(item) {
-        let f = this[`layers_${item.constructor.name}`];
+class GenericPainter {
+    static items = [];
 
-        if (!f) {
-            return [];
-        }
-
-        return f.bind(this)(item);
+    static layers(item) {
+        return [`Board:${item.layer}`];
     }
 
-    static paint(gfx, layer, item) {
-        let f = this[`paint_${item.constructor.name}`];
+    static paint(gfx, layer, item) {}
+}
 
-        if (!f) {
-            return;
-        }
+class LinePainter extends GenericPainter {
+    static items = [pcb_items.GrLine, pcb_items.FpLine];
 
-        return f.bind(this)(gfx, layer, item);
-    }
-
-    static paint_Line(gfx, layer, s) {
+    static paint(gfx, layer, s) {
         const points = [s.start, s.end];
         gfx.line(points, s.width, get_color(layer));
     }
+}
 
-    static layers_FpLine(l) {
-        return [`Board:${l.layer}`];
-    }
+class RectPainter extends GenericPainter {
+    static items = [pcb_items.GrRect, pcb_items.FpRect];
 
-    static paint_FpLine(gfx, layer, l) {
-        this.paint_Line(gfx, layer, l);
-    }
-
-    static layers_GrLine(l) {
-        return [`Board:${l.layer}`];
-    }
-
-    static paint_GrLine(gfx, layer, l) {
-        this.paint_Line(gfx, layer, l);
-    }
-
-    static paint_Rect(gfx, layer, r) {
+    static paint(gfx, layer, r) {
         const color = get_color(layer);
         const points = [
             r.start,
@@ -84,24 +63,12 @@ export class ItemVisitors {
             gfx.polygon(points, color);
         }
     }
+}
 
-    static layers_GrRect(r) {
-        return [`Board:${r.layer}`];
-    }
+class PolyPainter extends GenericPainter {
+    static items = [pcb_items.GrPoly, pcb_items.FpPoly];
 
-    static paint_GrRect(gfx, layer, r) {
-        this.paint_Rect(gfx, layer, r);
-    }
-
-    static layers_FpRect(r) {
-        return [`Board:${r.layer}`];
-    }
-
-    static paint_FpRect(gfx, layer, r) {
-        this.paint_Rect(gfx, layer, r);
-    }
-
-    static paint_Poly(gfx, layer, p) {
+    static paint(gfx, layer, p) {
         const color = get_color(layer);
 
         if (p.width) {
@@ -112,42 +79,22 @@ export class ItemVisitors {
             gfx.polygon(p.pts, color);
         }
     }
+}
 
-    static layers_GrPoly(p) {
-        return [`Board:${p.layer}`];
-    }
+class ArcPainter extends GenericPainter {
+    static items = [pcb_items.GrArc, pcb_items.FpArc];
 
-    static paint_GrPoly(gfx, layer, p) {
-        this.paint_Poly(gfx, layer, p);
-    }
-
-    static layers_FpPoly(p) {
-        return [`Board:${p.layer}`];
-    }
-
-    static paint_FpPoly(gfx, layer, p) {
-        this.paint_Poly(gfx, layer, p);
-    }
-
-    static layers_GrArc(p) {
-        return [`Board:${p.layer}`];
-    }
-
-    static paint_GrArc(gfx, layer, a) {
+    static paint(gfx, layer, a) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const polyline = arc.to_polyline();
         gfx.line(polyline.points, polyline.width, get_color(layer));
     }
+}
 
-    static layers_FpArc(p) {
-        return [`Board:${p.layer}`];
-    }
+class CirclePainter extends GenericPainter {
+    static items = [pcb_items.GrCircle, pcb_items.FpCircle];
 
-    static paint_FpArc(gfx, layer, a) {
-        return this.paint_GrArc(gfx, layer, a);
-    }
-
-    static paint_Circle(gfx, layer, c) {
+    static paint(gfx, layer, c) {
         const color = get_color(layer);
 
         const radius = c.center.sub(c.end).length;
@@ -166,51 +113,47 @@ export class ItemVisitors {
             gfx.line(polyline.points, polyline.width, color);
         }
     }
+}
 
-    static layers_GrCircle(c) {
-        return [`Board:${c.layer}`];
+class TraceSegmentPainter extends GenericPainter {
+    static items = [pcb_items.Segment];
+
+    static layers(s) {
+        return [`Board:${s.layer}`, `Virtual:${s.layer}:NetNames`];
     }
 
-    static paint_GrCircle(gfx, layer, c) {
-        return this.paint_Circle(gfx, layer, c);
-    }
-
-    static layers_FpCircle(c) {
-        return [`Board:${c.layer}`];
-    }
-
-    static paint_FpCircle(gfx, layer, c) {
-        return this.paint_Circle(gfx, layer, c);
-    }
-
-    static layers_Segment(segment) {
-        return [`Board:${segment.layer}`, `Virtual:${segment.layer}:NetNames`];
-    }
-
-    static paint_Segment(gfx, layer, s) {
+    static paint(gfx, layer, s) {
         if (layer.name.startsWith("Board:")) {
             const points = [s.start, s.end];
             gfx.line(points, s.width, get_color(layer));
         }
     }
+}
 
-    static layers_Arc(arc) {
-        return [`Board:${arc.layer}`, `Virtual:${arc.layer}:NetNames`];
+class TraceArcPainter extends GenericPainter {
+    static items = [pcb_items.Arc];
+
+    static layers(a) {
+        return [`Board:${a.layer}`, `Virtual:${a.layer}:NetNames`];
     }
 
-    static paint_Arc(gfx, layer, a) {
+    static paint(gfx, layer, a) {
         if (layer.name.startsWith("Board:")) {
             const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
             const polyline = arc.to_polyline();
             gfx.line(polyline.points, polyline.width, get_color(layer));
         }
     }
+}
 
-    static layers_Via(v) {
+class ViaPainter extends GenericPainter {
+    static items = [pcb_items.Via];
+
+    static layers(v) {
         return ["Virtual:Via:Holes", "Virtual:Via:Through"];
     }
 
-    static paint_Via(gfx, layer, v) {
+    static paint(gfx, layer, v) {
         const color = get_color(layer);
         if (layer.name == "Virtual:Via:Through") {
             gfx.circle(v.at, v.size / 2, color);
@@ -218,28 +161,37 @@ export class ItemVisitors {
             gfx.circle(v.at, v.drill / 2, color);
         }
     }
+}
 
-    static layers_Zone(z) {
+class ZonePainter extends GenericPainter {
+    static items = [pcb_items.Zone];
+
+    static layers(z) {
         const layers = z.layers.map((name) => {
             return `Board:${name}`;
         });
         return layers;
     }
 
-    static paint_Zone(gfx, layer, z) {
-        // if (!z.filled_polygons) {
-        //     return;
-        // }
-        // for (const p of z.filled_polygons) {
-        //     if (!layer.name.includes(p.layer)) {
-        //         continue;
-        //     }
-        //     let color = color_for_layer({ name: p.layer });
-        //     gfx.polygon(p.pts, color);
-        // }
+    static paint(gfx, layer, z) {
+        if (!z.filled_polygons) {
+            return;
+        }
+        for (const p of z.filled_polygons) {
+            if (!layer.name.includes(p.layer)) {
+                continue;
+            }
+            let color = Array.from(get_color({ name: p.layer }));
+            color[3] *= 0.01; // TODO: Remove
+            gfx.polygon(p.pts, color);
+        }
     }
+}
 
-    static layers_Pad(pad) {
+class PadPainter extends GenericPainter {
+    static items = [pcb_items.Pad];
+
+    static layers(pad) {
         // TODO: Port KiCAD's logic over.
         let layers = [];
 
@@ -261,6 +213,7 @@ export class ItemVisitors {
         switch (pad.type) {
             case "thru_hole":
                 layers.push("Virtual:Pad:HoleWalls");
+            // falls through
             case "np_thru_hole":
                 layers.push("Virtual:Pad:Holes");
                 break;
@@ -274,7 +227,7 @@ export class ItemVisitors {
         return layers;
     }
 
-    static paint_Pad(gfx, layer, pad) {
+    static paint(gfx, layer, pad) {
         const color = get_color(layer);
 
         const position_mat = Matrix3.translation(
@@ -388,75 +341,138 @@ export class ItemVisitors {
                     break;
 
                 case "oval":
-                    const half_size = new Vec2(pad.size.x / 2, pad.size.y / 2);
-                    const half_width = Math.min(half_size.x, half_size.y);
-                    let half_len = new Vec2(
-                        half_size.x - half_width,
-                        half_size.y - half_width
-                    );
+                    {
+                        const half_size = new Vec2(
+                            pad.size.x / 2,
+                            pad.size.y / 2
+                        );
+                        const half_width = Math.min(half_size.x, half_size.y);
+                        let half_len = new Vec2(
+                            half_size.x - half_width,
+                            half_size.y - half_width
+                        );
 
-                    half_len = Matrix3.rotation(
-                        Angle.deg_to_rad(pad.at.rotation)
-                    ).transform(half_len);
+                        half_len = Matrix3.rotation(
+                            Angle.deg_to_rad(pad.at.rotation)
+                        ).transform(half_len);
 
-                    const pad_pos = center.add(pad.drill.offset);
-                    const pad_start = pad_pos.sub(half_len);
-                    const pad_end = pad_pos.add(half_len);
+                        const pad_pos = center.add(pad.drill.offset);
+                        const pad_start = pad_pos.sub(half_len);
+                        const pad_end = pad_pos.add(half_len);
 
-                    if (pad_start.equals(pad_end)) {
-                        gfx.circle(pad_pos, half_width, color);
-                    } else {
-                        gfx.line([pad_start, pad_end], half_width * 2, color);
+                        if (pad_start.equals(pad_end)) {
+                            gfx.circle(pad_pos, half_width, color);
+                        } else {
+                            gfx.line(
+                                [pad_start, pad_end],
+                                half_width * 2,
+                                color
+                            );
+                        }
                     }
                     break;
 
                 default:
-                    console.log("idk how to draw", p);
+                    console.log("idk how to draw", pad);
                     break;
             }
 
             if (pad.shape == "custom") {
                 for (const prim of pad.primitives) {
-                    this.paint(gfx, layer, prim);
+                    painter_for_class[prim.constructor].paint(gfx, layer, prim);
                 }
             }
         }
 
         gfx.pop_transform();
     }
+}
 
-    static layers_Footprint(fp) {
+class TextPainter extends GenericPainter {
+    static items = [pcb_items.GrText, pcb_items.FpText];
+
+    static layers(t) {
+        return [];
+    }
+
+    static paint(gfx, layer, t) {}
+}
+
+class DimensionPainter extends GenericPainter {
+    static items = [pcb_items.Dimension];
+
+    static layers(d) {
+        return [];
+    }
+
+    static paint(gfx, layer, t) {}
+}
+
+class FootprintPainter extends GenericPainter {
+    static items = [pcb_items.Footprint];
+
+    static layers(fp) {
         let layers = new Set();
         for (const item of fp.items) {
-            for (const layer of this.layers_for(item)) {
+            const item_layers =
+                painter_for_class[item.constructor].layers(item);
+            for (const layer of item_layers) {
                 layers.add(layer);
             }
         }
         return Array.from(layers.values());
     }
 
-    static paint_Footprint(gfx, layer, fp) {
+    static paint(gfx, layer, fp) {
         let matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
         ).rotate(Angle.deg_to_rad(fp.at.rotation));
-
         gfx.set_transform(matrix);
 
         for (const item of fp.items) {
-            const item_layers = Array.from(this.layers_for(item));
+            const item_layers = Array.from(
+                painter_for_class[item.constructor].layers(item)
+            );
             if (item_layers.includes(layer.name)) {
-                this.paint(gfx, layer, item);
+                painter_for_class[item.constructor].paint(gfx, layer, item);
             }
         }
-
         gfx.set_transform();
+    }
+}
+
+const painters = [
+    LinePainter,
+    RectPainter,
+    PolyPainter,
+    ArcPainter,
+    CirclePainter,
+    TraceSegmentPainter,
+    TraceArcPainter,
+    ViaPainter,
+    ZonePainter,
+    PadPainter,
+    FootprintPainter,
+    TextPainter,
+    DimensionPainter,
+];
+
+const painter_for_class = {};
+
+for (const painter of painters) {
+    for (const item_class of painter.items) {
+        painter_for_class[item_class] = painter;
     }
 }
 
 export class Painter {
     constructor(gfx) {
         this.gfx = gfx;
+    }
+
+    get_layers_for(item) {
+        return painter_for_class[item.constructor].layers(item);
     }
 
     paint_layer(layer) {
@@ -468,6 +484,6 @@ export class Painter {
     }
 
     paint_item(layer, item) {
-        ItemVisitors.paint(this.gfx, layer, item);
+        return painter_for_class[item.constructor].paint(this.gfx, layer, item);
     }
 }
