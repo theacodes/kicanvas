@@ -51,13 +51,23 @@ class PCBViewer {
     }
 
     async #setup_gl() {
-        const gl = this.#cvs.getContext("webgl2");
+        // just in case the browser still gives us a backbuffer with alpha,
+        // set the background color of the canvas to black so that it behaves
+        // correctly.
+        this.#cvs.style.backgroundColor = "black";
+
+        const gl = this.#cvs.getContext("webgl2", { alpha: false });
         this.#gl = gl;
 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.GREATER);
+
+        gl.clearColor(0.074, 0.071, 0.094, 1);
+        gl.clearDepth(0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         await PolygonSet.load_shader(gl);
         await PolylineSet.load_shader(gl);
@@ -108,7 +118,9 @@ class PCBViewer {
         if (!this.#view) return;
 
         window.requestAnimationFrame(() => {
-            this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
+            this.#gl.clear(
+                this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT
+            );
 
             let matrix = this.#scene.view_projection_matrix;
             this.#view.draw(matrix);
