@@ -1,4 +1,4 @@
-import { default as layers } from "./layers.js";
+import { Layers } from "./layers.js";
 import { Painter } from "./painter.js";
 import { GeometrySet } from "../gfx/vg.js";
 import { Matrix3 } from "../math/matrix3.js";
@@ -8,7 +8,7 @@ export class View {
         this.gfx = new CanvasBackend(gl);
         this.painter = new Painter(this.gfx);
         this.board = board;
-        this.layers = layers();
+        this.layers = new Layers();
         this.#assign_items_to_layers();
         this.#paint();
     }
@@ -16,21 +16,21 @@ export class View {
     #assign_items_to_layers() {
         for (const item of this.board.items) {
             for (const layer_name of this.painter.get_layers_for(item)) {
-                this.layers.get(layer_name).items.push(item);
+                this.layers.by_name(layer_name).items.push(item);
             }
         }
     }
 
     #paint() {
-        for (const [_, layer] of this.layers) {
+        for (const layer of this.layers.in_display_order()) {
             this.painter.paint_layer(layer);
         }
     }
 
     draw(matrix) {
-        const layers = Array.from(this.gfx.layers()).reverse();
-        for (const layer of layers) {
-            layer.draw(matrix);
+        const gfx_layers = Array.from(this.gfx.layers()).reverse();
+        for (const gfx_layer of gfx_layers) {
+            gfx_layer.draw(matrix);
         }
     }
 }
