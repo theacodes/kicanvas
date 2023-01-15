@@ -438,17 +438,20 @@ export class GeometrySet {
         this.#circles = null;
     }
 
-    draw(matrix) {
+    draw(matrix, depth = 0) {
         this.#polygon_set.shader.bind();
         this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
+        this.#polygon_set.shader.u_depth.f1(depth);
         this.#polygon_set.draw();
 
         this.#circle_set.shader.bind();
         this.#circle_set.shader.u_matrix.mat3f(false, matrix.elements);
+        this.#circle_set.shader.u_depth.f1(depth);
         this.#circle_set.draw();
 
         this.#polyline_set.shader.bind();
         this.#polyline_set.shader.u_matrix.mat3f(false, matrix.elements);
+        this.#polyline_set.shader.u_depth.f1(depth);
         this.#polyline_set.draw();
     }
 }

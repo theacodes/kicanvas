@@ -2,6 +2,8 @@
 
 precision highp float;
 
+uniform float u_depth;
+
 in vec2 v_linespace;
 in float v_cap_region;
 in vec4 v_color;
@@ -32,4 +34,6 @@ void main() {
     } else {
         outColor = v_color;
     }
+
+    gl_FragDepth = u_depth;
 }

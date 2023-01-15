@@ -31,11 +31,13 @@ export class View {
     }
 
     draw(matrix) {
+        let depth = 0;
         const gfx_layers = Array.from(this.#gfx_layers.entries()).reverse();
         for (const [pcb_layer_name, gfx_layer] of gfx_layers) {
             if (this.layers.by_name(pcb_layer_name).visible) {
-                gfx_layer.draw(matrix);
+                gfx_layer.draw(matrix, depth);
             }
+            depth += 0.01;
         }
     }
 }
