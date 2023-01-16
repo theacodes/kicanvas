@@ -15,8 +15,10 @@ export class View {
     }
 
     #set_enabled_layers() {
-        for (const layer of Object.values(this.board.layers)) {
-            this.layers.by_name(layer.name).enabled = true;
+        for (const board_layer of Object.values(this.board.layers)) {
+            const layer = this.layers.by_name(board_layer.name);
+            layer.enabled = true;
+            layer.visible = true;
         }
     }
 

@@ -38,6 +38,7 @@ export class Layers {
 
     constructor(colors) {
         this.#colors = colors;
+
         this.#layer_list = [
             new Layer(this, ":Overlay"),
 
@@ -60,12 +61,24 @@ export class Layers {
 
             new Layer(this, ":Anchors"),
 
-            new Layer(this, ":Via:Holes"),
-            new Layer(this, ":Pad:Holes"),
-            new Layer(this, ":Pad:HoleWalls"),
-            new Layer(this, ":Via:Through"),
-            new Layer(this, ":Via:BuriedBlind"),
-            new Layer(this, ":Via:MicroVia"),
+            new Layer(this, ":Via:Holes", () =>
+                this.is_any_copper_layer_visible()
+            ),
+            new Layer(this, ":Pad:Holes", () =>
+                this.is_any_copper_layer_visible()
+            ),
+            new Layer(this, ":Pad:HoleWalls", () =>
+                this.is_any_copper_layer_visible()
+            ),
+            new Layer(this, ":Via:Through", () =>
+                this.is_any_copper_layer_visible()
+            ),
+            new Layer(this, ":Via:BuriedBlind", () =>
+                this.is_any_copper_layer_visible()
+            ),
+            new Layer(this, ":Via:MicroVia", () =>
+                this.is_any_copper_layer_visible()
+            ),
 
             new Layer(this, ":Pads:Front", () => this.by_name("F.Cu").visible),
             new Layer(this, "F.Cu"),
@@ -80,7 +93,7 @@ export class Layers {
 
         for (let i = 0; i <= max_inner_copper_layers; i++) {
             const name = `In${i}.Cu`;
-            this.#layer_list.push(new Layer(this, name, true, false));
+            this.#layer_list.push(new Layer(this, name, false, false));
             this.#layer_list.push(
                 new Layer(
                     this,
@@ -171,5 +184,14 @@ export class Layers {
 
     by_name(name) {
         return this.#layer_map.get(name);
+    }
+
+    is_any_copper_layer_visible() {
+        for (const l of this.in_display_order()) {
+            if (l.name.endsWith(".Cu") && l.enabled && l.visible) {
+                return true;
+            }
+        }
+        return false;
     }
 }
