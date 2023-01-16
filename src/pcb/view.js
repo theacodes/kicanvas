@@ -11,8 +11,15 @@ export class View {
         this.painter = new Painter(this.gfx);
         this.board = board;
         this.layers = new Layers();
+        this.#set_enabled_layers();
         this.#assign_items_to_layers();
         this.#paint();
+    }
+
+    #set_enabled_layers() {
+        for (const layer of Object.values(this.board.layers)) {
+            this.layers.by_name(layer.name).enabled = true;
+        }
     }
 
     #assign_items_to_layers() {

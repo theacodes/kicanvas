@@ -1,8 +1,24 @@
 class Layer {
-    constructor(name) {
+    #visible;
+    enabled;
+
+    constructor(name, visible = true, enabled = true) {
         this.name = name;
-        this.visible = true;
+        this.#visible = visible;
+        this.enabled = enabled;
         this.items = [];
+    }
+
+    get visible() {
+        if (this.#visible instanceof Function) {
+            return this.#visible();
+        } else {
+            return this.#visible;
+        }
+    }
+
+    set visible(v) {
+        this.#visible = v;
     }
 }
 
@@ -23,15 +39,15 @@ export class Layers {
             new Layer("Edge.Cuts"),
             new Layer("Margin"),
 
-            new Layer("User.1"),
-            new Layer("User.2"),
-            new Layer("User.3"),
-            new Layer("User.4"),
-            new Layer("User.5"),
-            new Layer("User.6"),
-            new Layer("User.7"),
-            new Layer("User.8"),
-            new Layer("User.9"),
+            new Layer("User.1", true, false),
+            new Layer("User.2", true, false),
+            new Layer("User.3", true, false),
+            new Layer("User.4", true, false),
+            new Layer("User.5", true, false),
+            new Layer("User.6", true, false),
+            new Layer("User.7", true, false),
+            new Layer("User.8", true, false),
+            new Layer("User.9", true, false),
 
             new Layer(":Anchors"),
 
@@ -42,8 +58,9 @@ export class Layers {
             new Layer(":Via:BuriedBlind"),
             new Layer(":Via:MicroVia"),
 
-            new Layer(":Pads:Front"),
+            new Layer(":Pads:Front", () => this.by_name("F.Cu").visible),
             new Layer("F.Cu"),
+            new Layer(":Zones:F.Cu", () => this.by_name("F.Cu").visible),
             new Layer("F.Mask"),
             new Layer("F.SilkS"),
             new Layer("F.Adhes"),
@@ -53,42 +70,17 @@ export class Layers {
         ];
 
         for (let i = 0; i <= max_inner_copper_layers; i++) {
-            this.#layer_list.push(new Layer(`In${i}.Cu`));
+            const name = `In${i}.Cu`;
+            this.#layer_list.push(new Layer(name, true, false));
+            this.#layer_list.push(
+                new Layer(`:Zones:${name}`, () => this.by_name(name).visible)
+            );
         }
 
         this.#layer_list = this.#layer_list.concat([
-            new Layer("In2.Cu"),
-            new Layer("In3.Cu"),
-            new Layer("In4.Cu"),
-            new Layer("In5.Cu"),
-            new Layer("In6.Cu"),
-            new Layer("In7.Cu"),
-            new Layer("In8.Cu"),
-            new Layer("In9.Cu"),
-            new Layer("In10.Cu"),
-            new Layer("In11.Cu"),
-            new Layer("In12.Cu"),
-            new Layer("In13.Cu"),
-            new Layer("In14.Cu"),
-            new Layer("In15.Cu"),
-            new Layer("In16.Cu"),
-            new Layer("In17.Cu"),
-            new Layer("In18.Cu"),
-            new Layer("In19.Cu"),
-            new Layer("In20.Cu"),
-            new Layer("In21.Cu"),
-            new Layer("In22.Cu"),
-            new Layer("In23.Cu"),
-            new Layer("In24.Cu"),
-            new Layer("In25.Cu"),
-            new Layer("In26.Cu"),
-            new Layer("In27.Cu"),
-            new Layer("In28.Cu"),
-            new Layer("In29.Cu"),
-            new Layer("In30.Cu"),
-
-            new Layer(":Pads:Back"),
+            new Layer(":Pads:Back", () => this.by_name("B.Cu").visible),
             new Layer("B.Cu"),
+            new Layer(":Zones:B.Cu", () => this.by_name("B.Cu").visible),
             new Layer("B.Mask"),
             new Layer("B.SilkS"),
             new Layer("B.Adhes"),
@@ -146,14 +138,14 @@ export class Layers {
             if (name == Symbol.inner_copper) {
                 for (let i = 1; i <= max_inner_copper_layers; i++) {
                     const layer = this.by_name(`In${i}.Cu`);
-                    if (layer.items.length) {
+                    if (layer.enabled) {
                         yield layer;
                     }
                 }
             } else {
                 const layer = this.by_name(name);
 
-                if (layer.items.length) {
+                if (layer.enabled) {
                     yield layer;
                 }
             }
