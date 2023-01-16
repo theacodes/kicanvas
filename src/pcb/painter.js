@@ -20,9 +20,9 @@ function get_color(layer) {
     let name = layer.name.replace(".", "_").toLowerCase();
     if (name.endsWith("_cu")) {
         name = name.replace("_cu", "");
-        return board_colors.copper[name] ?? [0, 1, 0, 1];
+        return board_colors.copper[name] ?? [0, 0, 1, 1];
     }
-    return board_colors[name] ?? [1, 0, 0, 1];
+    return board_colors[name] ?? [0, 0, 1, 1];
 }
 
 class GenericPainter {
@@ -155,7 +155,7 @@ class ZonePainter extends GenericPainter {
     static items = [pcb_items.Zone];
 
     static layers(z) {
-        return z.layers;
+        return z.layers.map((l) => `:Zones:${l}`);
     }
 
     static paint(gfx, layer, z) {
@@ -167,7 +167,7 @@ class ZonePainter extends GenericPainter {
                 continue;
             }
             let color = Array.from(get_color({ name: p.layer }));
-            color[3] *= 0.01; // TODO: Remove
+            color[3] = 0.5; // TODO: Remove
             gfx.polygon(p.pts, color);
         }
     }
