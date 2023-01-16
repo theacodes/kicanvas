@@ -9,26 +9,26 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Camera2 } from "./camera2.js";
 
 export class Scene {
-    gl;
+    renderer;
     width = null;
     height = null;
     camera;
 
-    constructor(gl) {
-        this.gl = gl;
+    constructor(renderer) {
+        this.renderer = renderer;
 
         this.camera = new Camera2(new Vec2(0, 0), new Vec2(0, 0), 1, 0);
 
         this.resize(
-            this.gl.canvas.clientWidth,
-            this.gl.canvas.clientWeight,
-            this.gl.canvas.width,
-            this.gl.canvas.height
+            this.renderer.canvas.clientWidth,
+            this.renderer.canvas.clientWeight,
+            this.renderer.canvas.width,
+            this.renderer.canvas.height
         );
     }
 
     resize(logical_w, logical_h, display_w, display_h) {
-        this.gl.viewport(0, 0, display_w, display_h);
+        this.renderer.set_viewport(0, 0, display_w, display_h);
 
         if (this.width != logical_w || this.height != logical_h) {
             this.width = logical_w;

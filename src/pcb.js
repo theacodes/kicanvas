@@ -51,12 +51,8 @@ class PCBViewer {
         await this.#setup_scene();
     }
 
-    async #setup_gl() {
-        // pcb_geometry.PCBPainter.text_shaper = await TextShaper.default();
-    }
-
     async #setup_scene() {
-        this.#scene = new Scene(this.#renderer.gl);
+        this.#scene = new Scene(this.#renderer);
 
         new CanvasSizeObserver(this.#cvs, (_, ...args) => {
             this.#scene.resize(...args);

@@ -35,9 +35,15 @@ export class WebGl2Renderer {
         gl.clearDepth(0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+        this.set_viewport(0, 0, this.canvas.width, this.canvas.height);
+
         await PolygonSet.load_shader(gl);
         await PolylineSet.load_shader(gl);
         await CircleSet.load_shader(gl);
+    }
+
+    set_viewport(x, y, w, h) {
+        this.gl.viewport(x, y, w, h);
     }
 
     clear_canvas() {
