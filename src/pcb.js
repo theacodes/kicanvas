@@ -13,27 +13,6 @@ import * as pcb_view from "./pcb/view.js";
 import { BBox } from "./math/bbox.js";
 import { WebGl2Renderer } from "./rendering/webgl2.js";
 
-const layers_ordered_for_controls = [
-    "F.Cu",
-    "In1.Cu",
-    "In2.Cu",
-    "B.Cu",
-    "F.Paste",
-    "B.Paste",
-    "F.SilkS",
-    "B.SilkS",
-    "F.Mask",
-    "B.Mask",
-    "Dwgs.User",
-    "Cmts.User",
-    "Edge.Cuts",
-    "Margin",
-    "F.CrtYd",
-    "B.CrtYd",
-    "F.Fab",
-    "B.Fab",
-];
-
 class PCBViewer {
     #cvs;
     #renderer;
@@ -85,7 +64,7 @@ class PCBViewer {
     }
 
     #look_at_board() {
-        this.#scene.lookat(new BBox(0, 0, 400, 400));
+        this.#scene.lookat(new BBox(0, 0, 200, 200));
         // const board_bbox = this.layers["Edge.Cuts"].geometry.bbox;
         // this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
     }
