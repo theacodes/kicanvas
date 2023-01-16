@@ -46,3 +46,9 @@ export function rgba_to_f4(rgba) {
     const a = parts[3];
     return [...rgb, a];
 }
+
+export function f4_to_rgba(color) {
+    return `rgba(${color[0] * 255}, ${color[1] * 255}, ${color[2] * 255}, ${
+        color[3]
+    })`;
+}

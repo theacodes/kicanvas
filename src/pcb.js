@@ -12,6 +12,8 @@ import { CanvasSizeObserver } from "./gfx/resize.js";
 import * as pcb_view from "./pcb/view.js";
 import { BBox } from "./math/bbox.js";
 import { WebGl2Renderer } from "./rendering/webgl2.js";
+import { f4_to_rgba } from "./gfx/colorspace.js";
+import { board as board_colors } from "./pcb/colors.js";
 
 class PCBViewer {
     #cvs;
@@ -22,7 +24,7 @@ class PCBViewer {
 
     constructor(canvas) {
         this.#cvs = canvas;
-        this.#renderer = new WebGl2Renderer(this.#cvs);
+        this.#renderer = new WebGl2Renderer(this.#cvs, board_colors.background);
     }
 
     async setup() {
@@ -54,13 +56,13 @@ class PCBViewer {
     async load(url) {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
-        this.#setup_board();
+        this.#setup_view();
         this.#look_at_board();
         this.draw();
     }
 
-    #setup_board() {
-        this.#view = new pcb_view.View(this.#renderer, this.pcb);
+    #setup_view() {
+        this.#view = new pcb_view.View(this.#renderer, board_colors, this.pcb);
     }
 
     #look_at_board() {
@@ -168,9 +170,7 @@ class KicadPCBLayerControls extends HTMLElement {
         for (const layer of viewer.layers.in_ui_order()) {
             const visible = layer.visible ? "yes" : "no";
             const color = layer.color;
-            const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
-                color[2] * 255
-            })`;
+            const css_color = f4_to_rgba([...color.slice(0, 3), 1]);
             buttons.push(`
                 <button type="button" name="${layer.name}" visible="${visible}">
                     <span class="color" style="background-color: ${css_color};"></span>

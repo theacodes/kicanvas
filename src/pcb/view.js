@@ -1,15 +1,14 @@
 import { Layers } from "./layers.js";
 import { Painter } from "./painter.js";
-import { board as board_colors } from "./colors.js";
 
 export class View {
     #gfx_layers = new Map();
 
-    constructor(renderer, board) {
+    constructor(renderer, colors, board) {
         this.gfx = renderer;
         this.painter = new Painter(this.gfx);
         this.board = board;
-        this.layers = new Layers(board_colors);
+        this.layers = new Layers(colors);
         this.#set_enabled_layers();
         this.#assign_items_to_layers();
         this.#paint();

@@ -5,21 +5,24 @@ import {
     GeometrySet,
 } from "../gfx/geometry.js";
 import { Matrix3 } from "../math/matrix3.js";
+import { f4_to_rgba } from "../gfx/colorspace.js";
 
 export class WebGl2Renderer {
     #transform_stack = [Matrix3.identity()];
     #layers = [];
     #active_layer;
+    #background_color;
 
-    constructor(canvas) {
+    constructor(canvas, background_color) {
         this.canvas = canvas;
+        this.#background_color = background_color;
     }
 
     async setup() {
         // just in case the browser still gives us a backbuffer with alpha,
         // set the background color of the canvas to black so that it behaves
         // correctly.
-        this.canvas.style.backgroundColor = "black";
+        this.canvas.style.backgroundColor = f4_to_rgba(this.#background_color);
 
         let gl = this.canvas.getContext("webgl2", { alpha: false });
         this.gl = gl;
@@ -31,7 +34,7 @@ export class WebGl2Renderer {
         gl.depthFunc(gl.GREATER);
 
         // TODO: Pull background color from theme
-        gl.clearColor(0.074, 0.071, 0.094, 1);
+        gl.clearColor(...this.#background_color);
         gl.clearDepth(0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
