@@ -394,15 +394,12 @@ export class GeometrySet {
 
     constructor(gl) {
         this.gl = gl;
-        this.#polygon_set = new PolygonSet(gl);
-        this.#circle_set = new CircleSet(gl);
-        this.#polyline_set = new PolylineSet(gl);
     }
 
     dispose() {
-        this.#polygon_set.dispose();
-        this.#circle_set.dispose();
-        this.#polyline_set.dispose();
+        this.#polygon_set?.dispose();
+        this.#circle_set?.dispose();
+        this.#polyline_set?.dispose();
     }
 
     add_circle(point, radius, color) {
@@ -430,28 +427,43 @@ export class GeometrySet {
     }
 
     commit() {
-        this.#polygon_set.set(this.#polygons);
-        this.#polygons = null;
-        this.#polyline_set.set(this.#lines);
-        this.#lines = null;
-        this.#circle_set.set(this.#circles);
-        this.#circles = null;
+        if (this.#polygons.length) {
+            this.#polygon_set = new PolygonSet(this.gl);
+            this.#polygon_set.set(this.#polygons);
+            this.#polygons = [];
+        }
+        if (this.#lines.length) {
+            this.#polyline_set = new PolylineSet(this.gl);
+            this.#polyline_set.set(this.#lines);
+            this.#lines = [];
+        }
+        if (this.#circles.length) {
+            this.#circle_set = new CircleSet(this.gl);
+            this.#circle_set.set(this.#circles);
+            this.#circles = [];
+        }
     }
 
     draw(matrix, depth = 0) {
-        this.#polygon_set.shader.bind();
-        this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
-        this.#polygon_set.shader.u_depth.f1(depth);
-        this.#polygon_set.draw();
+        if (this.#polygon_set) {
+            this.#polygon_set.shader.bind();
+            this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
+            this.#polygon_set.shader.u_depth.f1(depth);
+            this.#polygon_set.draw();
+        }
 
-        this.#circle_set.shader.bind();
-        this.#circle_set.shader.u_matrix.mat3f(false, matrix.elements);
-        this.#circle_set.shader.u_depth.f1(depth);
-        this.#circle_set.draw();
+        if (this.#circle_set) {
+            this.#circle_set.shader.bind();
+            this.#circle_set.shader.u_matrix.mat3f(false, matrix.elements);
+            this.#circle_set.shader.u_depth.f1(depth);
+            this.#circle_set.draw();
+        }
 
-        this.#polyline_set.shader.bind();
-        this.#polyline_set.shader.u_matrix.mat3f(false, matrix.elements);
-        this.#polyline_set.shader.u_depth.f1(depth);
-        this.#polyline_set.draw();
+        if (this.#polyline_set) {
+            this.#polyline_set.shader.bind();
+            this.#polyline_set.shader.u_matrix.mat3f(false, matrix.elements);
+            this.#polyline_set.shader.u_depth.f1(depth);
+            this.#polyline_set.draw();
+        }
     }
 }
