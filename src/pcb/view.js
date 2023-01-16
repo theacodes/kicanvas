@@ -1,6 +1,6 @@
 import { Layers } from "./layers.js";
 import { Painter } from "./painter.js";
-import { GeometrySet } from "../gfx/vg.js";
+import { GeometrySet } from "../gfx/geometry.js";
 import { Matrix3 } from "../math/matrix3.js";
 
 export class View {

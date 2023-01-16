@@ -9,7 +9,12 @@ import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Arc } from "../math/arc.js";
 import { BBox } from "../math/bbox.js";
-import { CircleSet, PolygonSet, PolylineSet, GeometrySet } from "../gfx/vg.js";
+import {
+    CircleSet,
+    PolygonSet,
+    PolylineSet,
+    GeometrySet,
+} from "../gfx/geometry.js";
 import * as pcb_items from "../kicad/pcb_items.js";
 
 export class CanvasBackend {

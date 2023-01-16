@@ -5,7 +5,7 @@
 */
 
 import { parse } from "./kicad/parser.js";
-import { CircleSet, PolygonSet, PolylineSet } from "./gfx/vg.js";
+import { CircleSet, PolygonSet, PolylineSet } from "./gfx/geometry.js";
 import * as pcb_items from "./kicad/pcb_items.js";
 import { Scene } from "./gfx/scene.js";
 import { PanAndZoom } from "./gfx/pan_and_zoom.js";
