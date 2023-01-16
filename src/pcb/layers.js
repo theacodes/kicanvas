@@ -1,12 +1,19 @@
 class Layer {
+    #layers;
+    name;
     #visible;
     enabled;
 
-    constructor(name, visible = true, enabled = true) {
+    constructor(layers, name, visible = true, enabled = true) {
+        this.#layers = layers;
         this.name = name;
         this.#visible = visible;
         this.enabled = enabled;
         this.items = [];
+    }
+
+    get color() {
+        return this.#layers.color_for(this.name);
     }
 
     get visible() {
@@ -25,73 +32,83 @@ class Layer {
 const max_inner_copper_layers = 30;
 
 export class Layers {
+    #colors;
     #layer_list = [];
     #layer_map = new Map();
 
-    constructor() {
+    constructor(colors) {
+        this.#colors = colors;
         this.#layer_list = [
-            new Layer(":Overlay"),
+            new Layer(this, ":Overlay"),
 
-            new Layer("Dwgs.User"),
-            new Layer("Cmts.User"),
-            new Layer("Eco1.User"),
-            new Layer("Eco2.User"),
-            new Layer("Edge.Cuts"),
-            new Layer("Margin"),
+            new Layer(this, "Dwgs.User"),
+            new Layer(this, "Cmts.User"),
+            new Layer(this, "Eco1.User"),
+            new Layer(this, "Eco2.User"),
+            new Layer(this, "Edge.Cuts"),
+            new Layer(this, "Margin"),
 
-            new Layer("User.1", true, false),
-            new Layer("User.2", true, false),
-            new Layer("User.3", true, false),
-            new Layer("User.4", true, false),
-            new Layer("User.5", true, false),
-            new Layer("User.6", true, false),
-            new Layer("User.7", true, false),
-            new Layer("User.8", true, false),
-            new Layer("User.9", true, false),
+            new Layer(this, "User.1", true, false),
+            new Layer(this, "User.2", true, false),
+            new Layer(this, "User.3", true, false),
+            new Layer(this, "User.4", true, false),
+            new Layer(this, "User.5", true, false),
+            new Layer(this, "User.6", true, false),
+            new Layer(this, "User.7", true, false),
+            new Layer(this, "User.8", true, false),
+            new Layer(this, "User.9", true, false),
 
-            new Layer(":Anchors"),
+            new Layer(this, ":Anchors"),
 
-            new Layer(":Via:Holes"),
-            new Layer(":Pad:Holes"),
-            new Layer(":Pad:HoleWalls"),
-            new Layer(":Via:Through"),
-            new Layer(":Via:BuriedBlind"),
-            new Layer(":Via:MicroVia"),
+            new Layer(this, ":Via:Holes"),
+            new Layer(this, ":Pad:Holes"),
+            new Layer(this, ":Pad:HoleWalls"),
+            new Layer(this, ":Via:Through"),
+            new Layer(this, ":Via:BuriedBlind"),
+            new Layer(this, ":Via:MicroVia"),
 
-            new Layer(":Pads:Front", () => this.by_name("F.Cu").visible),
-            new Layer("F.Cu"),
-            new Layer(":Zones:F.Cu", () => this.by_name("F.Cu").visible),
-            new Layer("F.Mask"),
-            new Layer("F.SilkS"),
-            new Layer("F.Adhes"),
-            new Layer("F.Paste"),
-            new Layer("F.CrtYd"),
-            new Layer("F.Fab"),
+            new Layer(this, ":Pads:Front", () => this.by_name("F.Cu").visible),
+            new Layer(this, "F.Cu"),
+            new Layer(this, ":Zones:F.Cu", () => this.by_name("F.Cu").visible),
+            new Layer(this, "F.Mask"),
+            new Layer(this, "F.SilkS"),
+            new Layer(this, "F.Adhes"),
+            new Layer(this, "F.Paste"),
+            new Layer(this, "F.CrtYd"),
+            new Layer(this, "F.Fab"),
         ];
 
         for (let i = 0; i <= max_inner_copper_layers; i++) {
             const name = `In${i}.Cu`;
-            this.#layer_list.push(new Layer(name, true, false));
+            this.#layer_list.push(new Layer(this, name, true, false));
             this.#layer_list.push(
-                new Layer(`:Zones:${name}`, () => this.by_name(name).visible)
+                new Layer(
+                    this,
+                    `:Zones:${name}`,
+                    () => this.by_name(name).visible
+                )
             );
         }
 
         this.#layer_list = this.#layer_list.concat([
-            new Layer(":Pads:Back", () => this.by_name("B.Cu").visible),
-            new Layer("B.Cu"),
-            new Layer(":Zones:B.Cu", () => this.by_name("B.Cu").visible),
-            new Layer("B.Mask"),
-            new Layer("B.SilkS"),
-            new Layer("B.Adhes"),
-            new Layer("B.Paste"),
-            new Layer("B.CrtYd"),
-            new Layer("B.Fab"),
+            new Layer(this, ":Pads:Back", () => this.by_name("B.Cu").visible),
+            new Layer(this, "B.Cu"),
+            new Layer(this, ":Zones:B.Cu", () => this.by_name("B.Cu").visible),
+            new Layer(this, "B.Mask"),
+            new Layer(this, "B.SilkS"),
+            new Layer(this, "B.Adhes"),
+            new Layer(this, "B.Paste"),
+            new Layer(this, "B.CrtYd"),
+            new Layer(this, "B.Fab"),
         ]);
 
         for (const l of this.#layer_list) {
             this.#layer_map.set(l.name, l);
         }
+    }
+
+    color_for(layer_name) {
+        return this.#colors.get_layer_color(layer_name);
     }
 
     *in_display_order() {

@@ -167,8 +167,7 @@ class KicadPCBLayerControls extends HTMLElement {
 
         for (const layer of viewer.layers.in_ui_order()) {
             const visible = layer.visible ? "yes" : "no";
-            // TODO: Get actual layer color
-            const color = [1, 0, 0, 1];
+            const color = layer.color;
             const css_color = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
                 color[2] * 255
             })`;

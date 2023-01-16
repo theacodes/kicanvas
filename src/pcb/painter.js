@@ -3,27 +3,6 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
-import { board as board_colors } from "./colors.js";
-
-function get_color(layer) {
-    switch (layer.name) {
-        case ":Via:Holes":
-            return board_colors.via_hole;
-        case ":Via:Through":
-            return board_colors.via_through;
-        case ":Pad:Holes":
-            return board_colors.background;
-        case ":Pad:HoleWalls":
-            return board_colors.pad_through_hole;
-    }
-
-    let name = layer.name.replace(".", "_").toLowerCase();
-    if (name.endsWith("_cu")) {
-        name = name.replace("_cu", "");
-        return board_colors.copper[name] ?? [0, 0, 1, 1];
-    }
-    return board_colors[name] ?? [0, 0, 1, 1];
-}
 
 class GenericPainter {
     static items = [];
@@ -40,7 +19,7 @@ class LinePainter extends GenericPainter {
 
     static paint(gfx, layer, s) {
         const points = [s.start, s.end];
-        gfx.line(points, s.width, get_color(layer));
+        gfx.line(points, s.width, layer.color);
     }
 }
 
@@ -48,7 +27,7 @@ class RectPainter extends GenericPainter {
     static items = [pcb_items.GrRect, pcb_items.FpRect];
 
     static paint(gfx, layer, r) {
-        const color = get_color(layer);
+        const color = layer.color;
         const points = [
             r.start,
             new Vec2(r.start.x, r.end.y),
@@ -69,7 +48,7 @@ class PolyPainter extends GenericPainter {
     static items = [pcb_items.GrPoly, pcb_items.FpPoly];
 
     static paint(gfx, layer, p) {
-        const color = get_color(layer);
+        const color = layer.color;
 
         if (p.width) {
             gfx.line([...p.pts, p.pts[0]], p.width, color);
@@ -87,7 +66,7 @@ class ArcPainter extends GenericPainter {
     static paint(gfx, layer, a) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const polyline = arc.to_polyline();
-        gfx.line(polyline.points, polyline.width, get_color(layer));
+        gfx.line(polyline.points, polyline.width, layer.color);
     }
 }
 
@@ -95,7 +74,7 @@ class CirclePainter extends GenericPainter {
     static items = [pcb_items.GrCircle, pcb_items.FpCircle];
 
     static paint(gfx, layer, c) {
-        const color = get_color(layer);
+        const color = layer.color;
 
         const radius = c.center.sub(c.end).length;
         const arc = new Arc(
@@ -120,7 +99,7 @@ class TraceSegmentPainter extends GenericPainter {
 
     static paint(gfx, layer, s) {
         const points = [s.start, s.end];
-        gfx.line(points, s.width, get_color(layer));
+        gfx.line(points, s.width, layer.color);
     }
 }
 
@@ -130,7 +109,7 @@ class TraceArcPainter extends GenericPainter {
     static paint(gfx, layer, a) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const polyline = arc.to_polyline();
-        gfx.line(polyline.points, polyline.width, get_color(layer));
+        gfx.line(polyline.points, polyline.width, layer.color);
     }
 }
 
@@ -142,7 +121,7 @@ class ViaPainter extends GenericPainter {
     }
 
     static paint(gfx, layer, v) {
-        const color = get_color(layer);
+        const color = layer.color;
         if (layer.name == ":Via:Through") {
             gfx.circle(v.at, v.size / 2, color);
         } else if (layer.name == ":Via:Holes") {
@@ -166,7 +145,7 @@ class ZonePainter extends GenericPainter {
             if (!layer.name.includes(p.layer)) {
                 continue;
             }
-            let color = Array.from(get_color({ name: p.layer }));
+            let color = Array.from(layer.color);
             color[3] = 0.5; // TODO: Remove
             gfx.polygon(p.pts, color);
         }
@@ -213,7 +192,7 @@ class PadPainter extends GenericPainter {
     }
 
     static paint(gfx, layer, pad) {
-        const color = get_color(layer);
+        const color = layer.color;
 
         const position_mat = Matrix3.translation(
             pad.at.position.x,

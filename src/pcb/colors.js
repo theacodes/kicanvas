@@ -1,6 +1,27 @@
 import { rgba_to_f4 } from "../gfx/colorspace.js";
 
 export const board = {
+    get_layer_color(layer_name) {
+        switch (layer_name) {
+            case ":Via:Holes":
+                return this.via_hole;
+            case ":Via:Through":
+                return this.via_through;
+            case ":Pad:Holes":
+                return this.background;
+            case ":Pad:HoleWalls":
+                return this.pad_through_hole;
+        }
+
+        let name = layer_name;
+
+        name = name.replace(":Zones:", "").replace(".", "_").toLowerCase();
+        if (name.endsWith("_cu")) {
+            name = name.replace("_cu", "");
+            return this.copper[name];
+        }
+        return this[name];
+    },
     anchor: "rgb(100, 203, 150)",
     aux_items: "rgb(255, 98, 0)",
     b_adhes: "rgb(0, 0, 132)",
