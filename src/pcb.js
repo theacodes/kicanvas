@@ -56,13 +56,14 @@ class PCBViewer {
     async load(url) {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
-        this.#setup_view();
+        await this.#setup_view();
         this.#look_at_board();
         this.draw();
     }
 
-    #setup_view() {
+    async #setup_view() {
         this.#view = new pcb_view.View(this.#renderer, board_colors, this.pcb);
+        await this.#view.setup();
     }
 
     #look_at_board() {

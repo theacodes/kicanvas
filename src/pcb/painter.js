@@ -3,6 +3,7 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
+import { TextShaper } from "../gfx/text.js";
 
 class GenericPainter {
     static items = [];
@@ -356,10 +357,41 @@ class TextPainter extends GenericPainter {
     static items = [pcb_items.GrText, pcb_items.FpText];
 
     static layers(t) {
-        return [];
+        if (t.hide) {
+            return [];
+        } else {
+            return [t.layer];
+        }
     }
 
-    static paint(gfx, layer, t) {}
+    static paint(gfx, layer, t, context) {
+        let rotation = t.at.rotation;
+
+        if (rotation == 180 || rotation == -180) {
+            rotation = 0;
+        }
+
+        if (t.footprint) {
+            rotation -= t.footprint.at.rotation ?? 0;
+        }
+
+        const shaped = context.text_shaper.paragraph(
+            t.text,
+            t.at.position,
+            Angle.deg_to_rad(rotation),
+            t.effects.size,
+            t.effects.thickness,
+            {
+                valign: "center",
+                halign: t.effects.h_align,
+                mirror: t.effects.mirror,
+            }
+        );
+
+        for (const stroke of shaped) {
+            gfx.line(stroke, t.effects.thickness, layer.color);
+        }
+    }
 }
 
 class DimensionPainter extends GenericPainter {
@@ -387,7 +419,7 @@ class FootprintPainter extends GenericPainter {
         return Array.from(layers.values());
     }
 
-    static paint(gfx, layer, fp) {
+    static paint(gfx, layer, fp, context) {
         let matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
@@ -399,7 +431,12 @@ class FootprintPainter extends GenericPainter {
                 painter_for_class[item.constructor].layers(item)
             );
             if (item_layers.includes(layer.name)) {
-                painter_for_class[item.constructor].paint(gfx, layer, item);
+                painter_for_class[item.constructor].paint(
+                    gfx,
+                    layer,
+                    item,
+                    context
+                );
             }
         }
         gfx.set_transform();
@@ -431,8 +468,14 @@ for (const painter of painters) {
 }
 
 export class Painter {
+    #text_shaper;
+
     constructor(gfx) {
         this.gfx = gfx;
+    }
+
+    async setup() {
+        this.#text_shaper = await TextShaper.default();
     }
 
     get_layers_for(item) {
@@ -448,6 +491,13 @@ export class Painter {
     }
 
     paint_item(layer, item) {
-        return painter_for_class[item.constructor].paint(this.gfx, layer, item);
+        return painter_for_class[item.constructor].paint(
+            this.gfx,
+            layer,
+            item,
+            {
+                text_shaper: this.#text_shaper,
+            }
+        );
     }
 }

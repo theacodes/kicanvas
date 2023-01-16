@@ -9,6 +9,10 @@ export class View {
         this.painter = new Painter(this.gfx);
         this.board = board;
         this.layers = new Layers(colors);
+    }
+
+    async setup() {
+        await this.painter.setup();
         this.#set_enabled_layers();
         this.#assign_items_to_layers();
         this.#paint();
