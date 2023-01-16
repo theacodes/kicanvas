@@ -65,6 +65,7 @@ class PCBViewer {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.GREATER);
 
+        // TODO: Pull background color from theme
         gl.clearColor(0.074, 0.071, 0.094, 1);
         gl.clearDepth(0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
