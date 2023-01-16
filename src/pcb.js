@@ -5,13 +5,13 @@
 */
 
 import { parse } from "./kicad/parser.js";
-import { CircleSet, PolygonSet, PolylineSet } from "./gfx/geometry.js";
 import * as pcb_items from "./kicad/pcb_items.js";
 import { Scene } from "./gfx/scene.js";
 import { PanAndZoom } from "./gfx/pan_and_zoom.js";
 import { CanvasSizeObserver } from "./gfx/resize.js";
 import * as pcb_view from "./pcb/view.js";
 import { BBox } from "./math/bbox.js";
+import { WebGl2Renderer } from "./rendering/webgl2.js";
 
 const layers_ordered_for_controls = [
     "F.Cu",
@@ -36,48 +36,27 @@ const layers_ordered_for_controls = [
 
 class PCBViewer {
     #cvs;
-    #gl;
+    #renderer;
     #scene;
     #view;
     pcb;
 
     constructor(canvas) {
         this.#cvs = canvas;
+        this.#renderer = new WebGl2Renderer(this.#cvs);
     }
 
     async setup() {
-        await this.#setup_gl();
+        await this.#renderer.setup();
         await this.#setup_scene();
     }
 
     async #setup_gl() {
-        // just in case the browser still gives us a backbuffer with alpha,
-        // set the background color of the canvas to black so that it behaves
-        // correctly.
-        this.#cvs.style.backgroundColor = "black";
-
-        const gl = this.#cvs.getContext("webgl2", { alpha: false });
-        this.#gl = gl;
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.GREATER);
-
-        // TODO: Pull background color from theme
-        gl.clearColor(0.074, 0.071, 0.094, 1);
-        gl.clearDepth(0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        await PolygonSet.load_shader(gl);
-        await PolylineSet.load_shader(gl);
-        await CircleSet.load_shader(gl);
         // pcb_geometry.PCBPainter.text_shaper = await TextShaper.default();
     }
 
     async #setup_scene() {
-        this.#scene = new Scene(this.#gl);
+        this.#scene = new Scene(this.#renderer.gl);
 
         new CanvasSizeObserver(this.#cvs, (_, ...args) => {
             this.#scene.resize(...args);
@@ -106,7 +85,7 @@ class PCBViewer {
     }
 
     #setup_board() {
-        this.#view = new pcb_view.View(this.#gl, this.pcb);
+        this.#view = new pcb_view.View(this.#renderer, this.pcb);
     }
 
     #look_at_board() {
@@ -119,10 +98,7 @@ class PCBViewer {
         if (!this.#view) return;
 
         window.requestAnimationFrame(() => {
-            this.#gl.clear(
-                this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT
-            );
-
+            this.#renderer.clear_canvas();
             let matrix = this.#scene.view_projection_matrix;
             this.#view.draw(matrix);
         });
