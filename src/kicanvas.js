@@ -65,7 +65,7 @@ class KicadSchematicElement extends HTMLElement {
 
             this.select();
             for (const b of this.selectable_items) {
-                if (b.contains_point(p.x, p.y)) {
+                if (b.contains_point(p)) {
                     this.select([b]);
                     break;
                 }

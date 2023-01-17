@@ -88,6 +88,22 @@ export class BBox {
         return new Vec2(this.x + this.w, this.y + this.h);
     }
 
+    get top_left() {
+        return this.start;
+    }
+
+    get top_right() {
+        return new Vec2(this.x + this.w, this.y);
+    }
+
+    get bottom_left() {
+        return new Vec2(this.x, this.y + this.h);
+    }
+
+    get bottom_right() {
+        return this.end;
+    }
+
     get x2() {
         return this.x + this.w;
     }
@@ -129,7 +145,9 @@ export class BBox {
         return this;
     }
 
-    contains_point(x, y) {
-        return x >= this.x && x <= this.x2 && y >= this.y && y <= this.y2;
+    contains_point(v) {
+        return (
+            v.x >= this.x && v.x <= this.x2 && v.y >= this.y && v.y <= this.y2
+        );
     }
 }
