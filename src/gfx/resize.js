@@ -5,6 +5,14 @@
 */
 
 /**
+ * @callback ResizeObserverCallback
+ * @param {number} clientWidth
+ * @param {number} clientHeight
+ * @param {number} pixelWidth
+ * @param {number} pixelHeight
+ */
+
+/**
  * Like ResizeObserver, but specific to HTMLCanvasElement.
  *
  * Handles setting the initial canvas size based on the device pixel ratio,
@@ -15,6 +23,11 @@ export class CanvasSizeObserver {
     canvas = null;
     #callback = null;
 
+    /**
+     * Create a CanvasSizeObserver
+     * @param {HTMLCanvasElement} canvas
+     * @param {ResizeObserverCallback} callback
+     */
     constructor(canvas, callback) {
         this.canvas = canvas;
         this.#callback = callback;
@@ -24,6 +37,11 @@ export class CanvasSizeObserver {
         }).observe(canvas);
     }
 
+    /** Resizes the canvas
+     *
+     * Typically not called directly, it's invoked automatically through
+     * event listeners.
+     */
     resize() {
         const c = this.canvas;
         c.width = c.clientWidth * window.devicePixelRatio;

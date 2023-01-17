@@ -75,10 +75,8 @@ class PCBViewer {
             () => {
                 this.draw();
             },
-            {
-                minZoom: 0.5,
-                maxZoom: 130,
-            }
+            0.5,
+            130
         );
     }
 
@@ -98,7 +96,7 @@ class PCBViewer {
     #look_at_board() {
         const board_bbox = this.#view.get_board_bbox();
         console.log(board_bbox);
-        this.#scene.lookat(board_bbox.grow(board_bbox.w * 0.1));
+        this.#scene.camera.lookat(board_bbox.grow(board_bbox.w * 0.1));
     }
 
     draw() {

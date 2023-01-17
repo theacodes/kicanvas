@@ -107,4 +107,18 @@ export class Camera2 {
     world_to_screen(v) {
         return this.matrix.transform(v);
     }
+
+    /**
+     * Move the camera and adjust zoom so that the given bounding box is in
+     * view.
+     * @param {BBox} bbox
+     */
+    lookat(bbox) {
+        const zoom_w = this.viewport_size.x / bbox.w;
+        const zoom_h = this.viewport_size.y / bbox.h;
+        const center_x = bbox.x + bbox.w / 2;
+        const center_y = bbox.y + bbox.h / 2;
+        this.zoom = Math.min(zoom_w, zoom_h);
+        this.center.set(center_x, center_y);
+    }
 }

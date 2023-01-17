@@ -6,6 +6,9 @@
 
 import { Vec2 } from "../math/vec2.js";
 
+/**
+ * Interactive Pan and Zoom helper
+ */
 export class PanAndZoom {
     #target;
     #camera;
@@ -18,17 +21,26 @@ export class PanAndZoom {
     #pan_center = new Vec2(0, 0);
     #pan_mouse = new Vec2(0, 0);
 
+    /**
+     * Create an interactive pan and zoom helper
+     * @param {HTMLElement} target - the element to attach to and listen for mouse events
+     * @param {Camera2} camera - the camera that will be updated when panning and zooming
+     * @param {*} callback - optional callback when pan and zoom happens
+     * @param {number} min_zoom
+     * @param {number} max_zoom
+     */
     constructor(
         target,
         camera,
         callback = () => {},
-        options = { minZoom: 0.5, maxZoom: 10 }
+        min_zoom = 0.5,
+        max_zoom = 10
     ) {
         this.#target = target;
         this.#camera = camera;
         this.#callback = callback;
-        this.#min_zoom = options.minZoom;
-        this.#max_zoom = options.maxZoom;
+        this.#min_zoom = min_zoom;
+        this.#max_zoom = max_zoom;
 
         this.#target.addEventListener("mousedown", (e) => {
             e.preventDefault();
