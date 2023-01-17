@@ -7,15 +7,34 @@
 import { Angle } from "./angle.js";
 import { Matrix3 } from "./matrix3.js";
 
+/**
+ * A 2-dimensional point vector
+ *
+ * All operations except for set() return new vectors and do not modify the existing vector
+ */
 export class Vec2 {
+    /**
+     * Create a Vec2
+     * @param {number|Vec2} x_or_other
+     * @param {number} y
+     */
     constructor(x_or_other = 0, y = undefined) {
         this.set(x_or_other, y);
     }
 
+    /**
+     * Copy this vector
+     * @returns Vec2
+     */
     copy() {
         return new Vec2(...this);
     }
 
+    /**
+     * Update this vector's values
+     * @param {number|Vec2} x_or_other
+     * @param {number} y
+     */
     set(x_or_other, y = undefined) {
         if (
             x_or_other instanceof this.constructor ||
@@ -29,25 +48,35 @@ export class Vec2 {
         }
     }
 
+    /** Iterate through [x, y] */
     *[Symbol.iterator]() {
         yield this.x;
         yield this.y;
     }
 
-    get length() {
+    get magnitude() {
         return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
 
+    /**
+     * @returns {Vec2} the perpendicular normal of this vector
+     */
     get normal() {
         return new Vec2(-this.y, this.x);
     }
 
+    /**
+     * @returns {Angle} the direction (angle) of this vector
+     */
     get angle() {
         return new Angle(Math.atan2(this.y, this.x));
     }
 
+    /**
+     * @returns {Vec2} a new unit vector in the same direction as this vector
+     */
     normalize() {
-        const l = this.length;
+        const l = this.magnitude;
         this.x /= l;
         this.y /= l;
         return this;

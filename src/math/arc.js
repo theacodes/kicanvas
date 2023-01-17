@@ -24,7 +24,7 @@ export class Arc {
         );
         center.x /= u;
         center.y /= u;
-        const radius = center.sub(mid).length;
+        const radius = center.sub(mid).magnitude;
         const start_radial = start.sub(center);
         const mid_radial = mid.sub(center);
         const end_radial = end.sub(center);
@@ -118,9 +118,9 @@ function arc_center_from_three_points(start, mid, end) {
     let slope_b = y_delta_32 / x_delta_32;
 
     const d_slope_a =
-        slope_a * new Vec2(0.5 / y_delta_21, 0.5 / x_delta_21).length;
+        slope_a * new Vec2(0.5 / y_delta_21, 0.5 / x_delta_21).magnitude;
     const d_slope_b =
-        slope_b * new Vec2(0.5 / y_delta_32, 0.5 / x_delta_32).length;
+        slope_b * new Vec2(0.5 / y_delta_32, 0.5 / x_delta_32).magnitude;
 
     if (slope_a == slope_b) {
         if (start == end) {

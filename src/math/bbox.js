@@ -150,4 +150,15 @@ export class BBox {
             v.x >= this.x && v.x <= this.x2 && v.y >= this.y && v.y <= this.y2
         );
     }
+
+    /**
+     * Constrain a vector within the bounds of this box
+     * @param {Vec2} v
+     * @returns {Vec2}
+     */
+    constrain_point(v) {
+        let x = Math.min(Math.max(v.x, this.x), this.x2);
+        let y = Math.min(Math.max(v.y, this.y), this.y2);
+        return new Vec2(x, y);
+    }
 }

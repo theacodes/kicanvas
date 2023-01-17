@@ -66,7 +66,7 @@ export class Polygon {
     }
     /**
      * Convert a point cloud polygon into an array of triangles.
-     * @param {Vec2[]} points
+     * @param {Array.<Vec2>} points
      * @returns {Float32Array} an array of 2d vertices
      */
     triangulate() {
@@ -110,7 +110,7 @@ class Tesselator {
 
     /**
      * Convert a quad to two triangles that cover the same area
-     * @param {Vec2[]} quad - four points defining the quad
+     * @param {Array.<Vec2>} quad - four points defining the quad
      * @returns {Vec2} - six points representing two triangles
      */
     static quad_to_triangles(quad) {
@@ -152,8 +152,8 @@ class Tesselator {
      * Tesselate a line segment into a quad
      * @param {Vec2} p1
      * @param {Vec2} p2
-     * @param {number} width
-     * @returns {Vec2[]} four points representing the line segment.
+     * @param {number} widths
+     * @returns {Array.<Vec2>} four points representing the line segment.
      */
     static tesselate_segment(p1, p2, width) {
         const line = p2.sub(p1);
@@ -190,7 +190,7 @@ class Tesselator {
             const p1 = points[segment_num - 1];
             const p2 = points[segment_num];
 
-            const length = p2.sub(p1).length;
+            const length = p2.sub(p1).magnitude;
 
             // skip zero-length segments
             if (length == 0) {
@@ -225,7 +225,7 @@ class Tesselator {
     /**
      * Tesselate a circle into a quad
      * @param {Circle} circle
-     * @returns {Vec2[]} four points representing the quad
+     * @returns {Array.<Vec2>} four points representing the quad
      */
     static tesselate_circle(circle) {
         const n = new Vec2(circle.radius, 0);
@@ -624,7 +624,7 @@ export class PrimitiveSet {
 
     /**
      * Collect a new filled polygon
-     * @param {Vec2[]} points
+     * @param {Array.<Vec2>} points
      * @param {number[]} color - normalized rgba values
      */
     add_polygon(points, color) {
@@ -633,7 +633,7 @@ export class PrimitiveSet {
 
     /**
      * Collect a new polyline
-     * @param {Vec2[]} points
+     * @param {Array.<Vec2>} points
      * @param {number} width
      * @param {number[]} color - normalized rgba values
      */

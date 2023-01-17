@@ -77,7 +77,7 @@ class CirclePainter extends GenericPainter {
     static paint(gfx, layer, c) {
         const color = layer.color;
 
-        const radius = c.center.sub(c.end).length;
+        const radius = c.center.sub(c.end).magnitude;
         const arc = new Arc(
             c.center,
             radius,

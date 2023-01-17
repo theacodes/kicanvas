@@ -119,7 +119,7 @@ export class ShapedGlyph {
      * @param {Matrix3} matrix
      * @param {Array} stroke
      * @param {number} tilt;
-     * @yields {Vec2[]}
+     * @yields {Array.<Vec2>}
      */
     static *points(matrix, stroke, tilt) {
         for (const point of stroke) {
@@ -134,7 +134,7 @@ export class ShapedGlyph {
     /**
      * Yields line segments representing this glyph's strokes
      * @param {Matrix3} matrix
-     * @yields {Vec2[][]}
+     * @yields {Array.<Vec2>[]}
      */
     *strokes(matrix) {
         let full_matrix = matrix.copy().multiply(this.matrix);
@@ -356,7 +356,7 @@ export class TextShaper {
      * @param {Vec2} size
      * @param {number} thickness
      * @param {*} options
-     * @yields {Vec2[][]} strokes for each glyph
+     * @yields {Array.<Vec2>[]} strokes for each glyph
      */
     *paragraph(
         text,
