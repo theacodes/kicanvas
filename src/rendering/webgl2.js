@@ -6,12 +6,15 @@ import {
 } from "../gfx/geometry.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { f4_to_rgba } from "../gfx/colorspace.js";
+import { BBox } from "../math/bbox.js";
+import { Vec2 } from "../math/vec2.js";
 
 export class WebGl2Renderer {
     #transform_stack = [Matrix3.identity()];
     #layers = [];
     #active_layer;
     #background_color;
+    #current_object_points;
 
     constructor(canvas, background_color) {
         this.canvas = canvas;
@@ -80,19 +83,40 @@ export class WebGl2Renderer {
         return this.#layers.at(-1);
     }
 
+    start_object() {
+        this.#current_object_points = [];
+    }
+
+    end_object() {
+        const bbox = BBox.from_points(this.#current_object_points);
+        this.#current_object_points = null;
+        return bbox;
+    }
+
     circle(point, radius, color) {
         point = this.get_transform().transform(point);
         this.#active_layer.add_circle(point, radius, color);
+        this.#current_object_points?.push(
+            point.add(new Vec2(radius, radius)),
+            point.sub(new Vec2(radius, radius))
+        );
     }
 
     line(points, width, color) {
         points = Array.from(this.get_transform().transform_all(points));
         this.#active_layer.add_line(points, width, color);
+        // TODO: take width into account?
+        this.#current_object_points?.push(...points);
     }
 
     polygon(points, color) {
         points = Array.from(this.get_transform().transform_all(points));
         this.#active_layer.add_polygon(points, color);
+
+        if (this.#current_object_points != null) {
+            this.#current_object_points =
+                this.#current_object_points.concat(points);
+        }
     }
 
     *layers() {
