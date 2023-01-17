@@ -7,6 +7,7 @@
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
+import { BBox } from "../math/bbox.js";
 
 /**
  * A camera in 2d space.
@@ -75,6 +76,49 @@ export class Camera2 {
     }
 
     /**
+     * Bounding box representing the camera's view
+     * @returns {BBox}
+     * */
+    get bbox() {
+        const m = this.matrix.inverse();
+        const start = m.transform(new Vec2(0, 0));
+        const end = m.transform(
+            new Vec2(this.viewport_size.x, this.viewport_size.y)
+        );
+        return new BBox(start.x, start.y, end.x - start.x, end.y - start.y);
+    }
+
+    /**
+     * Move the camera and adjust zoom so that the given bounding box is in
+     * view.
+     * @param {BBox} bbox
+     */
+    set bbox(bbox) {
+        const zoom_w = this.viewport_size.x / bbox.w;
+        const zoom_h = this.viewport_size.y / bbox.h;
+        const center_x = bbox.x + bbox.w / 2;
+        const center_y = bbox.y + bbox.h / 2;
+        this.zoom = Math.min(zoom_w, zoom_h);
+        this.center.set(center_x, center_y);
+    }
+
+    get top() {
+        return this.bbox.y;
+    }
+
+    get bottom() {
+        return this.bbox.y2;
+    }
+
+    get left() {
+        return this.bbox.x;
+    }
+
+    get right() {
+        return this.bbox.x2;
+    }
+
+    /**
      * Apply this camera to a 2d canvas
      *
      * A simple convenience method that sets the canvas's transform to
@@ -106,19 +150,5 @@ export class Camera2 {
      */
     world_to_screen(v) {
         return this.matrix.transform(v);
-    }
-
-    /**
-     * Move the camera and adjust zoom so that the given bounding box is in
-     * view.
-     * @param {BBox} bbox
-     */
-    lookat(bbox) {
-        const zoom_w = this.viewport_size.x / bbox.w;
-        const zoom_h = this.viewport_size.y / bbox.h;
-        const center_x = bbox.x + bbox.w / 2;
-        const center_y = bbox.y + bbox.h / 2;
-        this.zoom = Math.min(zoom_w, zoom_h);
-        this.center.set(center_x, center_y);
     }
 }

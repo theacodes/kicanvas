@@ -96,7 +96,7 @@ class PCBViewer {
     #look_at_board() {
         const board_bbox = this.#view.get_board_bbox();
         console.log(board_bbox);
-        this.#scene.camera.lookat(board_bbox.grow(board_bbox.w * 0.1));
+        this.#scene.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
     }
 
     draw() {
