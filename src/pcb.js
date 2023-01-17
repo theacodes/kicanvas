@@ -13,6 +13,7 @@ import * as pcb_view from "./pcb/view.js";
 import { WebGl2Renderer } from "./rendering/webgl2.js";
 import { f4_to_rgba } from "./gfx/colorspace.js";
 import { board as board_colors } from "./pcb/colors.js";
+import { Vec2 } from "./math/vec2.js";
 
 class PCBViewer {
     #cvs;
@@ -24,6 +25,35 @@ class PCBViewer {
     constructor(canvas) {
         this.#cvs = canvas;
         this.#renderer = new WebGl2Renderer(this.#cvs, board_colors.background);
+
+        this.#cvs.addEventListener("click", (e) => {
+            const rect = this.#cvs.getBoundingClientRect();
+            const mouse = this.#scene.screen_to_world(
+                new Vec2(e.clientX - rect.left, e.clientY - rect.top)
+            );
+
+            this.selected = null;
+
+            for (const layer of this.layers.in_display_order()) {
+                if (layer.visible && layer.enabled) {
+                    for (const [item, bb] of layer.bboxes.entries()) {
+                        if (bb.contains_point(mouse)) {
+                            this.selected = item;
+                            this.selected_bbox = bb;
+                            break;
+                        }
+                    }
+                }
+
+                if (this.selected) {
+                    break;
+                }
+            }
+
+            console.log("Selected", this.selected);
+            this.show_selected();
+            this.draw();
+        });
     }
 
     async setup() {
@@ -83,6 +113,29 @@ class PCBViewer {
 
     get layers() {
         return this.#view.layers;
+    }
+
+    show_selected() {
+        const bb = this.selected_bbox.copy().grow(this.selected_bbox.w * 0.3);
+        const layer = this.layers.by_name(":Overlay");
+
+        layer.graphics?.dispose();
+
+        this.#renderer.start_layer();
+
+        this.#renderer.line(
+            [
+                bb.top_left,
+                bb.top_right,
+                bb.bottom_right,
+                bb.bottom_left,
+                bb.top_left,
+            ],
+            1,
+            [1, 1, 1, 1]
+        );
+
+        layer.graphics = this.#renderer.end_layer();
     }
 }
 
