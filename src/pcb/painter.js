@@ -483,11 +483,19 @@ export class Painter {
     }
 
     paint_layer(layer) {
+        const bboxes = new Map();
+
         this.gfx.start_layer();
+
         for (const item of layer.items) {
+            this.gfx.start_object();
             this.paint_item(layer, item);
+            const bbox = this.gfx.end_object();
+            bboxes.set(item, bbox);
         }
-        return this.gfx.end_layer();
+
+        layer.graphics = this.gfx.end_layer();
+        layer.bboxes = bboxes;
     }
 
     paint_item(layer, item) {

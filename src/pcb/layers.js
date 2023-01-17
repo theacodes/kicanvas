@@ -3,6 +3,8 @@ class Layer {
     name;
     #visible;
     enabled;
+    graphics;
+    bboxes;
 
     constructor(layers, name, visible = true, enabled = true) {
         this.#layers = layers;
