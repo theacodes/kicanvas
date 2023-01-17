@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Vec2 } from "./vec2.js";
+
 export class BBox {
     constructor(x = 0, y = 0, w = 0, h = 0, context = undefined) {
         this.x = x;
