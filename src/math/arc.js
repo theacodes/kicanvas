@@ -6,7 +6,18 @@
 
 import { Vec2 } from "./vec2.js";
 
+/**
+ * A circular arc
+ */
 export class Arc {
+    /**
+     * Create a new Arc
+     * @param {Vec2} center
+     * @param {number} radius
+     * @param {Angle} start_angle
+     * @param {Angle} end_angle
+     * @param {number} width
+     */
     constructor(center, radius, start_angle, end_angle, width) {
         this.center = center;
         this.radius = radius;
@@ -15,6 +26,15 @@ export class Arc {
         this.width = width;
     }
 
+    /**
+     * Create an Arc given three points on a circle
+     *
+     * @param {Vec2} start
+     * @param {Vec2} mid
+     * @param {Vec2} end
+     * @param {number} width
+     * @returns {Arc}
+     */
     static from_three_points(start, mid, end, width = 1) {
         const u = 1000000;
         const center = arc_center_from_three_points(
@@ -48,6 +68,10 @@ export class Arc {
         return new Arc(center, radius, start_angle, end_angle, width);
     }
 
+    /**
+     * Approximate the Arc using a polyline
+     * @returns {Array.<Vec2>}
+     */
     to_polyline() {
         let start = this.start_angle.radians;
         let end = this.end_angle.radians;
@@ -59,7 +83,8 @@ export class Arc {
             );
         }
 
-        // TODO: Pull KiCAD's logic for this
+        // TODO: Pull KiCAD's logic for this, since it adds more segments the
+        // larger the arc is.
         for (let theta = start; theta < end; theta += Math.PI / 32) {
             points.push(
                 new Vec2(
@@ -79,16 +104,13 @@ export class Arc {
             points.push(last_point);
         }
 
-        return {
-            points: points,
-            width: this.width,
-        };
+        return points;
     }
 }
 
 /* Ported from KiCAD's KiMATH trigo */
 function arc_center_from_three_points(start, mid, end) {
-    const sqrt_1_2 = 0.7071067811865475244;
+    const sqrt_1_2 = Math.SQRT1_2;
     let center = new Vec2(0, 0);
     let y_delta_21 = mid.y - start.y;
     let x_delta_21 = mid.x - start.x;
@@ -227,8 +249,8 @@ function arc_center_from_three_points(start, mid, end) {
     const rounded_10_center_y = Math.floor((center_y + 5.0) / 10.0) * 10.0;
 
     // The last step is to find the nice, round numbers near our baseline estimate and see if they are within our uncertainty
-    // range.  If they are, then we use this round value as the true value.  This is justified because ALL values within the
-    // uncertainty range are equally true.  Using a round number will make sure that we are on a multiple of 1mil or 100nm
+    // range  If they are, then we use this round value as the true value.  This is justified because ALL values within the
+    // uncertainty range are equally true. Using a round number will make sure that we are on a multiple of 1mil or 100nm
     // when calculating centers.
     if (
         Math.abs(rounded_100_center_x - center_x) < d_center_x &&

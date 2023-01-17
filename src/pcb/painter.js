@@ -66,8 +66,8 @@ class ArcPainter extends GenericPainter {
 
     static paint(gfx, layer, a) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
-        const polyline = arc.to_polyline();
-        gfx.line(polyline.points, polyline.width, layer.color);
+        const points = arc.to_polyline();
+        gfx.line(points, arc.width, layer.color);
     }
 }
 
@@ -89,8 +89,8 @@ class CirclePainter extends GenericPainter {
         if (c.fill) {
             gfx.circle(arc.center, arc.radius + (c.width ?? 0), color);
         } else {
-            const polyline = arc.to_polyline();
-            gfx.line(polyline.points, polyline.width, color);
+            const points = arc.to_polyline();
+            gfx.line(points, arc.width, color);
         }
     }
 }
@@ -109,8 +109,8 @@ class TraceArcPainter extends GenericPainter {
 
     static paint(gfx, layer, a) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
-        const polyline = arc.to_polyline();
-        gfx.line(polyline.points, polyline.width, layer.color);
+        const points = arc.to_polyline();
+        gfx.line(points, arc.width, layer.color);
     }
 }
 
