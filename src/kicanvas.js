@@ -42,8 +42,7 @@ class KicadSchematicElement extends HTMLElement {
         this.prepend(this.canvas);
         this.renderer = new render.Renderer(this.canvas);
 
-        const sch_bb = this.renderer.bbox(this.sch);
-        sch_bb.grow(2);
+        const sch_bb = this.renderer.bbox(this.sch).grow(2);
         this.renderer.fit_to_bbox(sch_bb);
 
         this.setAttribute("loaded", true);
@@ -51,8 +50,9 @@ class KicadSchematicElement extends HTMLElement {
 
     gather_selectable_items() {
         this.selectable_items = this.renderer.interactive_bboxes(this.sch);
-        for (const bb of this.selectable_items) {
-            bb.grow(2);
+        for (const idx in this.selectable_items) {
+            const bb = this.selectable_items[idx];
+            this.selectable_items[idx] = bb.grow(2);
         }
     }
 

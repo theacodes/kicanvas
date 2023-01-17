@@ -6,7 +6,18 @@
 
 import { Vec2 } from "./vec2.js";
 
+/**
+ * An axis-alignment bounding box (AABB)
+ */
 export class BBox {
+    /**
+     * Create a bounding box
+     * @param {number} x
+     * @param {number} y
+     * @param {number} w
+     * @param {number} h
+     * @param {*} context
+     */
     constructor(x = 0, y = 0, w = 0, h = 0, context = undefined) {
         this.x = x;
         this.y = y;
@@ -15,10 +26,22 @@ export class BBox {
         this.context = context;
     }
 
+    /**
+     * @returns {BBox}
+     */
     copy() {
         return new BBox(this.x, this.y, this.w, this.h, this.context);
     }
 
+    /**
+     * Create a BBox given the top left and bottom right corners
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @param {*} context
+     * @returns {BBox}
+     */
     static from_corners(x1, y1, x2, y2, context) {
         if (x2 < x1) {
             [x1, x2] = [x2, x1];
@@ -29,6 +52,12 @@ export class BBox {
         return new BBox(x1, y1, x2 - x1, y2 - y1, context);
     }
 
+    /**
+     * Create a BBox that contains all the given points
+     * @param {Array.<Vec2>} points
+     * @param {*} context
+     * @returns {BBox}
+     */
     static from_points(points, context) {
         const start = points[0].copy();
         const end = points[0].copy();
@@ -43,6 +72,12 @@ export class BBox {
         return BBox.from_corners(start.x, start.y, end.x, end.y, context);
     }
 
+    /**
+     * Combine two or more BBoxes into a new BBox that contains both
+     * @param {Array.<BBox>} boxes
+     * @param {*} context
+     * @returns {BBox}
+     */
     static combine(boxes, context) {
         let min_x = Number.MAX_VALUE;
         let min_y = Number.MAX_VALUE;
@@ -72,6 +107,9 @@ export class BBox {
         return BBox.from_corners(min_x, min_y, max_x, max_y, context);
     }
 
+    /**
+     * @returns {boolean} true if the bbox has a non-zero area
+     */
     get valid() {
         return (
             (this.w !== 0 || this.h !== 0) &&
@@ -126,25 +164,28 @@ export class BBox {
         this.h = v - this.y;
     }
 
+    /**
+     * @param {Matrix3} mat
+     * @returns A new BBox transformed by the given matrix.
+     */
     transform(mat) {
-        // TODO: Make this use Matrix3
-        const p1 = mat.transformPoint(new DOMPoint(this.x, this.y));
-        const p2 = mat.transformPoint(new DOMPoint(this.x2, this.y2));
-        this.x = p1.x;
-        this.y = p1.y;
-        this.x2 = p2.x;
-        this.y2 = p2.y;
-        return this;
+        const start = mat.transform(this.start);
+        const end = mat.transform(this.end);
+        return BBox.from_corners(start, end);
     }
 
-    grow(v) {
-        this.x -= v;
-        this.y -= v;
-        this.w += v * 2;
-        this.h += v * 2;
-        return this;
+    /**
+     * @param {number} s
+     * @returns A new BBox with the size uniformly modified from the center
+     */
+    grow(s) {
+        return new BBox(this.x - s, this.y - s, this.w + s * 2, this.h + s * 2);
     }
 
+    /**
+     * @param {Vec2} v
+     * @returns {boolean} true if the point is within the bounding box.
+     */
     contains_point(v) {
         return (
             v.x >= this.x && v.x <= this.x2 && v.y >= this.y && v.y <= this.y2
@@ -152,9 +193,8 @@ export class BBox {
     }
 
     /**
-     * Constrain a vector within the bounds of this box
      * @param {Vec2} v
-     * @returns {Vec2}
+     * @returns {Vec2} A new Vec2 constrained within this bounding box
      */
     constrain_point(v) {
         let x = Math.min(Math.max(v.x, this.x), this.x2);

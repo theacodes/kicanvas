@@ -242,7 +242,7 @@ export class Renderer {
                 text
             );
 
-            bb.transform(this.transforms.mat);
+            bb = bb.transform(this.transforms.mat);
         });
 
         return bb;
@@ -325,8 +325,7 @@ export class Renderer {
 
     bbox_Rectangle(r) {
         const bb = BBox.from_corners(r.start.x, r.start.y, r.end.x, r.end.y, r);
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_Polyline(pl) {
@@ -358,8 +357,7 @@ export class Renderer {
         }
 
         const bb = BBox.from_corners(min_x, min_y, max_x, max_y, pl);
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_Circle(c) {
@@ -380,8 +378,7 @@ export class Renderer {
             c.center.y + c.radius,
             c
         );
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_Arc(a) {
@@ -399,8 +396,7 @@ export class Renderer {
             Math.max(a.start.y, a.mid.y, a.end.y),
             a
         );
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_Wire(w) {
@@ -421,8 +417,7 @@ export class Renderer {
             w.pts[1].y,
             w
         );
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_Junction(j) {
@@ -441,8 +436,7 @@ export class Renderer {
             j.at.y + r,
             j
         );
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_NoConnect(nc) {
@@ -467,8 +461,7 @@ export class Renderer {
             j.at.y + r,
             j
         );
-        bb.transform(this.transforms.mat);
-        return bb;
+        return bb.transform(this.transforms.mat);
     }
 
     draw_Label(l) {
@@ -604,8 +597,7 @@ export class Renderer {
                     metrics.actualBoundingBoxRight,
                     y + metrics.actualBoundingBoxDescent,
                     t
-                );
-                line_bb.transform(this.transforms.mat);
+                ).transform(this.transforms.mat);
 
                 bb = BBox.combine([bb, line_bb], t);
 
