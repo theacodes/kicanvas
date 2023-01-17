@@ -10,7 +10,6 @@ import { Scene } from "./gfx/scene.js";
 import { PanAndZoom } from "./gfx/pan_and_zoom.js";
 import { CanvasSizeObserver } from "./gfx/resize.js";
 import * as pcb_view from "./pcb/view.js";
-import { BBox } from "./math/bbox.js";
 import { WebGl2Renderer } from "./rendering/webgl2.js";
 import { f4_to_rgba } from "./gfx/colorspace.js";
 import { board as board_colors } from "./pcb/colors.js";
@@ -67,9 +66,9 @@ class PCBViewer {
     }
 
     #look_at_board() {
-        this.#scene.lookat(new BBox(0, 0, 200, 200));
-        // const board_bbox = this.layers["Edge.Cuts"].geometry.bbox;
-        // this.#scene.lookat(board_bbox.copy().grow(board_bbox.w * 0.1));
+        const board_bbox = this.#view.get_board_bbox();
+        console.log(board_bbox);
+        this.#scene.lookat(board_bbox.grow(board_bbox.w * 0.1));
     }
 
     draw() {

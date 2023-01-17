@@ -1,9 +1,8 @@
+import { BBox } from "../math/bbox.js";
 import { Layers } from "./layers.js";
 import { Painter } from "./painter.js";
 
 export class View {
-    #gfx_layers = new Map();
-
     constructor(renderer, colors, board) {
         this.gfx = renderer;
         this.painter = new Painter(this.gfx);
@@ -36,17 +35,21 @@ export class View {
 
     #paint() {
         for (const layer of this.layers.in_display_order()) {
-            const gfx_layer = this.painter.paint_layer(layer);
-            this.#gfx_layers.set(layer.name, gfx_layer);
+            this.painter.paint_layer(layer);
         }
+    }
+
+    get_board_bbox() {
+        const edge_cuts = this.layers.by_name("Edge.Cuts");
+        return BBox.combine(edge_cuts.bboxes.values());
     }
 
     draw(matrix) {
         let depth = 0;
-        const gfx_layers = Array.from(this.#gfx_layers.entries()).reverse();
-        for (const [pcb_layer_name, gfx_layer] of gfx_layers) {
-            if (this.layers.by_name(pcb_layer_name).visible) {
-                gfx_layer.draw(matrix, depth);
+        const layers = Array.from(this.layers.in_display_order()).reverse();
+        for (const layer of layers) {
+            if (layer.visible && layer.enabled && layer.graphics) {
+                layer.graphics.draw(matrix, depth);
             }
             depth += 0.01;
         }
