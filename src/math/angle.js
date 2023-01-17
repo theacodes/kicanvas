@@ -4,22 +4,45 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+/**
+ * An angle for rotation and orientation
+ */
 export class Angle {
+    /**
+     * Convert radians to degrees
+     * @param {number} radians
+     * @returns {number} degrees
+     */
     static rad_to_deg(radians) {
         return (radians / Math.PI) * 180;
     }
 
-    static deg_to_rad(degress) {
-        return (degress / 180) * Math.PI;
+    /**
+     * Convert degrees to radians
+     * @param {number} degrees
+     * @returns {number} radians
+     */
+    static deg_to_rad(degrees) {
+        return (degrees / 180) * Math.PI;
     }
 
-    // A lot of math involving angles is done with degrees to two decimal places
-    // instead of radians to match KiCAD's behavior and to avoid floating point
-    // nonsense.
+    /** Round degrees to two decimal places
+     *
+     * A lot of math involving angles is done with degrees to two decimal places
+     * instead of radians to match KiCAD's behavior and to avoid floating point
+     * nonsense.
+     *
+     * @param {*} degrees
+     * @returns
+     */
     static round(degrees) {
         return Math.round((degrees + Number.EPSILON) * 100) / 100;
     }
 
+    /**
+     * Create an Angle
+     * @param {number|Angle} radians
+     */
     constructor(radians) {
         if (radians instanceof Angle) {
             return radians;
@@ -45,21 +68,32 @@ export class Angle {
         this.theta_rad = this.constructor.deg_to_rad(v);
     }
 
+    /**
+     * Returns a new Angle representing the sum of this angle and the given angle.
+     * @param {Angle|number} other
+     * @returns {Angle}
+     */
     add(other) {
-        this.radians += new Angle(other).radians;
-        return this;
+        const sum = this.radians + new Angle(other).radians;
+        return new Angle(sum);
     }
 
+    /**
+     * @returns {Angle} a new Angle constrained to 0 to 360 degrees.
+     */
     normalize() {
         let deg = this.constructor.round(this.degrees);
+
         while (deg < 0) {
             deg += 360;
         }
         while (deg >= 360) {
             deg -= 360;
         }
-        this.degrees = this.constructor.round(deg);
 
-        return this;
+        const a = new Angle(0);
+        a.degrees = deg;
+
+        return a;
     }
 }

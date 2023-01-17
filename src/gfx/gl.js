@@ -246,7 +246,7 @@ export class VertexArray {
         this.vao = null;
 
         if (include_buffers) {
-            for (const buf in this.buffers) {
+            for (const buf of this.buffers) {
                 buf.dispose();
             }
         }

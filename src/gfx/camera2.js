@@ -56,7 +56,7 @@ export class Camera2 {
      * @param {Angle|number} a - rotation in radians
      */
     rotate(a) {
-        this.rotation.add(a);
+        this.rotation = this.rotation.add(a);
     }
 
     /**
