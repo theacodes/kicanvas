@@ -4,9 +4,32 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+/**
+ * Text rendering using Hershey fonts.
+ *
+ * The primary interface here is TextShaper
+ */
+
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 
+class GlyphData {
+    /**
+     * Create Glyph data
+     * @param {Array} strokes
+     * @param {number} width
+     * @param {number[]} bbox
+     */
+    constructor(strokes, width, bbox) {
+        this.strokes = strokes;
+        this.width = width;
+        this.bbox = bbox;
+    }
+}
+
+/**
+ * A Hershey font
+ */
 export class Font {
     interline_pitch_ratio = 1.61;
     overbar_position_factor = 1.33;
@@ -19,10 +42,20 @@ export class Font {
         this.glyphs = [];
     }
 
+    /**
+     * Load glyph data from the given URL
+     * @param {URL} src
+     */
     async load(src) {
         this.glyphs = await (await fetch(src)).json();
     }
 
+    /**
+     * Get the glyph data for a given glyph.
+     * @param {string} chr
+     * @param {string} subsitute
+     * @returns {GlyphData}
+     */
     glyph(chr, subsitute = "?") {
         return (
             this.glyphs.at(chr.charCodeAt(0) - 32) ??
@@ -30,10 +63,21 @@ export class Font {
         );
     }
 
+    /**
+     * Vertical distance between two lines of text.
+     * @param {number} size - font size
+     * @returns {number}
+     */
     interline(size) {
         return size.y * this.interline_pitch_ratio;
     }
 
+    /**
+     * Get overbar line data for the given glyph
+     * @param {GlyphData} glyph
+     * @param {boolean} italic
+     * @returns {GlyphData}
+     */
     overbar_for(glyph, italic) {
         const start = [0, -this.overbar_position_factor];
         const end = [glyph.bbox.end[0], start[1]];
@@ -42,15 +86,22 @@ export class Font {
             start[0] -= start[1] * this.italic_tilt;
         }
 
-        return {
-            strokes: [[start, end]],
-            width: glyph.width,
-            bbox: glyph.bbox,
-        };
+        return new GlyphData([[start, end]], glyph.width, glyph.bbox);
     }
 }
 
+/**
+ * A shaped glyph contains all the information needed
+ * to draw a specific character in a string of shaped text.
+ */
 export class ShapedGlyph {
+    /**
+     * Create a ShapedGlyph
+     * @param {GlyphData} glyph
+     * @param {Vec2} position
+     * @param {Vec2} size
+     * @param {number} tilt
+     */
     constructor(glyph, position, size, tilt = 0) {
         this.glyph = glyph;
         this.position = position;
@@ -62,24 +113,50 @@ export class ShapedGlyph {
         ).scale(size.x, size.y);
     }
 
-    *points(matrix, stroke) {
+    /**
+     * Yields points from a given stroke transformed by the given matrix
+     * and tilt.
+     * @param {Matrix3} matrix
+     * @param {Array} stroke
+     * @param {number} tilt;
+     * @yields {Vec2[]}
+     */
+    static *points(matrix, stroke, tilt) {
         for (const point of stroke) {
             const pt = new Vec2(...point);
-            if (this.tilt) {
+            if (tilt) {
                 pt.x -= pt.y * this.tilt;
             }
-            yield matrix.copy().multiply(this.matrix).transform(pt);
+            yield matrix.transform(pt);
         }
     }
 
+    /**
+     * Yields line segments representing this glyph's strokes
+     * @param {Matrix3} matrix
+     * @yields {Vec2[][]}
+     */
     *strokes(matrix) {
+        let full_matrix = matrix.copy().multiply(this.matrix);
         for (const stroke of this.glyph.strokes) {
-            yield this.points(matrix, stroke);
+            yield this.constructor.points(full_matrix, stroke, this.tilt);
         }
     }
 }
 
+/**
+ * A shaped line contains all of the information and glyphs needed to
+ * render a specific line of text.
+ */
 export class ShapedLine {
+    /**
+     * Create a ShapedLine
+     * @param {Font} font
+     * @param {Vec2} size
+     * @param {number} thickness
+     * @param {boolean} italic
+     * @param {ShapedGlyph[]} shaped_glyphs
+     */
     constructor(font, size, thickness, italic, shaped_glyphs) {
         this.font = font;
         this.size = size;
@@ -88,6 +165,11 @@ export class ShapedLine {
         this.shaped_glyphs = shaped_glyphs;
     }
 
+    /**
+     * Yields line segments needed to draw every glyph that makes up this line
+     * of text.
+     * @param {Matrix3} matrix
+     */
     *strokes(matrix) {
         for (const glyph of this.shaped_glyphs) {
             yield* glyph.strokes(matrix);
@@ -121,20 +203,38 @@ export class ShapedLine {
     }
 }
 
+/**
+ * A text shaper prepares text for rendering by performing layout and tesselation
+ */
 export class TextShaper {
+    /**
+     * Create a TextShaper
+     * @param {Font} font
+     */
     constructor(font) {
         this.font = font;
     }
 
+    /**
+     * Load the default font and create a TextShaper for it
+     * @returns {TextShaper}
+     */
     static async default() {
         const font = new Font();
         await font.load(new URL("../kicad/font/glyphs.json", import.meta.url));
         return new TextShaper(font);
     }
 
+    /**
+     * Shapes a single line.
+     * @param {string} text
+     * @param {Vec2} size
+     * @param {number} thickness
+     * @param {boolean} italic
+     * @returns {ShapedLine}
+     */
     line(text, size, thickness, italic) {
-        // Shapes a single line. Returns an array of glyphs and their locations.
-        // See STROKE_FONT::drawSingleLineText
+        // Loosely based on KiCAD's STROKE_FONT::drawSingleLineText
 
         const out = [];
         const line_offset = new Vec2(thickness / 2, 0);
@@ -247,6 +347,17 @@ export class TextShaper {
         return new ShapedLine(this.font, size, thickness, italic, out);
     }
 
+    /**
+     * Lays out a paragraph of text and generates strokes
+     *
+     * @param {string} text
+     * @param {Vec2} position
+     * @param {Angle} rotation
+     * @param {Vec2} size
+     * @param {number} thickness
+     * @param {*} options
+     * @yields {Vec2[][]} strokes for each glyph
+     */
     *paragraph(
         text,
         position,
