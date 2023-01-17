@@ -83,7 +83,7 @@ export class PanAndZoom {
         );
         const new_world = this.#camera.screen_to_world(mouse);
         const center_delta = mouse_world.sub(new_world);
-        this.#camera.move(center_delta);
+        this.#camera.translate(center_delta);
         this.#callback();
     }
 }

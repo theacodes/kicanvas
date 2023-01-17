@@ -1,9 +1,4 @@
-import {
-    PolygonSet,
-    PolylineSet,
-    CircleSet,
-    GeometrySet,
-} from "../gfx/geometry.js";
+import { PrimitiveSet } from "../gfx/primitives.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { f4_to_rgba } from "../gfx/colorspace.js";
 import { BBox } from "../math/bbox.js";
@@ -43,9 +38,7 @@ export class WebGl2Renderer {
 
         this.set_viewport(0, 0, this.canvas.width, this.canvas.height);
 
-        await PolygonSet.load_shader(gl);
-        await PolylineSet.load_shader(gl);
-        await CircleSet.load_shader(gl);
+        await PrimitiveSet.load_shaders(gl);
     }
 
     set_viewport(x, y, w, h) {
@@ -73,7 +66,7 @@ export class WebGl2Renderer {
     }
 
     start_layer() {
-        this.#active_layer = new GeometrySet(this.gl);
+        this.#active_layer = new PrimitiveSet(this.gl);
     }
 
     end_layer() {

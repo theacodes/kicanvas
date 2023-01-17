@@ -21,6 +21,9 @@ export class Angle {
     }
 
     constructor(radians) {
+        if (radians instanceof Angle) {
+            return radians;
+        }
         this.radians = radians;
     }
 
@@ -40,6 +43,11 @@ export class Angle {
     set degrees(v) {
         this.theta_deg = v;
         this.theta_rad = this.constructor.deg_to_rad(v);
+    }
+
+    add(other) {
+        this.radians += new Angle(other).radians;
+        return this;
     }
 
     normalize() {

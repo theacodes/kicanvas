@@ -6,13 +6,29 @@
 
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
+import { Angle } from "../math/angle.js";
 
+/**
+ * A camera in 2d space.
+ *
+ * This manages the minimal state required to pan, zoom, and rotate. It's
+ * abstract and isn't integrated into any specific graphics backend. Use
+ * .matrix to get the complete transformation matrix to pass to whichever
+ * graphics backend you're using.
+ */
 export class Camera2 {
     viewport_size;
     center;
     zoom;
     rotation;
 
+    /**
+     * Create a camera
+     * @param {Vec2} viewport_size - The width and height of the viewport
+     * @param {Vec2} center - The point at which the camera's view is centered
+     * @param {number} zoom - Scale factor, increasing numbers zoom the camera in.
+     * @param {number|Angle} rotation - Rotation (roll) in radians.
+     */
     constructor(
         viewport_size = new Vec2(0, 0),
         center = new Vec2(0, 0),
@@ -21,15 +37,31 @@ export class Camera2 {
     ) {
         this.center = center;
         this.viewport_size = viewport_size;
-        this.rotation = rotation;
+        this.rotation = new Angle(rotation);
         this.zoom = zoom;
     }
 
-    move(v) {
+    /**
+     * Relative translation
+     * @param {Vec2} v
+     */
+    translate(v) {
         this.center.x += v.x;
         this.center.y += v.y;
     }
 
+    /**
+     * Relative rotation
+     * @param {Angle|number} a - rotation in radians
+     */
+    rotate(a) {
+        this.rotation.add(a);
+    }
+
+    /**
+     * Complete transformation matrix.
+     * @returns {Matrix3}
+     */
     get matrix() {
         const mx = this.viewport_size.x / 2;
         const my = this.viewport_size.y / 2;
@@ -42,6 +74,14 @@ export class Camera2 {
             .scale(this.zoom, this.zoom);
     }
 
+    /**
+     * Apply this camera to a 2d canvas
+     *
+     * A simple convenience method that sets the canvas's transform to
+     * the camera's transformation matrix.
+     *
+     * @param {CanvasRenderingContext2D} ctx
+     */
     apply_to_canvas(ctx) {
         this.viewportSize.set(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
         let m = Matrix3.from_DOMMatrix(ctx.getTransform());
@@ -49,10 +89,21 @@ export class Camera2 {
         ctx.setTransform(m.to_DOMMatrix());
     }
 
+    /**
+     * Transform screen coordinates to world coordinates
+     *
+     * @param {Vec2} v
+     * @returns {Vec2}
+     */
     screen_to_world(v) {
         return this.matrix.inverse().transform(v);
     }
 
+    /**
+     * Transform world coordinates to screen coordinates
+     * @param {Vec2} v
+     * @returns {Vec2}
+     */
     world_to_screen(v) {
         return this.matrix.transform(v);
     }

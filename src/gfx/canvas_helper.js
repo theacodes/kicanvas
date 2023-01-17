@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+// TODO: remove this class
+
 export class CanvasHelper {
     #cvs;
     #ctx;

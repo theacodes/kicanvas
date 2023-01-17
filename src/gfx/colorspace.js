@@ -4,6 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+/**
+ * Convert hue, saturation, luminance, and alpha to red green blue alpha
+ * @param {number} h - hue, in degrees
+ * @param {number} s - saturation from 0 to 1
+ * @param {number} l - luminance from 0 to 1
+ * @param {number} a - alpha from 0 to 1
+ * @returns {number[]} an array of normalized red, green, blue, and alpha values
+ */
 export function hsla_to_rgba(h, s, l, a) {
     const k = (n) => (n + h / 30) % 12;
     const sl = s * Math.min(l, 1 - l);
@@ -12,6 +20,11 @@ export function hsla_to_rgba(h, s, l, a) {
     return [f(0), f(8), f(4), a];
 }
 
+/**
+ * Convert CSS rgb/rgba hex string to an array of normalized red, green, blue, alpha.
+ * @param {string} rgba - css hex color string, such as #FFCCAA
+ * @returns {number[]} an array of normalized red, green, blue, and alpha values
+ */
 export function rgba_hex_to_f4(rgba) {
     if (rgba[0] == "#") {
         rgba = rgba.slice(1);
@@ -36,6 +49,11 @@ export function rgba_hex_to_f4(rgba) {
     return components;
 }
 
+/**
+ * Convert CSS rgb/rgba string to an array of normalized red, green, blue, alpha.
+ * @param {string} rgba - css rgba color string, such as rgb(200, 100, 50)
+ * @returns {number[]} an array of normalized red, green, blue, and alpha values
+ */
 export function rgba_to_f4(rgba) {
     if (!rgba.startsWith("rgba")) {
         rgba = `rgba(${rgba.slice(4, -1)}, 1)`;
@@ -47,6 +65,12 @@ export function rgba_to_f4(rgba) {
     return [...rgb, a];
 }
 
+/**
+ * Converts an array of normalized red, green, blue, alpha values to a CSS
+ * rgba color string.
+ * @param {number[]} color - normalized color
+ * @returns {string} css color string
+ */
 export function f4_to_rgba(color) {
     return `rgba(${color[0] * 255}, ${color[1] * 255}, ${color[2] * 255}, ${
         color[3]

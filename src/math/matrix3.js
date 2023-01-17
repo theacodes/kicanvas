@@ -189,7 +189,7 @@ export class Matrix3 {
     }
 
     static rotation(angle) {
-        const theta = angle instanceof Angle ? angle.radians : angle;
+        const theta = new Angle(angle).radians;
         const cos = Math.cos(theta);
         const sin = Math.sin(theta);
         // prettier-ignore
