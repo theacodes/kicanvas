@@ -198,9 +198,9 @@ class PadPainter extends GenericPainter {
         const position_mat = Matrix3.translation(
             pad.at.position.x,
             pad.at.position.y
-        )
-            .rotate(-Angle.deg_to_rad(pad.parent.at.rotation))
-            .rotate(Angle.deg_to_rad(pad.at.rotation));
+        );
+        position_mat.rotate_self(-Angle.deg_to_rad(pad.parent.at.rotation));
+        position_mat.rotate_self(Angle.deg_to_rad(pad.at.rotation));
 
         gfx.push_transform(position_mat);
 
@@ -423,7 +423,7 @@ class FootprintPainter extends GenericPainter {
         let matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
-        ).rotate(Angle.deg_to_rad(fp.at.rotation));
+        ).rotate_self(Angle.deg_to_rad(fp.at.rotation));
         gfx.set_transform(matrix);
 
         for (const item of fp.items) {

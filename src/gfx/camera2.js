@@ -71,8 +71,8 @@ export class Camera2 {
         const left = -(this.center.x - mx) + dx;
         const top = -(this.center.y - my) + dy;
         return Matrix3.translation(left, top)
-            .rotate(this.rotation)
-            .scale(this.zoom, this.zoom);
+            .rotate_self(this.rotation)
+            .scale_self(this.zoom, this.zoom);
     }
 
     /**
@@ -129,7 +129,7 @@ export class Camera2 {
     apply_to_canvas(ctx) {
         this.viewportSize.set(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
         let m = Matrix3.from_DOMMatrix(ctx.getTransform());
-        m = m.multiply(this.matrix);
+        m.multiply_self(this.matrix);
         ctx.setTransform(m.to_DOMMatrix());
     }
 

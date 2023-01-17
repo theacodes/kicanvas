@@ -110,7 +110,7 @@ export class ShapedGlyph {
         this.matrix = Matrix3.translation(
             this.position.x,
             this.position.y
-        ).scale(size.x, size.y);
+        ).scale_self(size.x, size.y);
     }
 
     /**
@@ -137,7 +137,7 @@ export class ShapedGlyph {
      * @yields {Array.<Vec2>[]}
      */
     *strokes(matrix) {
-        let full_matrix = matrix.copy().multiply(this.matrix);
+        let full_matrix = matrix.multiply(this.matrix);
         for (const stroke of this.glyph.strokes) {
             yield this.constructor.points(full_matrix, stroke, this.tilt);
         }
@@ -384,21 +384,21 @@ export class TextShaper {
 
         const line_spacing = this.font.interline(size);
         const total_height = (shaped_lines.length - 1) * line_spacing;
-        const matrix = Matrix3.translation(...position).rotate(rotation);
+        const matrix = Matrix3.translation(...position).rotate_self(rotation);
 
         switch (options.valign) {
             case "top":
-                matrix.translate(0, size.y);
+                matrix.translate_self(0, size.y);
                 break;
             case "center":
-                matrix.translate(0, size.y / 2 - total_height / 2);
+                matrix.translate_self(0, size.y / 2 - total_height / 2);
                 break;
             case "bottom":
-                matrix.translate(0, -total_height);
+                matrix.translate_self(0, -total_height);
         }
 
         if (options.mirror) {
-            matrix.scale(-1, 1);
+            matrix.scale_self(-1, 1);
         }
 
         for (const shaped_line of shaped_lines) {
@@ -413,9 +413,9 @@ export class TextShaper {
                     x_offset = -shaped_line.extents.x;
                     break;
             }
-            matrix.translate(x_offset, 0);
+            matrix.translate_self(x_offset, 0);
             yield* shaped_line.strokes(matrix);
-            matrix.translate(-x_offset, line_spacing);
+            matrix.translate_self(-x_offset, line_spacing);
         }
     }
 }

@@ -66,7 +66,7 @@ export class Scene {
      * @type {Matrix3}
      */
     get view_projection_matrix() {
-        return this.projection.copy().multiply(this.view_matrix.inverse());
+        return this.projection.multiply(this.view_matrix.inverse());
     }
 
     /**

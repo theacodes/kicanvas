@@ -58,7 +58,7 @@ export class WebGl2Renderer {
     }
 
     push_transform(mat) {
-        this.#transform_stack.push(this.get_transform().copy().multiply(mat));
+        this.#transform_stack.push(this.get_transform().multiply(mat));
     }
 
     pop_transform() {
