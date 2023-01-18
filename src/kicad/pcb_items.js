@@ -11,8 +11,13 @@
 */
 
 import { Vec2 } from "../math/vec2.js";
+// eslint-disable-next-line no-unused-vars
+import { SExprParser } from "./parser.js";
 
 export class At {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.position = new Vec2(e.expect_number(), e.expect_number());
         this.rotation = e.maybe_number() ?? 0;
@@ -21,6 +26,9 @@ export class At {
 }
 
 export class Segment {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
@@ -31,6 +39,9 @@ export class Segment {
 }
 
 export class Arc {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.start = e.expect_vec2("start");
         this.mid = e.expect_vec2("mid");
@@ -42,12 +53,18 @@ export class Arc {
 }
 
 export class Polygon {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.pts = e.expect_vec2_list("pts");
     }
 }
 
 export class FilledPolygon {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.layer = e.expect_pair_string("layer");
         this.pts = e.expect_vec2_list("pts");
@@ -55,6 +72,9 @@ export class FilledPolygon {
 }
 
 export class Zone {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.net = e.expect_pair_number("net");
         this.net_name = e.expect_pair_string("net_name");
@@ -92,6 +112,9 @@ export class Zone {
 }
 
 export class Via {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         if (e.maybe_atom("blind")) {
             this.type = "blind";
@@ -116,6 +139,9 @@ export class Via {
 }
 
 export class GrLine {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
@@ -125,6 +151,9 @@ export class GrLine {
 }
 
 export class FpLine {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.start = e.expect_vec2("start");
@@ -135,6 +164,9 @@ export class FpLine {
 }
 
 export class GrRect {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.locked = e.maybe_atom("locked") ? true : false;
         this.start = e.expect_vec2("start");
@@ -146,6 +178,10 @@ export class GrRect {
 }
 
 export class FpRect {
+    /**
+     * @param {Footprint} parent
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.start = e.expect_vec2("start");
@@ -157,6 +193,9 @@ export class FpRect {
 }
 
 export class GrArc {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.start = e.expect_vec2("start");
         this.mid = e.expect_vec2("mid");
@@ -167,6 +206,10 @@ export class GrArc {
 }
 
 export class FpArc {
+    /**
+     * @param {Footprint} parent
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.start = e.expect_vec2("start");
@@ -180,6 +223,10 @@ export class FpArc {
 }
 
 export class FpPoly {
+    /**
+     * @param {Footprint} parent
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.pts = e.expect_vec2_list("pts");
@@ -192,17 +239,23 @@ export class FpPoly {
 }
 
 export class GrPoly {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.pts = e.expect_vec2_list("pts");
         this.layer = e.maybe_pair_string("layer");
         this.width = e.expect_pair_number("width");
-        this.fill = ["solid", "yes"].includes(e.maybe_pair_atom("fill"));
+        this.fill = ["solid", "yes"].includes(e.maybe_pair_atom("fill") ?? "");
         this.locked = e.maybe_atom("locked") ? true : false;
         this.tstamp = e.maybe_pair_atom("tstamp");
     }
 }
 
 export class GrCircle {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.center = e.expect_vec2("center");
         this.end = e.expect_vec2("end");
@@ -215,6 +268,10 @@ export class GrCircle {
 }
 
 export class FpCircle {
+    /**
+     * @param {Footprint} parent
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.center = e.expect_vec2("center");
@@ -228,10 +285,27 @@ export class FpCircle {
 }
 
 export class Effects {
-    constructor(e = undefined) {
-        if (!e) {
-            return;
+    /**
+     * @param {SExprParser?} e
+     */
+    constructor(e = null) {
+        this.size = new Vec2(1.27, 1.27);
+        this.bold = false;
+        this.italic = false;
+        this.h_align = "center";
+        this.v_align = "center";
+        this.mirror = false;
+        this.hide = false;
+
+        if (e) {
+            this.from_expr(e);
         }
+    }
+
+    /**
+     * @param {SExprParser} e
+     */
+    from_expr(e) {
         const font = e.expect_expr("font");
         const font_size = font.expect_expr("size");
         this.size = new Vec2(
@@ -239,8 +313,8 @@ export class Effects {
             font_size.expect_number()
         );
         this.thickness = font.maybe_pair_number("thickness");
-        this.bold = font.maybe_atom("bold") || false;
-        this.italic = font.maybe_atom("italic") || false;
+        this.bold = font.maybe_atom("bold") ? true : false;
+        this.italic = font.maybe_atom("italic") ? true : false;
 
         this.h_align = "center";
         this.v_align = "center";
@@ -279,17 +353,6 @@ export class Effects {
         }
     }
 
-    static default() {
-        const e = new Effects();
-        e.size = { x: 1.27, y: 1.27 };
-        e.bold = false;
-        e.italic = false;
-        e.h_align = "center";
-        e.v_align = "center";
-        e.mirror = false;
-        e.hide = false;
-    }
-
     copy() {
         const e = new Effects();
         Object.assign(e, window.structuredClone(this));
@@ -298,8 +361,13 @@ export class Effects {
 }
 
 export class GrText {
+    original_text;
+
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
-        this.text = e.expect_string();
+        this.original_text = this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
         this.layer = e.expect_pair_string("layer");
         this.tstamp = e.maybe_pair_atom("tstamp");
@@ -308,10 +376,16 @@ export class GrText {
 }
 
 export class FpText {
+    original_text;
+
+    /**
+     * @param {Footprint} parent
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.type = e.expect_atom();
-        this.text = e.expect_string();
+        this.original_text = this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
         this.unlocked = e.maybe_atom("unlocked") ? true : false;
         this.layer = e.expect_pair_string("layer");
@@ -322,6 +396,9 @@ export class FpText {
 }
 
 export class DimensionFormat {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.prefix = e.maybe_pair_string("prefix");
         this.suffix = e.maybe_pair_string("suffix");
@@ -334,6 +411,9 @@ export class DimensionFormat {
 }
 
 export class DimensionStyle {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.thickness = e.expect_pair_number("thickness");
         this.arrow_length = e.expect_pair_number("arrow_length");
@@ -346,6 +426,9 @@ export class DimensionStyle {
 }
 
 export class Dimension {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.locked = e.maybe_atom("locked") ? true : false;
         this.type = e.expect_pair_atom("type");
@@ -372,6 +455,9 @@ export class Dimension {
 }
 
 export class Layer {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.ordinal = e.expect_number();
         this.name = e.expect_string();
@@ -383,6 +469,9 @@ export class Layer {
 }
 
 export class Drill {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.oval = e.maybe_atom("oval") ? true : false;
         this.diameter = e.expect_number();
@@ -400,6 +489,9 @@ export class Drill {
 }
 
 export class PadOptions {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.clearance = e.expect_pair_atom("clearance");
         this.anchor = e.expect_pair_atom("anchor");
@@ -407,6 +499,10 @@ export class PadOptions {
 }
 
 export class Pad {
+    /**
+     * @param {Footprint} parent
+     * @param {SExprParser} e
+     */
     constructor(parent, e) {
         this.parent = parent;
         this.number = e.expect_string();
@@ -477,6 +573,9 @@ export class Pad {
 }
 
 export class Model {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.filename = e.expect_string();
         for (const name in ["at", "scale", "rotation"]) {
@@ -496,6 +595,10 @@ export class Model {
 }
 
 export class Footprint {
+    /**
+     * @param {KicadPCB} pcb;
+     * @param {SExprParser} e
+     */
     constructor(pcb, e) {
         this.library_link = e.expect_string();
         this.version = e.maybe_pair_number("version");
@@ -503,7 +606,7 @@ export class Footprint {
         this.locked = e.maybe_atom("locked") ? true : false;
         this.placed = e.maybe_atom("placed") ? true : false;
         this.layer = e.expect_pair_string("layer");
-        this.tedit = e.expect_pair("tedit");
+        this.tedit = e.expect_pair("tedit", null);
         this.tstamp = e.maybe_pair_atom("tstamp");
         this.at = new At(e.expect_expr("at"));
         this.descr = e.maybe_pair_string("descr");
@@ -535,6 +638,7 @@ export class Footprint {
         while (e.element) {
             if ((se = e.maybe_expr("fp_text")) !== null) {
                 const text = new FpText(this, se);
+                text.original_text = text.text;
                 text.text = pcb.expand_text_vars(text.text, this);
                 this.items.push(text);
 
@@ -577,6 +681,9 @@ export class Footprint {
 }
 
 export class Paper {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.size = e.maybe_string();
         this.width = e.maybe_number();
@@ -586,6 +693,9 @@ export class Paper {
 }
 
 class TitleBlock {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         const maybe_comment = () => {
             const ce = e.maybe_expr("comment");
@@ -631,6 +741,9 @@ class TitleBlock {
 }
 
 class StackupLayer {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.name = e.expect_string();
         this.type = e.expect_pair_string("type");
@@ -643,6 +756,9 @@ class StackupLayer {
 }
 
 class Stackup {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.layers = [];
 
@@ -664,6 +780,9 @@ class Stackup {
 }
 
 class PcbPlotParams {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.layerselection = e.expect_pair_number("layerselection");
         this.disableapertmacros =
@@ -678,8 +797,7 @@ class PcbPlotParams {
                 : false;
         this.creategerberjobfile =
             e.expect_pair_atom("creategerberjobfile") == "true" ? true : false;
-        this.gerberprecision =
-            e.maybe_pair_number("gerberprecision") == "true" ? true : false;
+        this.gerberprecision = e.maybe_pair_number("gerberprecision");
         this.svguseinch =
             e.expect_pair_atom("svguseinch") == "true" ? true : false;
         this.svgprecision = e.expect_pair_number("svgprecision");
@@ -724,6 +842,9 @@ class PcbPlotParams {
 }
 
 class Setup {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         let se;
 
@@ -750,10 +871,15 @@ class Setup {
 }
 
 export class KicadPCB {
+    /**
+     * @param {SExprParser} e
+     */
     constructor(e) {
         this.layers = {};
         this.footprints = [];
         this.properties = {};
+
+        /** @type {(Footprint|Segment|Arc|Zone|Via|GrLine|FpLine|GrArc|FpArc|GrPoly|FpPoly|GrCircle|FpCircle|GrText|FpText|Dimension)[]} */
         this.items = [];
 
         let se;
@@ -850,6 +976,11 @@ export class KicadPCB {
         }
     }
 
+    /**
+     * @param {string} text
+     * @param {object?} context
+     * @returns {string}
+     */
     expand_text_vars(text, context) {
         const vars = {};
         Object.assign(

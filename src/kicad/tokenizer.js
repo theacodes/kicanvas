@@ -11,13 +11,18 @@
 */
 
 export class Token {
-    static OPEN = "opn";
-    static CLOSE = "clo";
-    static ATOM = "atm";
-    static NUMBER = "num";
-    static STRING = "str";
+    static OPEN = Symbol("opn");
+    static CLOSE = Symbol("clo");
+    static ATOM = Symbol("atm");
+    static NUMBER = Symbol("num");
+    static STRING = Symbol("str");
 
-    constructor(type, value) {
+    /**
+     * Create a new Token
+     * @param {symbol} type
+     * @param {*?} value
+     */
+    constructor(type, value = null) {
         this.type = type;
         this.value = value;
     }
@@ -168,7 +173,9 @@ export function* tokenize(input) {
             if (!escaping && c === '"') {
                 yield new Token(
                     Token.STRING,
-                    input.substring(start_idx + 1, i).replaceAll("\\n", "\n")
+                    input
+                        .substring((start_idx ?? 0) + 1, i)
+                        .replaceAll("\\n", "\n")
                 );
                 state = null;
                 escaping = false;
