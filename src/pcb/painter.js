@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2023 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 import * as pcb_items from "../kicad/pcb_items.js";
 import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";

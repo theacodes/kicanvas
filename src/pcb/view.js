@@ -1,5 +1,11 @@
+/*
+    Copyright (c) 2023 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 import { BBox } from "../math/bbox.js";
-import { Layers } from "./layers.js";
+import { LayerSet } from "./layers.js";
 import { Painter } from "./painter.js";
 
 export class View {
@@ -7,7 +13,7 @@ export class View {
         this.gfx = renderer;
         this.painter = new Painter(this.gfx);
         this.board = board;
-        this.layers = new Layers(colors);
+        this.layers = new LayerSet(colors);
     }
 
     async setup() {

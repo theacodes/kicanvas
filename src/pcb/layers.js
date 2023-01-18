@@ -1,23 +1,61 @@
-class Layer {
-    #layers;
-    name;
-    #visible;
-    enabled;
-    graphics;
-    bboxes;
+/*
+    Copyright (c) 2023 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
 
-    constructor(layers, name, visible = true, enabled = true) {
-        this.#layers = layers;
+/**
+ * A graphical layer
+ *
+ * Graphical layers are responsible for tying the basic board data to graphics
+ * generated using Painters.
+ */
+export class Layer {
+    /** @type {LayerSet} */
+    #layer_set;
+
+    /** @type {string} */
+    name;
+
+    /** @type {boolean} */
+    #visible;
+
+    /** @type {boolean} */
+    enabled;
+
+    /** @type {Array.<number>} */
+    color;
+
+    /**
+     * The renderer-generated graphics for items on this layer.
+     * @type {PrimitiveSet}
+     * */
+    graphics;
+
+    /** A map of board items to bounding boxes
+     * A board item can have graphics on multiple layers, the bounding box provided
+     * here is only valid for this layer.
+     * @type {Map.<*, BBox>}
+     */
+    bboxes = new Map();
+
+    /**
+     * Create a new Layer.
+     * @param {LayerSet} layer_set - the LayerSet that this Layer belongs to
+     * @param {string} name - this layer's name
+     * @param {boolean} visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
+     * @param {boolean} enabled - controls whether the layer is present at all in the board data
+     */
+    constructor(layer_set, name, visible = true, enabled = true) {
+        this.#layer_set = layer_set;
         this.name = name;
+        this.color = this.#layer_set.color_for(this.name);
         this.#visible = visible;
         this.enabled = enabled;
         this.items = [];
     }
 
-    get color() {
-        return this.#layers.color_for(this.name);
-    }
-
+    /** @returns {boolean} true if this layer should be drawn */
     get visible() {
         if (this.#visible instanceof Function) {
             return this.#visible();
@@ -33,11 +71,22 @@ class Layer {
 
 const max_inner_copper_layers = 30;
 
-export class Layers {
+/**
+ * Represents the complete set of layers used by a View to draw a board.
+ *
+ * There are graphical layers that correspond to respective board layers, but
+ * there are also several graphical layers that are "virtual", such as layers
+ * for drill holes and such.
+ */
+export class LayerSet {
     #colors;
     #layer_list = [];
     #layer_map = new Map();
 
+    /**
+     * Create a new LayerSet
+     * @param {*} colors the color theme to use
+     */
     constructor(colors) {
         this.#colors = colors;
 
@@ -122,16 +171,28 @@ export class Layers {
         }
     }
 
+    /**
+     * Get the theme color for a given layer.
+     * @param {string} layer_name
+     * @returns {Array.<number>} normalized [r, g, b, a]
+     */
     color_for(layer_name) {
         return this.#colors.get_layer_color(layer_name);
     }
 
+    /**
+     * @yields {Layer} layers in the order they should be drawn
+     */
     *in_display_order() {
         for (const layer of this.#layer_list) {
             yield layer;
         }
     }
 
+    /**
+     * @yields {Layer} layers that coorespond to board layers that should be
+     *      displayed in the layer selection UI
+     */
     *in_ui_order() {
         const order = [
             "F.Cu",
@@ -184,10 +245,18 @@ export class Layers {
         }
     }
 
+    /**
+     * Gets a Layer by name
+     * @param {string} name
+     * @returns {Layer}
+     */
     by_name(name) {
         return this.#layer_map.get(name);
     }
 
+    /**
+     * @returns {boolean} true if any copper layer is enabled and visible.
+     */
     is_any_copper_layer_visible() {
         for (const l of this.in_display_order()) {
             if (l.name.endsWith(".Cu") && l.enabled && l.visible) {
