@@ -35,6 +35,11 @@ export class WebGL2Renderer {
     #current_object_points;
 
     /**
+     * Context available to anything that uses this renderer.
+     */
+    context = {};
+
+    /**
      * Create a new WebGL2Renderer
      * @param {HTMLCanvasElement} canvas
      * @param {Array.<number>} background_color

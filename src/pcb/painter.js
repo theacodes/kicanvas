@@ -15,7 +15,6 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
-import { TextShaper } from "../gfx/text.js";
 
 /**
  * Painter base class
@@ -461,10 +460,9 @@ class TextPainter extends GenericPainter {
      * @param {WebGL2Renderer} gfx
      * @param {Layer} layer
      * @param {pcb_items.GrText|pcb_items.FpText} t
-     * @param {*} context
      * @override
      */
-    static paint(gfx, layer, t, context) {
+    static paint(gfx, layer, t) {
         let rotation = t.at.rotation;
 
         if (rotation == 180 || rotation == -180) {
@@ -475,7 +473,7 @@ class TextPainter extends GenericPainter {
             rotation -= t.footprint.at.rotation ?? 0;
         }
 
-        const shaped = context.text_shaper.paragraph(
+        const shaped = gfx.context.text_shaper.paragraph(
             t.text,
             t.at.position,
             Angle.deg_to_rad(rotation),
@@ -532,7 +530,7 @@ class FootprintPainter extends GenericPainter {
      * @param {*} context
      * @override
      */
-    static paint(gfx, layer, fp, context) {
+    static paint(gfx, layer, fp) {
         let matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
@@ -544,12 +542,7 @@ class FootprintPainter extends GenericPainter {
                 painter_for_class[item.constructor].layers(item)
             );
             if (item_layers.includes(layer.name)) {
-                painter_for_class[item.constructor].paint(
-                    gfx,
-                    layer,
-                    item,
-                    context
-                );
+                painter_for_class[item.constructor].paint(gfx, layer, item);
             }
         }
         gfx.set_transform();
@@ -593,13 +586,6 @@ export class Painter {
      */
     constructor(gfx) {
         this.gfx = gfx;
-    }
-
-    /**
-     * Configure Painter resources
-     */
-    async setup() {
-        this.#text_shaper = await TextShaper.default();
     }
 
     /**

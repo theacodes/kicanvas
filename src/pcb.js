@@ -12,6 +12,7 @@ import { WebGL2Renderer } from "./gfx/renderer.js";
 import { f4_to_rgba } from "./gfx/colorspace.js";
 import { board as board_colors } from "./pcb/colors.js";
 import { Vec2 } from "./math/vec2.js";
+import { TextShaper } from "./gfx/text.js";
 
 class PCBViewer {
     #cvs;
@@ -56,6 +57,8 @@ class PCBViewer {
 
     async setup() {
         await this.#renderer.setup();
+        this.#renderer.context.text_shaper = await TextShaper.default();
+
         this.#viewport = new Viewport(this.#renderer, () => {
             this.draw();
         });
@@ -65,14 +68,12 @@ class PCBViewer {
     async load(url) {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
-        await this.#setup_view();
+
+        this.#view = new pcb_view.View(this.#renderer, board_colors, this.pcb);
+        this.#view.setup();
+
         this.#look_at_board();
         this.draw();
-    }
-
-    async #setup_view() {
-        this.#view = new pcb_view.View(this.#renderer, board_colors, this.pcb);
-        await this.#view.setup();
     }
 
     #look_at_board() {

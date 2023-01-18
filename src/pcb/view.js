@@ -16,8 +16,7 @@ export class View {
         this.layers = new LayerSet(colors);
     }
 
-    async setup() {
-        await this.painter.setup();
+    setup() {
         this.#set_enabled_layers();
         this.#assign_items_to_layers();
         this.#paint();
