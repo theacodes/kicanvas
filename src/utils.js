@@ -5,11 +5,13 @@
 */
 
 export async function $onload() {
-    const p = new Promise((resolve) => {
-        window.addEventListener("load", () => {
-            resolve();
-        });
-    });
+    const p = /** @type {Promise<void>} */ (
+        new Promise((resolve) => {
+            window.addEventListener("load", () => {
+                resolve();
+            });
+        })
+    );
     return p;
 }
 

@@ -169,9 +169,9 @@ class KicadPCBElement extends HTMLElement {
             <canvas></canvas>
         `;
 
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
-        this.#canvas = this.shadowRoot.querySelector("canvas");
+        const root = this.attachShadow({ mode: "open" });
+        root.appendChild(template.content.cloneNode(true));
+        this.#canvas = root.querySelector("canvas");
     }
 }
 
@@ -247,9 +247,9 @@ class KicadPCBLayerControls extends HTMLElement {
             ${buttons.join("\n")}
         `;
 
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
-        this.shadowRoot.addEventListener("click", (e) => {
+        const root = this.attachShadow({ mode: "open" });
+        root.appendChild(template.content.cloneNode(true));
+        root.addEventListener("click", (e) => {
             this.#on_click(e);
         });
     }
