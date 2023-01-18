@@ -16,9 +16,9 @@ export class Vec2 {
     /**
      * Create a Vec2
      * @param {number|Vec2} x_or_other
-     * @param {number} y
+     * @param {number?} y
      */
-    constructor(x_or_other = 0, y = undefined) {
+    constructor(x_or_other = 0, y = null) {
         this.set(x_or_other, y);
     }
 
@@ -32,10 +32,10 @@ export class Vec2 {
 
     /**
      * Update this vector's values
-     * @param {number|Vec2} x_or_other
-     * @param {number} y
+     * @param {number|Vec2|*} x_or_other
+     * @param {number?} y
      */
-    set(x_or_other, y = undefined) {
+    set(x_or_other, y = null) {
         if (
             x_or_other instanceof this.constructor ||
             Object.hasOwn(x_or_other, "x")

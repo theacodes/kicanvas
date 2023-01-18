@@ -13,7 +13,7 @@ import { Angle } from "./angle.js";
 export class Matrix3 {
     /**
      * Create a new Matrix
-     * @param {Array.<number>} elements the 9 matrix elements
+     * @param {Array.<number>|Float32Array} elements the 9 matrix elements
      */
     constructor(elements) {
         this.elements = new Float32Array(elements);
@@ -127,7 +127,7 @@ export class Matrix3 {
 
     /**
      * Transforms a list of vectors
-     * @param {Vec2} vecs
+     * @param {Vec2[]} vecs
      * @yields {Vec2} new transformed vectors
      */
     *transform_all(vecs) {
@@ -138,7 +138,7 @@ export class Matrix3 {
 
     /**
      * Transforms a list of vector by a given matrix, which may be null.
-     * @param {Matrix} mat
+     * @param {Matrix3} mat
      * @param {Array.<Vec2>} vecs
      * @returns {Array.<Vec2>}
      */
@@ -252,7 +252,7 @@ export class Matrix3 {
      * @returns this matrix
      */
     translate_self(x, y) {
-        return this.multiply_self(this.constructor.translation(x, y));
+        return this.multiply_self(Matrix3.translation(x, y));
     }
 
     /**
@@ -262,7 +262,7 @@ export class Matrix3 {
      * @returns {Matrix3} a new matrix
      */
     translate(x, y) {
-        this.copy().translate_self(x, y);
+        return this.copy().translate_self(x, y);
     }
 
     /**
@@ -286,7 +286,7 @@ export class Matrix3 {
      * @returns this matrix
      */
     scale_self(x, y) {
-        return this.multiply_self(this.constructor.scaling(x, y));
+        return this.multiply_self(Matrix3.scaling(x, y));
     }
 
     /**
@@ -296,7 +296,7 @@ export class Matrix3 {
      * @returns {Matrix3} a new matrix
      */
     scale(x, y) {
-        this.copy().scale_self(x, y);
+        return this.copy().scale_self(x, y);
     }
 
     /**
@@ -321,7 +321,7 @@ export class Matrix3 {
      * @returns this matrix
      */
     rotate_self(angle) {
-        return this.multiply_self(this.constructor.rotation(angle));
+        return this.multiply_self(Matrix3.rotation(angle));
     }
 
     /**
@@ -331,6 +331,6 @@ export class Matrix3 {
      * @returns {Matrix3} a new matrix
      */
     rotate(x, y) {
-        this.copy().rotate(x, y);
+        return this.copy().rotate(x, y);
     }
 }

@@ -56,7 +56,7 @@ export class Angle {
 
     set radians(v) {
         this.theta_rad = v;
-        this.theta_deg = this.constructor.round(this.constructor.rad_to_deg(v));
+        this.theta_deg = Angle.round(Angle.rad_to_deg(v));
     }
 
     get degrees() {
@@ -65,7 +65,7 @@ export class Angle {
 
     set degrees(v) {
         this.theta_deg = v;
-        this.theta_rad = this.constructor.deg_to_rad(v);
+        this.theta_rad = Angle.deg_to_rad(v);
     }
 
     /**
@@ -82,7 +82,7 @@ export class Angle {
      * @returns {Angle} a new Angle constrained to 0 to 360 degrees.
      */
     normalize() {
-        let deg = this.constructor.round(this.degrees);
+        let deg = Angle.round(this.degrees);
 
         while (deg < 0) {
             deg += 360;

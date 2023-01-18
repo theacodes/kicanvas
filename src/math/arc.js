@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+// eslint-disable-next-line no-unused-vars
+import { Angle } from "./angle.js";
 import { Vec2 } from "./vec2.js";
 
 /**
@@ -108,7 +110,16 @@ export class Arc {
     }
 }
 
-/* Ported from KiCAD's KiMATH trigo */
+/**
+ * Figure out the center point of a circular arc given three points along the circle.
+ *
+ * Ported from KiCAD's KiMATH trigo
+ *
+ * @param {Vec2} start
+ * @param {Vec2} mid
+ * @param {Vec2} end
+ * @returns {Vec2}
+ */
 function arc_center_from_three_points(start, mid, end) {
     const sqrt_1_2 = Math.SQRT1_2;
     let center = new Vec2(0, 0);

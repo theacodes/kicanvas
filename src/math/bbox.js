@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+// eslint-disable-next-line no-unused-vars
+import { Matrix3 } from "./matrix3.js";
 import { Vec2 } from "./vec2.js";
 
 /**
@@ -171,7 +173,7 @@ export class BBox {
     transform(mat) {
         const start = mat.transform(this.start);
         const end = mat.transform(this.end);
-        return BBox.from_corners(start, end);
+        return BBox.from_corners(start.x, start.y, end.x, end.y, this.context);
     }
 
     /**
@@ -179,7 +181,13 @@ export class BBox {
      * @returns A new BBox with the size uniformly modified from the center
      */
     grow(s) {
-        return new BBox(this.x - s, this.y - s, this.w + s * 2, this.h + s * 2);
+        return new BBox(
+            this.x - s,
+            this.y - s,
+            this.w + s * 2,
+            this.h + s * 2,
+            this.context
+        );
     }
 
     /**
