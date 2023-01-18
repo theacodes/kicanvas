@@ -21,6 +21,8 @@
 import { VertexArray, ShaderProgram } from "./gl.js";
 import { Vec2 } from "../math/vec2.js";
 import earcut from "../math/earcut/earcut.js";
+// eslint-disable-next-line no-unused-vars
+import { Matrix3 } from "../math/matrix3.js";
 
 /** Circle primitive data */
 export class Circle {
@@ -41,7 +43,7 @@ export class Circle {
 export class Polyline {
     /**
      * Create a stroked polyline
-     * @param {Vec2} points - line segment points
+     * @param {Vec2[]} points - line segment points
      * @param {number} width - thickness of the rendered line
      * @param {number[]} color - normalized array of rgba
      */
@@ -56,7 +58,7 @@ export class Polyline {
 export class Polygon {
     /**
      * Create a filled polygon
-     * @param {Vec2} points - point cloud representing the polygon
+     * @param {Vec2[]} points - point cloud representing the polygon
      * @param {number[]} color - normalized array of rgba
      */
     constructor(points, color) {
@@ -66,8 +68,7 @@ export class Polygon {
     }
     /**
      * Convert a point cloud polygon into an array of triangles.
-     * @param {Array.<Vec2>} points
-     * @returns {Float32Array} an array of 2d vertices
+     * Populates this.vertices with the triangles and clears this.points.
      */
     triangulate() {
         if (this.vertices) {
@@ -84,7 +85,7 @@ export class Polygon {
 
         // shortcut if the polygon is a single triangle.
         if (points.length == 3) {
-            this.points = null;
+            this.points = [];
             this.vertices = new Float32Array(points_flattened);
             return;
         }
@@ -99,7 +100,7 @@ export class Polygon {
             vertices[i * 2 + 1] = points_flattened[index * 2 + 1];
         }
 
-        this.points = null;
+        this.points = [];
         this.vertices = vertices;
     }
 }
@@ -111,7 +112,7 @@ class Tesselator {
     /**
      * Convert a quad to two triangles that cover the same area
      * @param {Array.<Vec2>} quad - four points defining the quad
-     * @returns {Vec2} - six points representing two triangles
+     * @returns {number[]} - six points representing two triangles
      */
     static quad_to_triangles(quad) {
         const positions = [
@@ -152,7 +153,7 @@ class Tesselator {
      * Tesselate a line segment into a quad
      * @param {Vec2} p1
      * @param {Vec2} p2
-     * @param {number} widths
+     * @param {number} width
      * @returns {Array.<Vec2>} four points representing the line segment.
      */
     static tesselate_segment(p1, p2, width) {
@@ -305,11 +306,11 @@ export class CircleSet {
     /**
      * Create a new circle set.
      * @param {WebGL2RenderingContext} gl
-     * @param {ShaderProgram} shader - optional override for the shader program used when drawing.
+     * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
     constructor(gl, shader = null) {
         this.gl = gl;
-        this.shader = shader ?? this.constructor.shader;
+        this.shader = shader ?? CircleSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
@@ -371,11 +372,11 @@ export class PolylineSet {
     /**
      * Create a new polyline set.
      * @param {WebGL2RenderingContext} gl
-     * @param {ShaderProgram} shader - optional override for the shader program used when drawing.
+     * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
     constructor(gl, shader = null) {
         this.gl = gl;
-        this.shader = shader ?? this.constructor.shader;
+        this.shader = shader ?? PolylineSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
@@ -466,11 +467,11 @@ export class PolygonSet {
     /**
      * Create a new polygon set.
      * @param {WebGL2RenderingContext} gl
-     * @param {ShaderProgram} shader - optional override for the shader program used when drawing.
+     * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
     constructor(gl, shader = null) {
         this.gl = gl;
-        this.shader = shader || this.constructor.shader;
+        this.shader = shader || PolygonSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.color_buf = this.vao.buffer(this.shader.a_color, 4);
@@ -515,7 +516,7 @@ export class PolygonSet {
 
         for (const polygon of polygons) {
             polygon.triangulate();
-            total_vertex_data_length += polygon.vertices.length;
+            total_vertex_data_length += polygon.vertices?.length ?? 0;
         }
 
         const total_vertices = total_vertex_data_length / 2;
@@ -526,6 +527,10 @@ export class PolygonSet {
         let vertex_data_idx = 0;
         let color_data_idx = 0;
         for (const polygon of polygons) {
+            if (polygon.vertices == null) {
+                continue;
+            }
+
             const polygon_vertex_count = polygon.vertices.length / 2;
 
             vertex_data.set(polygon.vertices, vertex_data_idx);

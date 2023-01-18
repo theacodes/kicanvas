@@ -20,8 +20,8 @@
  * appropriately
  */
 export class CanvasSizeObserver {
-    canvas = null;
-    #callback = null;
+    canvas;
+    #callback;
 
     /**
      * Create a CanvasSizeObserver
@@ -46,6 +46,6 @@ export class CanvasSizeObserver {
         const c = this.canvas;
         c.width = c.clientWidth * window.devicePixelRatio;
         c.height = c.clientHeight * window.devicePixelRatio;
-        this.#callback(c, c.clientWidth, c.clientHeight, c.width, c.height);
+        this.#callback(c.clientWidth, c.clientHeight, c.width, c.height);
     }
 }

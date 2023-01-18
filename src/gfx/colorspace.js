@@ -38,15 +38,16 @@ export function rgba_hex_to_f4(rgba) {
         rgba = `${rgba}FF`;
     }
 
-    let components = [
+    const str_components = [
         rgba.slice(0, 2),
         rgba.slice(2, 4),
         rgba.slice(4, 6),
         rgba.slice(6, 8),
     ];
-    components = components.map((v) => parseInt(v, 16) / 255);
 
-    return components;
+    const num_components = str_components.map((v) => parseInt(v, 16) / 255);
+
+    return num_components;
 }
 
 /**

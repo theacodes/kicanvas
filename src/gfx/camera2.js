@@ -127,7 +127,7 @@ export class Camera2 {
      * @param {CanvasRenderingContext2D} ctx
      */
     apply_to_canvas(ctx) {
-        this.viewportSize.set(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+        this.viewport_size.set(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
         let m = Matrix3.from_DOMMatrix(ctx.getTransform());
         m.multiply_self(this.matrix);
         ctx.setTransform(m.to_DOMMatrix());

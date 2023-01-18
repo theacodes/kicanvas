@@ -19,18 +19,18 @@ export class WebGL2Renderer {
     #layers = [];
 
     /** The layer currently being drawn to.
-     * @type {PrimitiveSet}
+     * @type {PrimitiveSet?}
      */
     #active_layer;
 
     /** The color of the viewport & canvas background.
-     * @type {Array.<number>}
+     * @type {[number, number, number, number]}
      */
     #background_color;
 
     /** A list of points belonging to the object that's currently being drawn,
      * used to calculate object BBox.
-     * @type {Array.<Vec2>}
+     * @type {Array.<Vec2>?}
      */
     #current_object_points;
 
@@ -42,7 +42,7 @@ export class WebGL2Renderer {
     /**
      * Create a new WebGL2Renderer
      * @param {HTMLCanvasElement} canvas
-     * @param {Array.<number>} background_color
+     * @param {[number, number, number, number]} background_color
      */
     constructor(canvas, background_color) {
         this.canvas = canvas;
@@ -59,6 +59,11 @@ export class WebGL2Renderer {
         this.canvas.style.backgroundColor = f4_to_rgba(this.#background_color);
 
         let gl = this.canvas.getContext("webgl2", { alpha: false });
+
+        if (gl == null) {
+            throw new Error("Unable to create WebGL2 context");
+        }
+
         this.gl = gl;
 
         gl.enable(gl.BLEND);
@@ -85,6 +90,7 @@ export class WebGL2Renderer {
      * @param {number} h
      */
     set_viewport(x, y, w, h) {
+        if (this.gl == null) throw new Error("Uninitialized");
         this.gl.viewport(x, y, w, h);
     }
 
@@ -92,6 +98,7 @@ export class WebGL2Renderer {
      * Clear the canvas. Typically called at the start of a frame.
      */
     clear_canvas() {
+        if (this.gl == null) throw new Error("Uninitialized");
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     }
 
@@ -99,12 +106,12 @@ export class WebGL2Renderer {
      * @returns {Matrix3} the current transformation matrix
      */
     get_transform() {
-        return this.#transform_stack.at(-1);
+        return this.#transform_stack.at(-1) ?? Matrix3.identity();
     }
 
     /**
      * Set (or reset) the transformation matrix stack.
-     * @param {Matrix3} mat
+     * @param {Matrix3?} mat
      */
     set_transform(mat = null) {
         this.#transform_stack = mat ? [mat] : [Matrix3.identity()];
@@ -135,6 +142,7 @@ export class WebGL2Renderer {
      * must be called for the graphics to actually show up.
      */
     start_layer() {
+        if (this.gl == null) throw new Error("Uninitialized");
         this.#active_layer = new PrimitiveSet(this.gl);
     }
 
@@ -147,9 +155,13 @@ export class WebGL2Renderer {
      * @returns {PrimitiveSet} the finished layer
      */
     end_layer() {
+        if (this.#active_layer == null) throw new Error("No active layer");
+
         this.#active_layer.commit();
         this.#layers.push(this.#active_layer);
         this.#active_layer = null;
+
+        // @ts-ignore
         return this.#layers.at(-1);
     }
 
@@ -167,6 +179,9 @@ export class WebGL2Renderer {
      * @returns {BBox} the drawn object's bounding box
      */
     end_object() {
+        if (this.#current_object_points == null)
+            throw new Error("No current object");
+
         const bbox = BBox.from_points(this.#current_object_points);
         this.#current_object_points = null;
         return bbox;
@@ -179,8 +194,12 @@ export class WebGL2Renderer {
      * @param {Array.<number>} color an array of [r, g, b, a] normalized color values.
      */
     circle(point, radius, color) {
+        if (this.#active_layer == null) throw new Error("No active layer");
+
         point = this.get_transform().transform(point);
+
         this.#active_layer.add_circle(point, radius, color);
+
         this.#current_object_points?.push(
             point.add(new Vec2(radius, radius)),
             point.sub(new Vec2(radius, radius))
@@ -194,8 +213,12 @@ export class WebGL2Renderer {
      * @param {Array.<number>} color an array of [r, g, b, a] normalized color values.
      */
     line(points, width, color) {
+        if (this.#active_layer == null) throw new Error("No active layer");
+
         points = Array.from(this.get_transform().transform_all(points));
+
         this.#active_layer.add_line(points, width, color);
+
         // TODO: take width into account?
         this.#current_object_points?.push(...points);
     }
@@ -206,7 +229,10 @@ export class WebGL2Renderer {
      * @param {Array.<number>} color an array of [r, g, b, a] normalized color values.
      */
     polygon(points, color) {
+        if (this.#active_layer == null) throw new Error("No active layer");
+
         points = Array.from(this.get_transform().transform_all(points));
+
         this.#active_layer.add_polygon(points, color);
 
         if (this.#current_object_points != null) {

@@ -38,9 +38,7 @@ class Uniform {
         this.location = location;
         this.type = type;
 
-        for (const [dst, src] of Object.entries(
-            this.constructor._function_map
-        )) {
+        for (const [dst, src] of Object.entries(Uniform._function_map)) {
             this[dst] = (...args) => {
                 this.gl[src](this.location, ...args);
             };
@@ -60,7 +58,7 @@ export class ShaderProgram {
     uniforms = {};
 
     /** Shader attributes
-     * @type {Object.<string, GLint>}
+     * @type {Object.<string, WebGLActiveInfo>}
      */
     attribs = {};
 
@@ -68,28 +66,24 @@ export class ShaderProgram {
      * Create and compile a shader program
      * @param {WebGL2RenderingContext} gl
      * @param {string} name - used for caching and identifying the shader
-     * @param {string} vertex - vertex shader source code
-     * @param {string} fragment - fragment shader source code
+     * @param {string|WebGLShader} vertex - vertex shader source code
+     * @param {string|WebGLShader} fragment - fragment shader source code
      */
     constructor(gl, name, vertex, fragment) {
         this.gl = gl;
         this.name = name;
 
         if (typeof vertex === "string") {
-            vertex = this.constructor.compile(gl, gl.VERTEX_SHADER, vertex);
+            vertex = ShaderProgram.compile(gl, gl.VERTEX_SHADER, vertex);
         }
         this.vertex = vertex;
 
         if (typeof fragment === "string") {
-            fragment = this.constructor.compile(
-                gl,
-                gl.FRAGMENT_SHADER,
-                fragment
-            );
+            fragment = ShaderProgram.compile(gl, gl.FRAGMENT_SHADER, fragment);
         }
         this.fragment = fragment;
 
-        this.program = this.constructor.link(gl, vertex, fragment);
+        this.program = ShaderProgram.link(gl, vertex, fragment);
 
         this.#discover_uniforms();
         this.#discover_attribs();
@@ -124,12 +118,17 @@ export class ShaderProgram {
      * Typically not used directly, use load() instead.
      *
      * @param {WebGL2RenderingContext} gl
-     * @param {*} type - gl.FRAGMENT_SHADER or gl.VERTEX_SHADER
+     * @param {GLenum} type - gl.FRAGMENT_SHADER or gl.VERTEX_SHADER
      * @param {string} source
      * @returns {WebGLShader}
      */
     static compile(gl, type, source) {
         const shader = gl.createShader(type);
+
+        if (shader == null) {
+            throw new Error("Could not create new shader");
+        }
+
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
 
@@ -155,6 +154,11 @@ export class ShaderProgram {
      */
     static link(gl, vertex, fragment) {
         const program = gl.createProgram();
+
+        if (program == null) {
+            throw new Error("Could not create new shader program");
+        }
+
         gl.attachShader(program, vertex);
         gl.attachShader(program, fragment);
         gl.linkProgram(program);
@@ -178,14 +182,22 @@ export class ShaderProgram {
             u_n++
         ) {
             const info = this.gl.getActiveUniform(this.program, u_n);
-            info.n = u_n;
-            info.location = this.gl.getUniformLocation(this.program, info.name);
 
-            this.uniforms[info.name] = info;
-            this[info.name] = new Uniform(
+            if (info == null) {
+                throw new Error(
+                    `Could not get uniform info for uniform number ${u_n} for program ${this.program}`
+                );
+            }
+
+            const location = this.gl.getUniformLocation(
+                this.program,
+                info.name
+            );
+
+            this[info.name] = this.uniforms[info.name] = new Uniform(
                 this.gl,
                 info.name,
-                info.location,
+                location,
                 info.type
             );
         }
@@ -203,7 +215,13 @@ export class ShaderProgram {
             a_n++
         ) {
             const info = this.gl.getActiveAttrib(this.program, a_n);
-            info.n = a_n;
+
+            if (info == null) {
+                throw new Error(
+                    `Could not get attribute info for attribute number ${a_n} for program ${this.program}`
+                );
+            }
+
             this.attribs[info.name] = info;
             this[info.name] = this.gl.getAttribLocation(
                 this.program,
@@ -239,7 +257,7 @@ export class VertexArray {
 
     /**
      * Free WebGL resources
-     * @param {bool} include_buffers
+     * @param {boolean} include_buffers
      */
     dispose(include_buffers = true) {
         this.gl.deleteVertexArray(this.vao);
@@ -260,11 +278,11 @@ export class VertexArray {
      * Create a new buffer bound to this vertex array
      * @param {GLint} attrib - shader attribute location
      * @param {GLint} size - number of components per vertex attribute
-     * @param {GLenum} type - data type for each component, if unspecified it's gl.FLOAT.
+     * @param {GLenum?} type - data type for each component, if unspecified it's gl.FLOAT.
      * @param {GLboolean} normalized - whether or not to normalize integer types when converting to float
      * @param {GLsizei} stride - offset between consecutive attributes
      * @param {GLintptr} offset - offset from the beginning of the array to the first attribute
-     * @param {GLenum} target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
+     * @param {GLenum?} target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
      * @returns {Buffer}
      */
@@ -278,6 +296,7 @@ export class VertexArray {
         target = null
     ) {
         type ??= this.gl.FLOAT;
+
         const b = new Buffer(this.gl, target);
 
         b.bind();
@@ -306,7 +325,7 @@ export class Buffer {
     /**
      * Create a new buffer
      * @param {WebGL2RenderingContext} gl
-     * @param {GLenum} target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
+     * @param {GLenum?} target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
      */
     constructor(gl, target = null) {
@@ -330,8 +349,8 @@ export class Buffer {
     /**
      * Uploads data to the GPU buffer
      *
-     * @param {TypedArray|DataView|ArrayBuffer|SharedArrayBuffer} data
-     * @param {GLenum} usage - intended usage pattern, typically gl.STATIC_DRAW (the default if unspecified) or gl.DYNAMIC_DRAW
+     * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|DataView|ArrayBuffer|SharedArrayBuffer} data
+     * @param {GLenum?} usage - intended usage pattern, typically gl.STATIC_DRAW (the default if unspecified) or gl.DYNAMIC_DRAW
      */
     set(data, usage = null) {
         this.bind();
@@ -341,8 +360,7 @@ export class Buffer {
 
     /**
      * Gets the length of the buffer as reported by WebGL.
-     * @param {*} target
-     * @returns
+     * @returns {number}
      */
     get length() {
         this.bind();

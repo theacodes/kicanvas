@@ -5,6 +5,8 @@
 */
 
 import { Vec2 } from "../math/vec2.js";
+// eslint-disable-next-line no-unused-vars
+import { Camera2 } from "./camera2.js";
 
 /**
  * Interactive Pan and Zoom helper

@@ -8,7 +8,7 @@ import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Camera2 } from "./camera2.js";
 import { PanAndZoom } from "./pan_and_zoom.js";
-import { CanvasSizeObserver } from "./resize.js";
+import { CanvasSizeObserver } from "./canvas_size_observer.js";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view
@@ -17,9 +17,10 @@ import { CanvasSizeObserver } from "./resize.js";
 export class Viewport {
     renderer;
     #callback;
-    width = null;
-    height = null;
+    width;
+    height;
     camera;
+    projection;
 
     /**
      * Create a Scene
@@ -32,7 +33,7 @@ export class Viewport {
 
         this.camera = new Camera2(new Vec2(0, 0), new Vec2(0, 0), 1, 0);
 
-        new CanvasSizeObserver(this.renderer.canvas, (_, ...args) => {
+        new CanvasSizeObserver(this.renderer.canvas, (...args) => {
             this.resize(...args);
             this.#callback();
         });

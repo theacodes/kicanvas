@@ -18,9 +18,9 @@ export class BBox {
      * @param {number} y
      * @param {number} w
      * @param {number} h
-     * @param {*} context
+     * @param {*?} context
      */
-    constructor(x = 0, y = 0, w = 0, h = 0, context = undefined) {
+    constructor(x = 0, y = 0, w = 0, h = 0, context = null) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -41,10 +41,10 @@ export class BBox {
      * @param {number} y1
      * @param {number} x2
      * @param {number} y2
-     * @param {*} context
+     * @param {*?} context
      * @returns {BBox}
      */
-    static from_corners(x1, y1, x2, y2, context) {
+    static from_corners(x1, y1, x2, y2, context = null) {
         if (x2 < x1) {
             [x1, x2] = [x2, x1];
         }
@@ -57,10 +57,10 @@ export class BBox {
     /**
      * Create a BBox that contains all the given points
      * @param {Array.<Vec2>} points
-     * @param {*} context
+     * @param {*?} context
      * @returns {BBox}
      */
-    static from_points(points, context) {
+    static from_points(points, context = null) {
         const start = points[0].copy();
         const end = points[0].copy();
 
@@ -77,10 +77,10 @@ export class BBox {
     /**
      * Combine two or more BBoxes into a new BBox that contains both
      * @param {Array.<BBox>} boxes
-     * @param {*} context
+     * @param {*?} context
      * @returns {BBox}
      */
-    static combine(boxes, context) {
+    static combine(boxes, context = null) {
         let min_x = Number.MAX_VALUE;
         let min_y = Number.MAX_VALUE;
         let max_x = Number.MIN_VALUE;

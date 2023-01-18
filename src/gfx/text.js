@@ -12,13 +12,15 @@
 
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
+// eslint-disable-next-line no-unused-vars
+import { Angle } from "../math/angle.js";
 
 class GlyphData {
     /**
      * Create Glyph data
      * @param {Array} strokes
      * @param {number} width
-     * @param {number[]} bbox
+     * @param {{start: number[], end: number[]}} bbox
      */
     constructor(strokes, width, bbox) {
         this.strokes = strokes;
@@ -65,7 +67,7 @@ export class Font {
 
     /**
      * Vertical distance between two lines of text.
-     * @param {number} size - font size
+     * @param {Vec2} size - font size
      * @returns {number}
      */
     interline(size) {
@@ -125,7 +127,7 @@ export class ShapedGlyph {
         for (const point of stroke) {
             const pt = new Vec2(...point);
             if (tilt) {
-                pt.x -= pt.y * this.tilt;
+                pt.x -= pt.y * tilt;
             }
             yield matrix.transform(pt);
         }
@@ -139,7 +141,7 @@ export class ShapedGlyph {
     *strokes(matrix) {
         let full_matrix = matrix.multiply(this.matrix);
         for (const stroke of this.glyph.strokes) {
-            yield this.constructor.points(full_matrix, stroke, this.tilt);
+            yield ShapedGlyph.points(full_matrix, stroke, this.tilt);
         }
     }
 }
@@ -187,7 +189,8 @@ export class ShapedLine {
             return bb;
         }
 
-        const last = this.shaped_glyphs.at(-1);
+        const last = this.shaped_glyphs[this.shaped_glyphs.length - 1];
+
         bb.x =
             last.position.x +
             last.glyph.bbox.end[0] * last.size.x +
@@ -217,7 +220,7 @@ export class TextShaper {
 
     /**
      * Load the default font and create a TextShaper for it
-     * @returns {TextShaper}
+     * @returns {Promise<TextShaper>}
      */
     static async default() {
         const font = new Font();
@@ -384,7 +387,9 @@ export class TextShaper {
 
         const line_spacing = this.font.interline(size);
         const total_height = (shaped_lines.length - 1) * line_spacing;
-        const matrix = Matrix3.translation(...position).rotate_self(rotation);
+        const matrix = Matrix3.translation(position.x, position.y).rotate_self(
+            rotation
+        );
 
         switch (options.valign) {
             case "top":
