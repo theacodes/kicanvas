@@ -15,7 +15,9 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
+// eslint-disable-next-line no-unused-vars
 import { WebGL2Renderer } from "../gfx/renderer.js";
+// eslint-disable-next-line no-unused-vars
 import { Layer } from "./layers.js";
 
 /**
@@ -307,7 +309,7 @@ class PadPainter extends GenericPainter {
             } else {
                 const half_size = new Vec2(
                     pad.drill.diameter / 2,
-                    pad.drill.width / 2
+                    (pad.drill.width ?? 0) / 2
                 );
 
                 const half_width = Math.min(half_size.x, half_size.y);
@@ -329,8 +331,8 @@ class PadPainter extends GenericPainter {
             }
         } else {
             let shape = pad.shape;
-            if (shape == "custom") {
-                shape = pad.options?.anchor;
+            if (shape == "custom" && pad.options?.anchor) {
+                shape = pad.options.anchor;
             }
 
             switch (shape) {
@@ -357,7 +359,7 @@ class PadPainter extends GenericPainter {
                     {
                         const rounding =
                             Math.min(pad.size.x, pad.size.y) *
-                            pad.roundrect_rratio;
+                            (pad.roundrect_rratio ?? 0);
                         let half_size = new Vec2(
                             pad.size.x / 2,
                             pad.size.y / 2
@@ -491,7 +493,7 @@ class TextPainter extends GenericPainter {
         );
 
         for (const stroke of shaped) {
-            gfx.line(stroke, t.effects.thickness, layer.color);
+            gfx.line(stroke, t.effects.thickness ?? 0.127, layer.color);
         }
     }
 }
