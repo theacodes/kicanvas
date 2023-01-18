@@ -6,9 +6,7 @@
 
 import { parse } from "./kicad/parser.js";
 import * as pcb_items from "./kicad/pcb_items.js";
-import { Scene } from "./gfx/scene.js";
-import { PanAndZoom } from "./gfx/pan_and_zoom.js";
-import { CanvasSizeObserver } from "./gfx/resize.js";
+import { Viewport } from "./gfx/viewport.js";
 import * as pcb_view from "./pcb/view.js";
 import { WebGl2Renderer } from "./rendering/webgl2.js";
 import { f4_to_rgba } from "./gfx/colorspace.js";
@@ -18,7 +16,7 @@ import { Vec2 } from "./math/vec2.js";
 class PCBViewer {
     #cvs;
     #renderer;
-    #scene;
+    #viewport;
     #view;
     pcb;
 
@@ -28,7 +26,7 @@ class PCBViewer {
 
         this.#cvs.addEventListener("click", (e) => {
             const rect = this.#cvs.getBoundingClientRect();
-            const mouse = this.#scene.screen_to_world(
+            const mouse = this.#viewport.screen_to_world(
                 new Vec2(e.clientX - rect.left, e.clientY - rect.top)
             );
 
@@ -58,26 +56,10 @@ class PCBViewer {
 
     async setup() {
         await this.#renderer.setup();
-        await this.#setup_scene();
-    }
-
-    async #setup_scene() {
-        this.#scene = new Scene(this.#renderer);
-
-        new CanvasSizeObserver(this.#cvs, (_, ...args) => {
-            this.#scene.resize(...args);
+        this.#viewport = new Viewport(this.#renderer, () => {
             this.draw();
         });
-
-        new PanAndZoom(
-            this.#cvs,
-            this.#scene.camera,
-            () => {
-                this.draw();
-            },
-            0.5,
-            130
-        );
+        this.#viewport.enable_pan_and_zoom(0.3, 200);
     }
 
     async load(url) {
@@ -95,8 +77,7 @@ class PCBViewer {
 
     #look_at_board() {
         const board_bbox = this.#view.get_board_bbox();
-        console.log(board_bbox);
-        this.#scene.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
+        this.#viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
     }
 
     draw() {
@@ -104,7 +85,7 @@ class PCBViewer {
 
         window.requestAnimationFrame(() => {
             this.#renderer.clear_canvas();
-            let matrix = this.#scene.view_projection_matrix;
+            let matrix = this.#viewport.view_projection_matrix;
             this.#view.draw(matrix);
         });
     }
