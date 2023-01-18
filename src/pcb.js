@@ -8,7 +8,7 @@ import { parse } from "./kicad/parser.js";
 import * as pcb_items from "./kicad/pcb_items.js";
 import { Viewport } from "./gfx/viewport.js";
 import * as pcb_view from "./pcb/view.js";
-import { WebGl2Renderer } from "./rendering/webgl2.js";
+import { WebGl2Renderer } from "./gfx/renderer.js";
 import { f4_to_rgba } from "./gfx/colorspace.js";
 import { board as board_colors } from "./pcb/colors.js";
 import { Vec2 } from "./math/vec2.js";

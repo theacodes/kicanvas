@@ -1,6 +1,6 @@
-import { PrimitiveSet } from "../gfx/primitives.js";
+import { PrimitiveSet } from "./primitives.js";
 import { Matrix3 } from "../math/matrix3.js";
-import { f4_to_rgba } from "../gfx/colorspace.js";
+import { f4_to_rgba } from "./colorspace.js";
 import { BBox } from "../math/bbox.js";
 import { Vec2 } from "../math/vec2.js";
 
