@@ -300,7 +300,7 @@ export class Matrix3 {
     }
 
     /**
-     * @param {Angle} angle
+     * @param {Angle|number} angle
      * @returns A new matrix representing a 2d rotation
      */
     static rotation(angle) {
@@ -317,7 +317,7 @@ export class Matrix3 {
 
     /**
      * Rotate this matrix by the given angle
-     * @param {Angle} angle
+     * @param {Angle|number} angle
      * @returns this matrix
      */
     rotate_self(angle) {

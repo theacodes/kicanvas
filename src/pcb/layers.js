@@ -4,6 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+// eslint-disable-next-line no-unused-vars
+import { PrimitiveSet } from "../gfx/primitives.js";
+// eslint-disable-next-line no-unused-vars
+import { BBox } from "../math/bbox.js";
+
 /**
  * A graphical layer
  *
@@ -17,7 +22,7 @@ export class Layer {
     /** @type {string} */
     name;
 
-    /** @type {boolean} */
+    /** @type {boolean|Function} */
     #visible;
 
     /** @type {boolean} */
@@ -43,7 +48,7 @@ export class Layer {
      * Create a new Layer.
      * @param {LayerSet} layer_set - the LayerSet that this Layer belongs to
      * @param {string} name - this layer's name
-     * @param {boolean} visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
+     * @param {boolean|Function} visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
      * @param {boolean} enabled - controls whether the layer is present at all in the board data
      */
     constructor(layer_set, name, visible = true, enabled = true) {
@@ -194,9 +199,11 @@ export class LayerSet {
      *      displayed in the layer selection UI
      */
     *in_ui_order() {
+        const inner_copper = Symbol("inner_copper");
+
         const order = [
             "F.Cu",
-            Symbol.inner_copper,
+            inner_copper,
             "B.Cu",
             "F.Adhes",
             "B.Adhes",
@@ -228,7 +235,7 @@ export class LayerSet {
         ];
 
         for (const name of order) {
-            if (name == Symbol.inner_copper) {
+            if (name == inner_copper) {
                 for (let i = 1; i <= max_inner_copper_layers; i++) {
                     const layer = this.by_name(`In${i}.Cu`);
                     if (layer.enabled) {
@@ -236,6 +243,7 @@ export class LayerSet {
                     }
                 }
             } else {
+                // @ts-ignore
                 const layer = this.by_name(name);
 
                 if (layer.enabled) {

@@ -15,6 +15,8 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
+import { WebGL2Renderer } from "../gfx/renderer.js";
+import { Layer } from "./layers.js";
 
 /**
  * Painter base class
@@ -23,7 +25,7 @@ import { Angle } from "../math/angle.js";
 class GenericPainter {
     /**
      * List of item classes this painter can draw
-     * @type {Array.<type>}
+     * @type {Array.<Function>}
      * @abstract
      */
     static classes = [];
@@ -298,7 +300,7 @@ class PadPainter extends GenericPainter {
 
         const center = new Vec2(0, 0);
 
-        if (layer.name == ":Pad:Holes") {
+        if (layer.name == ":Pad:Holes" && pad.drill != null) {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 gfx.circle(drill_pos, pad.drill.diameter / 2, color);
@@ -328,7 +330,7 @@ class PadPainter extends GenericPainter {
         } else {
             let shape = pad.shape;
             if (shape == "custom") {
-                shape = pad.options.anchor;
+                shape = pad.options?.anchor;
             }
 
             switch (shape) {
@@ -413,7 +415,9 @@ class PadPainter extends GenericPainter {
                             Angle.deg_to_rad(pad.at.rotation)
                         ).transform(half_len);
 
-                        const pad_pos = center.add(pad.drill.offset);
+                        const pad_pos = center.add(
+                            pad.drill?.offset || new Vec2(0, 0)
+                        );
                         const pad_start = pad_pos.sub(half_len);
                         const pad_end = pad_pos.add(half_len);
 
@@ -434,7 +438,7 @@ class PadPainter extends GenericPainter {
                     break;
             }
 
-            if (pad.shape == "custom") {
+            if (pad.shape == "custom" && pad.primitives) {
                 for (const prim of pad.primitives) {
                     painter_for_class[prim.constructor].paint(gfx, layer, prim);
                 }
@@ -469,8 +473,8 @@ class TextPainter extends GenericPainter {
             rotation = 0;
         }
 
-        if (t.footprint) {
-            rotation -= t.footprint.at.rotation ?? 0;
+        if (t instanceof pcb_items.FpText && t.parent) {
+            rotation -= t.parent.at.rotation ?? 0;
         }
 
         const shaped = gfx.context.text_shaper.paragraph(
@@ -527,7 +531,6 @@ class FootprintPainter extends GenericPainter {
      * @param {WebGL2Renderer} gfx
      * @param {Layer} layer
      * @param {pcb_items.Footprint} fp
-     * @param {*} context
      * @override
      */
     static paint(gfx, layer, fp) {
@@ -577,9 +580,6 @@ for (const painter of painters) {
  * Painter handles painting all board items onto their respective graphics layers.
  */
 export class Painter {
-    /** @type {TextShaper} */
-    #text_shaper;
-
     /**
      * Create a Painter
      * @param {WebGL2Renderer} gfx
@@ -623,8 +623,6 @@ export class Painter {
      * @param {*} item
      */
     paint_item(layer, item) {
-        painter_for_class[item.constructor].paint(this.gfx, layer, item, {
-            text_shaper: this.#text_shaper,
-        });
+        painter_for_class[item.constructor].paint(this.gfx, layer, item);
     }
 }
