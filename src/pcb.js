@@ -23,6 +23,7 @@ class PCBViewer {
 
     constructor(canvas) {
         this.#cvs = canvas;
+        // @ts-ignore
         this.#renderer = new WebGL2Renderer(this.#cvs, board_colors.background);
 
         this.#cvs.addEventListener("click", (e) => {

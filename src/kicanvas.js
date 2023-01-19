@@ -45,7 +45,7 @@ class KicadSchematicElement extends HTMLElement {
         const sch_bb = this.renderer.bbox(this.sch).grow(2);
         this.renderer.fit_to_bbox(sch_bb);
 
-        this.setAttribute("loaded", true);
+        this.setAttribute("loaded", "true");
     }
 
     gather_selectable_items() {
@@ -95,7 +95,7 @@ class KicadSchematicElement extends HTMLElement {
 
         if (this.hasAttribute("id") && this.selected.length == 1) {
             const ref = this.selected[0].context.properties.Reference.value;
-            const url = new URL(window.location);
+            const url = new URL(window.location.href);
             url.hash = `#${this.getAttribute("id")}:${ref}`;
             window.history.pushState({}, "", url);
         }

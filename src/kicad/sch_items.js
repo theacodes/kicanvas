@@ -3,6 +3,7 @@
     Published under the standard MIT License.
     Full text available at: https://opensource.org/licenses/MIT
 */
+// @ts-nocheck
 
 /*
     References:

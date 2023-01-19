@@ -4,5 +4,15 @@
     "css.lint.float": "warning",
     "css.lint.ieHack": "error",
     "css.lint.important": "warning",
-    "eslint.alwaysShowStatus": false
+    "eslint.alwaysShowStatus": false,
+    "files.exclude": {
+        "**/*.js": {
+            "when": "$(basename).ts"
+        }
+    },
+    "cSpell.words": [
+        "bboxes",
+        "decidegrees",
+        "sexpr"
+    ]
 }

@@ -76,7 +76,7 @@ export class BBox {
 
     /**
      * Combine two or more BBoxes into a new BBox that contains both
-     * @param {Array.<BBox>} boxes
+     * @param {IterableIterator.<BBox>} boxes
      * @param {*?} context
      * @returns {BBox}
      */

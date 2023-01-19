@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+// @ts-nocheck
+
 import * as items from "../kicad/sch_items.js";
 import { Arc } from "../math/arc.js";
 import { TransformStack } from "../math/transform_stack.js";
