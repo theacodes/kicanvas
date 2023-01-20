@@ -4,22 +4,19 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Matrix3 } from "../math/matrix3.js";
 import { Vec2 } from "../math/vec2.js";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Camera2 } from "./camera2.js";
+
+export type PanAndZoomCallback = (() => void);
 
 /**
  * Interactive Pan and Zoom helper
  */
 export class PanAndZoom {
-    #target;
-    #camera;
-    #callback;
-    #min_zoom;
-    #max_zoom;
     #panning = false;
-    #rect;
-    #pan_inv_matrix;
+    #rect: DOMRect;
+    #pan_inv_matrix: Matrix3;
     #pan_center = new Vec2(0, 0);
     #pan_mouse = new Vec2(0, 0);
 
@@ -32,21 +29,16 @@ export class PanAndZoom {
      * @param {number} max_zoom
      */
     constructor(
-        target,
-        camera,
-        callback = () => {},
-        min_zoom = 0.5,
-        max_zoom = 10
+        public readonly target: HTMLElement,
+        public camera: Camera2,
+        public callback: PanAndZoomCallback,
+        public min_zoom = 0.5,
+        public max_zoom = 10
     ) {
-        this.#target = target;
-        this.#camera = camera;
-        this.#callback = callback;
-        this.#min_zoom = min_zoom;
-        this.#max_zoom = max_zoom;
 
-        this.#target.addEventListener("mousedown", (e) => {
+        this.target.addEventListener("mousedown", (e) => {
             e.preventDefault();
-            this.#rect = this.#target.getBoundingClientRect();
+            this.#rect = this.target.getBoundingClientRect();
             this.#start_pan(this.#relative_mouse_pos(e));
         });
 
@@ -59,9 +51,9 @@ export class PanAndZoom {
             this.#continue_pan(this.#relative_mouse_pos(e));
         });
 
-        this.#target.addEventListener("wheel", (e) => {
+        this.target.addEventListener("wheel", (e) => {
             e.preventDefault();
-            this.#rect = this.#target.getBoundingClientRect();
+            this.#rect = this.target.getBoundingClientRect();
             this.#handle_zoom(e.deltaY, this.#relative_mouse_pos(e));
         });
     }
@@ -74,30 +66,40 @@ export class PanAndZoom {
     }
 
     #start_pan(mouse) {
-        const mouse_world = this.#camera.screen_to_world(mouse);
+        const mouse_world = this.camera.screen_to_world(mouse);
         this.#pan_mouse.set(mouse_world);
-        this.#pan_center.set(this.#camera.center);
-        this.#pan_inv_matrix = this.#camera.matrix.inverse();
+        this.#pan_center.set(this.camera.center);
+        this.#pan_inv_matrix = this.camera.matrix.inverse();
         this.#panning = true;
     }
 
     #continue_pan(mouse) {
         const mouse_world = this.#pan_inv_matrix.transform(mouse);
         const delta = mouse_world.sub(this.#pan_mouse);
-        this.#camera.center.set(this.#pan_center.sub(delta));
-        this.#callback();
+
+        this.camera.center.set(this.#pan_center.sub(delta));
+
+        if (this.callback) {
+            this.callback();
+        }
     }
 
     #handle_zoom(delta, mouse) {
-        const mouse_world = this.#camera.screen_to_world(mouse);
-        this.#camera.zoom *= Math.exp(delta * -0.001);
-        this.#camera.zoom = Math.min(
-            this.#max_zoom,
-            Math.max(this.#camera.zoom, this.#min_zoom)
+        const mouse_world = this.camera.screen_to_world(mouse);
+
+        this.camera.zoom *= Math.exp(delta * -0.001);
+        this.camera.zoom = Math.min(
+            this.max_zoom,
+            Math.max(this.camera.zoom, this.min_zoom)
         );
-        const new_world = this.#camera.screen_to_world(mouse);
+
+        const new_world = this.camera.screen_to_world(mouse);
         const center_delta = mouse_world.sub(new_world);
-        this.#camera.translate(center_delta);
-        this.#callback();
+
+        this.camera.translate(center_delta);
+
+        if (this.callback) {
+            this.callback();
+        }
     }
 }

@@ -7,7 +7,7 @@
 import { rgba_to_f4 } from "../gfx/colorspace.js";
 
 export const board = {
-    get_layer_color(layer_name) {
+    get_layer_color(layer_name: string) {
         switch (layer_name) {
             case ":Via:Holes":
                 return this.via_hole;

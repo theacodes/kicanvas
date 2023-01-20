@@ -21,16 +21,15 @@
 import { VertexArray, ShaderProgram, Buffer } from "./gl.js";
 import { Vec2 } from "../math/vec2.js";
 import earcut from "../../third_party/earcut/earcut.js";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Matrix3 } from "../math/matrix3.js";
+import { ColorF4 } from "./colorspace.js";
 
 /** Circle primitive data */
 export class Circle {
     /**
      * Create a filled circle
-     * @param color - normalized array of rgba
      */
-    constructor(public point: Vec2, public radius: number, public color: number[]) {
+    constructor(public point: Vec2, public radius: number, public color: ColorF4) {
     }
 }
 
@@ -40,23 +39,21 @@ export class Polyline {
      * Create a stroked polyline
      * @param points - line segment points
      * @param width - thickness of the rendered line
-     * @param color - normalized array of rgba
      */
-    constructor(public points: Vec2[], public width: number, public color: number[]) {
+    constructor(public points: Vec2[], public width: number, public color: ColorF4) {
     }
 }
 
 /** Polygon primitive data */
 export class Polygon {
-    vertices: Float32Array = null;
+    vertices: Float32Array;
 
     /**
      * Create a filled polygon
      * @param points - point cloud representing the polygon
-     * @param color - normalized array of rgba
      */
-    constructor(public points: Vec2[], public color: number[]) {
-    }
+    constructor(public points: Vec2[], public color: ColorF4) { }
+
     /**
      * Convert a point cloud polygon into an array of triangles.
      * Populates this.vertices with the triangles and clears this.points.
@@ -102,10 +99,10 @@ class Tesselator {
 
     /**
      * Convert a quad to two triangles that cover the same area
-     * @param {Array.<Vec2>} quad - four points defining the quad
-     * @returns {number[]} - six points representing two triangles
+     * @param quad four points defining the quad
+     * @returns six points representing two triangles
      */
-    static quad_to_triangles(quad) {
+    static quad_to_triangles(quad: [Vec2, Vec2, Vec2, Vec2]): number[] {
         const positions = [
             ...quad[0],
             ...quad[2],
@@ -126,12 +123,13 @@ class Tesselator {
 
     /**
      * Populate an array with repeated copies of the given color
-     * @param {Float32Array} dest
-     * @param {number[]} color - normalized rgba values
-     * @param {number} offset
-     * @param {number} length
      */
-    static populate_color_data(dest, color, offset, length) {
+    static populate_color_data(
+        dest: Float32Array,
+        color: ColorF4,
+        offset: number,
+        length: number
+    ) {
         if (!color) {
             color = [1, 0, 0, 1];
         }
@@ -142,12 +140,9 @@ class Tesselator {
 
     /**
      * Tesselate a line segment into a quad
-     * @param {Vec2} p1
-     * @param {Vec2} p2
-     * @param {number} width
-     * @returns {Array.<Vec2>} four points representing the line segment.
+     * @returns four points representing the line segment.
      */
-    static tesselate_segment(p1, p2, width) {
+    static tesselate_segment(p1: Vec2, p2: Vec2, width: number): [Vec2, Vec2, Vec2, Vec2] {
         const line = p2.sub(p1);
         const norm = line.normal.normalize();
         const n = norm.multiply(width / 2);
@@ -163,10 +158,8 @@ class Tesselator {
 
     /**
      * Tesselate a Polyline into renderable data.
-     * @param {Polyline} polyline
-     * @returns {{position_array: Float32Array, cap_array: Float32Array, color_array: Float32Array}}
      */
-    static tesselate_polyline(polyline) {
+    static tesselate_polyline(polyline: Polyline) {
         const width = polyline.width || 0;
         const points = polyline.points;
         const color = polyline.color;
@@ -216,10 +209,9 @@ class Tesselator {
 
     /**
      * Tesselate a circle into a quad
-     * @param {Circle} circle
-     * @returns {Array.<Vec2>} four points representing the quad
+     * @returns four points representing the quad
      */
-    static tesselate_circle(circle) {
+    static tesselate_circle(circle: Circle): [Vec2, Vec2, Vec2, Vec2] {
         const n = new Vec2(circle.radius, 0);
         const n2 = n.normal;
 
@@ -233,10 +225,8 @@ class Tesselator {
 
     /**
      * Tesselate an array of circles into renderable data
-     * @param {Circle[]} circles
-     * @returns {{position_array: Float32Array, cap_array: Float32Array, color_array: Float32Array}}
      */
-    static tesselate_circles(circles) {
+    static tesselate_circles(circles: Circle[]) {
         const vertex_count = circles.length * this.vertices_per_quad;
         const position_data = new Float32Array(vertex_count * 2);
         const cap_data = new Float32Array(vertex_count);
@@ -278,8 +268,6 @@ class Tesselator {
  */
 export class CircleSet {
     static shader;
-    gl: WebGL2RenderingContext;
-    shader: ShaderProgram;
     vao: VertexArray;
     position_buf: Buffer;
     cap_region_buf: Buffer;
@@ -288,9 +276,8 @@ export class CircleSet {
 
     /**
      * Load the shader program required to render this primitive.
-     * @param {WebGL2RenderingContext} gl
      */
-    static async load_shader(gl) {
+    static async load_shader(gl: WebGL2RenderingContext) {
         // This re-uses the same shader that polyline uses, since the polyline
         // is pill-shaped, circle is just a special case of a zero-length polyline.
         this.shader = await ShaderProgram.load(
@@ -303,12 +290,10 @@ export class CircleSet {
 
     /**
      * Create a new circle set.
-     * @param {WebGL2RenderingContext} gl
-     * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
+     * @param shader - optional override for the shader program used when drawing.
      */
-    constructor(gl, shader = null) {
-        this.gl = gl;
-        this.shader = shader ?? CircleSet.shader;
+    constructor(public gl: WebGL2RenderingContext, public shader: ShaderProgram = null) {
+        this.shader ??= CircleSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
@@ -328,9 +313,8 @@ export class CircleSet {
 
     /**
      * Tesselate an array of circles and upload them to the GPU.
-     * @param {Circle[]} circles
      */
-    set(circles) {
+    set(circles: Circle[]) {
         const { position_array, cap_array, color_array } =
             Tesselator.tesselate_circles(circles);
         this.position_buf.set(position_array);
@@ -353,8 +337,6 @@ export class CircleSet {
  */
 export class PolylineSet {
     static shader;
-    gl: WebGL2RenderingContext;
-    shader: ShaderProgram;
     vao: VertexArray;
     position_buf: Buffer;
     cap_region_buf: Buffer;
@@ -363,9 +345,8 @@ export class PolylineSet {
 
     /**
      * Load the shader program required to render this primitive.
-     * @param {WebGL2RenderingContext} gl
      */
-    static async load_shader(gl) {
+    static async load_shader(gl: WebGL2RenderingContext) {
         this.shader = await ShaderProgram.load(
             gl,
             "polyline",
@@ -379,9 +360,8 @@ export class PolylineSet {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(gl, shader = null) {
-        this.gl = gl;
-        this.shader = shader ?? PolylineSet.shader;
+    constructor(public gl: WebGL2RenderingContext, public shader: ShaderProgram = null) {
+        this.shader ??= PolylineSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
@@ -401,11 +381,10 @@ export class PolylineSet {
 
     /**
      * Tesselate an array of polylines and upload them to the GPU.
-     * @param {Polyline[]} lines
      */
-    set(lines) {
+    set(lines: Polyline[]) {
         if (!lines.length) {
-            return false;
+            return;
         }
 
         const vertex_count = lines.reduce((v, e) => {
@@ -455,8 +434,6 @@ export class PolylineSet {
  */
 export class PolygonSet {
     static shader;
-    gl: WebGL2RenderingContext;
-    shader: ShaderProgram;
     vao: VertexArray;
     position_buf: Buffer;
     color_buf: Buffer;
@@ -464,9 +441,8 @@ export class PolygonSet {
 
     /**
      * Load the shader program required to render this primitive.
-     * @param {WebGL2RenderingContext} gl
      */
-    static async load_shader(gl) {
+    static async load_shader(gl: WebGL2RenderingContext) {
         this.shader = await ShaderProgram.load(
             gl,
             "polygon",
@@ -480,9 +456,8 @@ export class PolygonSet {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(gl, shader = null) {
-        this.gl = gl;
-        this.shader = shader || PolygonSet.shader;
+    constructor(public gl: WebGL2RenderingContext, public shader: ShaderProgram = null) {
+        this.shader ??= PolygonSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
         this.color_buf = this.vao.buffer(this.shader.a_color, 4);
@@ -504,10 +479,8 @@ export class PolygonSet {
      * This is a helper function for debugging. It allows easily drawing the
      * outlines of the results of triangulation.
      *
-     * @param {Float32Array} triangles
-     * @returns {Polyline[]}
      */
-    static polyline_from_triangles(triangles, width, color) {
+    static polyline_from_triangles(triangles: Float32Array, width: number, color: ColorF4): Polyline[] {
         const lines = [];
         for (let i = 0; i < triangles.length; i += 6) {
             const a = new Vec2(triangles[i], triangles[i + 1]);
@@ -520,9 +493,8 @@ export class PolygonSet {
 
     /**
      * Tesselate (triangulate) and upload a list of polygons to the GPU.
-     * @param {Polygon[]} polygons
      */
-    set(polygons) {
+    set(polygons: Polygon[]) {
         let total_vertex_data_length = 0;
 
         for (const polygon of polygons) {
@@ -585,8 +557,6 @@ export class PolygonSet {
  *
  */
 export class PrimitiveSet {
-    gl;
-
     #polygons = [];
     #circles = [];
     #lines = [];
@@ -597,9 +567,8 @@ export class PrimitiveSet {
 
     /**
      * Load all shader programs required to render primitives.
-     * @param {WebGL2RenderingContext} gl
      */
-    static async load_shaders(gl) {
+    static async load_shaders(gl: WebGL2RenderingContext) {
         await Promise.all([
             PolygonSet.load_shader(gl),
             PolylineSet.load_shader(gl),
@@ -609,9 +578,8 @@ export class PrimitiveSet {
 
     /**
      * Create a new primitive set
-     * @param {WebGL2RenderingContext} gl
      */
-    constructor(gl) {
+    constructor(public gl: WebGL2RenderingContext) {
         this.gl = gl;
     }
 
@@ -626,11 +594,8 @@ export class PrimitiveSet {
 
     /**
      * Collect a new filled circle
-     * @param {Vec2} point
-     * @param {number} radius
-     * @param {number[]} color - normalized rgba values
      */
-    add_circle(point, radius, color) {
+    add_circle(point: Vec2, radius: number, color: ColorF4) {
         this.#circles.push({
             point: point,
             radius: radius,
@@ -649,11 +614,8 @@ export class PrimitiveSet {
 
     /**
      * Collect a new polyline
-     * @param {Array.<Vec2>} points
-     * @param {number} width
-     * @param {number[]} color - normalized rgba values
      */
-    add_line(points, width, color) {
+    add_line(points: Vec2[], width: number, color: ColorF4) {
         this.#lines.push({
             points: points,
             width: width,
@@ -684,10 +646,10 @@ export class PrimitiveSet {
 
     /**
      * Draw all the previously commit()ed primitives
-     * @param {Matrix3} matrix - complete view/projection matrix
-     * @param {number} depth - used for depth testing
+     * @param matrix - complete view/projection matrix
+     * @param depth - used for depth testing
      */
-    draw(matrix, depth = 0) {
+    draw(matrix: Matrix3, depth = 0) {
         if (this.#polygon_set) {
             this.#polygon_set.shader.bind();
             this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);

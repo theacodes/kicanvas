@@ -9,14 +9,14 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Camera2 } from "./camera2.js";
 import { PanAndZoom } from "./pan_and_zoom.js";
 import { CanvasSizeObserver } from "./canvas_size_observer.js";
+import { WebGL2Renderer } from "./renderer.js";
+import { Angle } from "../math/angle.js";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view
  * into a scene.
  */
 export class Viewport {
-    renderer;
-    #callback;
     width;
     height;
     camera;
@@ -24,23 +24,26 @@ export class Viewport {
 
     /**
      * Create a Scene
-     * @param {*} renderer
-     * @param {*} callback - a callback used to re-draw the viewport when it changes.
+     * @param callback - a callback used to re-draw the viewport when it changes.
      */
-    constructor(renderer, callback) {
-        this.renderer = renderer;
-        this.#callback = callback;
+    constructor(public renderer: WebGL2Renderer, public callback: (() => void)) {
+        this.camera = new Camera2(
+            new Vec2(0, 0),
+            new Vec2(0, 0),
+            1,
+            new Angle(0));
 
-        this.camera = new Camera2(new Vec2(0, 0), new Vec2(0, 0), 1, 0);
-
-        new CanvasSizeObserver(this.renderer.canvas, (cw, ch, lw, lh) => {
-            this.resize(cw, ch, lw, lh);
-            this.#callback();
-        });
+        new CanvasSizeObserver(
+            this.renderer.canvas,
+            (cw, ch, lw, lh) => {
+                this.resize(cw, ch, lw, lh);
+                this.callback();
+            }
+        );
 
         this.resize(
             this.renderer.canvas.clientWidth,
-            this.renderer.canvas.clientWeight,
+            this.renderer.canvas.clientHeight,
             this.renderer.canvas.width,
             this.renderer.canvas.height
         );
@@ -48,12 +51,8 @@ export class Viewport {
 
     /**
      * Resize the viewport
-     * @param {number} logical_w
-     * @param {number} logical_h
-     * @param {number} display_w
-     * @param {number} display_h
      */
-    resize(logical_w, logical_h, display_w, display_h) {
+    resize(logical_w: number, logical_h: number, display_w: number, display_h: number) {
         this.renderer.set_viewport(0, 0, display_w, display_h);
 
         if (this.width != logical_w || this.height != logical_h) {
@@ -69,33 +68,25 @@ export class Viewport {
             this.renderer.canvas,
             this.camera,
             () => {
-                this.#callback();
+                this.callback();
             },
             min_zoom,
             max_zoom
         );
     }
 
-    /**
-     * @type {Matrix3}
-     */
-    get view_matrix() {
+    get view_matrix(): Matrix3 {
         return this.camera.matrix.inverse();
     }
 
-    /**
-     * @type {Matrix3}
-     */
-    get view_projection_matrix() {
+    get view_projection_matrix(): Matrix3 {
         return this.projection.multiply(this.view_matrix.inverse());
     }
 
     /**
      * Get clip space coordinates from screen coordinates
-     * @param {Vec2} v
-     * @returns {Vec2}
      */
-    screen_to_clip(v) {
+    screen_to_clip(v: Vec2): Vec2 {
         const x = 2 * (v.x / this.width) - 1;
         const y = -(2 * (v.y / this.height) - 1);
 
@@ -104,19 +95,15 @@ export class Viewport {
 
     /**
      * Get world space coordinates from clip coordinates
-     * @param {Vec2} v
-     * @returns {Vec2}
      */
-    clip_to_world(v) {
+    clip_to_world(v: Vec2): Vec2 {
         return this.view_projection_matrix.inverse().transform(v);
     }
 
     /**
      * Get screen space coordinates from world coordinates
-     * @param {Vec2} v
-     * @returns {Vec2}
      */
-    screen_to_world(v) {
+    screen_to_world(v: Vec2): Vec2 {
         return this.clip_to_world(this.screen_to_clip(v));
     }
 }

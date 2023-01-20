@@ -17,10 +17,6 @@
  *
  */
 class Uniform {
-    gl: WebGL2RenderingContext;
-    name: string;
-    location: WebGLUniformLocation;
-    type: GLenum;
 
     static _function_map = {
         f1: "uniform1f",
@@ -37,11 +33,11 @@ class Uniform {
         // TODO: I can also figure this out from the type
     };
 
-    constructor(gl, name, location, type) {
-        this.gl = gl;
-        this.name = name;
-        this.location = location;
-        this.type = type;
+    constructor(
+        public gl: WebGL2RenderingContext,
+        public name: string,
+        public location: WebGLUniformLocation,
+        public type: GLenum) {
 
         for (const [dst, src] of Object.entries(Uniform._function_map)) {
             this[dst] = (...args) => {
@@ -57,10 +53,6 @@ class Uniform {
 export class ShaderProgram {
     static #shader_cache = {};
 
-    gl: WebGL2RenderingContext;
-    name: string;
-    vertex: WebGLShader;
-    fragment: WebGLShader;
     program: WebGLProgram;
 
     /** Shader uniforms
@@ -75,14 +67,16 @@ export class ShaderProgram {
 
     /**
      * Create and compile a shader program
-     * @param {WebGL2RenderingContext} gl
-     * @param {string} name - used for caching and identifying the shader
-     * @param {string|WebGLShader} vertex - vertex shader source code
-     * @param {string|WebGLShader} fragment - fragment shader source code
+     * @param name - used for caching and identifying the shader
+     * @param vertex - vertex shader source code
+     * @param fragment - fragment shader source code
      */
-    constructor(gl, name, vertex, fragment) {
-        this.gl = gl;
-        this.name = name;
+    constructor(
+        public gl: WebGL2RenderingContext,
+        public name: string,
+        public vertex: WebGLShader,
+        public fragment: WebGLShader
+    ) {
 
         if (typeof vertex === "string") {
             vertex = ShaderProgram.compile(gl, gl.VERTEX_SHADER, vertex);
@@ -106,13 +100,14 @@ export class ShaderProgram {
     /**
      * Load vertex and fragment shader sources from URLs and compile them
      * into a new ShaderProgram
-     * @param {WebGL2RenderingContext} gl
-     * @param {string} name - used for caching and identifying the shader.
-     * @param {URL|string} vert_url
-     * @param {URL|string} frag_url
-     * @returns
+     * @param name used for caching and identifying the shader.
      */
-    static async load(gl, name, vert_url, frag_url) {
+    static async load(
+        gl: WebGL2RenderingContext,
+        name: string,
+        vert_url: URL | string,
+        frag_url: URL | string
+    ): Promise<ShaderProgram> {
         if (!this.#shader_cache[name]) {
             const vert = await (
                 await fetch(new URL(vert_url, import.meta.url))
@@ -131,12 +126,11 @@ export class ShaderProgram {
      *
      * Typically not used directly, use load() instead.
      *
-     * @param {WebGL2RenderingContext} gl
-     * @param {GLenum} type - gl.FRAGMENT_SHADER or gl.VERTEX_SHADER
-     * @param {string} source
-     * @returns {WebGLShader}
+     * @param gl
+     * @param type - gl.FRAGMENT_SHADER or gl.VERTEX_SHADER
+     * @param source
      */
-    static compile(gl, type, source) {
+    static compile(gl: WebGL2RenderingContext, type: GLenum, source: string) {
         const shader = gl.createShader(type);
 
         if (shader == null) {
@@ -160,13 +154,8 @@ export class ShaderProgram {
      * Link a vertex and fragment shader into a shader program.
      *
      * Typically not used directly, use load() instead.
-     *
-     * @param {WebGL2RenderingContext} gl
-     * @param {WebGLShader} vertex
-     * @param {WebGLShader} fragment
-     * @returns {WebGLShader}
      */
-    static link(gl, vertex, fragment) {
+    static link(gl: WebGL2RenderingContext, vertex: WebGLShader, fragment: WebGLShader) {
         const program = gl.createProgram();
 
         if (program == null) {
@@ -254,19 +243,14 @@ export class ShaderProgram {
  * Manages vertex array objects (VAOs) and associated buffers.
  */
 export class VertexArray {
-    gl: WebGL2RenderingContext;
     vao: WebGLVertexArrayObject;
-
-    /**
-     * @type {Buffer[]}
-     */
-    buffers = [];
+    buffers: Buffer[] = [];
 
     /**
      * Create a VertexArray
      * @param {WebGL2RenderingContext} gl
      */
-    constructor(gl) {
+    constructor(public gl: WebGL2RenderingContext) {
         this.gl = gl;
         this.vao = this.gl.createVertexArray();
         this.bind();
@@ -274,7 +258,7 @@ export class VertexArray {
 
     /**
      * Free WebGL resources
-     * @param {boolean} include_buffers
+     * @param include_buffers
      */
     dispose(include_buffers = true) {
         this.gl.deleteVertexArray(this.vao);
@@ -293,25 +277,24 @@ export class VertexArray {
 
     /**
      * Create a new buffer bound to this vertex array
-     * @param {GLint} attrib - shader attribute location
-     * @param {GLint} size - number of components per vertex attribute
-     * @param {GLenum?} type - data type for each component, if unspecified it's gl.FLOAT.
-     * @param {GLboolean} normalized - whether or not to normalize integer types when converting to float
-     * @param {GLsizei} stride - offset between consecutive attributes
-     * @param {GLintptr} offset - offset from the beginning of the array to the first attribute
-     * @param {GLenum?} target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
+     * @param attrib - shader attribute location
+     * @param size - number of components per vertex attribute
+     * @param type - data type for each component, if unspecified it's gl.FLOAT.
+     * @param normalized - whether or not to normalize integer types when converting to float
+     * @param stride - offset between consecutive attributes
+     * @param offset - offset from the beginning of the array to the first attribute
+     * @param target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
-     * @returns {Buffer}
      */
     buffer(
-        attrib,
-        size,
-        type = null,
-        normalized = false,
-        stride = 0,
-        offset = 0,
-        target = null
-    ) {
+        attrib: GLint,
+        size: GLint,
+        type: GLenum = null,
+        normalized: GLboolean = false,
+        stride: GLsizei = 0,
+        offset: GLintptr = 0,
+        target: GLenum = null
+    ): Buffer {
         type ??= this.gl.FLOAT;
 
         const b = new Buffer(this.gl, target);
@@ -333,21 +316,31 @@ export class VertexArray {
     }
 }
 
+export type TypedArray =
+    | Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array;
+
+export type TypedArrayLike = TypedArray | DataView | ArrayBuffer | SharedArrayBuffer;
+
 /**
  * Manages a buffer of GPU data like vertices or colors
  */
 export class Buffer {
-    gl: WebGL2RenderingContext;
-    target: GLenum;
-    #buf;
+    #buf: WebGLBuffer;
 
     /**
      * Create a new buffer
-     * @param {WebGL2RenderingContext} gl
-     * @param {GLenum?} target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
+     * @param target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
      */
-    constructor(gl, target = null) {
+    constructor(public gl: WebGL2RenderingContext, public target: GLenum = null) {
         this.gl = gl;
         this.target = target ?? gl.ARRAY_BUFFER;
         this.#buf = gl.createBuffer();
@@ -368,10 +361,10 @@ export class Buffer {
     /**
      * Uploads data to the GPU buffer
      *
-     * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|DataView|ArrayBuffer|SharedArrayBuffer} data
-     * @param {GLenum?} usage - intended usage pattern, typically gl.STATIC_DRAW (the default if unspecified) or gl.DYNAMIC_DRAW
+     * @param usage - intended usage pattern, typically gl.STATIC_DRAW
+     *      (the default if unspecified) or gl.DYNAMIC_DRAW
      */
-    set(data, usage = null) {
+    set(data: TypedArrayLike, usage: GLenum = null) {
         this.bind();
         usage ??= this.gl.STATIC_DRAW;
         this.gl.bufferData(this.target, data, usage);
@@ -379,10 +372,9 @@ export class Buffer {
 
     /**
      * Gets the length of the buffer as reported by WebGL.
-     * @returns {number}
      */
-    get length() {
+    get length(): number {
         this.bind();
-        return this.gl.getBufferParameter(this.target, this.gl.BUFFER_SIZE);
+        return this.gl.getBufferParameter(this.target, this.gl.BUFFER_SIZE) as number;
     }
 }

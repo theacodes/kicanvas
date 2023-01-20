@@ -6,7 +6,7 @@
 
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
-import { Angle } from "../math/angle.js";
+import { Angle, AngleLike } from "../math/angle.js";
 import { BBox } from "../math/bbox.js";
 
 /**
@@ -18,10 +18,6 @@ import { BBox } from "../math/bbox.js";
  * graphics backend you're using.
  */
 export class Camera2 {
-    viewport_size;
-    center;
-    zoom;
-    rotation;
 
     /**
      * Create a camera
@@ -31,22 +27,17 @@ export class Camera2 {
      * @param {number|Angle} rotation - Rotation (roll) in radians.
      */
     constructor(
-        viewport_size = new Vec2(0, 0),
-        center = new Vec2(0, 0),
-        zoom = 1,
-        rotation = 0
-    ) {
-        this.center = center;
-        this.viewport_size = viewport_size;
-        this.rotation = new Angle(rotation);
-        this.zoom = zoom;
-    }
+        public viewport_size: Vec2 = new Vec2(0, 0),
+        public center: Vec2 = new Vec2(0, 0),
+        public zoom: number = 1,
+        public rotation: Angle = new Angle(0),
+    ) { }
 
     /**
      * Relative translation
-     * @param {Vec2} v
+     * @param v
      */
-    translate(v) {
+    translate(v: Vec2) {
         this.center.x += v.x;
         this.center.y += v.y;
     }
@@ -55,15 +46,14 @@ export class Camera2 {
      * Relative rotation
      * @param {Angle|number} a - rotation in radians
      */
-    rotate(a) {
+    rotate(a: AngleLike) {
         this.rotation = this.rotation.add(a);
     }
 
     /**
      * Complete transformation matrix.
-     * @returns {Matrix3}
      */
-    get matrix() {
+    get matrix(): Matrix3 {
         const mx = this.viewport_size.x / 2;
         const my = this.viewport_size.y / 2;
         const dx = this.center.x - this.center.x * this.zoom;
@@ -77,9 +67,8 @@ export class Camera2 {
 
     /**
      * Bounding box representing the camera's view
-     * @returns {BBox}
      * */
-    get bbox() {
+    get bbox(): BBox {
         const m = this.matrix.inverse();
         const start = m.transform(new Vec2(0, 0));
         const end = m.transform(
@@ -91,9 +80,8 @@ export class Camera2 {
     /**
      * Move the camera and adjust zoom so that the given bounding box is in
      * view.
-     * @param {BBox} bbox
      */
-    set bbox(bbox) {
+    set bbox(bbox: BBox) {
         const zoom_w = this.viewport_size.x / bbox.w;
         const zoom_h = this.viewport_size.y / bbox.h;
         const center_x = bbox.x + bbox.w / 2;
@@ -123,10 +111,8 @@ export class Camera2 {
      *
      * A simple convenience method that sets the canvas's transform to
      * the camera's transformation matrix.
-     *
-     * @param {CanvasRenderingContext2D} ctx
      */
-    apply_to_canvas(ctx) {
+    apply_to_canvas(ctx: CanvasRenderingContext2D) {
         this.viewport_size.set(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
         const m = Matrix3.from_DOMMatrix(ctx.getTransform());
         m.multiply_self(this.matrix);
@@ -135,20 +121,15 @@ export class Camera2 {
 
     /**
      * Transform screen coordinates to world coordinates
-     *
-     * @param {Vec2} v
-     * @returns {Vec2}
      */
-    screen_to_world(v) {
+    screen_to_world(v: Vec2): Vec2 {
         return this.matrix.inverse().transform(v);
     }
 
     /**
      * Transform world coordinates to screen coordinates
-     * @param {Vec2} v
-     * @returns {Vec2}
      */
-    world_to_screen(v) {
+    world_to_screen(v: Vec2): Vec2 {
         return this.matrix.transform(v);
     }
 }

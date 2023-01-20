@@ -18,8 +18,10 @@ class GlyphData {
     /**
      * Create Glyph data
      */
-    constructor(public strokes: number[][][], public width: number, public bbox: { start: number[], end: number[] }) {
-    }
+    constructor(
+        public strokes: number[][][],
+        public width: number,
+        public bbox: { start: number[], end: number[] }) { }
 }
 
 /**
@@ -47,11 +49,8 @@ export class Font {
 
     /**
      * Get the glyph data for a given glyph.
-     * @param {string} chr
-     * @param {string} subsitute
-     * @returns {GlyphData}
      */
-    glyph(chr, subsitute = "?") {
+    glyph(chr: string, subsitute = "?"): GlyphData {
         return (
             this.glyphs.at(chr.charCodeAt(0) - 32) ??
             this.glyphs.at(subsitute.charCodeAt(0) - 32)
@@ -68,7 +67,7 @@ export class Font {
     /**
      * Get overbar line data for the given glyph
      */
-    overbar_for(glyph: GlyphData, italic: boolean) {
+    overbar_for(glyph: GlyphData, italic: boolean): GlyphData {
         const start = [0, -this.overbar_position_factor];
         const end = [glyph.bbox.end[0], start[1]];
 
@@ -90,7 +89,12 @@ export class ShapedGlyph {
     /**
      * Create a ShapedGlyph
      */
-    constructor(public glyph: GlyphData, public position: Vec2, public size: Vec2, public tilt: number = 0) {
+    constructor(
+        public glyph: GlyphData,
+        public position: Vec2,
+        public size: Vec2,
+        public tilt: number = 0
+    ) {
         this.glyph = glyph;
         this.position = position;
         this.size = size;
@@ -105,7 +109,11 @@ export class ShapedGlyph {
      * Yields points from a given stroke transformed by the given matrix
      * and tilt.
      */
-    static *points(matrix: Matrix3, stroke: number[][], tilt: number) {
+    static *points(
+        matrix: Matrix3,
+        stroke: number[][],
+        tilt: number
+    ) {
         for (const point of stroke) {
             const pt = new Vec2(...point);
             if (tilt) {
@@ -117,8 +125,6 @@ export class ShapedGlyph {
 
     /**
      * Yields line segments representing this glyph's strokes
-     * @param {Matrix3} matrix
-     * @yields {Array.<Vec2>[]}
      */
     *strokes(matrix: Matrix3) {
         const full_matrix = matrix.multiply(this.matrix);
@@ -136,7 +142,12 @@ export class ShapedLine {
     /**
      * Create a ShapedLine
      */
-    constructor(public font: Font, public size: Vec2, public thickness: number, public italic: boolean, public shaped_glyphs: ShapedGlyph[]) { }
+    constructor(
+        public font: Font,
+        public size: Vec2,
+        public thickness: number,
+        public italic: boolean,
+        public shaped_glyphs: ShapedGlyph[]) { }
 
     /**
      * Yields line segments needed to draw every glyph that makes up this line
@@ -148,7 +159,7 @@ export class ShapedLine {
         }
     }
 
-    get extents() {
+    get extents(): Vec2 {
         // This tries to match KiCAD's STROKE_FONT::ComputeStringBoundaryLimits,
         // which seems to totally ignore the glyph vertical extents for some reason.
         // this means the returned bbox is at the text's *baseline*. If there's some
@@ -197,7 +208,7 @@ export class TextShaper {
     /**
      * Shapes a single line.
      */
-    line(text: string, size: Vec2, thickness: number, italic: boolean) {
+    line(text: string, size: Vec2, thickness: number, italic: boolean): ShapedLine {
         // Loosely based on KiCAD's STROKE_FONT::drawSingleLineText
 
         const out = [];

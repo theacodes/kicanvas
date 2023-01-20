@@ -9,7 +9,7 @@ import * as pcb_items from "./kicad/pcb_items.js";
 import { Viewport } from "./gfx/viewport.js";
 import * as pcb_view from "./pcb/view.js";
 import { WebGL2Renderer } from "./gfx/renderer.js";
-import { f4_to_rgba } from "./gfx/colorspace.js";
+import { ColorF4, f4_to_rgba } from "./gfx/colorspace.js";
 import { board as board_colors } from "./pcb/colors.js";
 import { Vec2 } from "./math/vec2.js";
 import { TextShaper } from "./gfx/text.js";
@@ -26,7 +26,9 @@ class PCBViewer {
 
     constructor(canvas) {
         this.#cvs = canvas;
-        this.#renderer = new WebGL2Renderer(this.#cvs, board_colors.background);
+        this.#renderer = new WebGL2Renderer(
+            this.#cvs,
+            board_colors.background as unknown as ColorF4);
 
         this.#cvs.addEventListener("click", (e) => {
             const rect = this.#cvs.getBoundingClientRect();
@@ -206,7 +208,7 @@ class KicadPCBLayerControls extends HTMLElement {
         for (const layer of viewer.layers.in_ui_order()) {
             const visible = layer.visible ? "yes" : "no";
             const color = layer.color;
-            const css_color = f4_to_rgba([...color.slice(0, 3), 1]);
+            const css_color = f4_to_rgba([...color.slice(0, 3), 1] as ColorF4);
             buttons.push(`
                 <button type="button" name="${layer.name}" visible="${visible}">
                     <span class="color" style="background-color: ${css_color};"></span>

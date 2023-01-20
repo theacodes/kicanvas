@@ -1,6 +1,6 @@
 import { PrimitiveSet } from "./primitives.js";
 import { Matrix3 } from "../math/matrix3.js";
-import { f4_to_rgba } from "./colorspace.js";
+import { ColorF4, f4_to_rgba } from "./colorspace.js";
 import { BBox } from "../math/bbox.js";
 import { Vec2 } from "../math/vec2.js";
 
@@ -8,47 +8,31 @@ import { Vec2 } from "../math/vec2.js";
  * WebGL2-based renderer
  */
 export class WebGL2Renderer {
-    /** Transformation stack
-     * @type {Array.<Matrix3>}
-     */
-    #transform_stack = [Matrix3.identity()];
+    /** Transformation stack */
+    #transform_stack: Matrix3[] = [Matrix3.identity()];
 
-    /** Graphics layers
-     * @type {Array.<PrimitiveSet>}
-     */
-    #layers = [];
+    /** Graphics layers */
+    #layers: PrimitiveSet[] = [];
 
-    /** The layer currently being drawn to.
-     * @type {PrimitiveSet?}
-     */
-    #active_layer;
-
-    /** The color of the viewport & canvas background. */
-    #background_color: [number, number, number, number];
+    /** The layer currently being drawn to. */
+    #active_layer: PrimitiveSet = null;
 
     /** A list of points belonging to the object that's currently being drawn,
      * used to calculate object BBox.
-     * @type {Array.<Vec2>?}
-     */
-    #current_object_points;
+     * */
+    #current_object_points: Vec2[] = null;
 
     /**
      * Context available to anything that uses this renderer.
      */
-    context = {};
+    context: any = {};
 
-    canvas: HTMLCanvasElement;
     gl: WebGL2RenderingContext;
 
     /**
      * Create a new WebGL2Renderer
-     * @param {HTMLCanvasElement} canvas
-     * @param {[number, number, number, number]} background_color
      */
-    constructor(canvas, background_color) {
-        this.canvas = canvas;
-        this.#background_color = background_color;
-    }
+    constructor(public canvas: HTMLCanvasElement, public background_color: ColorF4) { }
 
     /**
      * Create and configure the WebGL2 context.
@@ -57,7 +41,7 @@ export class WebGL2Renderer {
         // just in case the browser still gives us a backbuffer with alpha,
         // set the background color of the canvas to black so that it behaves
         // correctly.
-        this.canvas.style.backgroundColor = f4_to_rgba(this.#background_color);
+        this.canvas.style.backgroundColor = f4_to_rgba(this.background_color);
 
         const gl = this.canvas.getContext("webgl2", { alpha: false });
 
@@ -73,7 +57,7 @@ export class WebGL2Renderer {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.GREATER);
 
-        gl.clearColor(...this.#background_color);
+        gl.clearColor(...this.background_color);
         gl.clearDepth(0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -85,12 +69,8 @@ export class WebGL2Renderer {
     /**
      * Update the WebGL2 context's viewport. Should be called whenever the size
      * of the underlying canvas element changes.
-     * @param {number} x
-     * @param {number} y
-     * @param {number} w
-     * @param {number} h
      */
-    set_viewport(x, y, w, h) {
+    set_viewport(x: number, y: number, w: number, h: number) {
         if (this.gl == null) throw new Error("Uninitialized");
         this.gl.viewport(x, y, w, h);
     }
@@ -104,26 +84,24 @@ export class WebGL2Renderer {
     }
 
     /**
-     * @returns {Matrix3} the current transformation matrix
+     * @returns the current transformation matrix
      */
-    get_transform() {
+    get_transform(): Matrix3 {
         return this.#transform_stack.at(-1) ?? Matrix3.identity();
     }
 
     /**
      * Set (or reset) the transformation matrix stack.
-     * @param {Matrix3?} mat
      */
-    set_transform(mat = null) {
+    set_transform(mat: Matrix3 = null) {
         this.#transform_stack = mat ? [mat] : [Matrix3.identity()];
     }
 
     /**
      * Save the current transformation matrix and push a new one onto the top
      * of the stack. The new matrix is multiplied by the old.
-     * @param {Matrix3} mat
      */
-    push_transform(mat) {
+    push_transform(mat: Matrix3) {
         this.#transform_stack.push(this.get_transform().multiply(mat));
     }
 
@@ -152,10 +130,8 @@ export class WebGL2Renderer {
      *
      * Performs any additional work needed such as tesselation and buffer
      * management.
-     *
-     * @returns {PrimitiveSet} the finished layer
      */
-    end_layer() {
+    end_layer(): PrimitiveSet {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         this.#active_layer.commit();
@@ -176,9 +152,9 @@ export class WebGL2Renderer {
 
     /**
      * Mark the end of an object.
-     * @returns {BBox} the drawn object's bounding box
+     * @returns the drawn object's bounding box
      */
-    end_object() {
+    end_object(): BBox {
         if (this.#current_object_points == null)
             throw new Error("No current object");
 
@@ -189,11 +165,8 @@ export class WebGL2Renderer {
 
     /**
      * Draw a circle
-     * @param {Vec2} point
-     * @param {number} radius
-     * @param {Array.<number>} color an array of [r, g, b, a] normalized color values.
      */
-    circle(point, radius, color) {
+    circle(point: Vec2, radius: number, color: ColorF4) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         point = this.get_transform().transform(point);
@@ -208,11 +181,8 @@ export class WebGL2Renderer {
 
     /**
      * Draw a polyline
-     * @param {Array.<Vec2>} points
-     * @param {number} width
-     * @param {Array.<number>} color an array of [r, g, b, a] normalized color values.
      */
-    line(points, width, color) {
+    line(points: Vec2[], width: number, color: ColorF4) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         points = Array.from(this.get_transform().transform_all(points));
@@ -225,10 +195,8 @@ export class WebGL2Renderer {
 
     /**
      * Draw a polygon
-     * @param {Array.<Vec2>} points
-     * @param {Array.<number>} color an array of [r, g, b, a] normalized color values.
      */
-    polygon(points, color) {
+    polygon(points: Vec2[], color: ColorF4) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         points = Array.from(this.get_transform().transform_all(points));
@@ -243,7 +211,6 @@ export class WebGL2Renderer {
 
     /**
      * Iterate through all layers
-     * @yields {PrimitiveSet}
      */
     *layers() {
         for (const layer of this.#layers) {

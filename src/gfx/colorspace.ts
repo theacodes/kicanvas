@@ -4,15 +4,16 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+export type ColorF4 = [number, number, number, number];
+
 /**
  * Convert hue, saturation, luminance, and alpha to red green blue alpha
- * @param {number} h - hue, in degrees
- * @param {number} s - saturation from 0 to 1
- * @param {number} l - luminance from 0 to 1
- * @param {number} a - alpha from 0 to 1
- * @returns {number[]} an array of normalized red, green, blue, and alpha values
+ * @param h - hue, in degrees
+ * @param s - saturation from 0 to 1
+ * @param l - luminance from 0 to 1
+ * @param a - alpha from 0 to 1
  */
-export function hsla_to_rgba(h, s, l, a) {
+export function hsla_to_rgba(h: number, s: number, l: number, a: number): ColorF4 {
     const k = (n) => (n + h / 30) % 12;
     const sl = s * Math.min(l, 1 - l);
     const f = (n) =>
@@ -22,10 +23,10 @@ export function hsla_to_rgba(h, s, l, a) {
 
 /**
  * Convert CSS rgb/rgba hex string to an array of normalized red, green, blue, alpha.
- * @param {string} rgba - css hex color string, such as #FFCCAA
- * @returns {number[]} an array of normalized red, green, blue, and alpha values
+ * @param rgba - css hex color string, such as #FFCCAA
+ * @returns an array of normalized red, green, blue, and alpha values
  */
-export function rgba_hex_to_f4(rgba) {
+export function rgba_hex_to_f4(rgba: string): ColorF4 {
     if (rgba[0] == "#") {
         rgba = rgba.slice(1);
     }
@@ -47,15 +48,14 @@ export function rgba_hex_to_f4(rgba) {
 
     const num_components = str_components.map((v) => parseInt(v, 16) / 255);
 
-    return num_components;
+    return num_components as ColorF4;
 }
 
 /**
  * Convert CSS rgb/rgba string to an array of normalized red, green, blue, alpha.
- * @param {string} rgba - css rgba color string, such as rgb(200, 100, 50)
- * @returns {number[]} an array of normalized red, green, blue, and alpha values
+ * @param rgba - css rgba color string, such as rgb(200, 100, 50)
  */
-export function rgba_to_f4(rgba) {
+export function rgba_to_f4(rgba: string): ColorF4 {
     if (!rgba.startsWith("rgba")) {
         rgba = `rgba(${rgba.slice(4, -1)}, 1)`;
     }
@@ -63,17 +63,15 @@ export function rgba_to_f4(rgba) {
     const parts = rgba.split(",").map((v) => parseFloat(v));
     const rgb = parts.slice(0, 3).map((v) => v / 255);
     const a = parts[3];
-    return [...rgb, a];
+    return [...rgb, a] as ColorF4;
 }
 
 /**
  * Converts an array of normalized red, green, blue, alpha values to a CSS
  * rgba color string.
- * @param {number[]} color - normalized color
- * @returns {string} css color string
+ * @param color - normalized color
+ * @returns css color string
  */
-export function f4_to_rgba(color) {
-    return `rgba(${color[0] * 255}, ${color[1] * 255}, ${color[2] * 255}, ${
-        color[3]
-    })`;
+export function f4_to_rgba(color: ColorF4): string {
+    return `rgba(${color[0] * 255}, ${color[1] * 255}, ${color[2] * 255}, ${color[3]})`;
 }
