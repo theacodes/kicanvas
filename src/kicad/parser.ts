@@ -11,24 +11,22 @@
 */
 
 import { Vec2 } from "../math/vec2.js";
-import * as Tokenizer from "./tokenizer.js";
+import { Token, tokenize } from "./tokenizer.js";
+
+type TokenType = symbol | symbol[];
 
 export class Parser {
-    /** @type {Generator<Tokenizer.Token>} */
-    tokens;
-
-    /** @type {Tokenizer.Token} */
-    token;
+    tokens: Generator<Token>;
+    token: Token;
 
     /**
      * Create a new Parser
-     * @param {string|Generator<Tokenizer.Token>} str_or_tokens
      */
-    constructor(str_or_tokens) {
-        if (typeof str_or_tokens === "string") {
-            this.tokens = Tokenizer.tokenize(str_or_tokens);
+    constructor(tokens: string | Generator<Token>) {
+        if (typeof tokens == "string") {
+            this.tokens = tokenize(tokens);
         } else {
-            this.tokens = str_or_tokens;
+            this.tokens = tokens;
         }
         this.next();
     }
@@ -37,11 +35,7 @@ export class Parser {
         this.token = this.tokens.next().value;
     }
 
-    /**
-     * @param {Symbol | Symbol[]} type
-     * @returns {Tokenizer.Token?}
-     */
-    accept(type) {
+    accept(type: TokenType): Token | null {
         if (!Array.isArray(type)) {
             type = [type];
         }
@@ -57,11 +51,7 @@ export class Parser {
         }
     }
 
-    /**
-     * @param {Symbol | Symbol[]} type
-     * @returns {Tokenizer.Token}
-     */
-    expect(type) {
+    expect(type: TokenType): Token {
         const token = this.accept(type);
         if (token === null) {
             throw new Error(`Unexpected token ${JSON.stringify(this.token)}`);
@@ -69,44 +59,37 @@ export class Parser {
         return token;
     }
 
-    /**
-     * @param {boolean} expect_open
-     * @returns {SExprParser}
-     */
-    _parse(expect_open = true) {
+    _parse(expect_open = true): SExprParser {
         const elements = [];
 
         if (expect_open) {
-            this.expect(Tokenizer.Token.OPEN);
+            this.expect(Token.OPEN);
         }
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
             const element = this.accept([
-                Tokenizer.Token.ATOM,
-                Tokenizer.Token.STRING,
-                Tokenizer.Token.NUMBER,
-                Tokenizer.Token.OPEN,
+                Token.ATOM,
+                Token.STRING,
+                Token.NUMBER,
+                Token.OPEN,
             ]);
 
             if (element === null) {
                 break;
-            } else if (element.type === Tokenizer.Token.OPEN) {
+            } else if (element.type === Token.OPEN) {
                 elements.push(this._parse((expect_open = false)));
             } else {
                 elements.push(element);
             }
         }
 
-        this.expect(Tokenizer.Token.CLOSE);
+        this.expect(Token.CLOSE);
 
         return new SExprParser(elements);
     }
 
-    /**
-     * @returns {SExprParser}
-     */
-    parse() {
+    parse(): SExprParser {
         const sexpr = this._parse();
 
         // A full document has one top-level s-expression.
@@ -125,18 +108,19 @@ export class Parser {
     }
 }
 
-type Element = Tokenizer.Token | SExprParser;
-type Unboxable = Tokenizer.Token | SExprParser | string | number;
+type ElementType = "list" | symbol;
+type Element = Token | SExprParser;
+type Unboxable = Token | SExprParser | string | number;
 type Unboxed = string | number | SExprParser;
+type Matchable = string | number;
 
 export class SExprParser {
     /**
      * Create an SExprParser
      */
-    constructor(public elements: Element[], public index: number = 0) {
-    }
+    constructor(public elements: Element[], public index: number = 0) { }
 
-    get element() {
+    get element(): Element {
         if (this.index > this.elements.length - 1) {
             return null;
         } else {
@@ -154,12 +138,12 @@ export class SExprParser {
     }
 
     unbox(value: Unboxable): Unboxed {
-        if (value instanceof Tokenizer.Token) {
+        if (value instanceof Token) {
             if (
                 [
-                    Tokenizer.Token.ATOM,
-                    Tokenizer.Token.STRING,
-                    Tokenizer.Token.NUMBER,
+                    Token.ATOM,
+                    Token.STRING,
+                    Token.NUMBER,
                 ].includes(value.type)
             ) {
                 return value.value;
@@ -179,21 +163,17 @@ export class SExprParser {
         }
     }
 
-    * rest() {
+    *rest() {
         while (this.element) {
             yield this.unbox(this.element);
             this.next();
         }
     }
 
-    /**
-     * @param {symbol|string?} type
-     * @param {*} match
-     * @returns {(Tokenizer.Token|SExprParser|number|string)?}
-     */
-    maybe(type, match = null) {
+    maybe(type: ElementType, match: Matchable = null): Unboxable {
         const e = this.element;
-        if (e instanceof Tokenizer.Token && e.type === type) {
+
+        if (e instanceof Token && e.type == type) {
             const value = this.unbox(e);
 
             if (match !== null) {
@@ -218,38 +198,19 @@ export class SExprParser {
         }
     }
 
-    /**
-     * @param {string?} match
-     * @returns {string?}
-     */
-    maybe_atom(match = null) {
-        return /** @type {string?} */ (this.maybe(Tokenizer.Token.ATOM, match));
+    maybe_atom(match: string = null): string | null {
+        return (this.maybe(Token.ATOM, match)) as string | null;
     }
 
-    /**
-     * @param {number?} match
-     * @returns {number?}
-     */
-    maybe_number(match = null) {
-        return /** @type {number?} */ (
-            this.maybe(Tokenizer.Token.NUMBER, match)
-        );
+    maybe_number(match: number = null): number | null {
+        return this.maybe(Token.NUMBER, match) as number | null;
     }
 
-    /**
-     * @param {string?} match
-     * @returns {string?}
-     */
-    maybe_string(match = null) {
-        return /** @type {string?} */ (
-            this.maybe(Tokenizer.Token.STRING, match)
-        );
+    maybe_string(match: string = null): string | null {
+        return this.maybe(Token.STRING, match) as string | null;
     }
 
-    /**
-     * @returns {SExprParser?}
-     */
-    maybe_list() {
+    maybe_list(): SExprParser | null {
         const e = this.maybe("list");
         if (e instanceof SExprParser) {
             return e;
@@ -258,12 +219,7 @@ export class SExprParser {
         }
     }
 
-    /**
-     * @param {symbol|string} type
-     * @param {*} match
-     * @returns {(Tokenizer.Token|SExprParser|number|string)}
-     */
-    expect(type, match = null) {
+    expect(type: ElementType, match: Matchable = null): Unboxable {
         const val = this.maybe(type, match);
 
         if (val === null) {
@@ -275,47 +231,23 @@ export class SExprParser {
         return val;
     }
 
-    /**
-     * @param {string?} match
-     * @returns {string}
-     */
-    expect_atom(match = null) {
-        return /** @type {string} */ (this.expect(Tokenizer.Token.ATOM, match));
+    expect_atom(match: string = null): string {
+        return (this.expect(Token.ATOM, match)) as string;
     }
 
-    /**
-     * @param {number?} match
-     * @returns {number}
-     */
-    expect_number(match = null) {
-        return /** @type {number} */ (
-            this.expect(Tokenizer.Token.NUMBER, match)
-        );
+    expect_number(match: number = null): number {
+        return (this.expect(Token.NUMBER, match)) as number;
     }
 
-    /**
-     * @param {string?} match
-     * @returns {string}
-     */
-    expect_string(match = null) {
-        return /** @type {string} */ (
-            this.expect(Tokenizer.Token.STRING, match)
-        );
+    expect_string(match: string = null): string {
+        return this.expect(Token.STRING, match) as string;
     }
 
-    /**
-     * @param {SExprParser?} match
-     * @returns {SExprParser}
-     */
-    expect_list(match = null) {
-        return /** @type {SExprParser} */ (this.expect("list", match));
+    expect_list(): SExprParser {
+        return (this.expect("list")) as SExprParser;
     }
 
-    /**
-     * @param {string} name
-     * @returns {SExprParser?}
-     */
-    maybe_expr(name) {
+    maybe_expr(name: string): SExprParser | null {
         const e = this.maybe_list();
 
         if (e === null) {
@@ -333,11 +265,7 @@ export class SExprParser {
         return e;
     }
 
-    /**
-     * @param {string} name
-     * @returns {SExprParser}
-     */
-    expect_expr(name) {
+    expect_expr(name: string) {
         const e = this.maybe_expr(name);
         if (e === null) {
             throw new Error(
@@ -349,11 +277,7 @@ export class SExprParser {
         return e;
     }
 
-    /**
-     * @param {string} name
-     * @yields {SExprParser}
-     */
-    * iter_exprs(name) {
+    *iter_exprs(name: string) {
         const start_index = this.index;
 
         for (const e of this.elements) {
@@ -366,12 +290,8 @@ export class SExprParser {
         this.index = start_index;
     }
 
-    /**
-     * @param {string} name
-     * @param {symbol|string?} type
-     * @returns {(Tokenizer.Token|SExprParser|number|string)?}
-     */
-    maybe_pair(name, type) {
+    maybe_pair(name: string, type: ElementType): Unboxable | null {
+
         const e = this.maybe_list();
 
         if (e === null) {
@@ -397,11 +317,7 @@ export class SExprParser {
         return v;
     }
 
-    /**
-     * @param {string} name
-     * @returns {(Tokenizer.Token|SExprParser|number|string)?}
-     */
-    maybe_pair_any(name) {
+    maybe_pair_any(name: string): Unboxed | null {
         const val = this.maybe_pair(name, null);
         if (val) {
             return this.unbox(val);
@@ -410,50 +326,23 @@ export class SExprParser {
         }
     }
 
-    /**
-     * @param {string} name
-     * @returns {string?}
-     */
-    maybe_pair_atom(name) {
-        return /** @type {string?} */ (
-            this.maybe_pair(name, Tokenizer.Token.ATOM)
-        );
+    maybe_pair_atom(name: string): string | null {
+        return this.maybe_pair(name, Token.ATOM) as string | null;
     }
 
-    /**
-     * @param {string} name
-     * @returns {string?}
-     */
-    maybe_pair_string(name) {
-        return /** @type {string?} */ (
-            this.maybe_pair(name, Tokenizer.Token.STRING)
-        );
+    maybe_pair_string(name: string): string | null {
+        return this.maybe_pair(name, Token.STRING) as string | null;
     }
 
-    /**
-     * @param {string} name
-     * @returns {number?}
-     */
-    maybe_pair_number(name) {
-        return /** @type {number?} */ (
-            this.maybe_pair(name, Tokenizer.Token.NUMBER)
-        );
+    maybe_pair_number(name: string): number | null {
+        return this.maybe_pair(name, Token.NUMBER) as number | null;
     }
 
-    /**
-     * @param {string} name
-     * @returns {SExprParser?}
-     */
-    maybe_pair_list(name) {
-        return /** @type {SExprParser?} */ (this.maybe_pair(name, "list"));
+    maybe_pair_list(name: string): SExprParser | null {
+        return this.maybe_pair(name, "list") as SExprParser | null;
     }
 
-    /**
-     * @param {string} name
-     * @param {string|symbol?} type
-     * @returns {(Tokenizer.Token|SExprParser|number|string)}
-     */
-    expect_pair(name, type) {
+    expect_pair(name: string, type: ElementType): Unboxable {
         const v = this.maybe_pair(name, type);
         if (v === null) {
             throw new Error(
@@ -463,72 +352,41 @@ export class SExprParser {
         return v;
     }
 
-    /**
-     * @param {string} name
-     * @returns {string}
-     */
-    expect_pair_atom(name) {
-        return /** @type {string} */ (
-            this.expect_pair(name, Tokenizer.Token.ATOM)
-        );
+    expect_pair_atom(name: string): string {
+        return this.expect_pair(name, Token.ATOM) as string;
     }
 
-    /**
-     * @param {string} name
-     * @returns {string}
-     */
-    expect_pair_string(name) {
-        return /** @type {string} */ (
-            this.expect_pair(name, Tokenizer.Token.STRING)
-        );
+    expect_pair_string(name: string): string {
+        return this.expect_pair(name, Token.STRING) as string;
     }
 
-    /**
-     * @param {string} name
-     * @returns {number}
-     */
-    expect_pair_number(name) {
-        return /** @type {number} */ (
-            this.expect_pair(name, Tokenizer.Token.NUMBER)
-        );
+    expect_pair_any(name: string): Unboxable {
+        return this.expect_pair(name, null) as Unboxable;
     }
 
-    /**
-     * @param {string} name
-     * @returns {SExprParser}
-     */
-    expect_pair_list(name) {
-        return /** @type {SExprParser} */ (this.expect_pair(name, "list"));
+    expect_pair_number(name: string): number {
+        return this.expect_pair(name, Token.NUMBER) as number;
     }
 
-    /**
-     * @param {string} name
-     * @param {Vec2} def
-     * @returns {Vec2}
-     */
-    maybe_vec2(name, def = new Vec2(0, 0)) {
+    expect_pair_list(name: string): SExprParser {
+        return this.expect_pair(name, "list") as SExprParser;
+    }
+
+
+    maybe_vec2(name: string, default_value: Vec2 = new Vec2(0, 0)): Vec2 {
         const v = this.maybe_expr(name);
         if (!v) {
-            return def;
+            return default_value;
         }
         return new Vec2(v.expect_number(), v.expect_number());
     }
 
-    /**
-     * @param {string} name
-     * @returns {Vec2}
-     */
-    expect_vec2(name) {
+    expect_vec2(name: string): Vec2 {
         const v = this.expect_expr(name);
         return new Vec2(v.expect_number(), v.expect_number());
     }
 
-    /**
-     * @param {string} name
-     * @param {string} point_name
-     * @returns {Vec2[]}
-     */
-    expect_vec2_list(name = "pts", point_name = "xy") {
+    expect_vec2_list(name = "pts", point_name = "xy"): Vec2[] {
         const pts = [];
         const e = this.expect_expr(name);
         let c;
@@ -539,10 +397,6 @@ export class SExprParser {
     }
 }
 
-/**
- * @param {string} str_or_tokens
- * @returns {SExprParser}
- */
-export function parse(str_or_tokens) {
-    return new Parser(str_or_tokens).parse();
+export function parse(src: string): SExprParser {
+    return new Parser(src).parse();
 }

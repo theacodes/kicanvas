@@ -23,19 +23,19 @@ export class Token {
     constructor(public type: symbol, public value: any = null) { }
 }
 
-function is_digit(c) {
+function is_digit(c: string) {
     return c >= "0" && c <= "9";
 }
 
-function is_alpha(c) {
+function is_alpha(c: string) {
     return (c >= "A" && c <= "Z") || (c >= "a" && c <= "z");
 }
 
-function is_whitespace(c) {
+function is_whitespace(c: string) {
     return c === " " || c === "\n" || c === "\r" || c === "\t";
 }
 
-function error_context(input, index) {
+function error_context(input: string, index: number) {
     let start = input.slice(0, index).lastIndexOf("\n");
     if (start < 0) start = 0;
     let end = input.slice(index).indexOf("\n");
@@ -43,7 +43,7 @@ function error_context(input, index) {
     return input.slice(start, index + end);
 }
 
-export function* tokenize(input) {
+export function* tokenize(input: string) {
     const open_token = new Token(Token.OPEN);
     const close_token = new Token(Token.CLOSE);
     let state = null;

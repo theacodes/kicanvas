@@ -481,7 +481,7 @@ export class FpText {
 export class DimensionFormat {
     prefix: string;
     suffix: string;
-    units: string;
+    units: number;
     units_format: number;
     precision: number;
     override_value: string;
@@ -762,7 +762,7 @@ export class Footprint {
         this.locked = e.maybe_atom("locked") ? true : false;
         this.placed = e.maybe_atom("placed") ? true : false;
         this.layer = e.expect_pair_string("layer");
-        this.tedit = e.expect_pair("tedit", null);
+        this.tedit = e.expect_pair_any("tedit") as string;
         this.tstamp = e.maybe_pair_atom("tstamp");
         this.at = new At(e.expect_expr("at"));
         this.descr = e.maybe_pair_string("descr");
@@ -1044,7 +1044,7 @@ class PcbPlotParams {
         this.outputformat = e.expect_pair_number("outputformat");
         this.mirror = e.expect_pair_atom("mirror") == "true" ? true : false;
         this.drillshape = e.expect_pair_number("drillshape");
-        this.scaleselection = e.expect_pair_number("scaleselection");
+        this.scaleselection = e.expect_pair("scaleselection", null) ? true : false;
         this.outputdirectory = e.expect_pair_string("outputdirectory");
     }
 }
