@@ -14,5 +14,7 @@
         "bboxes",
         "decidegrees",
         "sexpr"
-    ]
+    ],
+    "debug.console.closeOnEnd": true,
+    "debug.terminal.clearBeforeReusing": true
 }

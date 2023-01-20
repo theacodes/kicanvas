@@ -2,18 +2,25 @@
   "name": "kicanvas",
   "version": "0.0.0",
   "description": "",
-  "main": "build.js",
+  "type": "module",
   "directories": {
     "test": "tests"
   },
-  "dependencies": {
-    "esbuild": "^0.16.12"
-  },
   "devDependencies": {
-    "eslint": "^8.31.0"
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "esbuild": "^0.17.3",
+    "esbuild-plugin-copy": "^2.0.2",
+    "eslint": "^8.32.0",
+    "typescript": "^4.9.4"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "lint": "eslint --config .eslintrc.cjs src/ --ext .js,.ts",
+    "serve": "node scripts/serve.js",
+    "build": "tsc -p tsconfig.json && node scripts/build.js",
+    "clean": "rm -rf dist && rm -rf www/kicanvas",
+    "build-font": "node scripts/build-font.js"
   },
   "repository": {
     "type": "git",

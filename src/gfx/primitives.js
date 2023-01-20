@@ -298,8 +298,8 @@ export class CircleSet {
         this.shader = await ShaderProgram.load(
             gl,
             "polyline",
-            "./polyline.vert.glsl",
-            "./polyline.frag.glsl"
+            "./resources/polyline.vert.glsl",
+            "./resources/polyline.frag.glsl"
         );
     }
 
@@ -364,8 +364,8 @@ export class PolylineSet {
         this.shader = await ShaderProgram.load(
             gl,
             "polyline",
-            "./polyline.vert.glsl",
-            "./polyline.frag.glsl"
+            "./resources/polyline.vert.glsl",
+            "./resources/polyline.frag.glsl"
         );
     }
 
@@ -459,8 +459,8 @@ export class PolygonSet {
         this.shader = await ShaderProgram.load(
             gl,
             "polygon",
-            "./polygon.vert.glsl",
-            "./polygon.frag.glsl"
+            "./resources/polygon.vert.glsl",
+            "./resources/polygon.frag.glsl"
         );
     }
 
