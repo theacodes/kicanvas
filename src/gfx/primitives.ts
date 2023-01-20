@@ -18,7 +18,7 @@
  *
  */
 
-import { VertexArray, ShaderProgram } from "./gl.js";
+import { VertexArray, ShaderProgram, Buffer } from "./gl.js";
 import { Vec2 } from "../math/vec2.js";
 import earcut from "../math/earcut/earcut.js";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -28,14 +28,9 @@ import { Matrix3 } from "../math/matrix3.js";
 export class Circle {
     /**
      * Create a filled circle
-     * @param {Vec2} point
-     * @param {number} radius
-     * @param {number[]} color - normalized array of rgba
+     * @param color - normalized array of rgba
      */
-    constructor(point, radius, color) {
-        this.point = point;
-        this.radius = radius;
-        this.color = color;
+    constructor(public point: Vec2, public radius: number, public color: number[]) {
     }
 }
 
@@ -43,28 +38,24 @@ export class Circle {
 export class Polyline {
     /**
      * Create a stroked polyline
-     * @param {Vec2[]} points - line segment points
-     * @param {number} width - thickness of the rendered line
-     * @param {number[]} color - normalized array of rgba
+     * @param points - line segment points
+     * @param width - thickness of the rendered line
+     * @param color - normalized array of rgba
      */
-    constructor(points, width, color) {
-        this.points = points;
-        this.width = width;
-        this.color = color;
+    constructor(public points: Vec2[], public width: number, public color: number[]) {
     }
 }
 
 /** Polygon primitive data */
 export class Polygon {
+    vertices: Float32Array = null;
+
     /**
      * Create a filled polygon
-     * @param {Vec2[]} points - point cloud representing the polygon
-     * @param {number[]} color - normalized array of rgba
+     * @param points - point cloud representing the polygon
+     * @param color - normalized array of rgba
      */
-    constructor(points, color) {
-        this.points = points;
-        this.color = color;
-        this.vertices = null;
+    constructor(public points: Vec2[], public color: number[]) {
     }
     /**
      * Convert a point cloud polygon into an array of triangles.
@@ -75,7 +66,7 @@ export class Polygon {
             return;
         }
 
-        let points = this.points;
+        const points = this.points;
 
         const points_flattened = new Array(points.length * 2);
         for (let i = 0; i < points.length; i++) {
@@ -162,10 +153,10 @@ class Tesselator {
         const n = norm.multiply(width / 2);
         const n2 = n.normal;
 
-        let a = p1.add(n).add(n2);
-        let b = p1.sub(n).add(n2);
-        let c = p2.add(n).sub(n2);
-        let d = p2.sub(n).sub(n2);
+        const a = p1.add(n).add(n2);
+        const b = p1.sub(n).add(n2);
+        const c = p2.add(n).sub(n2);
+        const d = p2.sub(n).sub(n2);
 
         return [a, b, c, d];
     }
@@ -176,9 +167,9 @@ class Tesselator {
      * @returns {{position_array: Float32Array, cap_array: Float32Array, color_array: Float32Array}}
      */
     static tesselate_polyline(polyline) {
-        let width = polyline.width || 0;
-        let points = polyline.points;
-        let color = polyline.color;
+        const width = polyline.width || 0;
+        const points = polyline.points;
+        const color = polyline.color;
 
         const segment_count = points.length - 1;
         const vertex_count = segment_count * this.vertices_per_quad;
@@ -232,10 +223,10 @@ class Tesselator {
         const n = new Vec2(circle.radius, 0);
         const n2 = n.normal;
 
-        let a = circle.point.add(n).add(n2);
-        let b = circle.point.sub(n).add(n2);
-        let c = circle.point.add(n).sub(n2);
-        let d = circle.point.sub(n).sub(n2);
+        const a = circle.point.add(n).add(n2);
+        const b = circle.point.sub(n).add(n2);
+        const c = circle.point.add(n).sub(n2);
+        const d = circle.point.sub(n).sub(n2);
 
         return [a, b, c, d];
     }
@@ -287,6 +278,13 @@ class Tesselator {
  */
 export class CircleSet {
     static shader;
+    gl: WebGL2RenderingContext;
+    shader: ShaderProgram;
+    vao: VertexArray;
+    position_buf: Buffer;
+    cap_region_buf: Buffer;
+    color_buf: Buffer;
+    vertex_count: number;
 
     /**
      * Load the shader program required to render this primitive.
@@ -355,6 +353,13 @@ export class CircleSet {
  */
 export class PolylineSet {
     static shader;
+    gl: WebGL2RenderingContext;
+    shader: ShaderProgram;
+    vao: VertexArray;
+    position_buf: Buffer;
+    cap_region_buf: Buffer;
+    color_buf: Buffer;
+    vertex_count: number;
 
     /**
      * Load the shader program required to render this primitive.
@@ -450,6 +455,12 @@ export class PolylineSet {
  */
 export class PolygonSet {
     static shader;
+    gl: WebGL2RenderingContext;
+    shader: ShaderProgram;
+    vao: VertexArray;
+    position_buf: Buffer;
+    color_buf: Buffer;
+    vertex_count: number;
 
     /**
      * Load the shader program required to render this primitive.

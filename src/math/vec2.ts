@@ -13,6 +13,9 @@ import { Matrix3 } from "./matrix3.js";
  * All operations except for set() return new vectors and do not modify the existing vector
  */
 export class Vec2 {
+    x: number;
+    y: number;
+
     /**
      * Create a Vec2
      * @param {number|Vec2} x_or_other

@@ -19,13 +19,8 @@ export class Token {
 
     /**
      * Create a new Token
-     * @param {symbol} type
-     * @param {*?} value
      */
-    constructor(type, value = null) {
-        this.type = type;
-        this.value = value;
-    }
+    constructor(public type: symbol, public value: any = null) { }
 }
 
 function is_digit(c) {

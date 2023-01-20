@@ -57,6 +57,12 @@ class Style {
 }
 
 export class Renderer {
+    cvs: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    cvs_helper: CanvasHelper;
+    style: Style;
+    transforms: TransformStack;
+
     constructor(canvas) {
         this.cvs = canvas;
         this.ctx = canvas.getContext("2d");
@@ -252,17 +258,15 @@ export class Renderer {
 
     apply_Effects(e) {
         if (!e) {
-            this.ctx.font = `${1.27 * this.style.font_size}px "${
-                this.style.font_family
-            }"`;
+            this.ctx.font = `${1.27 * this.style.font_size}px "${this.style.font_family
+                }"`;
             this.ctx.textAlign = "center";
             this.ctx.textBaseline = "center";
             return;
         }
 
-        this.ctx.font = `${e.size.y * this.style.font_size}px "${
-            this.style.font_family
-        }"`;
+        this.ctx.font = `${e.size.y * this.style.font_size}px "${this.style.font_family
+            }"`;
         this.ctx.textAlign = e.h_align;
         this.ctx.textBaseline = {
             top: "top",

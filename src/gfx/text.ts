@@ -12,20 +12,13 @@
 
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
-// eslint-disable-next-line no-unused-vars
 import { Angle } from "../math/angle.js";
 
 class GlyphData {
     /**
      * Create Glyph data
-     * @param {Array} strokes
-     * @param {number} width
-     * @param {{start: number[], end: number[]}} bbox
      */
-    constructor(strokes, width, bbox) {
-        this.strokes = strokes;
-        this.width = width;
-        this.bbox = bbox;
+    constructor(public strokes: number[][][], public width: number, public bbox: { start: number[], end: number[] }) {
     }
 }
 
@@ -39,6 +32,7 @@ export class Font {
     bold_factor = 1.3;
     stroke_font_scale = 1.0 / 21.0;
     italic_tilt = 1.0 / 8;
+    glyphs;
 
     constructor() {
         this.glyphs = [];
@@ -46,9 +40,8 @@ export class Font {
 
     /**
      * Load glyph data from the given URL
-     * @param {URL} src
      */
-    async load(src) {
+    async load(src: URL) {
         this.glyphs = await (await fetch(src)).json();
     }
 
@@ -67,20 +60,15 @@ export class Font {
 
     /**
      * Vertical distance between two lines of text.
-     * @param {Vec2} size - font size
-     * @returns {number}
      */
-    interline(size) {
+    interline(size: Vec2): number {
         return size.y * this.interline_pitch_ratio;
     }
 
     /**
      * Get overbar line data for the given glyph
-     * @param {GlyphData} glyph
-     * @param {boolean} italic
-     * @returns {GlyphData}
      */
-    overbar_for(glyph, italic) {
+    overbar_for(glyph: GlyphData, italic: boolean) {
         const start = [0, -this.overbar_position_factor];
         const end = [glyph.bbox.end[0], start[1]];
 
@@ -97,14 +85,12 @@ export class Font {
  * to draw a specific character in a string of shaped text.
  */
 export class ShapedGlyph {
+    matrix: Matrix3;
+
     /**
      * Create a ShapedGlyph
-     * @param {GlyphData} glyph
-     * @param {Vec2} position
-     * @param {Vec2} size
-     * @param {number} tilt
      */
-    constructor(glyph, position, size, tilt = 0) {
+    constructor(public glyph: GlyphData, public position: Vec2, public size: Vec2, public tilt: number = 0) {
         this.glyph = glyph;
         this.position = position;
         this.size = size;
@@ -118,12 +104,8 @@ export class ShapedGlyph {
     /**
      * Yields points from a given stroke transformed by the given matrix
      * and tilt.
-     * @param {Matrix3} matrix
-     * @param {Array} stroke
-     * @param {number} tilt;
-     * @yields {Array.<Vec2>}
      */
-    static *points(matrix, stroke, tilt) {
+    static *points(matrix: Matrix3, stroke: number[][], tilt: number) {
         for (const point of stroke) {
             const pt = new Vec2(...point);
             if (tilt) {
@@ -138,8 +120,8 @@ export class ShapedGlyph {
      * @param {Matrix3} matrix
      * @yields {Array.<Vec2>[]}
      */
-    *strokes(matrix) {
-        let full_matrix = matrix.multiply(this.matrix);
+    *strokes(matrix: Matrix3) {
+        const full_matrix = matrix.multiply(this.matrix);
         for (const stroke of this.glyph.strokes) {
             yield ShapedGlyph.points(full_matrix, stroke, this.tilt);
         }
@@ -153,26 +135,14 @@ export class ShapedGlyph {
 export class ShapedLine {
     /**
      * Create a ShapedLine
-     * @param {Font} font
-     * @param {Vec2} size
-     * @param {number} thickness
-     * @param {boolean} italic
-     * @param {ShapedGlyph[]} shaped_glyphs
      */
-    constructor(font, size, thickness, italic, shaped_glyphs) {
-        this.font = font;
-        this.size = size;
-        this.thickness = thickness;
-        this.italic = italic;
-        this.shaped_glyphs = shaped_glyphs;
-    }
+    constructor(public font: Font, public size: Vec2, public thickness: number, public italic: boolean, public shaped_glyphs: ShapedGlyph[]) { }
 
     /**
      * Yields line segments needed to draw every glyph that makes up this line
      * of text.
-     * @param {Matrix3} matrix
      */
-    *strokes(matrix) {
+    *strokes(matrix: Matrix3) {
         for (const glyph of this.shaped_glyphs) {
             yield* glyph.strokes(matrix);
         }
@@ -212,15 +182,11 @@ export class ShapedLine {
 export class TextShaper {
     /**
      * Create a TextShaper
-     * @param {Font} font
      */
-    constructor(font) {
-        this.font = font;
-    }
+    constructor(public font: Font) { }
 
     /**
      * Load the default font and create a TextShaper for it
-     * @returns {Promise<TextShaper>}
      */
     static async default() {
         const font = new Font();
@@ -230,13 +196,8 @@ export class TextShaper {
 
     /**
      * Shapes a single line.
-     * @param {string} text
-     * @param {Vec2} size
-     * @param {number} thickness
-     * @param {boolean} italic
-     * @returns {ShapedLine}
      */
-    line(text, size, thickness, italic) {
+    line(text: string, size: Vec2, thickness: number, italic: boolean) {
         // Loosely based on KiCAD's STROKE_FONT::drawSingleLineText
 
         const out = [];
@@ -352,21 +313,14 @@ export class TextShaper {
 
     /**
      * Lays out a paragraph of text and generates strokes
-     *
-     * @param {string} text
-     * @param {Vec2} position
-     * @param {Angle} rotation
-     * @param {Vec2} size
-     * @param {number} thickness
-     * @param {*} options
-     * @yields {Array.<Vec2>[]} strokes for each glyph
+     * @yields strokes for each glyph
      */
     *paragraph(
-        text,
-        position,
-        rotation,
-        size,
-        thickness,
+        text: string,
+        position: Vec2,
+        rotation: Angle,
+        size: Vec2,
+        thickness: number,
         options = {
             italic: false,
             valign: "top",

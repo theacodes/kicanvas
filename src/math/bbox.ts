@@ -4,7 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-// eslint-disable-next-line no-unused-vars
 import { Matrix3 } from "./matrix3.js";
 import { Vec2 } from "./vec2.js";
 
@@ -12,6 +11,12 @@ import { Vec2 } from "./vec2.js";
  * An axis-alignment bounding box (AABB)
  */
 export class BBox {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    context: any;
+
     /**
      * Create a bounding box
      * @param {number} x
@@ -167,10 +172,9 @@ export class BBox {
     }
 
     /**
-     * @param {Matrix3} mat
      * @returns A new BBox transformed by the given matrix.
      */
-    transform(mat) {
+    transform(mat: Matrix3) {
         const start = mat.transform(this.start);
         const end = mat.transform(this.end);
         return BBox.from_corners(start.x, start.y, end.x, end.y, this.context);
@@ -205,8 +209,8 @@ export class BBox {
      * @returns {Vec2} A new Vec2 constrained within this bounding box
      */
     constrain_point(v) {
-        let x = Math.min(Math.max(v.x, this.x), this.x2);
-        let y = Math.min(Math.max(v.y, this.y), this.y2);
+        const x = Math.min(Math.max(v.x, this.x), this.x2);
+        const y = Math.min(Math.max(v.y, this.y), this.y2);
         return new Vec2(x, y);
     }
 }

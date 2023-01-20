@@ -33,8 +33,8 @@ export class Viewport {
 
         this.camera = new Camera2(new Vec2(0, 0), new Vec2(0, 0), 1, 0);
 
-        new CanvasSizeObserver(this.renderer.canvas, (...args) => {
-            this.resize(...args);
+        new CanvasSizeObserver(this.renderer.canvas, (cw, ch, lw, lh) => {
+            this.resize(cw, ch, lw, lh);
             this.#callback();
         });
 
@@ -96,8 +96,8 @@ export class Viewport {
      * @returns {Vec2}
      */
     screen_to_clip(v) {
-        let x = 2 * (v.x / this.width) - 1;
-        let y = -(2 * (v.y / this.height) - 1);
+        const x = 2 * (v.x / this.width) - 1;
+        const y = -(2 * (v.y / this.height) - 1);
 
         return new Vec2(x, y);
     }

@@ -5,13 +5,12 @@
 */
 
 class Transform {
-    constructor(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
-        this.x = x;
-        this.y = y;
-        this.rotation = rotation;
-        this.flip_x = flip_x;
-        this.flip_y = flip_y;
-    }
+    constructor(
+        public x: number = 0,
+        public y: number = 0,
+        public rotation: number = 0,
+        public flip_x: boolean = false,
+        public flip_y: boolean = false) { }
 
     copy() {
         return new Transform(
@@ -53,11 +52,14 @@ class Transform {
 }
 
 export class TransformStack {
-    constructor(ctx) {
+    ctx: CanvasRenderingContext2D;
+    base_matrix: DOMMatrix;
+    t_stack: Transform[] = [];
+    m_stack: DOMMatrix[] = [];
+
+    constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
         this.base_matrix = ctx.getTransform();
-        this.t_stack = [];
-        this.m_stack = [];
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {

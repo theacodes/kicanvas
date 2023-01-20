@@ -11,14 +11,14 @@
 */
 
 import { Vec2 } from "../math/vec2.js";
-// eslint-disable-next-line no-unused-vars
 import { SExprParser } from "./parser.js";
 
 export class At {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    position: Vec2;
+    rotation: number;
+    unlocked: boolean;
+
+    constructor(e: SExprParser) {
         this.position = new Vec2(e.expect_number(), e.expect_number());
         this.rotation = e.maybe_number() ?? 0;
         this.unlocked = e.maybe_atom("unlocked") ? true : false;
@@ -26,10 +26,13 @@ export class At {
 }
 
 export class Segment {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    start: Vec2;
+    end: Vec2;
+    width: number;
+    layer: string;
+    net: number;
+
+    constructor(e: SExprParser) {
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
         this.width = e.expect_pair_number("width");
@@ -39,10 +42,14 @@ export class Segment {
 }
 
 export class Arc {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    start: Vec2;
+    mid: Vec2;
+    end: Vec2;
+    width: number;
+    layer: string;
+    net: number;
+
+    constructor(e: SExprParser) {
         this.start = e.expect_vec2("start");
         this.mid = e.expect_vec2("mid");
         this.end = e.expect_vec2("end");
@@ -53,29 +60,39 @@ export class Arc {
 }
 
 export class Polygon {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    pts: Vec2[];
+
+    constructor(e: SExprParser) {
         this.pts = e.expect_vec2_list("pts");
     }
 }
 
 export class FilledPolygon {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    layer: string;
+    pts: Vec2[];
+
+    constructor(e: SExprParser) {
         this.layer = e.expect_pair_string("layer");
         this.pts = e.expect_vec2_list("pts");
     }
 }
 
 export class Zone {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    net: number;
+    net_name: string;
+    layers: string[];
+    tstamp: string;
+    hatch: SExprParser;
+    priority: number;
+    connect_pads: SExprParser;
+    min_thickness: number;
+    filled_areas_thickness: SExprParser;
+    keepout: SExprParser;
+    fill: SExprParser;
+    polygon: Polygon;
+    filled_polygons: FilledPolygon[];
+
+    constructor(e: SExprParser) {
         this.net = e.expect_pair_number("net");
         this.net_name = e.expect_pair_string("net_name");
 
@@ -87,7 +104,7 @@ export class Zone {
             if (layers == "F&B.Cu") {
                 this.layers = ["F.Cu", "B.Cu"];
             } else {
-                this.layers = Array.from(e.expect_expr("layers").rest());
+                this.layers = Array.from(e.expect_expr("layers").rest()) as string[];
             }
         }
 
@@ -112,10 +129,17 @@ export class Zone {
 }
 
 export class Via {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    type: "blind" | "buried" | "micro" | "through-hole";
+    locked: boolean;
+    at: Vec2;
+    size: number;
+    drill: number;
+    layers: string[];
+    free: boolean;
+    net: number;
+    tstamp: string;
+
+    constructor(e: SExprParser) {
         if (e.maybe_atom("blind")) {
             this.type = "blind";
         } else if (e.maybe_atom("buried")) {
@@ -131,7 +155,7 @@ export class Via {
         this.at = e.expect_vec2("at");
         this.size = e.expect_pair_number("size");
         this.drill = e.expect_pair_number("drill");
-        this.layers = Array.from(e.expect_expr("layers").rest());
+        this.layers = Array.from(e.expect_expr("layers").rest()) as string[];
         this.free = e.maybe_expr("free") ? true : false;
         this.net = e.expect_pair_number("net");
         this.tstamp = e.expect_pair_atom("tstamp");
@@ -139,10 +163,12 @@ export class Via {
 }
 
 export class GrLine {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    start: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+
+    constructor(e: SExprParser) {
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
         this.layer = e.maybe_pair_string("layer");
@@ -151,9 +177,12 @@ export class GrLine {
 }
 
 export class FpLine {
-    /**
-     * @param {SExprParser} e
-     */
+    parent: Footprint;
+    start: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+
     constructor(parent, e) {
         this.parent = parent;
         this.start = e.expect_vec2("start");
@@ -164,10 +193,14 @@ export class FpLine {
 }
 
 export class GrRect {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    locked: boolean;
+    start: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+    fill: boolean;
+
+    constructor(e: SExprParser) {
         this.locked = e.maybe_atom("locked") ? true : false;
         this.start = e.expect_vec2("start");
         this.end = e.expect_vec2("end");
@@ -178,10 +211,14 @@ export class GrRect {
 }
 
 export class FpRect {
-    /**
-     * @param {Footprint} parent
-     * @param {SExprParser} e
-     */
+    parent: Footprint;
+    locked: boolean;
+    start: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+    fill: boolean;
+
     constructor(parent, e) {
         this.parent = parent;
         this.start = e.expect_vec2("start");
@@ -193,10 +230,13 @@ export class FpRect {
 }
 
 export class GrArc {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    start: Vec2;
+    mid: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+
+    constructor(e: SExprParser) {
         this.start = e.expect_vec2("start");
         this.mid = e.expect_vec2("mid");
         this.end = e.expect_vec2("end");
@@ -206,10 +246,15 @@ export class GrArc {
 }
 
 export class FpArc {
-    /**
-     * @param {Footprint} parent
-     * @param {SExprParser} e
-     */
+    parent: Footprint;
+    start: Vec2;
+    mid: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+    locked: boolean;
+    tstamp: string;
+
     constructor(parent, e) {
         this.parent = parent;
         this.start = e.expect_vec2("start");
@@ -223,10 +268,14 @@ export class FpArc {
 }
 
 export class FpPoly {
-    /**
-     * @param {Footprint} parent
-     * @param {SExprParser} e
-     */
+    parent: Footprint;
+    pts: Vec2[];
+    layer: string;
+    width: number;
+    fill: boolean;
+    locked: boolean;
+    tstamp: string;
+
     constructor(parent, e) {
         this.parent = parent;
         this.pts = e.expect_vec2_list("pts");
@@ -239,10 +288,14 @@ export class FpPoly {
 }
 
 export class GrPoly {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    pts: Vec2[];
+    layer: string;
+    width: number;
+    fill: boolean;
+    locked: boolean;
+    tstamp: string;
+
+    constructor(e: SExprParser) {
         this.pts = e.expect_vec2_list("pts");
         this.layer = e.maybe_pair_string("layer");
         this.width = e.expect_pair_number("width");
@@ -253,10 +306,15 @@ export class GrPoly {
 }
 
 export class GrCircle {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    center: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+    fill: boolean;
+    locked: boolean;
+    tstamp: string;
+
+    constructor(e: SExprParser) {
         this.center = e.expect_vec2("center");
         this.end = e.expect_vec2("end");
         this.layer = e.maybe_pair_string("layer");
@@ -268,10 +326,15 @@ export class GrCircle {
 }
 
 export class FpCircle {
-    /**
-     * @param {Footprint} parent
-     * @param {SExprParser} e
-     */
+    parent: Footprint;
+    center: Vec2;
+    end: Vec2;
+    layer: string;
+    width: number;
+    fill: boolean;
+    locked: boolean;
+    tstamp: string;
+
     constructor(parent, e) {
         this.parent = parent;
         this.center = e.expect_vec2("center");
@@ -285,10 +348,16 @@ export class FpCircle {
 }
 
 export class Effects {
-    /**
-     * @param {SExprParser?} e
-     */
-    constructor(e = null) {
+    size: Vec2;
+    thickness: number;
+    bold: boolean;
+    italic: boolean;
+    h_align: string;
+    v_align: string;
+    mirror: boolean;
+    hide: boolean;
+
+    constructor(e: SExprParser = null) {
         this.size = new Vec2(1.27, 1.27);
         this.bold = false;
         this.italic = false;
@@ -361,12 +430,17 @@ export class Effects {
 }
 
 export class GrText {
-    original_text;
+    text: string
+    original_text: string;
+    at: At;
+    layer: string;
+    tstamp: string;
+    effects: Effects;
 
     /**
      * @param {SExprParser} e
      */
-    constructor(e) {
+    constructor(e: SExprParser) {
         this.original_text = this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
         this.layer = e.expect_pair_string("layer");
@@ -376,7 +450,16 @@ export class GrText {
 }
 
 export class FpText {
-    original_text;
+    parent: Footprint;
+    type: string;
+    text: string
+    original_text: string;
+    at: At;
+    unlocked: boolean;
+    layer: string;
+    hide: boolean;
+    effects: Effects;
+    tstamp: string;
 
     /**
      * @param {Footprint} parent
@@ -396,10 +479,15 @@ export class FpText {
 }
 
 export class DimensionFormat {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    prefix: string;
+    suffix: string;
+    units: string;
+    units_format: number;
+    precision: number;
+    override_value: string;
+    suppress_zeros: boolean;
+
+    constructor(e: SExprParser) {
         this.prefix = e.maybe_pair_string("prefix");
         this.suffix = e.maybe_pair_string("suffix");
         this.units = e.expect_pair_number("units");
@@ -411,10 +499,15 @@ export class DimensionFormat {
 }
 
 export class DimensionStyle {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    thickness: number;
+    arrow_length: number;
+    text_position_mode: number;
+    extension_height: number;
+    text_frame: number;
+    extension_offset: number;
+    keep_text_aligned: boolean;
+
+    constructor(e: SExprParser) {
         this.thickness = e.expect_pair_number("thickness");
         this.arrow_length = e.expect_pair_number("arrow_length");
         this.text_position_mode = e.expect_pair_number("text_position_mode");
@@ -426,16 +519,25 @@ export class DimensionStyle {
 }
 
 export class Dimension {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    locked: boolean;
+    type: string;
+    layer: string;
+    tstamp: string;
+    start: Vec2;
+    end: Vec2;
+    height: number;
+    orientation: number;
+    text: GrText;
+    format: DimensionFormat;
+    style: DimensionStyle;
+
+    constructor(e: SExprParser) {
         this.locked = e.maybe_atom("locked") ? true : false;
         this.type = e.expect_pair_atom("type");
         this.layer = e.expect_pair_string("layer");
         this.tstamp = e.expect_pair_atom("tstamp");
 
-        let pts = e.expect_vec2_list("pts");
+        const pts = e.expect_vec2_list("pts");
         this.start = pts[0];
         this.end = pts[1];
         this.height = e.maybe_pair_number("height") ?? 0;
@@ -454,11 +556,16 @@ export class Dimension {
     }
 }
 
+export type LayerItems = Dimension | Footprint | GrArc | GrCircle | GrLine | GrPoly;
+
 export class Layer {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    ordinal: number;
+    name: string;
+    type: string;
+    user_name: string;
+    items: LayerItems[];
+
+    constructor(e: SExprParser) {
         this.ordinal = e.expect_number();
         this.name = e.expect_string();
         this.type = e.expect_atom();
@@ -469,10 +576,12 @@ export class Layer {
 }
 
 export class Drill {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    oval: boolean;
+    diameter: number;
+    width: number;
+    offset: Vec2;
+
+    constructor(e: SExprParser) {
         this.oval = e.maybe_atom("oval") ? true : false;
         this.diameter = e.expect_number();
         this.width = e.maybe_number();
@@ -489,20 +598,43 @@ export class Drill {
 }
 
 export class PadOptions {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    clearance: string;
+    anchor: string;
+
+    constructor(e: SExprParser) {
         this.clearance = e.expect_pair_atom("clearance");
         this.anchor = e.expect_pair_atom("anchor");
     }
 }
 
 export class Pad {
-    /**
-     * @param {Footprint} parent
-     * @param {SExprParser} e
-     */
+    parent: Footprint;
+    number: string; // I hate this
+    type: string;
+    shape: string;
+    locked: boolean;
+    at: At;
+    size: Vec2;
+    drill: Drill;
+    rect_delta: Vec2;
+    layers: string[];
+    roundrect_rratio: number;
+    chamfer_ratio: number;
+    chamfer: number;
+    net: { number: number, name: string };
+    pinfunction: string;
+    pintype: string;
+    solder_mask_margin: number;
+    solder_paste_margin: number;
+    solder_paste_margin_ratio: number;
+    clearance: number;
+    thermal_width: number;
+    thermal_gap: number;
+    zone_connect: number;
+    options: PadOptions;
+    primitives: (GrCircle | GrRect | GrPoly | GrLine | GrArc)[];
+    tstamp: string;
+
     constructor(parent, e) {
         this.parent = parent;
         this.number = e.expect_string();
@@ -534,7 +666,7 @@ export class Pad {
         this.solder_paste_margin_ratio = e.maybe_pair_number(
             "solder_paste_margin_ratio"
         );
-        this.clear = e.maybe_pair_number("clearance");
+        this.clearance = e.maybe_pair_number("clearance");
         this.thermal_width = e.maybe_pair_number("thermal_width");
         this.thermal_gap = e.maybe_pair_number("thermal_gap");
         this.zone_connect = e.maybe_pair_number("zone_connect");
@@ -543,7 +675,7 @@ export class Pad {
             this.options = new PadOptions(options);
         }
 
-        let prims = e.maybe_expr("primitives");
+        const prims = e.maybe_expr("primitives");
 
         if (prims) {
             this.primitives = [];
@@ -573,10 +705,12 @@ export class Pad {
 }
 
 export class Model {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    filename: string;
+    at: [number, number, number];
+    scale: [number, number, number];
+    rotation: [number, number, number];
+
+    constructor(e: SExprParser) {
         this.filename = e.expect_string();
         for (const name in ["at", "scale", "rotation"]) {
             let se = e.maybe_expr(name);
@@ -595,11 +729,33 @@ export class Model {
 }
 
 export class Footprint {
-    /**
-     * @param {KicadPCB} pcb;
-     * @param {SExprParser} e
-     */
-    constructor(pcb, e) {
+    library_link: string;
+    version: number;
+    generator: string;
+    locked: boolean;
+    placed: boolean;
+    layer: string;
+    tedit: string;
+    tstamp: string;
+    at: At;
+    descr: string;
+    tags: string;
+    properties: Record<string, string>;
+    path: string;
+    autoplace_cost90: number;
+    autoplace_cost180: number;
+    solder_mask_margin: number;
+    solder_paste_margin: number;
+    solder_paste_ratio: number;
+    clearance: number;
+    zone_connect: number;
+    thermal_width: number;
+    thermal_gap: number;
+    attr: string[];
+    models: Model[];
+    items: (Pad | Zone | FpText | FpArc | FpCircle | FpLine | FpPoly | FpRect)[];
+
+    constructor(pcb: KicadPCB, e: SExprParser) {
         this.library_link = e.expect_string();
         this.version = e.maybe_pair_number("version");
         this.generator = e.maybe_pair_atom("generator");
@@ -629,7 +785,7 @@ export class Footprint {
         this.zone_connect = e.maybe_pair_number("zone_connect");
         this.thermal_width = e.maybe_pair_number("thermal_width");
         this.thermal_gap = e.maybe_pair_number("thermal_gap");
-        this.attr = Array.from(e.expect_expr("attr").rest());
+        this.attr = Array.from(e.expect_expr("attr").rest()) as string[];
 
         this.models = [];
         this.items = [];
@@ -681,10 +837,12 @@ export class Footprint {
 }
 
 export class Paper {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    size: string;
+    width: number;
+    height: number;
+    portrait: boolean;
+
+    constructor(e: SExprParser) {
         this.size = e.maybe_string();
         this.width = e.maybe_number();
         this.height = e.maybe_number();
@@ -693,16 +851,27 @@ export class Paper {
 }
 
 class TitleBlock {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
-        const maybe_comment = () => {
+    title: string;
+    date: string;
+    rev: string;
+    company: string;
+    comment_1: string;
+    comment_2: string;
+    comment_3: string;
+    comment_4: string;
+    comment_5: string;
+    comment_6: string;
+    comment_7: string;
+    comment_8: string;
+    comment_9: string;
+
+    constructor(e: SExprParser) {
+        const maybe_comment = (): string => {
             const ce = e.maybe_expr("comment");
             if (ce === null) {
                 return null;
             }
-            return ce.unbox(ce.elements[2]);
+            return ce.unbox(ce.elements[2]) as string;
         };
 
         this.title = e.expect_pair_string("title");
@@ -741,10 +910,15 @@ class TitleBlock {
 }
 
 class StackupLayer {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    name: string;
+    type: string;
+    color: string;
+    thickness: number;
+    material: string;
+    epsilon_r: number;
+    loss_tangent: number;
+
+    constructor(e: SExprParser) {
         this.name = e.expect_string();
         this.type = e.expect_pair_string("type");
         this.color = e.maybe_pair_string("color");
@@ -756,10 +930,14 @@ class StackupLayer {
 }
 
 class Stackup {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    layers: StackupLayer[];
+    copper_finish: string;
+    dielectric_constraints: boolean;
+    edge_connector: string;
+    castellated_pads: boolean;
+    edge_plating: boolean;
+
+    constructor(e: SExprParser) {
         this.layers = [];
 
         let se;
@@ -780,10 +958,40 @@ class Stackup {
 }
 
 class PcbPlotParams {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    layerselection: number;
+    disableapertmacros: boolean;
+    usegerberextensions: boolean;
+    usegerberattributes: boolean;
+    usegerberadvancedattributes: boolean;
+    creategerberjobfile: boolean;
+    gerberprecision: number;
+    svguseinch: boolean;
+    svgprecision: number;
+    excludeedgelayer: boolean;
+    plotframeref: boolean;
+    viasonmask: boolean;
+    mode: number;
+    useauxorigin: boolean;
+    hpglpennumber: number;
+    hpglpenspeed: number;
+    hpglpendiameter: number;
+    dxfpolygonmode: boolean;
+    dxfimperialunits: boolean;
+    dxfusepcbnewfont: boolean;
+    psnegative: boolean;
+    psa4output: boolean;
+    plotreference: boolean;
+    plotvalue: boolean;
+    plotinvisibletext: boolean;
+    sketchpadsonfab: boolean;
+    subtractmaskfromsilk: boolean;
+    outputformat: number;
+    mirror: boolean;
+    drillshape: number;
+    scaleselection: boolean;
+    outputdirectory: string;
+
+    constructor(e: SExprParser) {
         this.layerselection = e.expect_pair_number("layerselection");
         this.disableapertmacros =
             e.expect_pair_atom("disableapertmacros") == "true" ? true : false;
@@ -842,10 +1050,16 @@ class PcbPlotParams {
 }
 
 class Setup {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
+    stackup: Stackup;
+    pad_to_mask_clearance: number;
+    solder_mask_min_width: number;
+    pad_to_paste_clearance: number;
+    pad_to_paste_clearance_ratio: number;
+    aux_axis_origin: Vec2;
+    grid_origin: Vec2;
+    pcbplotparams: PcbPlotParams;
+
+    constructor(e: SExprParser) {
         let se;
 
         if ((se = e.maybe_expr("stackup")) !== null) {
@@ -870,18 +1084,22 @@ class Setup {
     }
 }
 
+export type PCBItem = Footprint | Segment | Arc | Zone | Via | GrLine | FpLine | GrArc | FpArc | GrPoly | FpPoly | GrCircle | FpCircle | GrText | FpText | Dimension;
+
 export class KicadPCB {
-    /**
-     * @param {SExprParser} e
-     */
-    constructor(e) {
-        this.layers = {};
-        this.footprints = [];
-        this.properties = {};
+    layers: Record<string, Layer> = {};
+    footprints: Footprint[] = [];
+    properties: Record<string, string> = {};
+    items: PCBItem[] = [];
 
-        /** @type {(Footprint|Segment|Arc|Zone|Via|GrLine|FpLine|GrArc|FpArc|GrPoly|FpPoly|GrCircle|FpCircle|GrText|FpText|Dimension)[]} */
-        this.items = [];
+    version: number;
+    generator: string;
+    thickness: number;
+    paper: Paper;
+    title_block: TitleBlock;
+    setup: Setup;
 
+    constructor(e: SExprParser) {
         let se;
 
         e.expect_atom("kicad_pcb");
@@ -976,12 +1194,7 @@ export class KicadPCB {
         }
     }
 
-    /**
-     * @param {string} text
-     * @param {object?} context
-     * @returns {string}
-     */
-    expand_text_vars(text, context) {
+    expand_text_vars(text: string, context: { properties?: Record<string, string> } = {}): string {
         const vars = {};
         Object.assign(
             vars,
@@ -990,15 +1203,15 @@ export class KicadPCB {
             context?.properties ?? {}
         );
 
-        for (let [k, v] of Object.entries(vars)) {
-            text = text.replace("${" + k.toUpperCase() + "}", v);
+        for (const [k, v] of Object.entries(vars)) {
+            text = text.replace("${" + k.toUpperCase() + "}", v as string);
         }
 
         const escape_vars = {
             dblquote: '"',
         };
 
-        for (let [k, v] of Object.entries(escape_vars)) {
+        for (const [k, v] of Object.entries(escape_vars)) {
             text = text.replace("{" + k + "}", v);
         }
 

@@ -17,6 +17,11 @@
  *
  */
 class Uniform {
+    gl: WebGL2RenderingContext;
+    name: string;
+    location: WebGLUniformLocation;
+    type: GLenum;
+
     static _function_map = {
         f1: "uniform1f",
         f1v: "uniform1fv",
@@ -51,6 +56,12 @@ class Uniform {
  */
 export class ShaderProgram {
     static #shader_cache = {};
+
+    gl: WebGL2RenderingContext;
+    name: string;
+    vertex: WebGLShader;
+    fragment: WebGLShader;
+    program: WebGLProgram;
 
     /** Shader uniforms
      * @type {Object.<string, Uniform>}
@@ -88,6 +99,9 @@ export class ShaderProgram {
         this.#discover_uniforms();
         this.#discover_attribs();
     }
+
+    // TODO: Consider moving uniforms into typesafe container
+    [key: string]: any | Uniform;
 
     /**
      * Load vertex and fragment shader sources from URLs and compile them
@@ -240,6 +254,9 @@ export class ShaderProgram {
  * Manages vertex array objects (VAOs) and associated buffers.
  */
 export class VertexArray {
+    gl: WebGL2RenderingContext;
+    vao: WebGLVertexArrayObject;
+
     /**
      * @type {Buffer[]}
      */
@@ -320,6 +337,8 @@ export class VertexArray {
  * Manages a buffer of GPU data like vertices or colors
  */
 export class Buffer {
+    gl: WebGL2RenderingContext;
+    target: GLenum;
     #buf;
 
     /**

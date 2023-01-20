@@ -11,11 +11,13 @@ import { Angle } from "./angle.js";
  * A 3x3 transformation matrix
  */
 export class Matrix3 {
+    elements: Float32Array;
+
     /**
      * Create a new Matrix
-     * @param {Array.<number>|Float32Array} elements the 9 matrix elements
+     * @param elements the 9 matrix elements
      */
-    constructor(elements) {
+    constructor(elements: number[] | Float32Array) {
         this.elements = new Float32Array(elements);
     }
 
@@ -55,10 +57,10 @@ export class Matrix3 {
         const e = this.elements;
         // prettier-ignore
         return new DOMMatrix([
-            e[0], e[1],  0, e[2],
-            e[3], e[4],  0, e[5],
-            0,    0,     1, 0,
-            e[6], e[7],  0, 1
+            e[0], e[1], 0, e[2],
+            e[3], e[4], 0, e[5],
+            0, 0, 1, 0,
+            e[6], e[7], 0, 1
         ]);
     }
 
@@ -82,9 +84,9 @@ export class Matrix3 {
     static orthographic(width, height) {
         // prettier-ignore
         return new Matrix3([
-            2 / width   ,              0,      0,
-            0           , -2 / height   ,      0,
-            -1          , 1             ,      1
+            2 / width, 0, 0,
+            0, -2 / height, 0,
+            -1, 1, 1
         ]);
     }
 

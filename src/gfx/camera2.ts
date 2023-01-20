@@ -128,7 +128,7 @@ export class Camera2 {
      */
     apply_to_canvas(ctx) {
         this.viewport_size.set(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
-        let m = Matrix3.from_DOMMatrix(ctx.getTransform());
+        const m = Matrix3.from_DOMMatrix(ctx.getTransform());
         m.multiply_self(this.matrix);
         ctx.setTransform(m.to_DOMMatrix());
     }

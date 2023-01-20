@@ -4,15 +4,23 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+// @ts-nocheck
+
 import * as parser from "./kicad/parser.js";
 import * as items from "./kicad/sch_items.js";
+import { BBox } from "./math/bbox.js";
 import * as render from "./rendering/sch_render.js";
 import { $make, $draw, $on, $event, $q } from "./utils.js";
 
 class KicadSchematicElement extends HTMLElement {
+    canvas: HTMLCanvasElement;
+    renderer: render.Renderer;
+    sch: items.KicadSch;
+    selected: any[] = [];
+    selectable_items: BBox[];
+
     constructor() {
         super();
-        this.selected = [];
     }
 
     async connectedCallback() {

@@ -15,9 +15,7 @@ import { Arc } from "../math/arc.js";
 import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
-// eslint-disable-next-line no-unused-vars
 import { WebGL2Renderer } from "../gfx/renderer.js";
-// eslint-disable-next-line no-unused-vars
 import { Layer } from "./layers.js";
 
 /**
@@ -48,7 +46,7 @@ class GenericPainter {
      * @param {*} item
      * @abstract
      */
-    static paint(gfx, layer, item) {}
+    static paint(gfx, layer, item) { }
 }
 
 class LinePainter extends GenericPainter {
@@ -236,7 +234,7 @@ class ZonePainter extends GenericPainter {
             if (!layer.name.includes(p.layer)) {
                 continue;
             }
-            let color = Array.from(layer.color);
+            const color = Array.from(layer.color);
             color[3] = 0.5; // TODO: Remove
             gfx.polygon(p.pts, color);
         }
@@ -248,9 +246,9 @@ class PadPainter extends GenericPainter {
 
     static layers(pad) {
         // TODO: Port KiCAD's logic over.
-        let layers = [];
+        const layers = [];
 
-        for (let layer of pad.layers) {
+        for (const layer of pad.layers) {
             if (layer == "*.Cu") {
                 layers.push("F.Cu");
                 layers.push("B.Cu");
@@ -442,7 +440,7 @@ class PadPainter extends GenericPainter {
 
             if (pad.shape == "custom" && pad.primitives) {
                 for (const prim of pad.primitives) {
-                    painter_for_class[prim.constructor].paint(gfx, layer, prim);
+                    painter_for_class.get(prim.constructor).paint(gfx, layer, prim);
                 }
             }
         }
@@ -511,17 +509,17 @@ class DimensionPainter extends GenericPainter {
      * @param {pcb_items.Dimension} d
      * @override
      */
-    static paint(gfx, layer, d) {}
+    static paint(gfx, layer, d) { }
 }
 
 class FootprintPainter extends GenericPainter {
     static classes = [pcb_items.Footprint];
 
     static layers(fp) {
-        let layers = new Set();
+        const layers = new Set();
         for (const item of fp.items) {
             const item_layers =
-                painter_for_class[item.constructor].layers(item);
+                painter_for_class.get(item.constructor).layers(item);
             for (const layer of item_layers) {
                 layers.add(layer);
             }
@@ -536,7 +534,7 @@ class FootprintPainter extends GenericPainter {
      * @override
      */
     static paint(gfx, layer, fp) {
-        let matrix = Matrix3.translation(
+        const matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
         ).rotate_self(Angle.deg_to_rad(fp.at.rotation));
@@ -544,10 +542,10 @@ class FootprintPainter extends GenericPainter {
 
         for (const item of fp.items) {
             const item_layers = Array.from(
-                painter_for_class[item.constructor].layers(item)
+                painter_for_class.get(item.constructor).layers(item)
             );
             if (item_layers.includes(layer.name)) {
-                painter_for_class[item.constructor].paint(gfx, layer, item);
+                painter_for_class.get(item.constructor).paint(gfx, layer, item);
             }
         }
         gfx.set_transform();
@@ -570,11 +568,11 @@ const painters = [
     DimensionPainter,
 ];
 
-const painter_for_class = {};
+const painter_for_class: Map<any, typeof GenericPainter> = new Map();
 
 for (const painter of painters) {
     for (const item_class of painter.classes) {
-        painter_for_class[item_class] = painter;
+        painter_for_class.set(item_class, painter);
     }
 }
 
@@ -584,26 +582,20 @@ for (const painter of painters) {
 export class Painter {
     /**
      * Create a Painter
-     * @param {WebGL2Renderer} gfx
      */
-    constructor(gfx) {
-        this.gfx = gfx;
-    }
+    constructor(public gfx: WebGL2Renderer) { }
 
     /**
      * Get a list of layer names that an item will be painted on.
-     * @param {*} item
-     * @returns {Array.<string>}
      */
-    get_layers_for(item) {
-        return painter_for_class[item.constructor].layers(item);
+    get_layers_for(item): string[] {
+        return painter_for_class.get(item.constructor).layers(item);
     }
 
     /**
      * Paint all items on the given layer.
-     * @param {Layer} layer
      */
-    paint_layer(layer) {
+    paint_layer(layer: Layer) {
         const bboxes = new Map();
 
         this.gfx.start_layer();
@@ -621,10 +613,8 @@ export class Painter {
 
     /**
      * Paint a single item on a given layer.
-     * @param {Layer} layer
-     * @param {*} item
      */
-    paint_item(layer, item) {
-        painter_for_class[item.constructor].paint(this.gfx, layer, item);
+    paint_item(layer: Layer, item) {
+        painter_for_class.get(item.constructor).paint(this.gfx, layer, item);
     }
 }

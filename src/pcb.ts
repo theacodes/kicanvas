@@ -13,6 +13,7 @@ import { f4_to_rgba } from "./gfx/colorspace.js";
 import { board as board_colors } from "./pcb/colors.js";
 import { Vec2 } from "./math/vec2.js";
 import { TextShaper } from "./gfx/text.js";
+import { BBox } from "./math/bbox.js";
 
 class PCBViewer {
     #cvs;
@@ -20,10 +21,11 @@ class PCBViewer {
     #viewport;
     #view;
     pcb;
+    selected: any;
+    selected_bbox: BBox;
 
     constructor(canvas) {
         this.#cvs = canvas;
-        // @ts-ignore
         this.#renderer = new WebGL2Renderer(this.#cvs, board_colors.background);
 
         this.#cvs.addEventListener("click", (e) => {
@@ -70,7 +72,7 @@ class PCBViewer {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
 
-        this.#view = new pcb_view.View(this.#renderer, board_colors, this.pcb);
+        this.#view = new pcb_view.View(this.#renderer, this.pcb, board_colors);
         this.#view.setup();
 
         this.#look_at_board();
@@ -87,7 +89,7 @@ class PCBViewer {
 
         window.requestAnimationFrame(() => {
             this.#renderer.clear_canvas();
-            let matrix = this.#viewport.view_projection_matrix;
+            const matrix = this.#viewport.view_projection_matrix;
             this.#view.draw(matrix);
         });
     }
@@ -123,10 +125,10 @@ class PCBViewer {
 class KicadPCBElement extends HTMLElement {
     #canvas;
     viewer;
+    selected = [];
 
     constructor() {
         super();
-        this.selected = [];
     }
 
     get loaded() {

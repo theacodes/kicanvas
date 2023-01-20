@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-// eslint-disable-next-line no-unused-vars
 import { PrimitiveSet } from "../gfx/primitives.js";
-// eslint-disable-next-line no-unused-vars
 import { BBox } from "../math/bbox.js";
+
+type VisibilityType = boolean | (() => boolean);
 
 /**
  * A graphical layer
@@ -22,8 +22,7 @@ export class Layer {
     /** @type {string} */
     name;
 
-    /** @type {boolean|Function} */
-    #visible;
+    #visible: VisibilityType;
 
     /** @type {boolean} */
     enabled;
@@ -32,17 +31,20 @@ export class Layer {
     color;
 
     /**
+     * Items on this layer.
+     */
+    items: any[];
+
+    /**
      * The renderer-generated graphics for items on this layer.
-     * @type {PrimitiveSet}
      * */
-    graphics;
+    graphics: PrimitiveSet;
 
     /** A map of board items to bounding boxes
      * A board item can have graphics on multiple layers, the bounding box provided
      * here is only valid for this layer.
-     * @type {Map.<*, BBox>}
      */
-    bboxes = new Map();
+    bboxes: Map<any, BBox> = new Map();
 
     /**
      * Create a new Layer.
@@ -51,7 +53,9 @@ export class Layer {
      * @param {boolean|Function} visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
      * @param {boolean} enabled - controls whether the layer is present at all in the board data
      */
-    constructor(layer_set, name, visible = true, enabled = true) {
+    constructor(
+        layer_set: LayerSet,
+        name: string, visible: VisibilityType = true, enabled = true) {
         this.#layer_set = layer_set;
         this.name = name;
         this.color = this.#layer_set.color_for(this.name);
@@ -60,7 +64,7 @@ export class Layer {
         this.items = [];
     }
 
-    /** @returns {boolean} true if this layer should be drawn */
+    /** true if this layer should be drawn */
     get visible() {
         if (this.#visible instanceof Function) {
             return this.#visible();
@@ -69,7 +73,7 @@ export class Layer {
         }
     }
 
-    set visible(v) {
+    set visible(v: VisibilityType) {
         this.#visible = v;
     }
 }
@@ -243,8 +247,7 @@ export class LayerSet {
                     }
                 }
             } else {
-                // @ts-ignore
-                const layer = this.by_name(name);
+                const layer: Layer = this.by_name(name);
 
                 if (layer.enabled) {
                     yield layer;

@@ -4,7 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-// eslint-disable-next-line no-unused-vars
 import { Angle } from "./angle.js";
 import { Vec2 } from "./vec2.js";
 
@@ -20,24 +19,17 @@ export class Arc {
      * @param {Angle} end_angle
      * @param {number} width
      */
-    constructor(center, radius, start_angle, end_angle, width) {
-        this.center = center;
-        this.radius = radius;
-        this.start_angle = start_angle;
-        this.end_angle = end_angle;
-        this.width = width;
-    }
+    constructor(
+        public center: Vec2,
+        public radius: number,
+        public start_angle: Angle,
+        public end_angle: Angle,
+        public width: number) { }
 
     /**
      * Create an Arc given three points on a circle
-     *
-     * @param {Vec2} start
-     * @param {Vec2} mid
-     * @param {Vec2} end
-     * @param {number} width
-     * @returns {Arc}
      */
-    static from_three_points(start, mid, end, width = 1) {
+    static from_three_points(start: Vec2, mid: Vec2, end: Vec2, width = 1) {
         const u = 1000000;
         const center = arc_center_from_three_points(
             new Vec2(start.x * u, start.y * u),
@@ -51,7 +43,7 @@ export class Arc {
         const mid_radial = mid.sub(center);
         const end_radial = end.sub(center);
         let start_angle = start_radial.angle.normalize();
-        let mid_angle = mid_radial.angle.normalize();
+        const mid_angle = mid_radial.angle.normalize();
         let end_angle = end_radial.angle.normalize();
 
         if (start_angle.degrees > mid_angle.degrees) {
@@ -75,8 +67,8 @@ export class Arc {
      * @returns {Array.<Vec2>}
      */
     to_polyline() {
-        let start = this.start_angle.radians;
-        let end = this.end_angle.radians;
+        const start = this.start_angle.radians;
+        const end = this.end_angle.radians;
         const points = [];
 
         if (start > end) {
@@ -122,10 +114,10 @@ export class Arc {
  */
 function arc_center_from_three_points(start, mid, end) {
     const sqrt_1_2 = Math.SQRT1_2;
-    let center = new Vec2(0, 0);
-    let y_delta_21 = mid.y - start.y;
+    const center = new Vec2(0, 0);
+    const y_delta_21 = mid.y - start.y;
     let x_delta_21 = mid.x - start.x;
-    let y_delta_32 = end.y - mid.y;
+    const y_delta_32 = end.y - mid.y;
     let x_delta_32 = end.x - mid.x;
 
     // This is a special case for mid as the half-way point when aSlope = 0 and bSlope = inf
@@ -189,8 +181,8 @@ function arc_center_from_three_points(start, mid, end) {
         slope_ab_start_end_y *
         Math.sqrt(
             ((d_slope_a / slope_a) * d_slope_a) / slope_a +
-                ((d_slope_b / slope_b) * d_slope_b) / slope_b +
-                (sqrt_1_2 / (start.y - end.y)) * (sqrt_1_2 / (start.y - end.y))
+            ((d_slope_b / slope_b) * d_slope_b) / slope_b +
+            (sqrt_1_2 / (start.y - end.y)) * (sqrt_1_2 / (start.y - end.y))
         );
 
     const slope_b_start_mid_x = slope_b * (start.x + mid.x);
@@ -198,7 +190,7 @@ function arc_center_from_three_points(start, mid, end) {
         slope_b_start_mid_x *
         Math.sqrt(
             ((d_slope_b / slope_b) * d_slope_b) / slope_b +
-                ((sqrt_1_2 / (start.x + mid.x)) * sqrt_1_2) / (start.x + mid.x)
+            ((sqrt_1_2 / (start.x + mid.x)) * sqrt_1_2) / (start.x + mid.x)
         );
 
     const slope_a_mid_end_x = slope_a * (mid.x + end.x);
@@ -206,7 +198,7 @@ function arc_center_from_three_points(start, mid, end) {
         slope_a_mid_end_x *
         Math.sqrt(
             ((d_slope_a / slope_a) * d_slope_a) / slope_a +
-                ((sqrt_1_2 / (mid.x + end.x)) * sqrt_1_2) / (mid.x + end.x)
+            ((sqrt_1_2 / (mid.x + end.x)) * sqrt_1_2) / (mid.x + end.x)
         );
 
     const twice_b_a_slope_diff = 2 * (slope_b - slope_a);
@@ -217,8 +209,8 @@ function arc_center_from_three_points(start, mid, end) {
         slope_ab_start_end_y + slope_b_start_mid_x - slope_a_mid_end_x;
     const d_center_numerator_x = Math.sqrt(
         d_slope_ab_start_end_y * d_slope_ab_start_end_y +
-            d_slope_b_start_mid_x * d_slope_b_start_mid_x +
-            d_slope_a_mid_end_x * d_slope_a_mid_end_x
+        d_slope_b_start_mid_x * d_slope_b_start_mid_x +
+        d_slope_a_mid_end_x * d_slope_a_mid_end_x
     );
 
     const center_x =
@@ -230,10 +222,10 @@ function arc_center_from_three_points(start, mid, end) {
         Math.sqrt(
             ((d_center_numerator_x / center_numerator_x) *
                 d_center_numerator_x) /
-                center_numerator_x +
-                ((d_twice_b_a_slope_diff / twice_b_a_slope_diff) *
-                    d_twice_b_a_slope_diff) /
-                    twice_b_a_slope_diff
+            center_numerator_x +
+            ((d_twice_b_a_slope_diff / twice_b_a_slope_diff) *
+                d_twice_b_a_slope_diff) /
+            twice_b_a_slope_diff
         );
 
     const center_numerator_y = (start.x + mid.x) / 2.0 - center_x;
@@ -245,8 +237,8 @@ function arc_center_from_three_points(start, mid, end) {
         Math.sqrt(
             ((d_center_numerator_y / center_numerator_y) *
                 d_center_numerator_y) /
-                center_numerator_y +
-                ((d_slope_a / slope_a) * d_slope_a) / slope_a
+            center_numerator_y +
+            ((d_slope_a / slope_a) * d_slope_a) / slope_a
         );
 
     const center_y = center_first_term + (start.y + mid.y) / 2.0;

@@ -82,7 +82,7 @@ export class Parser {
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            let element = this.accept([
+            const element = this.accept([
                 Tokenizer.Token.ATOM,
                 Tokenizer.Token.STRING,
                 Tokenizer.Token.NUMBER,
@@ -125,17 +125,17 @@ export class Parser {
     }
 }
 
+type Element = Tokenizer.Token | SExprParser;
+type Unboxable = Tokenizer.Token | SExprParser | string | number;
+type Unboxed = string | number | SExprParser;
+
 export class SExprParser {
     /**
      * Create an SExprParser
-     * @param {(Tokenizer.Token|SExprParser)[]} elements
      */
-    constructor(elements) {
-        this.elements = elements;
-        this.index = 0;
+    constructor(public elements: Element[], public index: number = 0) {
     }
 
-    /** @type {(Tokenizer.Token|SExprParser)?} */
     get element() {
         if (this.index > this.elements.length - 1) {
             return null;
@@ -144,8 +144,7 @@ export class SExprParser {
         }
     }
 
-    /** @returns {(Tokenizer.Token|SExprParser)?} */
-    next() {
+    next(): Element {
         this.index++;
         return this.element;
     }
@@ -154,11 +153,7 @@ export class SExprParser {
         this.index = 0;
     }
 
-    /**
-     * @param {Tokenizer.Token|SExprParser|string|number} value
-     * @returns {(string|number|SExprParser)?}
-     * */
-    unbox(value) {
+    unbox(value: Unboxable): Unboxed {
         if (value instanceof Tokenizer.Token) {
             if (
                 [
@@ -184,7 +179,7 @@ export class SExprParser {
         }
     }
 
-    *rest() {
+    * rest() {
         while (this.element) {
             yield this.unbox(this.element);
             this.next();
@@ -358,7 +353,7 @@ export class SExprParser {
      * @param {string} name
      * @yields {SExprParser}
      */
-    *iter_exprs(name) {
+    * iter_exprs(name) {
         const start_index = this.index;
 
         for (const e of this.elements) {
@@ -535,7 +530,7 @@ export class SExprParser {
      */
     expect_vec2_list(name = "pts", point_name = "xy") {
         const pts = [];
-        let e = this.expect_expr(name);
+        const e = this.expect_expr(name);
         let c;
         while ((c = e.maybe_expr(point_name)) !== null) {
             pts.push(new Vec2(c.expect_number(), c.expect_number()));

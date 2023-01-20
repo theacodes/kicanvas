@@ -23,10 +23,8 @@ export class WebGL2Renderer {
      */
     #active_layer;
 
-    /** The color of the viewport & canvas background.
-     * @type {[number, number, number, number]}
-     */
-    #background_color;
+    /** The color of the viewport & canvas background. */
+    #background_color: [number, number, number, number];
 
     /** A list of points belonging to the object that's currently being drawn,
      * used to calculate object BBox.
@@ -38,6 +36,9 @@ export class WebGL2Renderer {
      * Context available to anything that uses this renderer.
      */
     context = {};
+
+    canvas: HTMLCanvasElement;
+    gl: WebGL2RenderingContext;
 
     /**
      * Create a new WebGL2Renderer
@@ -58,7 +59,7 @@ export class WebGL2Renderer {
         // correctly.
         this.canvas.style.backgroundColor = f4_to_rgba(this.#background_color);
 
-        let gl = this.canvas.getContext("webgl2", { alpha: false });
+        const gl = this.canvas.getContext("webgl2", { alpha: false });
 
         if (gl == null) {
             throw new Error("Unable to create WebGL2 context");
@@ -161,7 +162,6 @@ export class WebGL2Renderer {
         this.#layers.push(this.#active_layer);
         this.#active_layer = null;
 
-        // @ts-ignore
         return this.#layers.at(-1);
     }
 

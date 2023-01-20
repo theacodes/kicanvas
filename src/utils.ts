@@ -5,7 +5,7 @@
 */
 
 export async function $onload() {
-    const p = /** @type {Promise<void>} */ (
+    const p: Promise<void> = (
         new Promise((resolve) => {
             window.addEventListener("load", () => {
                 resolve();
@@ -43,7 +43,7 @@ export function $make(tag_name, properties = {}) {
     const elem = document.createElement(tag_name);
     for (const [name, value] of Object.entries(properties)) {
         if (name === "children") {
-            for (const child of value) {
+            for (const child of value as IterableIterator<HTMLElement>) {
                 elem.appendChild(child);
             }
         } else if (name === "innerText") {
