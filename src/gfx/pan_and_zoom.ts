@@ -5,7 +5,7 @@
 */
 
 import { Vec2 } from "../math/vec2.js";
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Camera2 } from "./camera2.js";
 
 /**
