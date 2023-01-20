@@ -39,12 +39,12 @@
         // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "third_party/earcut"
     ],
     "exclude": [
         "node_modules",
         "**/node_modules/*",
-        "./src/kicad/font/parse_newstroke.js",
-        "./src/kicad/font/test.js",
+        "scripts/"
     ]
 }

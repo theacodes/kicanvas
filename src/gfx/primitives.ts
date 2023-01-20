@@ -20,7 +20,7 @@
 
 import { VertexArray, ShaderProgram, Buffer } from "./gl.js";
 import { Vec2 } from "../math/vec2.js";
-import earcut from "../math/earcut/earcut.js";
+import earcut from "../../third_party/earcut/earcut.js";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Matrix3 } from "../math/matrix3.js";
 
