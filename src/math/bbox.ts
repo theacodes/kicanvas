@@ -11,61 +11,41 @@ import { Vec2 } from "./vec2.js";
  * An axis-alignment bounding box (AABB)
  */
 export class BBox {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    context: any;
 
     /**
      * Create a bounding box
-     * @param {number} x
-     * @param {number} y
-     * @param {number} w
-     * @param {number} h
-     * @param {*?} context
      */
-    constructor(x = 0, y = 0, w = 0, h = 0, context = null) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-        this.context = context;
-    }
+    constructor(
+        public x: number = 0,
+        public y: number = 0,
+        public w: number = 0,
+        public h: number = 0,
+        public context: any = null) { }
 
-    /**
-     * @returns {BBox}
-     */
     copy() {
         return new BBox(this.x, this.y, this.w, this.h, this.context);
     }
 
     /**
      * Create a BBox given the top left and bottom right corners
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @param {*?} context
-     * @returns {BBox}
      */
-    static from_corners(x1, y1, x2, y2, context = null) {
+    static from_corners(
+        x1: number, y1: number, x2: number, y2: number, context: any = null) {
+
         if (x2 < x1) {
             [x1, x2] = [x2, x1];
         }
         if (y2 < y1) {
             [y1, y2] = [y2, y1];
         }
+
         return new BBox(x1, y1, x2 - x1, y2 - y1, context);
     }
 
     /**
      * Create a BBox that contains all the given points
-     * @param {Array.<Vec2>} points
-     * @param {*?} context
-     * @returns {BBox}
      */
-    static from_points(points, context = null) {
+    static from_points(points: Vec2[], context: any = null) {
         const start = points[0].copy();
         const end = points[0].copy();
 
@@ -81,11 +61,8 @@ export class BBox {
 
     /**
      * Combine two or more BBoxes into a new BBox that contains both
-     * @param {IterableIterator.<BBox>} boxes
-     * @param {*?} context
-     * @returns {BBox}
      */
-    static combine(boxes, context = null) {
+    static combine(boxes: Iterable<BBox>, context: any = null) {
         let min_x = Number.MAX_VALUE;
         let min_y = Number.MAX_VALUE;
         let max_x = Number.MIN_VALUE;
@@ -115,7 +92,7 @@ export class BBox {
     }
 
     /**
-     * @returns {boolean} true if the bbox has a non-zero area
+     * @returns true if the bbox has a non-zero area
      */
     get valid() {
         return (
@@ -153,7 +130,7 @@ export class BBox {
         return this.x + this.w;
     }
 
-    set x2(v) {
+    set x2(v: number) {
         if (v < this.x) {
             [v, this.x] = [this.x, v];
         }
@@ -164,7 +141,7 @@ export class BBox {
         return this.y + this.h;
     }
 
-    set y2(v) {
+    set y2(v: number) {
         if (v < this.y) {
             [v, this.y] = [this.y, v];
         }
@@ -181,10 +158,9 @@ export class BBox {
     }
 
     /**
-     * @param {number} s
      * @returns A new BBox with the size uniformly modified from the center
      */
-    grow(s) {
+    grow(s: number) {
         return new BBox(
             this.x - s,
             this.y - s,
@@ -195,20 +171,18 @@ export class BBox {
     }
 
     /**
-     * @param {Vec2} v
-     * @returns {boolean} true if the point is within the bounding box.
+     * @returns true if the point is within the bounding box.
      */
-    contains_point(v) {
+    contains_point(v: Vec2) {
         return (
             v.x >= this.x && v.x <= this.x2 && v.y >= this.y && v.y <= this.y2
         );
     }
 
     /**
-     * @param {Vec2} v
-     * @returns {Vec2} A new Vec2 constrained within this bounding box
+     * @returns A new Vec2 constrained within this bounding box
      */
-    constrain_point(v) {
+    constrain_point(v: Vec2): Vec2 {
         const x = Math.min(Math.max(v.x, this.x), this.x2);
         const y = Math.min(Math.max(v.y, this.y), this.y2);
         return new Vec2(x, y);

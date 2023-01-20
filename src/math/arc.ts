@@ -13,11 +13,6 @@ import { Vec2 } from "./vec2.js";
 export class Arc {
     /**
      * Create a new Arc
-     * @param {Vec2} center
-     * @param {number} radius
-     * @param {Angle} start_angle
-     * @param {Angle} end_angle
-     * @param {number} width
      */
     constructor(
         public center: Vec2,
@@ -64,9 +59,8 @@ export class Arc {
 
     /**
      * Approximate the Arc using a polyline
-     * @returns {Array.<Vec2>}
      */
-    to_polyline() {
+    to_polyline(): Vec2[] {
         const start = this.start_angle.radians;
         const end = this.end_angle.radians;
         const points = [];
@@ -106,13 +100,8 @@ export class Arc {
  * Figure out the center point of a circular arc given three points along the circle.
  *
  * Ported from KiCAD's KiMATH trigo
- *
- * @param {Vec2} start
- * @param {Vec2} mid
- * @param {Vec2} end
- * @returns {Vec2}
  */
-function arc_center_from_three_points(start, mid, end) {
+function arc_center_from_three_points(start: Vec2, mid: Vec2, end: Vec2): Vec2 {
     const sqrt_1_2 = Math.SQRT1_2;
     const center = new Vec2(0, 0);
     const y_delta_21 = mid.y - start.y;

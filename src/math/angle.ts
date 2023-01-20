@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+export type AngleLike = Angle | number;
+
 /**
  * An angle for rotation and orientation
  */
@@ -13,19 +15,15 @@ export class Angle {
 
     /**
      * Convert radians to degrees
-     * @param {number} radians
-     * @returns {number} degrees
      */
-    static rad_to_deg(radians) {
+    static rad_to_deg(radians: number) {
         return (radians / Math.PI) * 180;
     }
 
     /**
      * Convert degrees to radians
-     * @param {number} degrees
-     * @returns {number} radians
      */
-    static deg_to_rad(degrees) {
+    static deg_to_rad(degrees: number) {
         return (degrees / 180) * Math.PI;
     }
 
@@ -34,19 +32,15 @@ export class Angle {
      * A lot of math involving angles is done with degrees to two decimal places
      * instead of radians to match KiCAD's behavior and to avoid floating point
      * nonsense.
-     *
-     * @param {*} degrees
-     * @returns
      */
-    static round(degrees) {
+    static round(degrees: number): number {
         return Math.round((degrees + Number.EPSILON) * 100) / 100;
     }
 
     /**
      * Create an Angle
-     * @param {number|Angle} radians
      */
-    constructor(radians) {
+    constructor(radians: AngleLike) {
         if (radians instanceof Angle) {
             return radians;
         }
@@ -73,16 +67,14 @@ export class Angle {
 
     /**
      * Returns a new Angle representing the sum of this angle and the given angle.
-     * @param {Angle|number} other
-     * @returns {Angle}
      */
-    add(other) {
+    add(other: AngleLike) {
         const sum = this.radians + new Angle(other).radians;
         return new Angle(sum);
     }
 
     /**
-     * @returns {Angle} a new Angle constrained to 0 to 360 degrees.
+     * @returns a new Angle constrained to 0 to 360 degrees.
      */
     normalize() {
         let deg = Angle.round(this.degrees);

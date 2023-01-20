@@ -5,7 +5,19 @@
 */
 
 import { Vec2 } from "./vec2.js";
-import { Angle } from "./angle.js";
+import { Angle, AngleLike } from "./angle.js";
+
+type ElementArray = [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+];
 
 /**
  * A 3x3 transformation matrix
@@ -17,16 +29,14 @@ export class Matrix3 {
      * Create a new Matrix
      * @param elements the 9 matrix elements
      */
-    constructor(elements: number[] | Float32Array) {
+    constructor(elements: ElementArray | Float32Array) {
         this.elements = new Float32Array(elements);
     }
 
     /**
      * Create a Matrix3 from a DOMMatrix
-     * @param {DOMMatrix} m
-     * @returns {Matrix3}
      */
-    static from_DOMMatrix(m) {
+    static from_DOMMatrix(m: DOMMatrix): Matrix3 {
         // prettier-ignore
         return new Matrix3([
             m.m11, m.m12, m.m14,
@@ -37,9 +47,8 @@ export class Matrix3 {
 
     /**
      * Create a DOMMatrix from this Matrix3
-     * @returns {DOMMatrix}
      */
-    to_DOMMatrix() {
+    to_DOMMatrix(): DOMMatrix {
         const e = this.elements;
         // prettier-ignore
         return new DOMMatrix([
@@ -51,9 +60,8 @@ export class Matrix3 {
 
     /**
      * Create a 4x4 DOMMatrix from this Matrix3
-     * @returns {DOMMatrix}
      */
-    to_4x4_DOMMatrix() {
+    to_4x4_DOMMatrix(): DOMMatrix {
         const e = this.elements;
         // prettier-ignore
         return new DOMMatrix([
@@ -65,9 +73,9 @@ export class Matrix3 {
     }
 
     /**
-     * @returns {Matrix3} a new identity matrix
+     * @returns a new identity matrix
      */
-    static identity() {
+    static identity(): Matrix3 {
         // prettier-ignore
         return new Matrix3([
             1, 0, 0,
@@ -77,11 +85,9 @@ export class Matrix3 {
     }
 
     /**
-     * @param {number} width
-     * @param {number} height
-     * @returns {Matrix3} a new matrix representing a 2d orthographic projection
+     * @returns a new matrix representing a 2d orthographic projection
      */
-    static orthographic(width, height) {
+    static orthographic(width: number, height: number): Matrix3 {
         // prettier-ignore
         return new Matrix3([
             2 / width, 0, 0,
@@ -91,7 +97,7 @@ export class Matrix3 {
     }
 
     /**
-     * @returns {Matrix3} a copy of this matrix
+     * @returns a copy of this matrix
      */
     copy() {
         return new Matrix3(this.elements);
@@ -99,18 +105,16 @@ export class Matrix3 {
 
     /**
      * Update this matrix's elements
-     * @param {Array.<number>} elements - the 9 matrix elements
      */
-    set(elements) {
+    set(elements: ElementArray) {
         this.elements.set(elements);
     }
 
     /**
      * Transform a vector by multiplying it with this matrix.
-     * @param {Vec2} vec
-     * @returns {Vec2} A new Vec2
+     * @returns A new Vec2
      */
-    transform(vec) {
+    transform(vec: Vec2): Vec2 {
         const a00 = this.elements[0 * 3 + 0];
         const a01 = this.elements[0 * 3 + 1];
         const a10 = this.elements[1 * 3 + 0];
@@ -129,10 +133,9 @@ export class Matrix3 {
 
     /**
      * Transforms a list of vectors
-     * @param {Vec2[]} vecs
-     * @yields {Vec2} new transformed vectors
+     * @yields new transformed vectors
      */
-    *transform_all(vecs) {
+    *transform_all(vecs: Vec2[]) {
         for (const vec of vecs) {
             yield this.transform(vec);
         }
@@ -140,11 +143,8 @@ export class Matrix3 {
 
     /**
      * Transforms a list of vector by a given matrix, which may be null.
-     * @param {Matrix3} mat
-     * @param {Array.<Vec2>} vecs
-     * @returns {Array.<Vec2>}
      */
-    static transform_all(mat, vecs) {
+    static transform_all(mat: Matrix3 | null, vecs: Vec2[]): Vec2[] {
         if (!mat) {
             return vecs;
         }
@@ -154,10 +154,9 @@ export class Matrix3 {
     /**
      * Multiply this matrix by another and store the result
      * in this matrix.
-     * @param {Matrix3} b
-     * @returns {Matrix3} this matrix
+     * @returns this matrix
      */
-    multiply_self(b) {
+    multiply_self(b: Matrix3) {
         const a00 = this.elements[0 * 3 + 0];
         const a01 = this.elements[0 * 3 + 1];
         const a02 = this.elements[0 * 3 + 2];
@@ -192,17 +191,16 @@ export class Matrix3 {
 
     /**
      * Create a new matrix by multiplying this matrix with another
-     * @param {Matrix3} b
-     * @returns {Matrix3} a new matrix
+     * @returns a new matrix
      */
-    multiply(b) {
+    multiply(b: Matrix3) {
         return this.copy().multiply_self(b);
     }
 
     /**
-     * @returns {Matrix3} A new matrix that is the inverse of this matrix
+     * @returns A new matrix that is the inverse of this matrix
      */
-    inverse() {
+    inverse(): Matrix3 {
         const a00 = this.elements[0 * 3 + 0];
         const a01 = this.elements[0 * 3 + 1];
         const a02 = this.elements[0 * 3 + 2];
@@ -234,11 +232,9 @@ export class Matrix3 {
     }
 
     /**
-     * @param {number} x
-     * @param {number} y
-     * @returns {Matrix3} A new matrix representing a 2d translation
+     * @returns A new matrix representing a 2d translation
      */
-    static translation(x, y) {
+    static translation(x: number, y: number): Matrix3 {
         // prettier-ignore
         return new Matrix3([
             1, 0, 0,
@@ -249,30 +245,24 @@ export class Matrix3 {
 
     /**
      * Translate this matrix by the given amounts
-     * @param {number} x
-     * @param {number} y
      * @returns this matrix
      */
-    translate_self(x, y) {
+    translate_self(x: number, y: number) {
         return this.multiply_self(Matrix3.translation(x, y));
     }
 
     /**
      * Creates a new matrix representing this matrix translated by the given amount
-     * @param {*} x
-     * @param {*} y
-     * @returns {Matrix3} a new matrix
+     * @returns a new matrix
      */
-    translate(x, y) {
+    translate(x: number, y: number): Matrix3 {
         return this.copy().translate_self(x, y);
     }
 
     /**
-     * @param {number} x
-     * @param {number} y
      * @returns {Matrix3} A new matrix representing a 2d scale
      */
-    static scaling(x, y) {
+    static scaling(x: number, y: number): Matrix3 {
         // prettier-ignore
         return new Matrix3([
             x, 0, 0,
@@ -283,29 +273,24 @@ export class Matrix3 {
 
     /**
      * Scale this matrix by the given amounts
-     * @param {number} x
-     * @param {number} y
      * @returns this matrix
      */
-    scale_self(x, y) {
+    scale_self(x: number, y: number) {
         return this.multiply_self(Matrix3.scaling(x, y));
     }
 
     /**
      * Creates a new matrix representing this matrix scaled by the given amount
-     * @param {*} x
-     * @param {*} y
-     * @returns {Matrix3} a new matrix
+     * @returns a new matrix
      */
-    scale(x, y) {
+    scale(x: number, y: number): Matrix3 {
         return this.copy().scale_self(x, y);
     }
 
     /**
-     * @param {Angle|number} angle
      * @returns A new matrix representing a 2d rotation
      */
-    static rotation(angle) {
+    static rotation(angle: AngleLike): Matrix3 {
         const theta = new Angle(angle).radians;
         const cos = Math.cos(theta);
         const sin = Math.sin(theta);
@@ -319,20 +304,17 @@ export class Matrix3 {
 
     /**
      * Rotate this matrix by the given angle
-     * @param {Angle|number} angle
      * @returns this matrix
      */
-    rotate_self(angle) {
+    rotate_self(angle: AngleLike) {
         return this.multiply_self(Matrix3.rotation(angle));
     }
 
     /**
      * Creates a new matrix representing this matrix rotated by the given angle
-     * @param {*} x
-     * @param {*} y
-     * @returns {Matrix3} a new matrix
+     * @returns a new matrix
      */
-    rotate(x, y) {
-        return this.copy().rotate(x, y);
+    rotate(angle: AngleLike) {
+        return this.copy().rotate(angle);
     }
 }

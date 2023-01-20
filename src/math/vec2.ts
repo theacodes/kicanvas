@@ -4,8 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle } from "./angle.js";
+import { Angle, AngleLike } from "./angle.js";
 import { Matrix3 } from "./matrix3.js";
+
+
+export type Vec2Like = Vec2 | { x: number, y: number } | [number, number] | number;
 
 /**
  * A 2-dimensional point vector
@@ -18,16 +21,13 @@ export class Vec2 {
 
     /**
      * Create a Vec2
-     * @param {number|Vec2} x_or_other
-     * @param {number?} y
      */
-    constructor(x_or_other = 0, y = null) {
-        this.set(x_or_other, y);
+    constructor(x: Vec2Like = 0, y: number | null = null) {
+        this.set(x, y);
     }
 
     /**
      * Copy this vector
-     * @returns Vec2
      */
     copy() {
         return new Vec2(...this);
@@ -35,20 +35,27 @@ export class Vec2 {
 
     /**
      * Update this vector's values
-     * @param {number|Vec2|*} x_or_other
-     * @param {number?} y
      */
-    set(x_or_other, y = null) {
-        if (
-            x_or_other instanceof this.constructor ||
-            Object.hasOwn(x_or_other, "x")
+    set(x: Vec2Like, y: number = null) {
+        let x_prime: number;
+
+        if (typeof x == "number" && typeof y == "number") {
+            x_prime = x;
+        } else if (x instanceof Vec2) {
+            x_prime = x.x;
+            y = x.y;
+        } else if (x instanceof Array) {
+            x_prime = x[0];
+            y = x[1];
+        } else if (
+            x instanceof Object && Object.hasOwn(x, "x")
         ) {
-            this.x = x_or_other.x;
-            this.y = x_or_other.y;
-        } else {
-            this.x = x_or_other;
-            this.y = y;
+            this.x = x.x;
+            this.y = x.y;
         }
+
+        this.x = x_prime;
+        this.y = y;
     }
 
     /** Iterate through [x, y] */
@@ -57,56 +64,56 @@ export class Vec2 {
         yield this.y;
     }
 
-    get magnitude() {
+    get magnitude(): number {
         return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
 
     /**
-     * @returns {Vec2} the perpendicular normal of this vector
+     * @returns the perpendicular normal of this vector
      */
-    get normal() {
+    get normal(): Vec2 {
         return new Vec2(-this.y, this.x);
     }
 
     /**
-     * @returns {Angle} the direction (angle) of this vector
+     * @returns the direction (angle) of this vector
      */
-    get angle() {
+    get angle(): Angle {
         return new Angle(Math.atan2(this.y, this.x));
     }
 
     /**
-     * @returns {Vec2} a new unit vector in the same direction as this vector
+     * @returns A new unit vector in the same direction as this vector
      */
-    normalize() {
+    normalize(): Vec2 {
         const l = this.magnitude;
-        this.x /= l;
-        this.y /= l;
-        return this;
+        const x = this.x /= l;
+        const y = this.y /= l;
+        return new Vec2(x, y);
     }
 
-    equals(b) {
+    equals(b: Vec2) {
         return this.x == b.x && this.y == b.y;
     }
 
-    add(b) {
+    add(b: Vec2) {
         return new Vec2(this.x + b.x, this.y + b.y);
     }
 
-    sub(b) {
+    sub(b: Vec2) {
         return new Vec2(this.x - b.x, this.y - b.y);
     }
 
-    scale(b) {
+    scale(b: Vec2) {
         return new Vec2(this.x * b.x, this.y * b.y);
     }
 
-    rotate(a) {
-        const m = Matrix3.rotation(a);
+    rotate(angle: AngleLike) {
+        const m = Matrix3.rotation(angle);
         return m.transform(this);
     }
 
-    multiply(s) {
+    multiply(s: number) {
         return new Vec2(this.x * s, this.y * s);
     }
 }
