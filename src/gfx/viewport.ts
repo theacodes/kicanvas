@@ -9,7 +9,7 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Camera2 } from "./camera2.js";
 import { PanAndZoom } from "./pan_and_zoom.js";
 import { CanvasSizeObserver } from "./canvas_size_observer.js";
-import { WebGL2Renderer } from "./renderer.js";
+import { WebGL2Renderer, Canvas2DRenderer } from "./renderer.js";
 import { Angle } from "../math/angle.js";
 
 /**
@@ -17,16 +17,16 @@ import { Angle } from "../math/angle.js";
  * into a scene.
  */
 export class Viewport {
-    width;
-    height;
-    camera;
-    projection;
+    width: number;
+    height: number;
+    camera: Camera2;
+    projection: Matrix3;
 
     /**
      * Create a Scene
      * @param callback - a callback used to re-draw the viewport when it changes.
      */
-    constructor(public renderer: WebGL2Renderer, public callback: (() => void)) {
+    constructor(public renderer: WebGL2Renderer | Canvas2DRenderer, public callback: (() => void)) {
         this.camera = new Camera2(
             new Vec2(0, 0),
             new Vec2(0, 0),
