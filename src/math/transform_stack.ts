@@ -4,6 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Matrix3 } from "./matrix3";
+import { Vec2 } from "./vec2";
+
 class Transform {
     constructor(
         public x: number = 0,
@@ -29,7 +32,7 @@ class Transform {
     }
 
     transform_point(x, y) {
-        const p = this.mat.transformPoint(new DOMPoint(x, y));
+        const p = this.mat.transform(new Vec2(x, y));
         return { x: p.x, y: p.y };
     }
 
@@ -43,35 +46,35 @@ class Transform {
     }
 
     get mat() {
-        const mat = new DOMMatrix();
-        mat.translateSelf(this.x, this.y);
-        mat.scaleSelf(this.flip_x ? -1 : 1, this.flip_y ? -1 : 1);
-        mat.rotateSelf(this.rotation);
+        const mat = Matrix3.identity();
+        mat.translate_self(this.x, this.y);
+        mat.scale_self(this.flip_x ? -1 : 1, this.flip_y ? -1 : 1);
+        mat.rotate_self(this.rotation);
         return mat;
     }
 }
 
 export class TransformStack {
     ctx: CanvasRenderingContext2D;
-    base_matrix: DOMMatrix;
+    base_matrix: Matrix3;
     t_stack: Transform[] = [];
-    m_stack: DOMMatrix[] = [];
+    m_stack: Matrix3[] = [];
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
-        this.base_matrix = ctx.getTransform();
+        this.base_matrix = Matrix3.from_DOMMatrix(ctx.getTransform());
     }
 
     push(x = 0, y = 0, rotation = 0, flip_x = false, flip_y = false) {
         const tx = new Transform(x, y, rotation, flip_x, flip_y);
-        this.m_stack.push(this.ctx.getTransform());
+        this.m_stack.push(Matrix3.from_DOMMatrix(this.ctx.getTransform()));
         this.t_stack.push(tx);
         tx.apply(this.ctx);
     }
 
     pop() {
         this.t_stack.pop();
-        this.ctx.setTransform(this.m_stack.pop());
+        this.ctx.setTransform(this.m_stack.pop().to_DOMMatrix());
     }
 
     get abs() {
@@ -92,9 +95,9 @@ export class TransformStack {
     }
 
     get mat() {
-        const mat = new DOMMatrix();
+        const mat = Matrix3.identity();
         for (const tx of this.t_stack) {
-            mat.multiplySelf(tx.mat);
+            mat.multiply_self(tx.mat);
         }
         return mat;
     }

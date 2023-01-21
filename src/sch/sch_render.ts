@@ -4,8 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-// @ts-nocheck
-
 import * as items from "../kicad/sch_items.js";
 import { Arc } from "../math/arc.js";
 import { TransformStack } from "../math/transform_stack.js";
@@ -54,6 +52,8 @@ class Style {
         );
         this.min_page_width = pf("--min-page-width") || 0;
     }
+
+    [key: string]: any;
 }
 
 export class Renderer {
@@ -246,11 +246,8 @@ export class Renderer {
                 -metrics.actualBoundingBoxAscent,
                 metrics.actualBoundingBoxRight,
                 metrics.actualBoundingBoxDescent,
-                this.transforms.mat,
                 text
-            );
-
-            bb = bb.transform(this.transforms.mat);
+            ).transform(this.transforms.mat);
         });
 
         return bb;
@@ -261,7 +258,7 @@ export class Renderer {
             this.ctx.font = `${1.27 * this.style.font_size}px "${this.style.font_family
                 }"`;
             this.ctx.textAlign = "center";
-            this.ctx.textBaseline = "center";
+            this.ctx.textBaseline = "middle";
             return;
         }
 
@@ -390,7 +387,12 @@ export class Renderer {
     draw_Arc(a) {
         const a2 = Arc.from_three_points(a.start, a.mid, a.end);
         this.ctx.beginPath();
-        this.ctx.arc(a2.center.x, a2.center.y, a2.radius, a2.start, a2.end);
+        this.ctx.arc(
+            a2.center.x,
+            a2.center.y,
+            a2.radius,
+            a2.start_angle.radians,
+            a2.end_angle.radians);
         this.ctx.stroke();
     }
 
@@ -505,7 +507,7 @@ export class Renderer {
         this.ctx.fillStyle = this.style.hierarchical_label;
         this.ctx.strokeStyle = this.style.hierarchical_label;
 
-        let s = 1.5;
+        const s = 1.5;
 
         this.ctx.beginPath();
         if (l.shape == "input") {
@@ -727,7 +729,7 @@ export class Renderer {
         let bb = new BBox(0, 0, 0, 0);
 
         for (const p of Object.values(s.pins)) {
-            let pin_bb = this.bbox_Pin(
+            const pin_bb = this.bbox_Pin(
                 p,
                 s.pin_name_offset,
                 s.hide_pin_names || hide_pin_names,
@@ -758,7 +760,7 @@ export class Renderer {
         );
 
         this.draw_LibrarySymbol(si.lib_symbol);
-        this.draw_LibrarySymbol_Pins(si.lib_symbol);
+        this.draw_LibrarySymbol_Pins(si.lib_symbol, false, false);
 
         this.pop();
 
@@ -781,7 +783,7 @@ export class Renderer {
         bb = BBox.combine([
             bb,
             this.bbox_LibrarySymbol(si.lib_symbol),
-            this.bbox_LibrarySymbol_Pins(si.lib_symbol),
+            this.bbox_LibrarySymbol_Pins(si.lib_symbol, false, false),
         ]);
 
         this.pop();
