@@ -17,48 +17,34 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
 import { WebGL2Renderer } from "../gfx/renderer.js";
 import { Layer } from "./layers.js";
+import { ColorF4 } from "../gfx/colorspace.js";
 
 /**
  * Painter base class
- * @interface
  */
 class GenericPainter {
     /**
      * List of item classes this painter can draw
-     * @type {Array.<Function>}
-     * @abstract
      */
     static classes = [];
 
     /**
      * List of layer names that the given item appears on
-     * @param {*} item
-     * @returns {Array.<string>}
      */
-    static layers(item) {
+    static layers(item: any) {
         return [item.layer];
     }
 
     /**
      * Paint the given item on the specified layer
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {*} item
-     * @abstract
      */
-    static paint(gfx, layer, item) { }
+    static paint(gfx: WebGL2Renderer, layer: Layer, item: any) { }
 }
 
 class LinePainter extends GenericPainter {
     static classes = [pcb_items.GrLine, pcb_items.FpLine];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.GrLine|pcb_items.FpLine} s
-     * @override
-     */
-    static paint(gfx, layer, s) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, s: pcb_items.GrLine | pcb_items.FpLine) {
         const points = [s.start, s.end];
         gfx.line(points, s.width, layer.color);
     }
@@ -67,13 +53,7 @@ class LinePainter extends GenericPainter {
 class RectPainter extends GenericPainter {
     static classes = [pcb_items.GrRect, pcb_items.FpRect];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.GrRect|pcb_items.FpRect} r
-     * @override
-     */
-    static paint(gfx, layer, r) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, r: pcb_items.GrRect | pcb_items.FpRect) {
         const color = layer.color;
         const points = [
             r.start,
@@ -94,13 +74,7 @@ class RectPainter extends GenericPainter {
 class PolyPainter extends GenericPainter {
     static classes = [pcb_items.GrPoly, pcb_items.FpPoly];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.GrPoly|pcb_items.FpPoly} p
-     * @override
-     */
-    static paint(gfx, layer, p) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, p: pcb_items.GrPoly | pcb_items.FpPoly) {
         const color = layer.color;
 
         if (p.width) {
@@ -116,13 +90,7 @@ class PolyPainter extends GenericPainter {
 class ArcPainter extends GenericPainter {
     static classes = [pcb_items.GrArc, pcb_items.FpArc];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.GrArc|pcb_items.FpArc} a
-     * @override
-     */
-    static paint(gfx, layer, a) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, a: pcb_items.GrArc | pcb_items.FpArc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         gfx.line(points, arc.width, layer.color);
@@ -132,13 +100,7 @@ class ArcPainter extends GenericPainter {
 class CirclePainter extends GenericPainter {
     static classes = [pcb_items.GrCircle, pcb_items.FpCircle];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.GrCircle|pcb_items.FpCircle} c
-     * @override
-     */
-    static paint(gfx, layer, c) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, c: pcb_items.GrCircle | pcb_items.FpCircle) {
         const color = layer.color;
 
         const radius = c.center.sub(c.end).magnitude;
@@ -162,13 +124,7 @@ class CirclePainter extends GenericPainter {
 class TraceSegmentPainter extends GenericPainter {
     static classes = [pcb_items.Segment];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Segment} s
-     * @override
-     */
-    static paint(gfx, layer, s) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, s: pcb_items.Segment) {
         const points = [s.start, s.end];
         gfx.line(points, s.width, layer.color);
     }
@@ -177,13 +133,7 @@ class TraceSegmentPainter extends GenericPainter {
 class TraceArcPainter extends GenericPainter {
     static classes = [pcb_items.Arc];
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Arc} a
-     * @override
-     */
-    static paint(gfx, layer, a) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, a: pcb_items.Arc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         gfx.line(points, arc.width, layer.color);
@@ -193,17 +143,11 @@ class TraceArcPainter extends GenericPainter {
 class ViaPainter extends GenericPainter {
     static classes = [pcb_items.Via];
 
-    static layers(v) {
+    static layers(v: pcb_items.Via): string[] {
         return [":Via:Holes", ":Via:Through"];
     }
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Via} v
-     * @override
-     */
-    static paint(gfx, layer, v) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, v: pcb_items.Via) {
         const color = layer.color;
         if (layer.name == ":Via:Through") {
             gfx.circle(v.at, v.size / 2, color);
@@ -216,17 +160,11 @@ class ViaPainter extends GenericPainter {
 class ZonePainter extends GenericPainter {
     static classes = [pcb_items.Zone];
 
-    static layers(z) {
+    static layers(z: pcb_items.Zone): string[] {
         return z.layers.map((l) => `:Zones:${l}`);
     }
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Zone} z
-     * @override
-     */
-    static paint(gfx, layer, z) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, z: pcb_items.Zone) {
         if (!z.filled_polygons) {
             return;
         }
@@ -236,7 +174,7 @@ class ZonePainter extends GenericPainter {
             }
             const color = Array.from(layer.color);
             color[3] = 0.5; // TODO: Remove
-            gfx.polygon(p.pts, color);
+            gfx.polygon(p.pts, color as ColorF4);
         }
     }
 }
@@ -244,9 +182,9 @@ class ZonePainter extends GenericPainter {
 class PadPainter extends GenericPainter {
     static classes = [pcb_items.Pad];
 
-    static layers(pad) {
+    static layers(pad: pcb_items.Pad): string[] {
         // TODO: Port KiCAD's logic over.
-        const layers = [];
+        const layers: string[] = [];
 
         for (const layer of pad.layers) {
             if (layer == "*.Cu") {
@@ -280,13 +218,7 @@ class PadPainter extends GenericPainter {
         return layers;
     }
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Pad} pad
-     * @override
-     */
-    static paint(gfx, layer, pad) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, pad: pcb_items.Pad) {
         const color = layer.color;
 
         const position_mat = Matrix3.translation(
@@ -452,21 +384,15 @@ class PadPainter extends GenericPainter {
 class TextPainter extends GenericPainter {
     static classes = [pcb_items.GrText, pcb_items.FpText];
 
-    static layers(t) {
-        if (t.hide) {
+    static layers(t: pcb_items.GrText | pcb_items.FpText) {
+        if (t instanceof pcb_items.FpText && t.hide) {
             return [];
         } else {
             return [t.layer];
         }
     }
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.GrText|pcb_items.FpText} t
-     * @override
-     */
-    static paint(gfx, layer, t) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, t: pcb_items.GrText | pcb_items.FpText) {
         let rotation = t.at.rotation;
 
         if (rotation == 180 || rotation == -180) {
@@ -499,23 +425,17 @@ class TextPainter extends GenericPainter {
 class DimensionPainter extends GenericPainter {
     static classes = [pcb_items.Dimension];
 
-    static layers(d) {
+    static layers(d: pcb_items.Dimension): string[] {
         return [];
     }
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Dimension} d
-     * @override
-     */
-    static paint(gfx, layer, d) { }
+    static paint(gfx: WebGL2Renderer, layer: Layer, d: pcb_items.Dimension) { }
 }
 
 class FootprintPainter extends GenericPainter {
     static classes = [pcb_items.Footprint];
 
-    static layers(fp) {
+    static layers(fp: pcb_items.Footprint): string[] {
         const layers = new Set();
         for (const item of fp.items) {
             const item_layers =
@@ -524,16 +444,10 @@ class FootprintPainter extends GenericPainter {
                 layers.add(layer);
             }
         }
-        return Array.from(layers.values());
+        return Array.from(layers.values()) as string[];
     }
 
-    /**
-     * @param {WebGL2Renderer} gfx
-     * @param {Layer} layer
-     * @param {pcb_items.Footprint} fp
-     * @override
-     */
-    static paint(gfx, layer, fp) {
+    static paint(gfx: WebGL2Renderer, layer: Layer, fp: pcb_items.Footprint) {
         const matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y

@@ -9,8 +9,8 @@ import * as pcb_items from "./kicad/pcb_items.js";
 import { Viewport } from "./gfx/viewport.js";
 import * as pcb_view from "./pcb/view.js";
 import { WebGL2Renderer } from "./gfx/renderer.js";
-import { ColorF4, f4_to_rgba } from "./gfx/colorspace.js";
-import { board as board_colors } from "./pcb/colors.js";
+import { ColorF4, f4_to_rgba, rgba_to_f4 } from "./gfx/colorspace.js";
+import * as color_theme from "./kicad/color_theme";
 import { Vec2 } from "./math/vec2.js";
 import { TextShaper } from "./gfx/text.js";
 import { BBox } from "./math/bbox.js";
@@ -28,7 +28,7 @@ class PCBViewer {
         this.#cvs = canvas;
         this.#renderer = new WebGL2Renderer(
             this.#cvs,
-            board_colors.background as unknown as ColorF4);
+            rgba_to_f4(color_theme.board.background));
 
         this.#cvs.addEventListener("click", (e) => {
             const rect = this.#cvs.getBoundingClientRect();
@@ -74,7 +74,7 @@ class PCBViewer {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
 
-        this.#view = new pcb_view.View(this.#renderer, this.pcb, board_colors);
+        this.#view = new pcb_view.View(this.#renderer, this.pcb, color_theme.board);
         this.#view.setup();
 
         this.#look_at_board();

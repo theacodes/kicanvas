@@ -7,6 +7,7 @@
 import { WebGL2Renderer } from "../gfx/renderer.js";
 import { KicadPCB } from "../kicad/pcb_items.js";
 import { BBox } from "../math/bbox.js";
+import { Matrix3 } from "../math/matrix3.js";
 import { LayerSet } from "./layers.js";
 import { Painter } from "./painter.js";
 
@@ -14,9 +15,9 @@ export class View {
     painter: Painter;
     layers: LayerSet;
 
-    constructor(public gfx: WebGL2Renderer, public board: KicadPCB, colors) {
+    constructor(public gfx: WebGL2Renderer, public board: KicadPCB, public color_theme) {
         this.painter = new Painter(this.gfx);
-        this.layers = new LayerSet(colors);
+        this.layers = new LayerSet(color_theme);
     }
 
     setup() {
@@ -47,13 +48,13 @@ export class View {
         }
     }
 
-    get_board_bbox() {
+    get_board_bbox(): BBox {
         const edge_cuts = this.layers.by_name("Edge.Cuts");
         return BBox.combine(edge_cuts.bboxes.values());
     }
 
-    draw(matrix) {
-        let depth = 0;
+    draw(matrix: Matrix3) {
+        let depth = 0.01;
         const layers = Array.from(this.layers.in_display_order()).reverse();
         for (const layer of layers) {
             if (layer.visible && layer.enabled && layer.graphics) {

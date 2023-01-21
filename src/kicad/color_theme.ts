@@ -7,27 +7,6 @@
 import { rgba_to_f4 } from "../gfx/colorspace.js";
 
 export const board = {
-    get_layer_color(layer_name: string) {
-        switch (layer_name) {
-            case ":Via:Holes":
-                return this.via_hole;
-            case ":Via:Through":
-                return this.via_through;
-            case ":Pad:Holes":
-                return this.background;
-            case ":Pad:HoleWalls":
-                return this.pad_through_hole;
-        }
-
-        let name = layer_name;
-
-        name = name.replace(":Zones:", "").replace(".", "_").toLowerCase();
-        if (name.endsWith("_cu")) {
-            name = name.replace("_cu", "");
-            return this.copper[name];
-        }
-        return this[name];
-    },
     anchor: "rgb(100, 203, 150)",
     aux_items: "rgb(255, 98, 0)",
     b_adhes: "rgb(0, 0, 132)",
@@ -111,18 +90,6 @@ export const board = {
     worksheet: "rgb(99, 78, 137)",
 };
 
-function colors_to_f4(colors) {
-    for (const [key, val] of Object.entries(colors)) {
-        if (typeof val == "string") {
-            colors[key] = rgba_to_f4(val);
-        } else {
-            colors_to_f4(colors[key]);
-        }
-    }
-}
-
-colors_to_f4(board);
-
 export const palette = [
     "rgb(200, 52, 52)",
     "rgb(127, 200, 127)",
@@ -162,7 +129,6 @@ export const schematic = {
     label_local: "rgb(220, 200, 255)",
     no_connect: "rgb(255, 129, 173)",
     note: "rgb(248, 248, 240)",
-    override_item_colors: false,
     pin: "rgb(129, 255, 190)",
     pin_name: "rgb(129, 255, 190)",
     pin_number: "rgb(100, 203, 150)",

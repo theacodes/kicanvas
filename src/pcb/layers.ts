@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { ColorF4, rgba_to_f4 } from "../gfx/colorspace.js";
 import { PrimitiveSet } from "../gfx/primitives.js";
 import { BBox } from "../math/bbox.js";
 
@@ -16,22 +17,14 @@ type VisibilityType = boolean | (() => boolean);
  * generated using Painters.
  */
 export class Layer {
-    /** @type {LayerSet} */
-    #layer_set;
-
-    /** @type {string} */
-    name;
-
+    #layer_set: LayerSet;
+    name: string;
     #visible: VisibilityType;
-
-    /** @type {boolean} */
-    enabled;
-
-    /** @type {Array.<number>} */
-    color;
+    enabled: boolean;
+    color: ColorF4;
 
     /**
-     * Items on this layer.
+     * Board items on this layer.
      */
     items: any[];
 
@@ -48,14 +41,17 @@ export class Layer {
 
     /**
      * Create a new Layer.
-     * @param {LayerSet} layer_set - the LayerSet that this Layer belongs to
-     * @param {string} name - this layer's name
-     * @param {boolean|Function} visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
-     * @param {boolean} enabled - controls whether the layer is present at all in the board data
+     * @param  layer_set - the LayerSet that this Layer belongs to
+     * @param name - this layer's name
+     * @param visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
+     * @param enabled - controls whether the layer is present at all in the board data
      */
     constructor(
         layer_set: LayerSet,
-        name: string, visible: VisibilityType = true, enabled = true) {
+        name: string,
+        visible: VisibilityType = true,
+        enabled = true
+    ) {
         this.#layer_set = layer_set;
         this.name = name;
         this.color = this.#layer_set.color_for(this.name);
@@ -64,8 +60,7 @@ export class Layer {
         this.items = [];
     }
 
-    /** true if this layer should be drawn */
-    get visible() {
+    get visible(): boolean {
         if (this.#visible instanceof Function) {
             return this.#visible();
         } else {
@@ -88,16 +83,15 @@ const max_inner_copper_layers = 30;
  * for drill holes and such.
  */
 export class LayerSet {
-    #colors;
-    #layer_list = [];
-    #layer_map = new Map();
+    #color_theme: any;
+    #layer_list: Layer[] = [];
+    #layer_map: Map<string, Layer> = new Map();
 
     /**
      * Create a new LayerSet
-     * @param {*} colors the color theme to use
      */
-    constructor(colors) {
-        this.#colors = colors;
+    constructor(color_theme) {
+        this.#color_theme = color_theme;
 
         this.#layer_list = [
             new Layer(this, ":Overlay"),
@@ -151,7 +145,7 @@ export class LayerSet {
             new Layer(this, "F.Fab"),
         ];
 
-        for (let i = 0; i <= max_inner_copper_layers; i++) {
+        for (let i = 1; i <= max_inner_copper_layers; i++) {
             const name = `In${i}.Cu`;
             this.#layer_list.push(new Layer(this, name, false, false));
             this.#layer_list.push(
@@ -182,15 +176,37 @@ export class LayerSet {
 
     /**
      * Get the theme color for a given layer.
-     * @param {string} layer_name
-     * @returns {Array.<number>} normalized [r, g, b, a]
+
      */
-    color_for(layer_name) {
-        return this.#colors.get_layer_color(layer_name);
+    color_for(layer_name: string): ColorF4 {
+        switch (layer_name) {
+            case ":Via:Holes":
+                return rgba_to_f4(this.#color_theme.via_hole);
+            case ":Via:Through":
+                return rgba_to_f4(this.#color_theme.via_through);
+            case ":Pad:Holes":
+                return rgba_to_f4(this.#color_theme.background);
+            case ":Pad:HoleWalls":
+                return rgba_to_f4(this.#color_theme.pad_through_hole);
+        }
+
+        let name = layer_name;
+
+        name = (name
+            .replace(":Zones:", "")
+            .replace(".", "_")
+            .toLowerCase());
+
+        if (name.endsWith("_cu")) {
+            name = name.replace("_cu", "");
+            return rgba_to_f4(this.#color_theme.copper[name]);
+        }
+
+        return rgba_to_f4(this.#color_theme[name] ?? "rgba(1, 0, 0, 1)");
     }
 
     /**
-     * @yields {Layer} layers in the order they should be drawn
+     * @yields layers in the order they should be drawn
      */
     *in_display_order() {
         for (const layer of this.#layer_list) {
@@ -199,7 +215,7 @@ export class LayerSet {
     }
 
     /**
-     * @yields {Layer} layers that coorespond to board layers that should be
+     * @yields layers that coorespond to board layers that should be
      *      displayed in the layer selection UI
      */
     *in_ui_order() {
@@ -247,7 +263,7 @@ export class LayerSet {
                     }
                 }
             } else {
-                const layer: Layer = this.by_name(name);
+                const layer: Layer = this.by_name(name as string);
 
                 if (layer.enabled) {
                     yield layer;
@@ -258,17 +274,15 @@ export class LayerSet {
 
     /**
      * Gets a Layer by name
-     * @param {string} name
-     * @returns {Layer}
      */
-    by_name(name) {
+    by_name(name: string): Layer {
         return this.#layer_map.get(name);
     }
 
     /**
-     * @returns {boolean} true if any copper layer is enabled and visible.
+     * @returns true if any copper layer is enabled and visible.
      */
-    is_any_copper_layer_visible() {
+    is_any_copper_layer_visible(): boolean {
         for (const l of this.in_display_order()) {
             if (l.name.endsWith(".Cu") && l.enabled && l.visible) {
                 return true;

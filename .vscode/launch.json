@@ -8,8 +8,8 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8000/demos/board.html",
-            "webRoot": "${workspaceFolder}",
+            "url": "http://localhost:8000/board.html",
+            "webRoot": "${workspaceFolder}/www",
             "preLaunchTask": "${defaultBuildTask}",
         }
     ]
