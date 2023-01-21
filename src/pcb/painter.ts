@@ -17,7 +17,7 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
 import { WebGL2Renderer } from "../gfx/renderer.js";
 import { Layer } from "./layers.js";
-import { ColorF4 } from "../gfx/colorspace.js";
+import { Color } from "../gfx/color.js";
 
 /**
  * Painter base class
@@ -172,9 +172,10 @@ class ZonePainter extends GenericPainter {
             if (!layer.name.includes(p.layer)) {
                 continue;
             }
-            const color = Array.from(layer.color);
-            color[3] = 0.5; // TODO: Remove
-            gfx.polygon(p.pts, color as ColorF4);
+
+            // TODO: Remove
+            const color = new Color(layer.color.r, layer.color.g, layer.color.b, layer.color.a * 0.5);
+            gfx.polygon(p.pts, color);
         }
     }
 }

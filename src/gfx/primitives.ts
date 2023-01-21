@@ -22,14 +22,14 @@ import { VertexArray, ShaderProgram, Buffer } from "./gl.js";
 import { Vec2 } from "../math/vec2.js";
 import earcut from "../../third_party/earcut/earcut.js";
 import { Matrix3 } from "../math/matrix3.js";
-import { ColorF4 } from "./colorspace.js";
+import { Color } from "./color.js";
 
 /** Circle primitive data */
 export class Circle {
     /**
      * Create a filled circle
      */
-    constructor(public point: Vec2, public radius: number, public color: ColorF4) {
+    constructor(public point: Vec2, public radius: number, public color: Color) {
     }
 }
 
@@ -40,7 +40,7 @@ export class Polyline {
      * @param points - line segment points
      * @param width - thickness of the rendered line
      */
-    constructor(public points: Vec2[], public width: number, public color: ColorF4) {
+    constructor(public points: Vec2[], public width: number, public color: Color) {
     }
 }
 
@@ -52,7 +52,7 @@ export class Polygon {
      * Create a filled polygon
      * @param points - point cloud representing the polygon
      */
-    constructor(public points: Vec2[], public color: ColorF4) { }
+    constructor(public points: Vec2[], public color: Color) { }
 
     /**
      * Convert a point cloud polygon into an array of triangles.
@@ -126,15 +126,16 @@ class Tesselator {
      */
     static populate_color_data(
         dest: Float32Array,
-        color: ColorF4,
+        color: Color,
         offset: number,
         length: number
     ) {
         if (!color) {
-            color = [1, 0, 0, 1];
+            color = new Color(1, 0, 0, 1);
         }
+        const color_data = color.to_array();
         for (let i = 0; i < length; i++) {
-            dest[offset + i] = color[i % color.length];
+            dest[offset + i] = color_data[i % color_data.length];
         }
     }
 
@@ -480,7 +481,7 @@ export class PolygonSet {
      * outlines of the results of triangulation.
      *
      */
-    static polyline_from_triangles(triangles: Float32Array, width: number, color: ColorF4): Polyline[] {
+    static polyline_from_triangles(triangles: Float32Array, width: number, color: Color): Polyline[] {
         const lines = [];
         for (let i = 0; i < triangles.length; i += 6) {
             const a = new Vec2(triangles[i], triangles[i + 1]);
@@ -595,7 +596,7 @@ export class PrimitiveSet {
     /**
      * Collect a new filled circle
      */
-    add_circle(point: Vec2, radius: number, color: ColorF4) {
+    add_circle(point: Vec2, radius: number, color: Color) {
         this.#circles.push({
             point: point,
             radius: radius,
@@ -615,7 +616,7 @@ export class PrimitiveSet {
     /**
      * Collect a new polyline
      */
-    add_line(points: Vec2[], width: number, color: ColorF4) {
+    add_line(points: Vec2[], width: number, color: Color) {
         this.#lines.push({
             points: points,
             width: width,

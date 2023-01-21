@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { ColorF4, rgba_to_f4 } from "../gfx/colorspace.js";
+import { Color } from "../gfx/color.js";
 import { PrimitiveSet } from "../gfx/primitives.js";
 import { BBox } from "../math/bbox.js";
 
@@ -21,7 +21,7 @@ export class Layer {
     name: string;
     #visible: VisibilityType;
     enabled: boolean;
-    color: ColorF4;
+    color: Color;
 
     /**
      * Board items on this layer.
@@ -178,16 +178,16 @@ export class LayerSet {
      * Get the theme color for a given layer.
 
      */
-    color_for(layer_name: string): ColorF4 {
+    color_for(layer_name: string): Color {
         switch (layer_name) {
             case ":Via:Holes":
-                return rgba_to_f4(this.#color_theme.via_hole);
+                return this.#color_theme.via_hole;
             case ":Via:Through":
-                return rgba_to_f4(this.#color_theme.via_through);
+                return this.#color_theme.via_through;
             case ":Pad:Holes":
-                return rgba_to_f4(this.#color_theme.background);
+                return this.#color_theme.background;
             case ":Pad:HoleWalls":
-                return rgba_to_f4(this.#color_theme.pad_through_hole);
+                return this.#color_theme.pad_through_hole;
         }
 
         let name = layer_name;
@@ -199,10 +199,10 @@ export class LayerSet {
 
         if (name.endsWith("_cu")) {
             name = name.replace("_cu", "");
-            return rgba_to_f4(this.#color_theme.copper[name]);
+            return this.#color_theme.copper[name];
         }
 
-        return rgba_to_f4(this.#color_theme[name] ?? "rgba(1, 0, 0, 1)");
+        return this.#color_theme[name] ?? new Color(1, 0, 0, 1);
     }
 
     /**

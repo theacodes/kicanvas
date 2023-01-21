@@ -9,7 +9,6 @@ import * as pcb_items from "../kicad/pcb_items.js";
 import { Viewport } from "../gfx/viewport.js";
 import * as pcb_view from "../pcb/view.js";
 import { WebGL2Renderer } from "../gfx/renderer.js";
-import { rgba_to_f4 } from "../gfx/colorspace.js";
 import * as color_theme from "../kicad/color_theme";
 import { Vec2 } from "../math/vec2.js";
 import { TextShaper } from "../gfx/text.js";
@@ -28,7 +27,7 @@ export class Viewer {
         this.#cvs = canvas;
         this.#renderer = new WebGL2Renderer(
             this.#cvs,
-            rgba_to_f4(color_theme.board.background));
+            color_theme.board.background);
 
         this.#cvs.addEventListener("click", (e) => {
             const rect = this.#cvs.getBoundingClientRect();

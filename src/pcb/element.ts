@@ -4,7 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { ColorF4, f4_to_rgba } from "../gfx/colorspace.js";
 import { Viewer } from "./viewer.js";
 
 class KicadPCBElement extends HTMLElement {
@@ -90,8 +89,7 @@ class KicadPCBLayerControls extends HTMLElement {
 
         for (const layer of viewer.layers.in_ui_order()) {
             const visible = layer.visible ? "yes" : "no";
-            const color = layer.color;
-            const css_color = f4_to_rgba([...color.slice(0, 3), 1] as ColorF4);
+            const css_color = layer.color.to_css();
             buttons.push(`
                 <button type="button" name="${layer.name}" visible="${visible}">
                     <span class="color" style="background-color: ${css_color};"></span>
