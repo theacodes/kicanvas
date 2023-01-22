@@ -8,6 +8,10 @@
 export class Color {
     constructor(public r: number, public g: number, public b: number, public a: number = 1) { }
 
+    copy() {
+        return new Color(this.r, this.g, this.b, this.a);
+    }
+
     static from_css(str: string) {
         let r, g, b, a;
 
