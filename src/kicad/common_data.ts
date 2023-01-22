@@ -102,8 +102,8 @@ export class Effects {
     thickness: number;
     bold: boolean;
     italic: boolean;
-    h_align: string;
-    v_align: string;
+    h_align: "left" | "center" | "right";
+    v_align: "top" | "center" | "bottom";
     mirror: boolean;
     hide: boolean;
 
@@ -121,10 +121,7 @@ export class Effects {
         }
     }
 
-    /**
-     * @param {SExprParser} e
-     */
-    from_expr(e) {
+    from_expr(e: SExprParser) {
         const font = e.expect_expr("font");
         const font_size = font.expect_expr("size");
         this.size = new Vec2(
