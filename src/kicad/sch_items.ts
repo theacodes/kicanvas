@@ -26,7 +26,7 @@ export class Property {
     at: At;
     effects: Effects;
 
-    constructor(e: SExprParser, number: number, parent_props = undefined) {
+    constructor(public parent: SymbolInstance | LibrarySymbol, number: number, e: SExprParser) {
         this.number = number;
         this.key = e.expect_string();
         this.value = e.expect_string();
@@ -164,8 +164,9 @@ export class LibrarySymbol {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
                 const p = new Property(
+                    this,
+                    Object.values(this.properties).length,
                     se,
-                    Object.values(this.properties).length
                 );
                 this.properties[p.key] = p;
                 continue;
@@ -224,9 +225,13 @@ export class PinInstance {
     name: string;
     uuid: string;
 
-    constructor(e: SExprParser) {
+    constructor(public parent: SymbolInstance, e: SExprParser) {
         this.name = e.expect_string();
         this.uuid = e.expect_pair_atom("uuid");
+    }
+
+    get definition(): PinDefinition {
+        return this.parent.lib_symbol.pins[this.name];
     }
 }
 
@@ -263,15 +268,15 @@ export class SymbolInstance {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
                 const p = new Property(
-                    se,
+                    this,
                     Object.values(this.properties).length,
-                    this.lib_symbol.properties
+                    se,
                 );
                 this.properties[p.key] = p;
                 continue;
             }
             if ((se = e.maybe_expr("pin")) !== null) {
-                const p = new PinInstance(se);
+                const p = new PinInstance(this, se);
                 this.pins[p.name] = p;
                 continue;
             }
