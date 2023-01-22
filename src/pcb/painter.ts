@@ -18,6 +18,7 @@ import { Angle } from "../math/angle.js";
 import { WebGL2Renderer } from "../gfx/renderer.js";
 import { Layer } from "./layers.js";
 import { Color } from "../gfx/color.js";
+import { TextOptions } from "../gfx/text.js";
 
 /**
  * Painter base class
@@ -408,16 +409,17 @@ class TextPainter extends GenericPainter {
             t.text,
             t.at.position,
             Angle.deg_to_rad(rotation),
-            t.effects.size,
-            t.effects.thickness,
-            {
-                valign: "center",
-                halign: t.effects.h_align,
-                mirror: t.effects.mirror,
-            }
+            new TextOptions(
+                t.effects.size,
+                t.effects.thickness,
+                t.effects.italic,
+                "center",
+                t.effects.h_align,
+                t.effects.mirror,
+            )
         );
 
-        for (const stroke of shaped) {
+        for (const stroke of shaped.strokes()) {
             gfx.line(stroke, t.effects.thickness ?? 0.127, layer.color);
         }
     }
