@@ -63,10 +63,10 @@ export class BBox {
      * Combine two or more BBoxes into a new BBox that contains both
      */
     static combine(boxes: Iterable<BBox>, context: any = null) {
-        let min_x = Number.MAX_VALUE;
-        let min_y = Number.MAX_VALUE;
-        let max_x = Number.MIN_VALUE;
-        let max_y = Number.MIN_VALUE;
+        let min_x = Number.POSITIVE_INFINITY;
+        let min_y = Number.POSITIVE_INFINITY;
+        let max_x = Number.NEGATIVE_INFINITY;
+        let max_y = Number.NEGATIVE_INFINITY;
 
         for (const box of boxes) {
             if (!box.valid) {
@@ -80,10 +80,10 @@ export class BBox {
         }
 
         if (
-            min_x == Number.MAX_VALUE ||
-            min_y == Number.MAX_VALUE ||
-            max_x == Number.MIN_VALUE ||
-            max_y == Number.MIN_VALUE
+            min_x == Number.POSITIVE_INFINITY ||
+            min_y == Number.POSITIVE_INFINITY ||
+            max_x == Number.NEGATIVE_INFINITY ||
+            max_y == Number.NEGATIVE_INFINITY
         ) {
             return new BBox(0, 0, 0, 0, context);
         }
@@ -146,6 +146,10 @@ export class BBox {
             [v, this.y] = [this.y, v];
         }
         this.h = v - this.y;
+    }
+
+    get center() {
+        return new Vec2(this.x + this.w / 2, this.y + this.h / 2);
     }
 
     /**
