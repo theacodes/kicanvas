@@ -148,24 +148,30 @@ class TextPainter extends GenericPainter {
         }
 
         const pos = t.at.position.copy();
-        pos.y -= t.effects.size.y * 0.15 + t.effects.thickness;
+
+        const options = new TextOptions(
+            t.effects.size,
+            t.effects.thickness,
+            t.effects.bold,
+            t.effects.italic,
+            t.effects.v_align,
+            t.effects.h_align,
+            t.effects.mirror
+        );
+
+        options.font = gfx.text_shaper.font;
+
+        pos.y -= t.effects.size.y * 0.15 + options.effective_thickness;
 
         const shaped = gfx.text_shaper.paragraph(
             t.text,
             pos,
             Angle.from_degrees(rotation),
-            new TextOptions(
-                t.effects.size,
-                t.effects.thickness,
-                t.effects.italic,
-                t.effects.v_align,
-                t.effects.h_align,
-                t.effects.mirror
-            )
+            options
         );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(Array.from(stroke), t.effects.thickness ?? 0.127, gfx.state.stroke);
+            gfx.line(Array.from(stroke), shaped.thickness, gfx.state.stroke);
         }
     }
 }
@@ -193,7 +199,8 @@ class LabelPainter extends GenericPainter {
             Angle.from_degrees(rotation),
             new TextOptions(
                 l.effects.size,
-                l.effects.thickness,
+                l.effects.thickness ?? 0.127,
+                l.effects.bold,
                 l.effects.italic,
                 l.effects.v_align,
                 l.effects.h_align,
@@ -202,7 +209,7 @@ class LabelPainter extends GenericPainter {
         );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(Array.from(stroke), l.effects.thickness ?? 0.127, gfx.theme.label_local);
+            gfx.line(Array.from(stroke), shaped.thickness, gfx.theme.label_local);
         }
     }
 }
@@ -236,7 +243,7 @@ class LibrarySymbolPainter extends GenericPainter {
     static classes = [sch_items.LibrarySymbol];
 
     static paint(gfx: Renderer, s: sch_items.LibrarySymbol) {
-        for (const c of s.children.slice().reverse()) {
+        for (const c of s.children) {
             LibrarySymbolPainter.paint(gfx, c);
         }
 
@@ -263,7 +270,7 @@ class PropertyPainter extends GenericPainter {
     static classes = [sch_items.Property];
 
     static paint(gfx: Renderer, p: sch_items.Property) {
-        if (p.effects.hide) {
+        if (p.effects.hide || !p.value) {
             return;
         }
 
@@ -291,6 +298,7 @@ class PropertyPainter extends GenericPainter {
         const text_options = new TextOptions(
             p.effects.size,
             p.effects.thickness || 0.127,
+            p.effects.bold,
             p.effects.italic,
             p.effects.v_align,
             p.effects.h_align,
