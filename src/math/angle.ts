@@ -65,6 +65,10 @@ export class Angle {
         this.#theta_rad = Angle.deg_to_rad(v);
     }
 
+    static from_degrees(v) {
+        return new Angle(Angle.deg_to_rad(v));
+    }
+
     /**
      * Returns a new Angle representing the sum of this angle and the given angle.
      */
