@@ -101,9 +101,9 @@ export class Viewer {
         const bb = this.selected_bbox.copy().grow(this.selected_bbox.w * 0.3);
         const layer = this.layers.by_name(":Overlay");
 
-        layer.graphics?.dispose();
+        layer.graphics?.clear();
 
-        this.#renderer.start_layer();
+        this.#renderer.start_layer(layer.name, 1);
 
         this.#renderer.line(
             [bb.top_left, bb.top_right, bb.bottom_right, bb.bottom_left, bb.top_left],

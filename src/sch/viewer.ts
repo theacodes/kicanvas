@@ -40,7 +40,7 @@ export class Viewer {
         const sch_src = await (await window.fetch(url)).text();
         this.sch = new sch_items.KicadSch(parse(sch_src));
 
-        this.#renderer.start_layer();
+        this.#renderer.start_layer("default", 0);
         for (const item of this.sch.items()) {
             Painter.paint(this.#renderer, item);
         }

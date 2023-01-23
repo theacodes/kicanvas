@@ -5,7 +5,7 @@
 */
 
 import { Color } from "../gfx/color.js";
-import { PrimitiveSet } from "../gfx/primitives.js";
+import { RenderLayer } from "../gfx/renderer.js";
 import { BBox } from "../math/bbox.js";
 
 type VisibilityType = boolean | (() => boolean);
@@ -31,7 +31,7 @@ export class Layer {
     /**
      * The renderer-generated graphics for items on this layer.
      * */
-    graphics: PrimitiveSet;
+    graphics: RenderLayer;
 
     /** A map of board items to bounding boxes
      * A board item can have graphics on multiple layers, the bounding box provided
@@ -46,12 +46,7 @@ export class Layer {
      * @param visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
      * @param enabled - controls whether the layer is present at all in the board data
      */
-    constructor(
-        layer_set: LayerSet,
-        name: string,
-        visible: VisibilityType = true,
-        enabled = true
-    ) {
+    constructor(layer_set: LayerSet, name: string, visible: VisibilityType = true, enabled = true) {
         this.#layer_set = layer_set;
         this.name = name;
         this.color = this.#layer_set.color_for(this.name);
@@ -115,24 +110,12 @@ export class LayerSet {
 
             new Layer(this, ":Anchors"),
 
-            new Layer(this, ":Via:Holes", () =>
-                this.is_any_copper_layer_visible()
-            ),
-            new Layer(this, ":Pad:Holes", () =>
-                this.is_any_copper_layer_visible()
-            ),
-            new Layer(this, ":Pad:HoleWalls", () =>
-                this.is_any_copper_layer_visible()
-            ),
-            new Layer(this, ":Via:Through", () =>
-                this.is_any_copper_layer_visible()
-            ),
-            new Layer(this, ":Via:BuriedBlind", () =>
-                this.is_any_copper_layer_visible()
-            ),
-            new Layer(this, ":Via:MicroVia", () =>
-                this.is_any_copper_layer_visible()
-            ),
+            new Layer(this, ":Via:Holes", () => this.is_any_copper_layer_visible()),
+            new Layer(this, ":Pad:Holes", () => this.is_any_copper_layer_visible()),
+            new Layer(this, ":Pad:HoleWalls", () => this.is_any_copper_layer_visible()),
+            new Layer(this, ":Via:Through", () => this.is_any_copper_layer_visible()),
+            new Layer(this, ":Via:BuriedBlind", () => this.is_any_copper_layer_visible()),
+            new Layer(this, ":Via:MicroVia", () => this.is_any_copper_layer_visible()),
 
             new Layer(this, ":Pads:Front", () => this.by_name("F.Cu").visible),
             new Layer(this, "F.Cu"),
@@ -149,11 +132,7 @@ export class LayerSet {
             const name = `In${i}.Cu`;
             this.#layer_list.push(new Layer(this, name, false, false));
             this.#layer_list.push(
-                new Layer(
-                    this,
-                    `:Zones:${name}`,
-                    () => this.by_name(name).visible
-                )
+                new Layer(this, `:Zones:${name}`, () => this.by_name(name).visible)
             );
         }
 
@@ -192,10 +171,7 @@ export class LayerSet {
 
         let name = layer_name;
 
-        name = (name
-            .replace(":Zones:", "")
-            .replace(".", "_")
-            .toLowerCase());
+        name = name.replace(":Zones:", "").replace(".", "_").toLowerCase();
 
         if (name.endsWith("_cu")) {
             name = name.replace("_cu", "");

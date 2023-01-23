@@ -43,8 +43,10 @@ export class View {
     }
 
     #paint() {
+        let depth = 0.999;
         for (const layer of this.layers.in_display_order()) {
-            this.painter.paint_layer(layer);
+            this.painter.paint_layer(layer, depth);
+            depth -= 0.001;
         }
     }
 
@@ -54,13 +56,11 @@ export class View {
     }
 
     draw(matrix: Matrix3) {
-        let depth = 0.01;
         const layers = Array.from(this.layers.in_display_order()).reverse();
         for (const layer of layers) {
             if (layer.visible && layer.enabled && layer.graphics) {
-                layer.graphics.draw(matrix, depth);
+                layer.graphics.draw(matrix);
             }
-            depth += 0.01;
         }
     }
 }

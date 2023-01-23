@@ -19,7 +19,6 @@ import { Renderer } from "../gfx/renderer.js";
 import { Layer } from "./layers.js";
 import { Color } from "../gfx/color.js";
 import { TextOptions } from "../gfx/text.js";
-import { PrimitiveSet } from "../gfx/primitives.js";
 
 /**
  * Painter base class
@@ -469,10 +468,10 @@ export class Painter {
     /**
      * Paint all items on the given layer.
      */
-    paint_layer(layer: Layer) {
+    paint_layer(layer: Layer, depth = 0) {
         const bboxes = new Map();
 
-        this.gfx.start_layer();
+        this.gfx.start_layer(layer.name, depth);
 
         for (const item of layer.items) {
             this.gfx.start_object();
@@ -481,7 +480,7 @@ export class Painter {
             bboxes.set(item, bbox);
         }
 
-        layer.graphics = this.gfx.end_layer() as PrimitiveSet;
+        layer.graphics = this.gfx.end_layer();
         layer.bboxes = bboxes;
     }
 
