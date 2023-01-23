@@ -5,7 +5,12 @@
 */
 
 export class Color {
-    constructor(public r: number, public g: number, public b: number, public a: number = 1) {}
+    constructor(
+        public r: number,
+        public g: number,
+        public b: number,
+        public a: number = 1
+    ) {}
 
     copy() {
         return new Color(this.r, this.g, this.b, this.a);
@@ -13,6 +18,14 @@ export class Color {
 
     static get transparent() {
         return new Color(0, 0, 0, 0);
+    }
+
+    static get black() {
+        return new Color(0, 0, 0, 1);
+    }
+
+    static get white() {
+        return new Color(1, 1, 1, 1);
     }
 
     static from_css(str: string) {
