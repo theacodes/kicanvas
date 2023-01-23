@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WebGL2Renderer } from "../gfx/renderer.js";
+import { Renderer } from "../gfx/renderer.js";
 import { KicadPCB } from "../kicad/pcb_items.js";
 import { BBox } from "../math/bbox.js";
 import { Matrix3 } from "../math/matrix3.js";
@@ -15,7 +15,7 @@ export class View {
     painter: Painter;
     layers: LayerSet;
 
-    constructor(public gfx: WebGL2Renderer, public board: KicadPCB, public color_theme) {
+    constructor(public gfx: Renderer, public board: KicadPCB, public color_theme) {
         this.painter = new Painter(this.gfx);
         this.layers = new LayerSet(color_theme);
     }
