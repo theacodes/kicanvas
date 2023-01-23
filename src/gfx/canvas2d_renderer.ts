@@ -6,7 +6,7 @@
 
 import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
-import { Renderer, StateStack } from "./renderer.js";
+import { Renderer, RenderLayer, RenderStateStack } from "./renderer.js";
 import { Matrix3 } from "../math/matrix3.js";
 
 /**
@@ -22,13 +22,13 @@ import { Matrix3 } from "../math/matrix3.js";
  */
 export class Canvas2DRenderer extends Renderer {
     /** Graphics layers */
-    #layers: Layer[] = [];
+    #layers: Canvas2dRenderLayer[] = [];
 
     /** The layer currently being drawn to. */
-    #active_layer: Layer = null;
+    #active_layer: Canvas2dRenderLayer = null;
 
     /** State */
-    state: StateStack = new StateStack();
+    state: RenderStateStack = new RenderStateStack();
 
     ctx2d: CanvasRenderingContext2D;
 
@@ -77,11 +77,11 @@ export class Canvas2DRenderer extends Renderer {
         this.ctx2d.lineJoin = "round";
     }
 
-    start_layer() {
-        this.#active_layer = new Layer(this.ctx2d);
+    start_layer(name: string, depth = 0) {
+        this.#active_layer = new Canvas2dRenderLayer(this, name, depth);
     }
 
-    end_layer(): Layer {
+    end_layer(): RenderLayer {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         this.#layers.push(this.#active_layer);
@@ -209,17 +209,32 @@ class DrawCommand {
     }
 }
 
-class Layer {
-    constructor(public ctx: CanvasRenderingContext2D, public commands: DrawCommand[] = []) {}
+class Canvas2dRenderLayer extends RenderLayer {
+    constructor(
+        public readonly renderer: Renderer,
+        public readonly name: string,
+        public readonly depth: number = 0,
+        public commands: DrawCommand[] = []
+    ) {
+        super(renderer, name, depth);
+    }
+
+    clear() {
+        this.commands = [];
+    }
 
     draw(transform: Matrix3) {
-        this.ctx.save();
-        const accumulated_transform = Matrix3.from_DOMMatrix(this.ctx.getTransform());
+        const ctx = (this.renderer as Canvas2DRenderer).ctx2d;
+        ctx.save();
+
+        const accumulated_transform = Matrix3.from_DOMMatrix(ctx.getTransform());
         accumulated_transform.multiply_self(transform);
-        this.ctx.setTransform(accumulated_transform.to_DOMMatrix());
+        ctx.setTransform(accumulated_transform.to_DOMMatrix());
+
         for (const command of this.commands) {
-            command.draw(this.ctx);
+            command.draw(ctx);
         }
-        this.ctx.restore();
+
+        ctx.restore();
     }
 }

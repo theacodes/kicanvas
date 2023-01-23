@@ -31,7 +31,7 @@ export abstract class Renderer {
     #object_points: Vec2[] = null;
 
     canvas: HTMLCanvasElement;
-    state: StateStack = new StateStack();
+    state: RenderStateStack = new RenderStateStack();
     text_shaper: TextShaper;
     theme: Record<string, Color>;
 
@@ -97,7 +97,7 @@ export abstract class Renderer {
      * that are all drawn at the same time and at the same depth. end_layer()
      * must be called for the graphics to actually show up.
      */
-    abstract start_layer(): void;
+    abstract start_layer(name: string, depth: number): void;
 
     /**
      * Finish a layer of graphics.
@@ -105,12 +105,12 @@ export abstract class Renderer {
      * Performs any additional work needed such as tesselation and buffer
      * management.
      */
-    abstract end_layer(): any;
+    abstract end_layer(): RenderLayer;
 
     /**
      * Iterate through layers.
      */
-    abstract get layers(): Iterable<Layer>;
+    abstract get layers(): Iterable<RenderLayer>;
 
     /**
      * Draw a filled circle
@@ -140,11 +140,23 @@ export abstract class Renderer {
     abstract polygon(points: Vec2[], color: Color);
 }
 
-export interface Layer {
-    draw(camera: Matrix3): void;
+export abstract class RenderLayer {
+    constructor(
+        public readonly renderer: Renderer,
+        public readonly name: string,
+        public readonly depth: number = 0
+    ) {
+        if (depth < 0 || depth > 1) {
+            throw new Error(`Invalid depth value ${depth}, depth should be between 0 and 1.`);
+        }
+    }
+
+    abstract clear(): void;
+
+    abstract draw(camera: Matrix3): void;
 }
 
-export class State {
+export class RenderState {
     constructor(
         public matrix: Matrix3 = Matrix3.identity(),
         public fill: Color = null,
@@ -153,7 +165,7 @@ export class State {
     ) {}
 
     copy() {
-        return new State(
+        return new RenderState(
             this.matrix.copy(),
             this.fill?.copy(),
             this.stroke?.copy(),
@@ -162,11 +174,11 @@ export class State {
     }
 }
 
-export class StateStack {
-    #stack: State[];
+export class RenderStateStack {
+    #stack: RenderState[];
 
     constructor() {
-        this.#stack = [new State()];
+        this.#stack = [new RenderState()];
     }
 
     get top() {

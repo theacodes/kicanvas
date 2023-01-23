@@ -7,17 +7,18 @@
 import { PrimitiveSet } from "./primitives.js";
 import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
-import { Layer, Renderer } from "./renderer.js";
+import { RenderLayer, Renderer } from "./renderer.js";
+import { Matrix3 } from "../math/matrix3.js";
 
 /**
  * WebGL2-based renderer
  */
 export class WebGL2Renderer extends Renderer {
     /** Graphics layers */
-    #layers: PrimitiveSet[] = [];
+    #layers: WebGL2RenderLayer[] = [];
 
     /** The layer currently being drawn to. */
-    #active_layer: PrimitiveSet = null;
+    #active_layer: WebGL2RenderLayer = null;
 
     /** WebGL backend */
     gl: WebGL2RenderingContext;
@@ -72,51 +73,32 @@ export class WebGL2Renderer extends Renderer {
         this.gl.viewport(x, y, w, h);
     }
 
-    /**
-     * Clear the canvas. Typically called at the start of a frame.
-     */
     clear_canvas() {
         if (this.gl == null) throw new Error("Uninitialized");
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     }
 
-    /**
-     * Start a new layer of graphics.
-     *
-     * Each layer represents a set of primitives
-     * that are all drawn at the same time and at the same depth. end_layer()
-     * must be called for the graphics to actually show up.
-     */
-    start_layer() {
+    start_layer(name: string, depth = 0) {
         if (this.gl == null) throw new Error("Uninitialized");
-        this.#active_layer = new PrimitiveSet(this.gl);
+        this.#active_layer = new WebGL2RenderLayer(this, name, depth, new PrimitiveSet(this.gl));
     }
 
-    /**
-     * Finish a layer of graphics.
-     *
-     * Performs any additional work needed such as tesselation and buffer
-     * management.
-     */
-    end_layer(): PrimitiveSet {
+    end_layer(): RenderLayer {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        this.#active_layer.commit();
+        this.#active_layer.commands.commit();
         this.#layers.push(this.#active_layer);
         this.#active_layer = null;
 
         return this.#layers.at(-1);
     }
 
-    /**
-     * Draw a circle
-     */
     circle(point: Vec2, radius: number, color: Color) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         point = this.state.matrix.transform(point);
 
-        this.#active_layer.add_circle(point, radius, color);
+        this.#active_layer.commands.add_circle(point, radius, color);
 
         this.add_object_points([
             point.add(new Vec2(radius, radius)),
@@ -135,37 +117,28 @@ export class WebGL2Renderer extends Renderer {
         // TODO
     }
 
-    /**
-     * Draw a polyline
-     */
     line(points: Vec2[], width: number, color: Color) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         points = Array.from(this.state.matrix.transform_all(points));
 
-        this.#active_layer.add_line(points, width, color);
+        this.#active_layer.commands.add_line(points, width, color);
 
         // TODO: take width into account?
         this.add_object_points(points);
     }
 
-    /**
-     * Draw a polygon
-     */
     polygon(points: Vec2[], color: Color) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         points = Array.from(this.state.matrix.transform_all(points));
 
-        this.#active_layer.add_polygon(points, color);
+        this.#active_layer.commands.add_polygon(points, color);
 
         this.add_object_points(points);
     }
 
-    /**
-     * Iterate through all layers
-     */
-    get layers(): Iterable<Layer> {
+    get layers(): Iterable<RenderLayer> {
         const layers = this.#layers;
         return {
             *[Symbol.iterator]() {
@@ -174,5 +147,24 @@ export class WebGL2Renderer extends Renderer {
                 }
             },
         };
+    }
+}
+
+class WebGL2RenderLayer extends RenderLayer {
+    constructor(
+        public readonly renderer: Renderer,
+        public readonly name: string,
+        public readonly depth: number,
+        public commands: PrimitiveSet
+    ) {
+        super(renderer, name, depth);
+    }
+
+    clear() {
+        this.commands.dispose();
+    }
+
+    draw(transform: Matrix3) {
+        this.commands.draw(transform, this.depth);
     }
 }
