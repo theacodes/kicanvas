@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { PrimitiveSet } from "./primitives.js";
+import { PrimitiveSet } from "./webgl_graphics";
 import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
 import { RenderLayer, Renderer } from "./renderer.js";
@@ -86,7 +86,7 @@ export class WebGL2Renderer extends Renderer {
     end_layer(): RenderLayer {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        this.#active_layer.commands.commit();
+        this.#active_layer.geometry.commit();
         this.#layers.push(this.#active_layer);
         this.#active_layer = null;
 
@@ -98,7 +98,7 @@ export class WebGL2Renderer extends Renderer {
 
         point = this.state.matrix.transform(point);
 
-        this.#active_layer.commands.add_circle(point, radius, color);
+        this.#active_layer.geometry.add_circle(point, radius, color);
 
         this.add_object_points([
             point.add(new Vec2(radius, radius)),
@@ -122,7 +122,7 @@ export class WebGL2Renderer extends Renderer {
 
         points = Array.from(this.state.matrix.transform_all(points));
 
-        this.#active_layer.commands.add_line(points, width, color);
+        this.#active_layer.geometry.add_line(points, width, color);
 
         // TODO: take width into account?
         this.add_object_points(points);
@@ -133,7 +133,7 @@ export class WebGL2Renderer extends Renderer {
 
         points = Array.from(this.state.matrix.transform_all(points));
 
-        this.#active_layer.commands.add_polygon(points, color);
+        this.#active_layer.geometry.add_polygon(points, color);
 
         this.add_object_points(points);
     }
@@ -155,16 +155,16 @@ class WebGL2RenderLayer extends RenderLayer {
         public readonly renderer: Renderer,
         public readonly name: string,
         public readonly depth: number,
-        public commands: PrimitiveSet
+        public geometry: PrimitiveSet
     ) {
         super(renderer, name, depth);
     }
 
     clear() {
-        this.commands.dispose();
+        this.geometry.dispose();
     }
 
     draw(transform: Matrix3) {
-        this.commands.draw(transform, this.depth);
+        this.geometry.draw(transform, this.depth);
     }
 }

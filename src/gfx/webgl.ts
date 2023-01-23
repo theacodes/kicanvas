@@ -17,7 +17,6 @@
  *
  */
 class Uniform {
-
     static _function_map = {
         f1: "uniform1f",
         f1v: "uniform1fv",
@@ -37,8 +36,8 @@ class Uniform {
         public gl: WebGL2RenderingContext,
         public name: string,
         public location: WebGLUniformLocation,
-        public type: GLenum) {
-
+        public type: GLenum
+    ) {
         for (const [dst, src] of Object.entries(Uniform._function_map)) {
             this[dst] = (...args) => {
                 this.gl[src](this.location, ...args);
@@ -77,7 +76,6 @@ export class ShaderProgram {
         public vertex: WebGLShader,
         public fragment: WebGLShader
     ) {
-
         if (typeof vertex === "string") {
             vertex = ShaderProgram.compile(gl, gl.VERTEX_SHADER, vertex);
         }
@@ -109,12 +107,8 @@ export class ShaderProgram {
         frag_url: URL | string
     ): Promise<ShaderProgram> {
         if (!this.#shader_cache[name]) {
-            const vert = await (
-                await fetch(new URL(vert_url, import.meta.url))
-            ).text();
-            const frag = await (
-                await fetch(new URL(frag_url, import.meta.url))
-            ).text();
+            const vert = await (await fetch(new URL(vert_url, import.meta.url))).text();
+            const frag = await (await fetch(new URL(frag_url, import.meta.url))).text();
             this.#shader_cache[name] = new ShaderProgram(gl, name, vert, frag);
         }
 
@@ -180,8 +174,7 @@ export class ShaderProgram {
         this.uniforms = {};
         for (
             let u_n = 0;
-            u_n <
-            this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS);
+            u_n < this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS);
             u_n++
         ) {
             const info = this.gl.getActiveUniform(this.program, u_n);
@@ -192,10 +185,7 @@ export class ShaderProgram {
                 );
             }
 
-            const location = this.gl.getUniformLocation(
-                this.program,
-                info.name
-            );
+            const location = this.gl.getUniformLocation(this.program, info.name);
 
             this[info.name] = this.uniforms[info.name] = new Uniform(
                 this.gl,
@@ -210,11 +200,7 @@ export class ShaderProgram {
         this.attribs = {};
         for (
             let a_n = 0;
-            a_n <
-            this.gl.getProgramParameter(
-                this.program,
-                this.gl.ACTIVE_ATTRIBUTES
-            );
+            a_n < this.gl.getProgramParameter(this.program, this.gl.ACTIVE_ATTRIBUTES);
             a_n++
         ) {
             const info = this.gl.getActiveAttrib(this.program, a_n);
@@ -226,10 +212,7 @@ export class ShaderProgram {
             }
 
             this.attribs[info.name] = info;
-            this[info.name] = this.gl.getAttribLocation(
-                this.program,
-                info.name
-            );
+            this[info.name] = this.gl.getAttribLocation(this.program, info.name);
         }
     }
 
@@ -300,14 +283,7 @@ export class VertexArray {
         const b = new Buffer(this.gl, target);
 
         b.bind();
-        this.gl.vertexAttribPointer(
-            attrib,
-            size,
-            type,
-            normalized,
-            stride,
-            offset
-        );
+        this.gl.vertexAttribPointer(attrib, size, type, normalized, stride, offset);
         this.gl.enableVertexAttribArray(attrib);
 
         this.buffers.push(b);
