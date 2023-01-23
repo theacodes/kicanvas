@@ -43,7 +43,14 @@ class Tesselator {
      * @returns six points representing two triangles
      */
     static quad_to_triangles(quad: [Vec2, Vec2, Vec2, Vec2]): number[] {
-        const positions = [...quad[0], ...quad[2], ...quad[1], ...quad[1], ...quad[2], ...quad[3]];
+        const positions = [
+            ...quad[0],
+            ...quad[2],
+            ...quad[1],
+            ...quad[1],
+            ...quad[2],
+            ...quad[3],
+        ];
 
         // check for degenerate quads
         // TODO: this can eventually be removed.
@@ -57,7 +64,12 @@ class Tesselator {
     /**
      * Populate an array with repeated copies of the given color
      */
-    static populate_color_data(dest: Float32Array, color: Color, offset: number, length: number) {
+    static populate_color_data(
+        dest: Float32Array,
+        color: Color,
+        offset: number,
+        length: number
+    ) {
         if (!color) {
             color = new Color(1, 0, 0, 1);
         }
@@ -71,7 +83,11 @@ class Tesselator {
      * Tesselate a line segment into a quad
      * @returns four points representing the line segment.
      */
-    static tesselate_segment(p1: Vec2, p2: Vec2, width: number): [Vec2, Vec2, Vec2, Vec2] {
+    static tesselate_segment(
+        p1: Vec2,
+        p2: Vec2,
+        width: number
+    ): [Vec2, Vec2, Vec2, Vec2] {
         const line = p2.sub(p1);
         const norm = line.normal.normalize();
         const n = norm.multiply(width / 2);
@@ -115,7 +131,10 @@ class Tesselator {
             const cap_region = width / (length + width);
 
             position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
-            cap_data.set(Array(this.vertices_per_quad).fill(cap_region), vertex_index);
+            cap_data.set(
+                Array(this.vertices_per_quad).fill(cap_region),
+                vertex_index
+            );
             this.populate_color_data(
                 color_data,
                 color,
@@ -141,10 +160,10 @@ class Tesselator {
         const n = new Vec2(circle.radius, 0);
         const n2 = n.normal;
 
-        const a = circle.point.add(n).add(n2);
-        const b = circle.point.sub(n).add(n2);
-        const c = circle.point.add(n).sub(n2);
-        const d = circle.point.sub(n).sub(n2);
+        const a = circle.center.add(n).add(n2);
+        const b = circle.center.sub(n).add(n2);
+        const c = circle.center.add(n).sub(n2);
+        const d = circle.center.sub(n).sub(n2);
 
         return [a, b, c, d];
     }
@@ -166,7 +185,10 @@ class Tesselator {
 
             position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
 
-            cap_data.set(Array(this.vertices_per_quad).fill(cap_region), vertex_index);
+            cap_data.set(
+                Array(this.vertices_per_quad).fill(cap_region),
+                vertex_index
+            );
 
             this.populate_color_data(
                 color_data,
@@ -255,7 +277,10 @@ export class CircleSet {
      * Create a new circle set.
      * @param shader - optional override for the shader program used when drawing.
      */
-    constructor(public gl: WebGL2RenderingContext, public shader: ShaderProgram = null) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        public shader: ShaderProgram = null
+    ) {
         this.shader ??= CircleSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
@@ -278,7 +303,8 @@ export class CircleSet {
      * Tesselate an array of circles and upload them to the GPU.
      */
     set(circles: Circle[]) {
-        const { position_array, cap_array, color_array } = Tesselator.tesselate_circles(circles);
+        const { position_array, cap_array, color_array } =
+            Tesselator.tesselate_circles(circles);
         this.position_buf.set(position_array);
         this.cap_region_buf.set(cap_array);
         this.color_buf.set(color_array);
@@ -322,7 +348,10 @@ export class PolylineSet {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(public gl: WebGL2RenderingContext, public shader: ShaderProgram = null) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        public shader: ShaderProgram = null
+    ) {
         this.shader ??= PolylineSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
@@ -362,7 +391,8 @@ export class PolylineSet {
         let color_idx = 0;
 
         for (const line of lines) {
-            const { position_array, cap_array, color_array } = Tesselator.tesselate_polyline(line);
+            const { position_array, cap_array, color_array } =
+                Tesselator.tesselate_polyline(line);
 
             position_data.set(position_array, position_idx);
             position_idx += position_array.length;
@@ -417,7 +447,10 @@ export class PolygonSet {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(public gl: WebGL2RenderingContext, public shader: ShaderProgram = null) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        public shader: ShaderProgram = null
+    ) {
         this.shader ??= PolygonSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader.a_position, 2);
@@ -522,13 +555,13 @@ export class PolygonSet {
  *
  */
 export class PrimitiveSet {
-    #polygons = [];
-    #circles = [];
-    #lines = [];
+    #polygons: Polygon[] = [];
+    #circles: Circle[] = [];
+    #lines: Polyline[] = [];
 
-    #polygon_set;
-    #circle_set;
-    #polyline_set;
+    #polygon_set?: PolygonSet;
+    #circle_set?: CircleSet;
+    #polyline_set?: PolylineSet;
 
     /**
      * Load all shader programs required to render primitives.
@@ -560,32 +593,22 @@ export class PrimitiveSet {
     /**
      * Collect a new filled circle
      */
-    add_circle(point: Vec2, radius: number, color: Color) {
-        this.#circles.push({
-            point: point,
-            radius: radius,
-            color: color,
-        });
+    add_circle(circle: Circle) {
+        this.#circles.push(circle);
     }
 
     /**
      * Collect a new filled polygon
-     * @param {Array.<Vec2>} points
-     * @param {number[]} color - normalized rgba values
      */
-    add_polygon(points, color) {
-        this.#polygons.push(new Polygon(points, color));
+    add_polygon(polygon: Polygon) {
+        this.#polygons.push(polygon);
     }
 
     /**
      * Collect a new polyline
      */
-    add_line(points: Vec2[], width: number, color: Color) {
-        this.#lines.push({
-            points: points,
-            width: width,
-            color: color,
-        });
+    add_line(line: Polyline) {
+        this.#lines.push(line);
     }
 
     /**

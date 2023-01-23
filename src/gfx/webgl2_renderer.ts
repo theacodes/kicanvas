@@ -5,10 +5,10 @@
 */
 
 import { PrimitiveSet } from "./webgl_graphics";
-import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
 import { RenderLayer, Renderer } from "./renderer.js";
 import { Matrix3 } from "../math/matrix3.js";
+import { Arc, Circle, Polygon, Polyline } from "./primitives";
 
 /**
  * WebGL2-based renderer
@@ -80,7 +80,12 @@ export class WebGL2Renderer extends Renderer {
 
     start_layer(name: string, depth = 0) {
         if (this.gl == null) throw new Error("Uninitialized");
-        this.#active_layer = new WebGL2RenderLayer(this, name, depth, new PrimitiveSet(this.gl));
+        this.#active_layer = new WebGL2RenderLayer(
+            this,
+            name,
+            depth,
+            new PrimitiveSet(this.gl)
+        );
     }
 
     end_layer(): RenderLayer {
@@ -93,49 +98,44 @@ export class WebGL2Renderer extends Renderer {
         return this.#layers.at(-1);
     }
 
-    circle(point: Vec2, radius: number, color: Color) {
+    circle(circle: Circle) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        point = this.state.matrix.transform(point);
+        circle.center = this.state.matrix.transform(circle.center);
 
-        this.#active_layer.geometry.add_circle(point, radius, color);
+        this.#active_layer.geometry.add_circle(circle);
 
         this.add_object_points([
-            point.add(new Vec2(radius, radius)),
-            point.sub(new Vec2(radius, radius)),
+            circle.center.add(new Vec2(circle.radius, circle.radius)),
+            circle.center.sub(new Vec2(circle.radius, circle.radius)),
         ]);
     }
 
-    arc(
-        point: Vec2,
-        radius: number,
-        start_angle: number,
-        end_angle: number,
-        width: number,
-        color: Color
-    ) {
+    arc(arc: Arc) {
         // TODO
     }
 
-    line(points: Vec2[], width: number, color: Color) {
+    line(line: Polyline) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        points = Array.from(this.state.matrix.transform_all(points));
+        line.points = Array.from(this.state.matrix.transform_all(line.points));
 
-        this.#active_layer.geometry.add_line(points, width, color);
+        this.#active_layer.geometry.add_line(line);
 
         // TODO: take width into account?
-        this.add_object_points(points);
+        this.add_object_points(line.points);
     }
 
-    polygon(points: Vec2[], color: Color) {
+    polygon(polygon: Polygon) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        points = Array.from(this.state.matrix.transform_all(points));
+        polygon.points = Array.from(
+            this.state.matrix.transform_all(polygon.points)
+        );
 
-        this.#active_layer.geometry.add_polygon(points, color);
+        this.#active_layer.geometry.add_polygon(polygon);
 
-        this.add_object_points(points);
+        this.add_object_points(polygon.points);
     }
 
     get layers(): Iterable<RenderLayer> {

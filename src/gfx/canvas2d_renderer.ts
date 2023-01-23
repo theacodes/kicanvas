@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
 import { Renderer, RenderLayer, RenderStateStack } from "./renderer.js";
 import { Matrix3 } from "../math/matrix3.js";
+import { Arc, Circle, Polygon, Polyline } from "./primitives.js";
 
 /**
  * Canvas2d-based renderer.
@@ -90,55 +90,64 @@ export class Canvas2DRenderer extends Renderer {
         return this.#layers.at(-1);
     }
 
-    circle(point: Vec2, radius: number, color: Color) {
+    circle(circle: Circle) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        point = this.state.matrix.transform(point);
+        circle.center = this.state.matrix.transform(circle.center);
 
         const path = new Path2D();
-        path.arc(point.x, point.y, radius, 0, Math.PI * 2);
+        path.arc(
+            circle.center.x,
+            circle.center.y,
+            circle.radius,
+            0,
+            Math.PI * 2
+        );
 
-        this.#active_layer.commands.push(new DrawCommand(path, color.to_css(), null, 0));
+        this.#active_layer.commands.push(
+            new DrawCommand(path, circle.color.to_css(), null, 0)
+        );
 
         this.add_object_points([
-            point.add(new Vec2(radius, radius)),
-            point.sub(new Vec2(radius, radius)),
+            circle.center.add(new Vec2(circle.radius, circle.radius)),
+            circle.center.sub(new Vec2(circle.radius, circle.radius)),
         ]);
     }
 
-    arc(
-        point: Vec2,
-        radius: number,
-        start_angle: number,
-        end_angle: number,
-        width: number,
-        color: Color
-    ) {
+    arc(arc: Arc) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        point = this.state.matrix.transform(point);
+        arc.center = this.state.matrix.transform(arc.center);
 
         const path = new Path2D();
-        path.arc(point.x, point.y, radius, start_angle, end_angle);
+        path.arc(
+            arc.center.x,
+            arc.center.y,
+            arc.radius,
+            arc.start_angle.radians,
+            arc.end_angle.radians
+        );
 
-        this.#active_layer.commands.push(new DrawCommand(path, null, color.to_css(), width));
+        this.#active_layer.commands.push(
+            new DrawCommand(path, null, arc.color.to_css(), arc.width)
+        );
 
         // TODO: Use arc start/mid/end instead of just the whole circle
         this.add_object_points([
-            point.add(new Vec2(radius, radius)),
-            point.sub(new Vec2(radius, radius)),
+            arc.center.add(new Vec2(arc.radius, arc.radius)),
+            arc.center.sub(new Vec2(arc.radius, arc.radius)),
         ]);
     }
 
-    line(points: Vec2[], width: number, color: Color) {
+    line(line: Polyline) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        points = Array.from(this.state.matrix.transform_all(points));
+        line.points = Array.from(this.state.matrix.transform_all(line.points));
 
         const path = new Path2D();
         let started = false;
 
-        for (const point of points) {
+        for (const point of line.points) {
             if (!started) {
                 path.moveTo(point.x, point.y);
                 started = true;
@@ -147,21 +156,25 @@ export class Canvas2DRenderer extends Renderer {
             }
         }
 
-        this.#active_layer.commands.push(new DrawCommand(path, null, color.to_css(), width));
+        this.#active_layer.commands.push(
+            new DrawCommand(path, null, line.color.to_css(), line.width)
+        );
 
         // TODO: take width into account?
-        this.add_object_points(points);
+        this.add_object_points(line.points);
     }
 
-    polygon(points: Vec2[], color: Color) {
+    polygon(polygon: Polygon) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
-        points = Array.from(this.state.matrix.transform_all(points));
+        polygon.points = Array.from(
+            this.state.matrix.transform_all(polygon.points)
+        );
 
         const path = new Path2D();
         let started = false;
 
-        for (const point of points) {
+        for (const point of polygon.points) {
             if (!started) {
                 path.moveTo(point.x, point.y);
                 started = true;
@@ -171,9 +184,11 @@ export class Canvas2DRenderer extends Renderer {
         }
         path.closePath();
 
-        this.#active_layer.commands.push(new DrawCommand(path, color.to_css(), null, 0));
+        this.#active_layer.commands.push(
+            new DrawCommand(path, polygon.color.to_css(), null, 0)
+        );
 
-        this.add_object_points(points);
+        this.add_object_points(polygon.points);
     }
 
     get layers() {
@@ -227,7 +242,9 @@ class Canvas2dRenderLayer extends RenderLayer {
         const ctx = (this.renderer as Canvas2DRenderer).ctx2d;
         ctx.save();
 
-        const accumulated_transform = Matrix3.from_DOMMatrix(ctx.getTransform());
+        const accumulated_transform = Matrix3.from_DOMMatrix(
+            ctx.getTransform()
+        );
         accumulated_transform.multiply_self(transform);
         ctx.setTransform(accumulated_transform.to_DOMMatrix());
 

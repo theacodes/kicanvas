@@ -9,6 +9,7 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Vec2 } from "../math/vec2.js";
 import { Color } from "./color.js";
 import { TextShaper } from "./text.js";
+import { Circle, Polyline, Polygon, Arc } from "./primitives.js";
 
 /**
  * KiCanvas' abstraction over various graphics backends.
@@ -115,29 +116,22 @@ export abstract class Renderer {
     /**
      * Draw a filled circle
      */
-    abstract circle(point: Vec2, radius: number, color: Color);
+    abstract circle(circle: Circle);
 
     /**
      * Draw a stroked arc
      */
-    abstract arc(
-        point: Vec2,
-        radius: number,
-        start_angle: number,
-        end_angle: number,
-        width: number,
-        color: Color
-    );
+    abstract arc(arc: Arc);
 
     /**
      * Draw a stroked polyline
      */
-    abstract line(points: Vec2[], width: number, color: Color);
+    abstract line(line: Polyline);
 
     /**
      * Draw a filled polygon
      */
-    abstract polygon(points: Vec2[], color: Color);
+    abstract polygon(polygon: Polygon);
 }
 
 export abstract class RenderLayer {

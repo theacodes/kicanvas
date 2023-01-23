@@ -5,11 +5,12 @@
 */
 
 import { Color } from "../gfx/color";
+import { Polygon, Polyline, Arc, Circle } from "../gfx/primitives";
 import { Renderer } from "../gfx/renderer";
 import { TextOptions } from "../gfx/text";
 import * as sch_items from "../kicad/sch_items";
 import { Angle } from "../math/angle";
-import { Arc } from "../math/arc";
+import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
@@ -44,7 +45,11 @@ class RectanglePainter extends GenericPainter {
     static classes = [sch_items.Rectangle];
 
     static paint(gfx: Renderer, r: sch_items.Rectangle) {
-        const color = color_maybe(r.stroke.color, gfx.state.stroke, gfx.theme.note);
+        const color = color_maybe(
+            r.stroke.color,
+            gfx.state.stroke,
+            gfx.theme.note
+        );
 
         const pts = [
             r.start,
@@ -55,10 +60,12 @@ class RectanglePainter extends GenericPainter {
         ];
 
         if (r.fill !== "none") {
-            gfx.polygon(pts, gfx.state.fill);
+            gfx.polygon(new Polygon(pts, gfx.state.fill));
         }
 
-        gfx.line(pts, r.stroke.width || gfx.state.stroke_width, color);
+        gfx.line(
+            new Polyline(pts, r.stroke.width || gfx.state.stroke_width, color)
+        );
     }
 }
 
@@ -66,12 +73,22 @@ class PolylinePainter extends GenericPainter {
     static classes = [sch_items.Polyline];
 
     static paint(gfx: Renderer, pl: sch_items.Polyline) {
-        const color = color_maybe(pl.stroke.color, gfx.state.stroke, gfx.theme.note);
+        const color = color_maybe(
+            pl.stroke.color,
+            gfx.state.stroke,
+            gfx.theme.note
+        );
 
-        gfx.line(pl.pts, pl.stroke.width || gfx.state.stroke_width, color);
+        gfx.line(
+            new Polyline(
+                pl.pts,
+                pl.stroke.width || gfx.state.stroke_width,
+                color
+            )
+        );
 
         if (pl.fill !== "none") {
-            gfx.polygon(pl.pts, color);
+            gfx.polygon(new Polygon(pl.pts, color));
         }
     }
 }
@@ -80,7 +97,7 @@ class WirePainter extends GenericPainter {
     static classes = [sch_items.Wire];
 
     static paint(gfx: Renderer, w: sch_items.Wire) {
-        gfx.line(w.pts, gfx.state.stroke_width, gfx.theme.wire);
+        gfx.line(new Polyline(w.pts, gfx.state.stroke_width, gfx.theme.wire));
     }
 }
 
@@ -91,16 +108,18 @@ class CirclePainter extends GenericPainter {
         const color = gfx.state.stroke ?? gfx.theme.note;
 
         gfx.arc(
-            c.center,
-            c.radius,
-            0,
-            Math.PI * 2,
-            c.stroke.width || gfx.state.stroke_width,
-            color
+            new Arc(
+                c.center,
+                c.radius,
+                new Angle(0),
+                new Angle(Math.PI * 2),
+                c.stroke.width || gfx.state.stroke_width,
+                color
+            )
         );
 
         if (c.fill != "none") {
-            gfx.circle(c.center, c.radius, color);
+            gfx.circle(new Circle(c.center, c.radius, color));
         }
     }
 }
@@ -111,15 +130,22 @@ class ArcPainter extends GenericPainter {
     static paint(gfx: Renderer, a: sch_items.Arc) {
         const color = gfx.state.stroke ?? gfx.theme.note;
 
-        const arc = Arc.from_three_points(a.start, a.mid, a.end, a.stroke.width);
+        const arc = MathArc.from_three_points(
+            a.start,
+            a.mid,
+            a.end,
+            a.stroke.width
+        );
 
         gfx.arc(
-            arc.center,
-            arc.radius,
-            -arc.end_angle.radians,
-            -arc.start_angle.radians,
-            a.stroke.width || gfx.state.stroke_width,
-            color
+            new Arc(
+                arc.center,
+                arc.radius,
+                arc.start_angle,
+                arc.end_angle,
+                a.stroke.width || gfx.state.stroke_width,
+                color
+            )
         );
     }
 }
@@ -129,7 +155,7 @@ class JunctionPainter extends GenericPainter {
 
     static paint(gfx: Renderer, j: sch_items.Junction) {
         const color = gfx.theme.junction;
-        gfx.circle(j.at.position, (j.diameter || 1) / 2, color);
+        gfx.circle(new Circle(j.at.position, (j.diameter || 1) / 2, color));
     }
 }
 
@@ -170,7 +196,13 @@ class TextPainter extends GenericPainter {
         );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(Array.from(stroke), shaped.thickness, gfx.state.stroke);
+            gfx.line(
+                new Polyline(
+                    Array.from(stroke),
+                    shaped.thickness,
+                    gfx.state.stroke
+                )
+            );
         }
     }
 }
@@ -209,7 +241,13 @@ class LabelPainter extends GenericPainter {
         );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(Array.from(stroke), shaped.thickness, gfx.theme.label_local);
+            gfx.line(
+                new Polyline(
+                    Array.from(stroke),
+                    shaped.thickness,
+                    gfx.theme.label_local
+                )
+            );
         }
     }
 }
@@ -230,10 +268,25 @@ class PinPainter extends GenericPainter {
         gfx.state.multiply(matrix);
 
         // Little connection circle
-        gfx.arc(new Vec2(0, 0), 0.254, 0, Math.PI * 2, gfx.state.stroke_width, gfx.theme.pin);
+        gfx.arc(
+            new Arc(
+                new Vec2(0, 0),
+                0.254,
+                new Angle(0),
+                new Angle(Math.PI * 2),
+                gfx.state.stroke_width,
+                gfx.theme.pin
+            )
+        );
 
         // Connecting line
-        gfx.line([new Vec2(0, 0), new Vec2(p.length, 0)], gfx.state.stroke_width, gfx.theme.pin);
+        gfx.line(
+            new Polyline(
+                [new Vec2(0, 0), new Vec2(p.length, 0)],
+                gfx.state.stroke_width,
+                gfx.theme.pin
+            )
+        );
 
         gfx.state.pop();
     }
@@ -311,7 +364,10 @@ class PropertyPainter extends GenericPainter {
         const parent = p.parent as sch_items.SymbolInstance;
         const parent_matrix = Matrix3.identity();
         parent_matrix.translate_self(p.at.position.x, p.at.position.y);
-        parent_matrix.scale_self(parent.mirror == "y" ? -1 : 1, parent.mirror == "x" ? -1 : 1);
+        parent_matrix.scale_self(
+            parent.mirror == "y" ? -1 : 1,
+            parent.mirror == "x" ? -1 : 1
+        );
 
         // Figure out the total rotation of this text including the
         // parent's rotation.
@@ -358,10 +414,15 @@ class PropertyPainter extends GenericPainter {
         text_options.v_align = "center";
         text_options.h_align = "center";
 
-        const shaped = gfx.text_shaper.paragraph(p.value, bbox_center, orient, text_options);
+        const shaped = gfx.text_shaper.paragraph(
+            p.value,
+            bbox_center,
+            orient,
+            text_options
+        );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(Array.from(stroke), 0.127, color);
+            gfx.line(new Polyline(Array.from(stroke), 0.127, color));
         }
     }
 }

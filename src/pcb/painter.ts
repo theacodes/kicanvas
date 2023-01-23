@@ -19,6 +19,7 @@ import { Renderer } from "../gfx/renderer.js";
 import { Layer } from "./layers.js";
 import { Color } from "../gfx/color.js";
 import { TextOptions } from "../gfx/text.js";
+import { Circle, Polygon, Polyline } from "../gfx/primitives.js";
 
 /**
  * Painter base class
@@ -45,16 +46,24 @@ class GenericPainter {
 class LinePainter extends GenericPainter {
     static classes = [pcb_items.GrLine, pcb_items.FpLine];
 
-    static paint(gfx: Renderer, layer: Layer, s: pcb_items.GrLine | pcb_items.FpLine) {
+    static paint(
+        gfx: Renderer,
+        layer: Layer,
+        s: pcb_items.GrLine | pcb_items.FpLine
+    ) {
         const points = [s.start, s.end];
-        gfx.line(points, s.width, layer.color);
+        gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
 class RectPainter extends GenericPainter {
     static classes = [pcb_items.GrRect, pcb_items.FpRect];
 
-    static paint(gfx: Renderer, layer: Layer, r: pcb_items.GrRect | pcb_items.FpRect) {
+    static paint(
+        gfx: Renderer,
+        layer: Layer,
+        r: pcb_items.GrRect | pcb_items.FpRect
+    ) {
         const color = layer.color;
         const points = [
             r.start,
@@ -64,10 +73,10 @@ class RectPainter extends GenericPainter {
             r.start,
         ];
 
-        gfx.line(points, r.width, color);
+        gfx.line(new Polyline(points, r.width, color));
 
         if (r.fill) {
-            gfx.polygon(points, color);
+            gfx.polygon(new Polygon(points, color));
         }
     }
 }
@@ -75,15 +84,19 @@ class RectPainter extends GenericPainter {
 class PolyPainter extends GenericPainter {
     static classes = [pcb_items.GrPoly, pcb_items.FpPoly];
 
-    static paint(gfx: Renderer, layer: Layer, p: pcb_items.GrPoly | pcb_items.FpPoly) {
+    static paint(
+        gfx: Renderer,
+        layer: Layer,
+        p: pcb_items.GrPoly | pcb_items.FpPoly
+    ) {
         const color = layer.color;
 
         if (p.width) {
-            gfx.line([...p.pts, p.pts[0]], p.width, color);
+            gfx.line(new Polyline([...p.pts, p.pts[0]], p.width, color));
         }
 
         if (p.fill) {
-            gfx.polygon(p.pts, color);
+            gfx.polygon(new Polygon(p.pts, color));
         }
     }
 }
@@ -91,27 +104,43 @@ class PolyPainter extends GenericPainter {
 class ArcPainter extends GenericPainter {
     static classes = [pcb_items.GrArc, pcb_items.FpArc];
 
-    static paint(gfx: Renderer, layer: Layer, a: pcb_items.GrArc | pcb_items.FpArc) {
+    static paint(
+        gfx: Renderer,
+        layer: Layer,
+        a: pcb_items.GrArc | pcb_items.FpArc
+    ) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
-        gfx.line(points, arc.width, layer.color);
+        gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
 class CirclePainter extends GenericPainter {
     static classes = [pcb_items.GrCircle, pcb_items.FpCircle];
 
-    static paint(gfx: Renderer, layer: Layer, c: pcb_items.GrCircle | pcb_items.FpCircle) {
+    static paint(
+        gfx: Renderer,
+        layer: Layer,
+        c: pcb_items.GrCircle | pcb_items.FpCircle
+    ) {
         const color = layer.color;
 
         const radius = c.center.sub(c.end).magnitude;
-        const arc = new Arc(c.center, radius, new Angle(0), new Angle(2 * Math.PI), c.width);
+        const arc = new Arc(
+            c.center,
+            radius,
+            new Angle(0),
+            new Angle(2 * Math.PI),
+            c.width
+        );
 
         if (c.fill) {
-            gfx.circle(arc.center, arc.radius + (c.width ?? 0), color);
+            gfx.circle(
+                new Circle(arc.center, arc.radius + (c.width ?? 0), color)
+            );
         } else {
             const points = arc.to_polyline();
-            gfx.line(points, arc.width, color);
+            gfx.line(new Polyline(points, arc.width, color));
         }
     }
 }
@@ -121,7 +150,7 @@ class TraceSegmentPainter extends GenericPainter {
 
     static paint(gfx: Renderer, layer: Layer, s: pcb_items.Segment) {
         const points = [s.start, s.end];
-        gfx.line(points, s.width, layer.color);
+        gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
@@ -131,7 +160,7 @@ class TraceArcPainter extends GenericPainter {
     static paint(gfx: Renderer, layer: Layer, a: pcb_items.Arc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
-        gfx.line(points, arc.width, layer.color);
+        gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
@@ -145,9 +174,9 @@ class ViaPainter extends GenericPainter {
     static paint(gfx: Renderer, layer: Layer, v: pcb_items.Via) {
         const color = layer.color;
         if (layer.name == ":Via:Through") {
-            gfx.circle(v.at, v.size / 2, color);
+            gfx.circle(new Circle(v.at, v.size / 2, color));
         } else if (layer.name == ":Via:Holes") {
-            gfx.circle(v.at, v.drill / 2, color);
+            gfx.circle(new Circle(v.at, v.drill / 2, color));
         }
     }
 }
@@ -175,7 +204,7 @@ class ZonePainter extends GenericPainter {
                 layer.color.b,
                 layer.color.a * 0.5
             );
-            gfx.polygon(p.pts, color);
+            gfx.polygon(new Polygon(p.pts, color));
         }
     }
 }
@@ -222,7 +251,10 @@ class PadPainter extends GenericPainter {
     static paint(gfx: Renderer, layer: Layer, pad: pcb_items.Pad) {
         const color = layer.color;
 
-        const position_mat = Matrix3.translation(pad.at.position.x, pad.at.position.y);
+        const position_mat = Matrix3.translation(
+            pad.at.position.x,
+            pad.at.position.y
+        );
         position_mat.rotate_self(-Angle.deg_to_rad(pad.parent.at.rotation));
         position_mat.rotate_self(Angle.deg_to_rad(pad.at.rotation));
 
@@ -234,21 +266,37 @@ class PadPainter extends GenericPainter {
         if (layer.name == ":Pad:Holes" && pad.drill != null) {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
-                gfx.circle(drill_pos, pad.drill.diameter / 2, color);
+                gfx.circle(
+                    new Circle(drill_pos, pad.drill.diameter / 2, color)
+                );
             } else {
-                const half_size = new Vec2(pad.drill.diameter / 2, (pad.drill.width ?? 0) / 2);
+                const half_size = new Vec2(
+                    pad.drill.diameter / 2,
+                    (pad.drill.width ?? 0) / 2
+                );
 
                 const half_width = Math.min(half_size.x, half_size.y);
 
-                let half_len = new Vec2(half_size.x - half_width, half_size.y - half_width);
+                let half_len = new Vec2(
+                    half_size.x - half_width,
+                    half_size.y - half_width
+                );
 
-                half_len = Matrix3.rotation(Angle.deg_to_rad(pad.at.rotation)).transform(half_len);
+                half_len = Matrix3.rotation(
+                    Angle.deg_to_rad(pad.at.rotation)
+                ).transform(half_len);
 
                 const drill_pos = center.add(pad.drill.offset);
                 const drill_start = drill_pos.sub(half_len);
                 const drill_end = drill_pos.add(half_len);
 
-                gfx.line([drill_start, drill_end], half_width * 2, color);
+                gfx.line(
+                    new Polyline(
+                        [drill_start, drill_end],
+                        half_width * 2,
+                        color
+                    )
+                );
             }
         } else {
             let shape = pad.shape;
@@ -258,7 +306,7 @@ class PadPainter extends GenericPainter {
 
             switch (shape) {
                 case "circle":
-                    gfx.circle(center, pad.size.x / 2, color);
+                    gfx.circle(new Circle(center, pad.size.x / 2, color));
                     break;
                 case "rect":
                     {
@@ -268,7 +316,7 @@ class PadPainter extends GenericPainter {
                             new Vec2(pad.size.x / 2, pad.size.y / 2),
                             new Vec2(-pad.size.x / 2, pad.size.y / 2),
                         ];
-                        gfx.polygon(rect_points, color);
+                        gfx.polygon(new Polygon(rect_points, color));
                     }
                     break;
                 case "roundrect":
@@ -279,45 +327,83 @@ class PadPainter extends GenericPainter {
                     // and a polyline.
                     {
                         const rounding =
-                            Math.min(pad.size.x, pad.size.y) * (pad.roundrect_rratio ?? 0);
-                        let half_size = new Vec2(pad.size.x / 2, pad.size.y / 2);
+                            Math.min(pad.size.x, pad.size.y) *
+                            (pad.roundrect_rratio ?? 0);
+                        let half_size = new Vec2(
+                            pad.size.x / 2,
+                            pad.size.y / 2
+                        );
                         half_size = half_size.sub(new Vec2(rounding, rounding));
 
-                        let trap_delta = pad.rect_delta ? pad.rect_delta.copy() : new Vec2(0, 0);
+                        let trap_delta = pad.rect_delta
+                            ? pad.rect_delta.copy()
+                            : new Vec2(0, 0);
                         trap_delta = trap_delta.multiply(0.5);
 
                         const rect_points = [
-                            new Vec2(-half_size.x - trap_delta.y, half_size.y + trap_delta.x),
-                            new Vec2(half_size.x + trap_delta.y, half_size.y - trap_delta.x),
-                            new Vec2(half_size.x - trap_delta.y, -half_size.y + trap_delta.x),
-                            new Vec2(-half_size.x + trap_delta.y, -half_size.y - trap_delta.x),
+                            new Vec2(
+                                -half_size.x - trap_delta.y,
+                                half_size.y + trap_delta.x
+                            ),
+                            new Vec2(
+                                half_size.x + trap_delta.y,
+                                half_size.y - trap_delta.x
+                            ),
+                            new Vec2(
+                                half_size.x - trap_delta.y,
+                                -half_size.y + trap_delta.x
+                            ),
+                            new Vec2(
+                                -half_size.x + trap_delta.y,
+                                -half_size.y - trap_delta.x
+                            ),
                         ];
 
                         // gfx.push_transform(offset_mat);
-                        gfx.polygon(rect_points, color);
-                        gfx.line([...rect_points, rect_points[0]], rounding * 2, color);
+                        gfx.polygon(new Polygon(rect_points, color));
+                        gfx.line(
+                            new Polyline(
+                                [...rect_points, rect_points[0]],
+                                rounding * 2,
+                                color
+                            )
+                        );
                         // gfx.pop_transform();
                     }
                     break;
 
                 case "oval":
                     {
-                        const half_size = new Vec2(pad.size.x / 2, pad.size.y / 2);
+                        const half_size = new Vec2(
+                            pad.size.x / 2,
+                            pad.size.y / 2
+                        );
                         const half_width = Math.min(half_size.x, half_size.y);
-                        let half_len = new Vec2(half_size.x - half_width, half_size.y - half_width);
-
-                        half_len = Matrix3.rotation(Angle.deg_to_rad(pad.at.rotation)).transform(
-                            half_len
+                        let half_len = new Vec2(
+                            half_size.x - half_width,
+                            half_size.y - half_width
                         );
 
-                        const pad_pos = center.add(pad.drill?.offset || new Vec2(0, 0));
+                        half_len = Matrix3.rotation(
+                            Angle.deg_to_rad(pad.at.rotation)
+                        ).transform(half_len);
+
+                        const pad_pos = center.add(
+                            pad.drill?.offset || new Vec2(0, 0)
+                        );
                         const pad_start = pad_pos.sub(half_len);
                         const pad_end = pad_pos.add(half_len);
 
                         if (pad_start.equals(pad_end)) {
-                            gfx.circle(pad_pos, half_width, color);
+                            gfx.circle(new Circle(pad_pos, half_width, color));
                         } else {
-                            gfx.line([pad_start, pad_end], half_width * 2, color);
+                            gfx.line(
+                                new Polyline(
+                                    [pad_start, pad_end],
+                                    half_width * 2,
+                                    color
+                                )
+                            );
                         }
                     }
                     break;
@@ -329,7 +415,9 @@ class PadPainter extends GenericPainter {
 
             if (pad.shape == "custom" && pad.primitives) {
                 for (const prim of pad.primitives) {
-                    painter_for_class.get(prim.constructor).paint(gfx, layer, prim);
+                    painter_for_class
+                        .get(prim.constructor)
+                        .paint(gfx, layer, prim);
                 }
             }
         }
@@ -349,7 +437,11 @@ class TextPainter extends GenericPainter {
         }
     }
 
-    static paint(gfx: Renderer, layer: Layer, t: pcb_items.GrText | pcb_items.FpText) {
+    static paint(
+        gfx: Renderer,
+        layer: Layer,
+        t: pcb_items.GrText | pcb_items.FpText
+    ) {
         let rotation = t.at.rotation;
 
         if (rotation == 180 || rotation == -180) {
@@ -377,7 +469,13 @@ class TextPainter extends GenericPainter {
         );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(Array.from(stroke), t.effects.thickness ?? 0.127, layer.color);
+            gfx.line(
+                new Polyline(
+                    Array.from(stroke),
+                    t.effects.thickness ?? 0.127,
+                    layer.color
+                )
+            );
         }
     }
 }
@@ -398,7 +496,9 @@ class FootprintPainter extends GenericPainter {
     static layers(fp: pcb_items.Footprint): string[] {
         const layers = new Set();
         for (const item of fp.items) {
-            const item_layers = painter_for_class.get(item.constructor).layers(item);
+            const item_layers = painter_for_class
+                .get(item.constructor)
+                .layers(item);
             for (const layer of item_layers) {
                 layers.add(layer);
             }
@@ -407,15 +507,18 @@ class FootprintPainter extends GenericPainter {
     }
 
     static paint(gfx: Renderer, layer: Layer, fp: pcb_items.Footprint) {
-        const matrix = Matrix3.translation(fp.at.position.x, fp.at.position.y).rotate_self(
-            Angle.deg_to_rad(fp.at.rotation)
-        );
+        const matrix = Matrix3.translation(
+            fp.at.position.x,
+            fp.at.position.y
+        ).rotate_self(Angle.deg_to_rad(fp.at.rotation));
 
         gfx.state.push();
         gfx.state.multiply(matrix);
 
         for (const item of fp.items) {
-            const item_layers = Array.from(painter_for_class.get(item.constructor).layers(item));
+            const item_layers = Array.from(
+                painter_for_class.get(item.constructor).layers(item)
+            );
             if (item_layers.includes(layer.name)) {
                 painter_for_class.get(item.constructor).paint(gfx, layer, item);
             }
