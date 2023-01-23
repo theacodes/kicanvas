@@ -116,22 +116,82 @@ export abstract class Renderer {
     /**
      * Draw a filled circle
      */
-    abstract circle(circle: Circle);
+    circle(circle: Circle) {
+        if (circle.color == null || (circle.color as Color)?.is_transparent) {
+            circle.color = this.state.fill;
+        }
+
+        if (!circle.color) {
+            return;
+        }
+
+        circle.center = this.state.matrix.transform(circle.center);
+
+        const radial = new Vec2(circle.radius, circle.radius);
+        this.add_object_points([
+            circle.center.add(radial),
+            circle.center.sub(radial),
+        ]);
+    }
 
     /**
      * Draw a stroked arc
      */
-    abstract arc(arc: Arc);
+    arc(arc: Arc) {
+        if (arc.color == null || (arc.color as Color)?.is_transparent) {
+            arc.color = this.state.stroke;
+        }
+
+        if (!arc.color) {
+            return;
+        }
+
+        arc.center = this.state.matrix.transform(arc.center);
+
+        // TODO: Use arc start/mid/end instead of just the whole circle
+        const radial = new Vec2(arc.radius, arc.radius);
+        this.add_object_points([
+            arc.center.add(radial),
+            arc.center.sub(radial),
+        ]);
+    }
 
     /**
      * Draw a stroked polyline
      */
-    abstract line(line: Polyline);
+    line(line: Polyline) {
+        if (line.color == null || (line.color as Color)?.is_transparent) {
+            line.color = this.state.stroke;
+        }
+
+        if (!line.color) {
+            return;
+        }
+
+        line.points = Array.from(this.state.matrix.transform_all(line.points));
+
+        // TODO: take width into account?
+        this.add_object_points(line.points);
+    }
 
     /**
      * Draw a filled polygon
      */
-    abstract polygon(polygon: Polygon);
+    polygon(polygon: Polygon) {
+        if (polygon.color == null || (polygon.color as Color)?.is_transparent) {
+            polygon.color = this.state.fill;
+        }
+
+        if (!polygon.color) {
+            return;
+        }
+
+        polygon.points = Array.from(
+            this.state.matrix.transform_all(polygon.points)
+        );
+
+        this.add_object_points(polygon.points);
+    }
 }
 
 export abstract class RenderLayer {
@@ -141,7 +201,9 @@ export abstract class RenderLayer {
         public readonly depth: number = 0
     ) {
         if (depth < 0 || depth > 1) {
-            throw new Error(`Invalid depth value ${depth}, depth should be between 0 and 1.`);
+            throw new Error(
+                `Invalid depth value ${depth}, depth should be between 0 and 1.`
+            );
         }
     }
 
@@ -153,8 +215,8 @@ export abstract class RenderLayer {
 export class RenderState {
     constructor(
         public matrix: Matrix3 = Matrix3.identity(),
-        public fill: Color = null,
-        public stroke: Color = null,
+        public fill: Color = Color.black,
+        public stroke: Color = Color.black,
         public stroke_width: number = 0
     ) {}
 

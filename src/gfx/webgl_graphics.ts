@@ -137,7 +137,7 @@ class Tesselator {
             );
             this.populate_color_data(
                 color_data,
-                color,
+                color as Color,
                 vertex_index * 4,
                 this.vertices_per_quad * 4
             );
@@ -192,7 +192,7 @@ class Tesselator {
 
             this.populate_color_data(
                 color_data,
-                c.color,
+                c.color as Color,
                 vertex_index * 4,
                 this.vertices_per_quad * 4
             );
@@ -519,7 +519,7 @@ export class PolygonSet {
 
             Tesselator.populate_color_data(
                 color_data,
-                polygon.color,
+                polygon.color as Color,
                 color_data_idx,
                 polygon_vertex_count * 4
             );

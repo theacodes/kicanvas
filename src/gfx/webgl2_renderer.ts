@@ -5,7 +5,6 @@
 */
 
 import { PrimitiveSet } from "./webgl_graphics";
-import { Vec2 } from "../math/vec2.js";
 import { RenderLayer, Renderer } from "./renderer.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Arc, Circle, Polygon, Polyline } from "./primitives";
@@ -99,43 +98,43 @@ export class WebGL2Renderer extends Renderer {
     }
 
     circle(circle: Circle) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.circle(circle);
 
-        circle.center = this.state.matrix.transform(circle.center);
+        if (!circle.color) {
+            return;
+        }
 
         this.#active_layer.geometry.add_circle(circle);
-
-        this.add_object_points([
-            circle.center.add(new Vec2(circle.radius, circle.radius)),
-            circle.center.sub(new Vec2(circle.radius, circle.radius)),
-        ]);
     }
 
     arc(arc: Arc) {
+        super.arc(arc);
+
+        if (!arc.color) {
+            return;
+        }
+
         // TODO
     }
 
     line(line: Polyline) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.line(line);
 
-        line.points = Array.from(this.state.matrix.transform_all(line.points));
+        if (!line.color) {
+            return;
+        }
 
         this.#active_layer.geometry.add_line(line);
-
-        // TODO: take width into account?
-        this.add_object_points(line.points);
     }
 
     polygon(polygon: Polygon) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.polygon(polygon);
 
-        polygon.points = Array.from(
-            this.state.matrix.transform_all(polygon.points)
-        );
+        if (!polygon.color) {
+            return;
+        }
 
         this.#active_layer.geometry.add_polygon(polygon);
-
-        this.add_object_points(polygon.points);
     }
 
     get layers(): Iterable<RenderLayer> {

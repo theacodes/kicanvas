@@ -28,6 +28,8 @@ import { Angle } from "../math/angle.js";
 import { Vec2 } from "../math/vec2.js";
 import { Color } from "./color.js";
 
+type OptionalDefaultColor = Color | false | null;
+
 /** A filled circle */
 export class Circle {
     /**
@@ -36,7 +38,11 @@ export class Circle {
      * @param radius - circle radius
      * @param color - fill color
      */
-    constructor(public center: Vec2, public radius: number, public color: Color) {}
+    constructor(
+        public center: Vec2,
+        public radius: number,
+        public color: OptionalDefaultColor
+    ) {}
 }
 
 /** A stroked circular arc */
@@ -55,7 +61,7 @@ export class Arc {
         public start_angle: Angle,
         public end_angle: Angle,
         public width: number,
-        public color: Color
+        public color: OptionalDefaultColor
     ) {}
 }
 
@@ -67,7 +73,11 @@ export class Polyline {
      * @param width - thickness of the rendered line
      * @param color - stroke color
      */
-    constructor(public points: Vec2[], public width: number, public color: Color) {}
+    constructor(
+        public points: Vec2[],
+        public width: number,
+        public color: OptionalDefaultColor
+    ) {}
 }
 
 /** Filled polygon */
@@ -79,5 +89,5 @@ export class Polygon {
      * @param points - point cloud representing the polygon
      * @param color - fill color
      */
-    constructor(public points: Vec2[], public color: Color) {}
+    constructor(public points: Vec2[], public color: OptionalDefaultColor) {}
 }

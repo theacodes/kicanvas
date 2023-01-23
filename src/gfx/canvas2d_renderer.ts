@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Vec2 } from "../math/vec2.js";
 import { Renderer, RenderLayer, RenderStateStack } from "./renderer.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Arc, Circle, Polygon, Polyline } from "./primitives.js";
+import { Color } from "./color.js";
 
 /**
  * Canvas2d-based renderer.
@@ -91,9 +91,13 @@ export class Canvas2DRenderer extends Renderer {
     }
 
     circle(circle: Circle) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.circle(circle);
 
-        circle.center = this.state.matrix.transform(circle.center);
+        if (!circle.color) {
+            return;
+        }
+
+        const color = (circle.color as Color).to_css();
 
         const path = new Path2D();
         path.arc(
@@ -104,20 +108,17 @@ export class Canvas2DRenderer extends Renderer {
             Math.PI * 2
         );
 
-        this.#active_layer.commands.push(
-            new DrawCommand(path, circle.color.to_css(), null, 0)
-        );
-
-        this.add_object_points([
-            circle.center.add(new Vec2(circle.radius, circle.radius)),
-            circle.center.sub(new Vec2(circle.radius, circle.radius)),
-        ]);
+        this.#active_layer.commands.push(new DrawCommand(path, color, null, 0));
     }
 
     arc(arc: Arc) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.arc(arc);
 
-        arc.center = this.state.matrix.transform(arc.center);
+        if (!arc.color) {
+            return;
+        }
+
+        const color = (arc.color as Color).to_css();
 
         const path = new Path2D();
         path.arc(
@@ -129,20 +130,18 @@ export class Canvas2DRenderer extends Renderer {
         );
 
         this.#active_layer.commands.push(
-            new DrawCommand(path, null, arc.color.to_css(), arc.width)
+            new DrawCommand(path, null, color, arc.width)
         );
-
-        // TODO: Use arc start/mid/end instead of just the whole circle
-        this.add_object_points([
-            arc.center.add(new Vec2(arc.radius, arc.radius)),
-            arc.center.sub(new Vec2(arc.radius, arc.radius)),
-        ]);
     }
 
     line(line: Polyline) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.line(line);
 
-        line.points = Array.from(this.state.matrix.transform_all(line.points));
+        if (!line.color) {
+            return;
+        }
+
+        const color = (line.color as Color).to_css();
 
         const path = new Path2D();
         let started = false;
@@ -157,19 +156,18 @@ export class Canvas2DRenderer extends Renderer {
         }
 
         this.#active_layer.commands.push(
-            new DrawCommand(path, null, line.color.to_css(), line.width)
+            new DrawCommand(path, null, color, line.width)
         );
-
-        // TODO: take width into account?
-        this.add_object_points(line.points);
     }
 
     polygon(polygon: Polygon) {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        super.polygon(polygon);
 
-        polygon.points = Array.from(
-            this.state.matrix.transform_all(polygon.points)
-        );
+        if (!polygon.color) {
+            return;
+        }
+
+        const color = (polygon.color as Color).to_css();
 
         const path = new Path2D();
         let started = false;
@@ -184,11 +182,7 @@ export class Canvas2DRenderer extends Renderer {
         }
         path.closePath();
 
-        this.#active_layer.commands.push(
-            new DrawCommand(path, polygon.color.to_css(), null, 0)
-        );
-
-        this.add_object_points(polygon.points);
+        this.#active_layer.commands.push(new DrawCommand(path, color, null, 0));
     }
 
     get layers() {
