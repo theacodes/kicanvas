@@ -150,6 +150,7 @@ class TextPainter extends GenericPainter {
         const pos = t.at.position.copy();
 
         const options = new TextOptions(
+            gfx.text_shaper.default_font,
             t.effects.size,
             t.effects.thickness,
             t.effects.bold,
@@ -158,8 +159,6 @@ class TextPainter extends GenericPainter {
             t.effects.h_align,
             t.effects.mirror
         );
-
-        options.font = gfx.text_shaper.font;
 
         pos.y -= t.effects.size.y * 0.15 + options.effective_thickness;
 
@@ -198,6 +197,7 @@ class LabelPainter extends GenericPainter {
             pos,
             Angle.from_degrees(rotation),
             new TextOptions(
+                gfx.text_shaper.default_font,
                 l.effects.size,
                 l.effects.thickness ?? 0.127,
                 l.effects.bold,
@@ -296,6 +296,7 @@ class PropertyPainter extends GenericPainter {
         */
 
         const text_options = new TextOptions(
+            gfx.text_shaper.default_font,
             p.effects.size,
             p.effects.thickness || 0.127,
             p.effects.bold,
@@ -354,8 +355,8 @@ class PropertyPainter extends GenericPainter {
         // alignment set to center, center, which side-steps any weirdness
         // with text alignment.
 
-        text_options.valign = "center";
-        text_options.halign = "center";
+        text_options.v_align = "center";
+        text_options.h_align = "center";
 
         const shaped = gfx.text_shaper.paragraph(p.value, bbox_center, orient, text_options);
 

@@ -366,6 +366,7 @@ class TextPainter extends GenericPainter {
             t.at.position,
             Angle.from_degrees(rotation),
             new TextOptions(
+                gfx.text_shaper.default_font,
                 t.effects.size,
                 t.effects.thickness,
                 t.effects.bold,
