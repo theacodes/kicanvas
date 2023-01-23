@@ -7,7 +7,7 @@
 import { parse } from "../kicad/parser.js";
 import * as pcb_items from "../kicad/pcb_items.js";
 import { Viewport } from "../gfx/viewport.js";
-import * as pcb_view from "../pcb/view.js";
+import { View } from "../pcb/view.js";
 import { WebGL2Renderer } from "../gfx/webgl2_renderer.js";
 import * as color_theme from "../kicad/color_theme";
 import { Vec2 } from "../math/vec2.js";
@@ -17,7 +17,7 @@ export class Viewer {
     #cvs;
     #renderer;
     #viewport;
-    #view;
+    #view: View;
     pcb;
     selected: any;
     selected_bbox: BBox;
@@ -71,7 +71,7 @@ export class Viewer {
         const pcb_src = await (await window.fetch(url)).text();
         this.pcb = new pcb_items.KicadPCB(parse(pcb_src));
 
-        this.#view = new pcb_view.View(this.#renderer, this.pcb, color_theme.board);
+        this.#view = new View(this.#renderer, this.pcb, color_theme.board);
         this.#view.setup();
 
         this.#look_at_board();
@@ -106,13 +106,7 @@ export class Viewer {
         this.#renderer.start_layer();
 
         this.#renderer.line(
-            [
-                bb.top_left,
-                bb.top_right,
-                bb.bottom_right,
-                bb.bottom_left,
-                bb.top_left,
-            ],
+            [bb.top_left, bb.top_right, bb.bottom_right, bb.bottom_left, bb.top_left],
             1,
             [1, 1, 1, 1]
         );
