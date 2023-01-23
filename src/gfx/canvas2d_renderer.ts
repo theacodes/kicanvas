@@ -176,10 +176,15 @@ export class Canvas2DRenderer extends Renderer {
         this.add_object_points(points);
     }
 
-    *layers() {
-        for (const layer of this.#layers) {
-            yield layer;
-        }
+    get layers() {
+        const layers = this.#layers;
+        return {
+            *[Symbol.iterator]() {
+                for (const layer of layers) {
+                    yield layer;
+                }
+            },
+        };
     }
 }
 

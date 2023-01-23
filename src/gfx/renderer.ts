@@ -108,6 +108,11 @@ export abstract class Renderer {
     abstract end_layer(): any;
 
     /**
+     * Iterate through layers.
+     */
+    abstract get layers(): Iterable<Layer>;
+
+    /**
      * Draw a filled circle
      */
     abstract circle(point: Vec2, radius: number, color: Color);
@@ -135,9 +140,9 @@ export abstract class Renderer {
     abstract polygon(points: Vec2[], color: Color);
 }
 
-// export interface Layer {
-//     // draw(transform: Matrix3): void;
-// }
+export interface Layer {
+    draw(camera: Matrix3): void;
+}
 
 export class State {
     constructor(

@@ -7,7 +7,7 @@
 import { PrimitiveSet } from "./primitives.js";
 import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
-import { Renderer } from "./renderer.js";
+import { Layer, Renderer } from "./renderer.js";
 
 /**
  * WebGL2-based renderer
@@ -165,9 +165,14 @@ export class WebGL2Renderer extends Renderer {
     /**
      * Iterate through all layers
      */
-    *layers() {
-        for (const layer of this.#layers) {
-            yield layer;
-        }
+    get layers(): Iterable<Layer> {
+        const layers = this.#layers;
+        return {
+            *[Symbol.iterator]() {
+                for (const layer of layers) {
+                    yield layer;
+                }
+            },
+        };
     }
 }

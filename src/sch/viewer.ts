@@ -56,7 +56,7 @@ export class Viewer {
             const camera_matrix = this.#viewport.camera.matrix;
             this.#renderer.clear_canvas();
 
-            for (const layer of this.#renderer.layers()) {
+            for (const layer of this.#renderer.layers) {
                 layer.draw(camera_matrix);
             }
         });
