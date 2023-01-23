@@ -368,6 +368,7 @@ class TextPainter extends GenericPainter {
             new TextOptions(
                 t.effects.size,
                 t.effects.thickness,
+                t.effects.bold,
                 t.effects.italic,
                 "center",
                 t.effects.h_align,
