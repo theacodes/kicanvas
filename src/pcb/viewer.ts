@@ -12,6 +12,8 @@ import { WebGL2Renderer } from "../gfx/webgl2_renderer.js";
 import * as color_theme from "../kicad/color_theme";
 import { Vec2 } from "../math/vec2.js";
 import { BBox } from "../math/bbox.js";
+import { Polyline } from "../gfx/primitives.js";
+import { Color } from "../gfx/color.js";
 
 export class Viewer {
     #cvs;
@@ -98,17 +100,30 @@ export class Viewer {
     }
 
     show_selected() {
-        const bb = this.selected_bbox.copy().grow(this.selected_bbox.w * 0.3);
         const layer = this.layers.by_name(":Overlay");
 
         layer.graphics?.clear();
 
+        if (!this.selected || !this.selected_bbox) {
+            return;
+        }
+
+        const bb = this.selected_bbox.copy().grow(this.selected_bbox.w * 0.3);
+
         this.#renderer.start_layer(layer.name, 1);
 
         this.#renderer.line(
-            [bb.top_left, bb.top_right, bb.bottom_right, bb.bottom_left, bb.top_left],
-            1,
-            [1, 1, 1, 1]
+            new Polyline(
+                [
+                    bb.top_left,
+                    bb.top_right,
+                    bb.bottom_right,
+                    bb.bottom_left,
+                    bb.top_left,
+                ],
+                1,
+                Color.white
+            )
         );
 
         layer.graphics = this.#renderer.end_layer();
