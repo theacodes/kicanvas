@@ -50,6 +50,17 @@ export abstract class Renderer {
     }
 
     /**
+     * Update the canvas and context with the new size. Should be called whenever the size
+     * of the underlying canvas element changes.
+     */
+    abstract set_viewport(x: number, y: number, w: number, h: number): void;
+
+    /**
+     * Clear the canvas. Typically called at the start of a frame.
+     */
+    abstract clear_canvas(): void;
+
+    /**
      * Mark the start of a new object.
      *
      * This is used to track bounding boxes of drawn objects.
@@ -79,12 +90,31 @@ export abstract class Renderer {
         return bbox;
     }
 
-    abstract set_viewport(x: number, y: number, w: number, h: number): void;
-    abstract clear_canvas(): void;
+    /**
+     * Start a new layer of graphics.
+     *
+     * Each layer represents a set of primitives
+     * that are all drawn at the same time and at the same depth. end_layer()
+     * must be called for the graphics to actually show up.
+     */
     abstract start_layer(): void;
+
+    /**
+     * Finish a layer of graphics.
+     *
+     * Performs any additional work needed such as tesselation and buffer
+     * management.
+     */
     abstract end_layer(): any;
 
+    /**
+     * Draw a filled circle
+     */
     abstract circle(point: Vec2, radius: number, color: Color);
+
+    /**
+     * Draw a stroked arc
+     */
     abstract arc(
         point: Vec2,
         radius: number,
@@ -93,7 +123,15 @@ export abstract class Renderer {
         width: number,
         color: Color
     );
+
+    /**
+     * Draw a stroked polyline
+     */
     abstract line(points: Vec2[], width: number, color: Color);
+
+    /**
+     * Draw a filled polygon
+     */
     abstract polygon(points: Vec2[], color: Color);
 }
 
