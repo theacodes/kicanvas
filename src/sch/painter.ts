@@ -9,6 +9,7 @@ import { Renderer } from "../gfx/renderer";
 import { TextOptions } from "../gfx/text";
 import * as sch_items from "../kicad/sch_items";
 import { Angle } from "../math/angle";
+import { Arc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
@@ -104,6 +105,25 @@ class CirclePainter extends GenericPainter {
     }
 }
 
+class ArcPainter extends GenericPainter {
+    static classes = [sch_items.Arc];
+
+    static paint(gfx: Renderer, a: sch_items.Arc) {
+        const color = gfx.state.stroke ?? gfx.theme.note;
+
+        const arc = Arc.from_three_points(a.start, a.mid, a.end, a.stroke.width);
+
+        gfx.arc(
+            arc.center,
+            arc.radius,
+            -arc.end_angle.radians,
+            -arc.start_angle.radians,
+            a.stroke.width || gfx.state.stroke_width,
+            color
+        );
+    }
+}
+
 class JunctionPainter extends GenericPainter {
     static classes = [sch_items.Junction];
 
@@ -157,8 +177,6 @@ class LabelPainter extends GenericPainter {
         if (l.effects.hide) {
             return;
         }
-
-        console.log(l);
 
         let rotation = l.at.rotation;
 
@@ -366,6 +384,7 @@ const painters = [
     PolylinePainter,
     WirePainter,
     CirclePainter,
+    ArcPainter,
     JunctionPainter,
     TextPainter,
     PinPainter,
