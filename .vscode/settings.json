@@ -13,7 +13,8 @@
     "cSpell.words": [
         "bboxes",
         "decidegrees",
-        "sexpr"
+        "sexpr",
+        "Tesselator"
     ],
     "debug.console.closeOnEnd": true,
     "debug.terminal.clearBeforeReusing": true
