@@ -135,7 +135,7 @@ export class Matrix3 {
      * Transforms a list of vectors
      * @yields new transformed vectors
      */
-    *transform_all(vecs: IterableIterator<Vec2>) {
+    *transform_all(vecs: Iterable<Vec2>) {
         for (const vec of vecs) {
             yield this.transform(vec);
         }
