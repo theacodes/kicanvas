@@ -10,6 +10,7 @@
     - https://gitlab.com/edea-dev/edea/-/tree/main/edea
 */
 
+import { Color } from "../gfx/color.js";
 import { Vec2 } from "../math/vec2.js";
 import { Token, tokenize } from "./tokenizer.js";
 
@@ -68,12 +69,7 @@ export class Parser {
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            const element = this.accept([
-                Token.ATOM,
-                Token.STRING,
-                Token.NUMBER,
-                Token.OPEN,
-            ]);
+            const element = this.accept([Token.ATOM, Token.STRING, Token.NUMBER, Token.OPEN]);
 
             if (element === null) {
                 break;
@@ -118,7 +114,7 @@ export class SExprParser {
     /**
      * Create an SExprParser
      */
-    constructor(public elements: Element[], public index: number = 0) { }
+    constructor(public elements: Element[], public index: number = 0) {}
 
     get element(): Element {
         if (this.index > this.elements.length - 1) {
@@ -139,18 +135,10 @@ export class SExprParser {
 
     unbox(value: Unboxable): Unboxed {
         if (value instanceof Token) {
-            if (
-                [
-                    Token.ATOM,
-                    Token.STRING,
-                    Token.NUMBER,
-                ].includes(value.type)
-            ) {
+            if ([Token.ATOM, Token.STRING, Token.NUMBER].includes(value.type)) {
                 return value.value;
             } else {
-                throw new Error(
-                    `Can not unbox token type ${String(value.type)}`
-                );
+                throw new Error(`Can not unbox token type ${String(value.type)}`);
             }
         } else if (value instanceof SExprParser) {
             return value;
@@ -199,7 +187,7 @@ export class SExprParser {
     }
 
     maybe_atom(match: string = null): string | null {
-        return (this.maybe(Token.ATOM, match)) as string | null;
+        return this.maybe(Token.ATOM, match) as string | null;
     }
 
     maybe_number(match: number = null): number | null {
@@ -223,20 +211,18 @@ export class SExprParser {
         const val = this.maybe(type, match);
 
         if (val === null) {
-            throw new Error(
-                `Expected ${String(type)} found ${JSON.stringify(this.element)}`
-            );
+            throw new Error(`Expected ${String(type)} found ${JSON.stringify(this.element)}`);
         }
 
         return val;
     }
 
     expect_atom(match: string = null): string {
-        return (this.expect(Token.ATOM, match)) as string;
+        return this.expect(Token.ATOM, match) as string;
     }
 
     expect_number(match: number = null): number {
-        return (this.expect(Token.NUMBER, match)) as number;
+        return this.expect(Token.NUMBER, match) as number;
     }
 
     expect_string(match: string = null): string {
@@ -244,7 +230,7 @@ export class SExprParser {
     }
 
     expect_list(): SExprParser {
-        return (this.expect("list")) as SExprParser;
+        return this.expect("list") as SExprParser;
     }
 
     maybe_expr(name: string): SExprParser | null {
@@ -268,11 +254,7 @@ export class SExprParser {
     expect_expr(name: string) {
         const e = this.maybe_expr(name);
         if (e === null) {
-            throw new Error(
-                `Expected expression ${name}, have ${JSON.stringify(
-                    this.element
-                )}`
-            );
+            throw new Error(`Expected expression ${name}, have ${JSON.stringify(this.element)}`);
         }
         return e;
     }
@@ -291,7 +273,6 @@ export class SExprParser {
     }
 
     maybe_pair(name: string, type: ElementType): Unboxable | null {
-
         const e = this.maybe_list();
 
         if (e === null) {
@@ -345,9 +326,7 @@ export class SExprParser {
     expect_pair(name: string, type: ElementType): Unboxable {
         const v = this.maybe_pair(name, type);
         if (v === null) {
-            throw new Error(
-                `Expected pair ${name}, found ${JSON.stringify(this.element)}`
-            );
+            throw new Error(`Expected pair ${name}, found ${JSON.stringify(this.element)}`);
         }
         return v;
     }
@@ -372,7 +351,6 @@ export class SExprParser {
         return this.expect_pair(name, "list") as SExprParser;
     }
 
-
     maybe_vec2(name: string, default_value: Vec2 = new Vec2(0, 0)): Vec2 {
         const v = this.maybe_expr(name);
         if (!v) {
@@ -394,6 +372,29 @@ export class SExprParser {
             pts.push(new Vec2(c.expect_number(), c.expect_number()));
         }
         return pts;
+    }
+
+    maybe_color(name = "color") {
+        const e = this.maybe_expr(name);
+        if (!e) {
+            return Color.transparent;
+        }
+        return new Color(
+            e.expect_number(),
+            e.expect_number(),
+            e.expect_number(),
+            e.expect_number()
+        );
+    }
+
+    expect_color(name = "color") {
+        const e = this.expect_expr(name);
+        return new Color(
+            e.expect_number(),
+            e.expect_number(),
+            e.expect_number(),
+            e.expect_number()
+        );
     }
 }
 
