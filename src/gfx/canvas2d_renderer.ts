@@ -7,16 +7,25 @@
 import { Color } from "./color.js";
 import { Vec2 } from "../math/vec2.js";
 import { Renderer, StateStack } from "./renderer.js";
+import { Matrix3 } from "../math/matrix3.js";
 
 /**
- * Canvas2d-based renderer
+ * Canvas2d-based renderer.
+ *
+ * This renderer works by turning draw calls into DrawCommands - basically
+ * serializing them as Path2D + state. These DrawCommands are combined into
+ * multiple Layers. When the layers are later drawn, the draw commands are
+ * stepped through and draw onto the canvas.
+ *
+ * This is similar to generating old-school display lists.
+ *
  */
 export class Canvas2DRenderer extends Renderer {
     /** Graphics layers */
-    #layers: DrawCommandList[] = [];
+    #layers: Layer[] = [];
 
     /** The layer currently being drawn to. */
-    #active_layer: DrawCommandList = null;
+    #active_layer: Layer = null;
 
     /** State */
     state: StateStack = new StateStack();
@@ -51,10 +60,6 @@ export class Canvas2DRenderer extends Renderer {
         this.set_viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    /**
-     * Update the Canvas2d with the new size. Should be called whenever the size
-     * of the underlying canvas element changes.
-     */
     set_viewport(x: number, y: number, w: number, h: number) {
         const dpr = window.devicePixelRatio;
         const rect = this.canvas.getBoundingClientRect();
@@ -63,34 +68,20 @@ export class Canvas2DRenderer extends Renderer {
         this.ctx2d.setTransform();
     }
 
-    /**
-     * Clear the canvas. Typically called at the start of a frame.
-     */
     clear_canvas() {
+        this.ctx2d.setTransform();
+        this.ctx2d.scale(window.devicePixelRatio, window.devicePixelRatio);
         this.ctx2d.fillStyle = this.background_color.to_css();
         this.ctx2d.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx2d.lineCap = "round";
         this.ctx2d.lineJoin = "round";
     }
 
-    /**
-     * Start a new layer of graphics.
-     *
-     * Each layer represents a set of primitives
-     * that are all drawn at the same time and at the same depth. end_layer()
-     * must be called for the graphics to actually show up.
-     */
     start_layer() {
-        this.#active_layer = new DrawCommandList();
+        this.#active_layer = new Layer(this.ctx2d);
     }
 
-    /**
-     * Finish a layer of graphics.
-     *
-     * Performs any additional work needed such as tesselation and buffer
-     * management.
-     */
-    end_layer(): DrawCommandList {
+    end_layer(): Layer {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         this.#layers.push(this.#active_layer);
@@ -99,9 +90,6 @@ export class Canvas2DRenderer extends Renderer {
         return this.#layers.at(-1);
     }
 
-    /**
-     * Draw a filled circle
-     */
     circle(point: Vec2, radius: number, color: Color) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
@@ -118,9 +106,6 @@ export class Canvas2DRenderer extends Renderer {
         ]);
     }
 
-    /**
-     * Draw a stroked arc
-     */
     arc(
         point: Vec2,
         radius: number,
@@ -145,9 +130,6 @@ export class Canvas2DRenderer extends Renderer {
         ]);
     }
 
-    /**
-     * Draw a polyline
-     */
     line(points: Vec2[], width: number, color: Color) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
@@ -171,9 +153,6 @@ export class Canvas2DRenderer extends Renderer {
         this.add_object_points(points);
     }
 
-    /**
-     * Draw a filled polygon
-     */
     polygon(points: Vec2[], color: Color) {
         if (this.#active_layer == null) throw new Error("No active layer");
 
@@ -197,9 +176,6 @@ export class Canvas2DRenderer extends Renderer {
         this.add_object_points(points);
     }
 
-    /**
-     * Iterate through all layers
-     */
     *layers() {
         for (const layer of this.#layers) {
             yield layer;
@@ -228,12 +204,17 @@ class DrawCommand {
     }
 }
 
-class DrawCommandList {
-    constructor(public commands: DrawCommand[] = []) {}
+class Layer {
+    constructor(public ctx: CanvasRenderingContext2D, public commands: DrawCommand[] = []) {}
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(transform: Matrix3) {
+        this.ctx.save();
+        const accumulated_transform = Matrix3.from_DOMMatrix(this.ctx.getTransform());
+        accumulated_transform.multiply_self(transform);
+        this.ctx.setTransform(accumulated_transform.to_DOMMatrix());
         for (const command of this.commands) {
-            command.draw(ctx);
+            command.draw(this.ctx);
         }
+        this.ctx.restore();
     }
 }
