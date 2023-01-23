@@ -8,10 +8,9 @@ import { parse } from "../kicad/parser.js";
 import * as pcb_items from "../kicad/pcb_items.js";
 import { Viewport } from "../gfx/viewport.js";
 import * as pcb_view from "../pcb/view.js";
-import { WebGL2Renderer } from "../gfx/renderer.js";
+import { WebGL2Renderer } from "../gfx/webgl2_renderer.js";
 import * as color_theme from "../kicad/color_theme";
 import { Vec2 } from "../math/vec2.js";
-import { TextShaper } from "../gfx/text.js";
 import { BBox } from "../math/bbox.js";
 
 export class Viewer {
@@ -25,9 +24,8 @@ export class Viewer {
 
     constructor(canvas) {
         this.#cvs = canvas;
-        this.#renderer = new WebGL2Renderer(
-            this.#cvs,
-            color_theme.board.background);
+        this.#renderer = new WebGL2Renderer(this.#cvs);
+        this.#renderer.theme = color_theme.board;
 
         this.#cvs.addEventListener("click", (e) => {
             const rect = this.#cvs.getBoundingClientRect();
@@ -61,11 +59,11 @@ export class Viewer {
 
     async setup() {
         await this.#renderer.setup();
-        this.#renderer.context.text_shaper = await TextShaper.default();
 
         this.#viewport = new Viewport(this.#renderer, () => {
             this.draw();
         });
+
         this.#viewport.enable_pan_and_zoom(0.3, 200);
     }
 
