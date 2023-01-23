@@ -150,6 +150,45 @@ class TextPainter extends GenericPainter {
     }
 }
 
+class LabelPainter extends GenericPainter {
+    static classes = [sch_items.Label];
+
+    static paint(gfx: Renderer, l: sch_items.Label) {
+        if (l.effects.hide) {
+            return;
+        }
+
+        console.log(l);
+
+        let rotation = l.at.rotation;
+
+        if (rotation == 180 || rotation == -180) {
+            rotation = 0;
+        }
+
+        const pos = l.at.position.copy();
+        pos.y -= l.effects.size.y * 0.15 + l.effects.thickness;
+
+        const shaped = gfx.text_shaper.paragraph(
+            l.name,
+            pos,
+            Angle.from_degrees(rotation),
+            new TextOptions(
+                l.effects.size,
+                l.effects.thickness,
+                l.effects.italic,
+                l.effects.v_align,
+                l.effects.h_align,
+                l.effects.mirror
+            )
+        );
+
+        for (const stroke of shaped.strokes()) {
+            gfx.line(Array.from(stroke), l.effects.thickness ?? 0.127, gfx.theme.label_local);
+        }
+    }
+}
+
 class PinPainter extends GenericPainter {
     static classes = [sch_items.PinDefinition];
 
@@ -333,6 +372,7 @@ const painters = [
     LibrarySymbolPainter,
     PropertyPainter,
     SymbolInstancePainter,
+    LabelPainter,
 ];
 
 const painter_for_class: Map<any, typeof GenericPainter> = new Map();
