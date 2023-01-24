@@ -194,7 +194,8 @@ export class LibrarySymbol {
                 continue;
             }
             if ((se = e.maybe_expr("text")) !== null) {
-                this.graphics.push(new Text(se));
+                const t = new Text(this, se);
+                this.graphics.push(t);
                 continue;
             }
             if ((se = e.maybe_expr("pin")) !== null) {
@@ -349,12 +350,14 @@ export class HierarchicalLabel {
 
 export class Text {
     static sort_order = 51;
+    parent: LibrarySymbol = null;
     text: string;
     at: At;
     effects: Effects;
     uuid: string;
 
-    constructor(e: SExprParser) {
+    constructor(parent: LibrarySymbol, e: SExprParser) {
+        this.parent = parent;
         this.text = e.expect_string();
         this.at = new At(e.expect_expr("at"));
         this.effects = new Effects(e.expect_expr("effects"));
@@ -363,7 +366,9 @@ export class Text {
         // From sch_sexpr_parser.cpp:1598:
         // "Yes, LIB_TEXT is really decidegrees even though all the others are degrees. :("
         // motherfuck.
-        this.at.rotation = this.at.rotation / 10;
+        if (parent) {
+            this.at.rotation = this.at.rotation / 10;
+        }
     }
 }
 
@@ -403,7 +408,7 @@ export class KicadSch {
             this.generator = e.expect_pair_atom("generator");
             this.uuid = e.expect_pair_atom("uuid");
             this.paper = new Paper(e.expect_expr("paper"));
-            this.title_block = new TitleBlock(e.expect_expr("title_block"));
+            this.title_block = new TitleBlock(e.maybe_expr("title_block"));
         }
 
         const lib_symbols_list = e.maybe_expr("lib_symbols");
@@ -439,7 +444,7 @@ export class KicadSch {
                 continue;
             }
             if ((se = e.maybe_expr("text")) !== null) {
-                const text = new Text(se);
+                const text = new Text(null, se);
                 this.graphics.push(text);
                 continue;
             }
