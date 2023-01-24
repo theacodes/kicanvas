@@ -39,21 +39,25 @@ export class Paper {
 }
 
 export class TitleBlock {
-    title: string;
-    date: string;
-    rev: string;
-    company: string;
-    comment_1: string;
-    comment_2: string;
-    comment_3: string;
-    comment_4: string;
-    comment_5: string;
-    comment_6: string;
-    comment_7: string;
-    comment_8: string;
-    comment_9: string;
+    title = "";
+    date = "";
+    rev = "";
+    company = "";
+    comment_1 = "";
+    comment_2 = "";
+    comment_3 = "";
+    comment_4 = "";
+    comment_5 = "";
+    comment_6 = "";
+    comment_7 = "";
+    comment_8 = "";
+    comment_9 = "";
 
     constructor(e: SExprParser) {
+        if (e == null) {
+            return;
+        }
+
         const maybe_comment = (): string => {
             const ce = e.maybe_expr("comment");
             if (ce === null) {
