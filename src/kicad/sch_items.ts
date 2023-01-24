@@ -23,7 +23,11 @@ export class Property {
     at: At;
     effects: Effects;
 
-    constructor(public parent: SymbolInstance | LibrarySymbol, number: number, e: SExprParser) {
+    constructor(
+        public parent: SymbolInstance | LibrarySymbol,
+        number: number,
+        e: SExprParser
+    ) {
         this.number = number;
         this.key = e.expect_string();
         this.value = e.expect_string();
@@ -151,14 +155,20 @@ export class LibrarySymbol {
         this.hide_pin_numbers = e.maybe_pair_atom("pin_numbers") === "hide";
         const pin_names = e.maybe_expr("pin_names");
         this.pin_name_offset = pin_names?.maybe_pair_number("offset") || 0.508;
-        this.hide_pin_names = pin_names ? pin_names.maybe_atom("hide") !== null : false;
+        this.hide_pin_names = pin_names
+            ? pin_names.maybe_atom("hide") !== null
+            : false;
         this.in_bom = e.maybe_pair_atom("in_bom") === "yes";
         this.on_board = e.maybe_pair_atom("on_board") === "yes";
 
         while (e.element) {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
-                const p = new Property(this, Object.values(this.properties).length, se);
+                const p = new Property(
+                    this,
+                    Object.values(this.properties).length,
+                    se
+                );
                 this.properties[p.key] = p;
                 continue;
             }
@@ -199,7 +209,8 @@ export class LibrarySymbol {
         this.graphics
             .sort((a, b) => {
                 // see EDA_SHAPE::Compare
-                const type_sort = a.constructor.sort_order - b.constructor.sort_order;
+                const type_sort =
+                    a.constructor.sort_order - b.constructor.sort_order;
                 if (type_sort !== 0) {
                     return type_sort;
                 }
@@ -243,7 +254,8 @@ export class SymbolInstance {
     constructor(e: SExprParser, lib_symbols: Map<string, LibrarySymbol>) {
         this.lib_name = e.maybe_pair_string("lib_name");
         this.lib_id = e.expect_pair_string("lib_id");
-        this.lib_symbol = lib_symbols.get(this.lib_id) || lib_symbols.get(this.lib_name);
+        this.lib_symbol =
+            lib_symbols.get(this.lib_id) || lib_symbols.get(this.lib_name);
 
         this.at = new At(e.expect_expr("at"));
         this.mirror = e.maybe_pair_atom("mirror");
@@ -256,7 +268,11 @@ export class SymbolInstance {
         while (e.element) {
             let se;
             if ((se = e.maybe_expr("property")) !== null) {
-                const p = new Property(this, Object.values(this.properties).length, se);
+                const p = new Property(
+                    this,
+                    Object.values(this.properties).length,
+                    se
+                );
                 this.properties[p.key] = p;
                 continue;
             }
