@@ -7,7 +7,7 @@
 import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/primitives";
 import { Renderer } from "../gfx/renderer";
-import { TextOptions } from "../gfx/text";
+import { ShapedParagraph, TextOptions } from "../gfx/text";
 import * as sch_items from "../kicad/sch_items";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
@@ -283,6 +283,7 @@ class TextPainter extends ItemPainter {
 
 class LabelPainter extends ItemPainter {
     static readonly text_offset_ratio = 0.15;
+    static readonly label_size_ratio = 0.375;
 
     static classes = [
         sch_items.Label,
@@ -297,6 +298,74 @@ class LabelPainter extends ItemPainter {
             | sch_items.GlobalLabel
     ) {
         return [":Label"];
+    }
+
+    static get_offset(
+        l:
+            | sch_items.Label
+            | sch_items.HierarchicalLabel
+            | sch_items.GlobalLabel,
+        options: TextOptions
+    ) {
+        const offset = new Vec2(0, 0);
+        let offset_dist =
+            l.effects.size.y * LabelPainter.text_offset_ratio +
+            options.get_effective_thickness(0.1524);
+
+        if (l instanceof sch_items.Label) {
+            if (l.at.rotation == 0 || l.at.rotation == 180) {
+                offset.y = -offset_dist;
+            } else {
+                offset.x = -offset_dist;
+            }
+        } else if (l instanceof sch_items.HierarchicalLabel) {
+            offset_dist += l.effects.size.x;
+            switch (l.at.rotation) {
+                case 0:
+                    offset.x = offset_dist;
+                    break;
+                case 90:
+                    offset.y = -offset_dist;
+                    break;
+                case 180:
+                    offset.x = -offset_dist;
+                    break;
+                case 270:
+                    offset.y = offset_dist;
+                    break;
+            }
+        } else if (l instanceof sch_items.GlobalLabel) {
+            let horz = LabelPainter.label_size_ratio * options.size.y;
+            // magic number from KiCAD's SCH_GLOBALLABEL::GetSchematicTextOffset
+            // that centers the text so there's room for the overbar.
+            const vert = options.size.y * 0.0715;
+
+            if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
+                // accommodate triangular shaped tail
+                horz += options.size.y * 0.75;
+            }
+
+            switch (l.at.rotation) {
+                case 0:
+                    offset.x = horz;
+                    offset.y = vert;
+                    break;
+                case 90:
+                    offset.x = vert;
+                    offset.y = -horz;
+                    break;
+                case 180:
+                    offset.x = -horz;
+                    offset.y = vert;
+                    break;
+                case 270:
+                    offset.x = vert;
+                    offset.y = horz;
+                    break;
+            }
+        }
+
+        return offset;
     }
 
     static paint(
@@ -336,36 +405,8 @@ class LabelPainter extends ItemPainter {
             l.effects.mirror
         );
 
-        const offset = new Vec2(0, 0);
-        let offset_dist =
-            l.effects.size.y * LabelPainter.text_offset_ratio +
-            options.get_effective_thickness(0.1524);
-
-        if (l instanceof sch_items.Label) {
-            if (rotation.degrees == 0) {
-                offset.y = -offset_dist;
-            } else {
-                offset.x = -offset_dist;
-            }
-        } else if (l instanceof sch_items.HierarchicalLabel) {
-            offset_dist += l.effects.size.x;
-            switch (l.at.rotation) {
-                case 0:
-                    offset.x = offset_dist;
-                    break;
-                case 90:
-                    offset.y = -offset_dist;
-                    break;
-                case 180:
-                    offset.x = -offset_dist;
-                    break;
-                case 270:
-                    offset.y = offset_dist;
-                    break;
-            }
-        }
-
-        const pos = l.at.position.add(offset);
+        const pos_offset = LabelPainter.get_offset(l, options);
+        const pos = l.at.position.add(pos_offset);
 
         const shaped = gfx.text_shaper.paragraph(
             l.name,
@@ -384,10 +425,26 @@ class LabelPainter extends ItemPainter {
                 l,
                 options.get_effective_thickness(0.1524)
             );
+        } else if (l instanceof sch_items.GlobalLabel) {
+            LabelPainter.paint_global_shape(gfx, l, shaped);
         }
 
         // debug
         gfx.circle(new Circle(l.at.position, 0.2, new Color(1, 0.2, 0.2, 1)));
+        const bb = shaped.bbox;
+        gfx.line(
+            new Polyline(
+                [
+                    bb.top_left,
+                    bb.top_right,
+                    bb.bottom_right,
+                    bb.bottom_left,
+                    bb.top_left,
+                ],
+                0.1,
+                new Color(1, 0.2, 0.2, 0.2)
+            )
+        );
     }
 
     static paint_hierarchical_shape(
@@ -470,6 +527,92 @@ class LabelPainter extends ItemPainter {
                 break;
         }
 
+        gfx.state.pop();
+    }
+
+    static paint_global_shape(
+        gfx: Renderer,
+        l: sch_items.GlobalLabel,
+        shaped: ShapedParagraph
+    ) {
+        const color = gfx.theme.label_global;
+        const margin = shaped.options.size.y * LabelPainter.label_size_ratio;
+        const half_size = shaped.options.size.y / 2 + margin;
+        const thickness = shaped.options.get_effective_thickness(0.1524);
+
+        let length = 0;
+        if (l.at.rotation == 90 || l.at.rotation == 270) {
+            length = shaped.bbox.h + 2 * margin;
+        } else {
+            length = shaped.bbox.w + 2 * margin;
+        }
+
+        // hack: I'm not yet sure how kicad adds this extra length to the bbox.
+        length += half_size * 0.5;
+
+        const x = length + thickness + 0.03;
+        const y = half_size + thickness + 0.03;
+
+        const line = new Polyline(
+            [
+                new Vec2(0, 0),
+                new Vec2(0, -y),
+                new Vec2(-x, -y),
+                new Vec2(-x, 0),
+                new Vec2(-x, y),
+                new Vec2(0, y),
+                new Vec2(0, 0),
+            ],
+            thickness,
+            color
+        );
+
+        let x_offset = 0;
+
+        switch (l.shape) {
+            case "input":
+                x_offset = -half_size;
+                line.points[0].x += half_size;
+                line.points[6].x += half_size;
+                break;
+            case "output":
+                line.points[3].x -= half_size;
+                break;
+            case "bidirectional":
+            case "tri_state":
+                x_offset = -half_size;
+                line.points[0].x += half_size;
+                line.points[6].x += half_size;
+                line.points[3].x -= half_size;
+                break;
+            default:
+                break;
+        }
+
+        for (const pt of line.points) {
+            pt.x += x_offset;
+        }
+
+        let rotation = 0;
+        switch (l.at.rotation) {
+            case 0:
+                rotation = 180;
+                break;
+            case 90:
+                rotation = 270;
+                break;
+            case 180:
+                rotation = 0;
+                break;
+            case 270:
+                rotation = 90;
+                break;
+        }
+
+        gfx.state.push();
+        gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
+        gfx.state.matrix.rotate_self(Angle.from_degrees(rotation));
+        gfx.line(line);
         gfx.state.pop();
     }
 }
