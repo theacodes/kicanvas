@@ -316,36 +316,36 @@ export class Junction {
     }
 }
 
-export class Label {
-    static sort_order = 53;
+class LabelBase {
     name: string;
     at: At;
+    shape: string;
+    fields_autoplaced: boolean;
     effects: Effects;
     uuid: string;
 
     constructor(e: SExprParser) {
         this.name = e.expect_string();
+        this.shape = e.maybe_pair_atom("shape");
         this.at = new At(e.expect_expr("at"));
+        this.fields_autoplaced = e.maybe_expr("fields_autoplaced")
+            ? true
+            : false;
         this.effects = new Effects(e.expect_expr("effects"));
         this.uuid = e.expect_pair_atom("uuid");
     }
 }
 
-export class HierarchicalLabel {
-    static sort_order = 54;
-    name: string;
-    shape: string;
-    at: At;
-    effects: Effects;
-    uuid: string;
+export class Label extends LabelBase {
+    static sort_order = 53;
+}
 
-    constructor(e: SExprParser) {
-        this.name = e.expect_string();
-        this.shape = e.expect_pair_atom("shape");
-        this.at = new At(e.expect_expr("at"));
-        this.effects = new Effects(e.expect_expr("effects"));
-        this.uuid = e.expect_pair_atom("uuid");
-    }
+export class HierarchicalLabel extends LabelBase {
+    static sort_order = 54;
+}
+
+export class GlobalLabel extends LabelBase {
+    static sort_order = 55;
 }
 
 export class Text {
@@ -394,8 +394,7 @@ export class KicadSch {
     library_symbols: Map<string, LibrarySymbol> = new Map();
     wires: Map<string, Wire> = new Map();
     junctions: Map<string, Junction> = new Map();
-    labels: Map<string, Label> = new Map();
-    hierarchical_labels: Map<string, HierarchicalLabel> = new Map();
+    labels: Map<string, Label | HierarchicalLabel> = new Map();
     symbols: Map<string, SymbolInstance> = new Map();
     graphics: Graphics[] = [];
 
@@ -438,9 +437,14 @@ export class KicadSch {
                 this.labels.set(label.uuid, label);
                 continue;
             }
+            if ((se = e.maybe_expr("global_label")) !== null) {
+                const label = new GlobalLabel(se);
+                this.labels.set(label.uuid, label);
+                continue;
+            }
             if ((se = e.maybe_expr("hierarchical_label")) !== null) {
                 const label = new HierarchicalLabel(se);
-                this.hierarchical_labels.set(label.uuid, label);
+                this.labels.set(label.uuid, label);
                 continue;
             }
             if ((se = e.maybe_expr("text")) !== null) {
@@ -482,9 +486,6 @@ export class KicadSch {
             yield j;
         }
         for (const l of this.labels.values()) {
-            yield l;
-        }
-        for (const l of this.hierarchical_labels.values()) {
             yield l;
         }
         for (const g of this.graphics) {
