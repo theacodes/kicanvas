@@ -227,7 +227,11 @@ class TextPainter extends ItemPainter {
     static classes = [sch_items.Text];
 
     static layers(item: sch_items.Text) {
-        return [":Notes"];
+        if (item.parent) {
+            return [":Symbol:Foreground"];
+        } else {
+            return [":Notes"];
+        }
     }
 
     static paint(
@@ -240,10 +244,12 @@ class TextPainter extends ItemPainter {
             return;
         }
 
-        let rotation = t.at.rotation;
+        const rotation = Angle.from_degrees(t.at.rotation).normalize();
 
-        if (rotation == 180 || rotation == -180) {
-            rotation = 0;
+        if (rotation.degrees == 180) {
+            rotation.degrees = 0;
+        } else if (rotation.degrees == 270) {
+            rotation.degrees = 90;
         }
 
         const pos = t.at.position.copy();
@@ -259,23 +265,18 @@ class TextPainter extends ItemPainter {
             t.effects.mirror
         );
 
-        pos.y -= t.effects.size.y * 0.15 + options.effective_thickness;
+        pos.y -=
+            t.effects.size.y * 0.15 + options.get_effective_thickness(0.1524);
 
         const shaped = gfx.text_shaper.paragraph(
             t.text,
             pos,
-            Angle.from_degrees(rotation),
+            rotation,
             options
         );
 
-        for (const stroke of shaped.strokes()) {
-            gfx.line(
-                new Polyline(
-                    Array.from(stroke),
-                    shaped.thickness,
-                    gfx.state.stroke
-                )
-            );
+        for (const line of shaped.to_polylines(gfx.state.stroke)) {
+            gfx.line(line);
         }
     }
 }
@@ -313,7 +314,7 @@ class LabelPainter extends ItemPainter {
             new TextOptions(
                 gfx.text_shaper.default_font,
                 l.effects.size,
-                l.effects.thickness ?? 0.127,
+                l.effects.thickness,
                 l.effects.bold,
                 l.effects.italic,
                 l.effects.v_align,
@@ -322,14 +323,10 @@ class LabelPainter extends ItemPainter {
             )
         );
 
-        for (const stroke of shaped.strokes()) {
-            gfx.line(
-                new Polyline(
-                    Array.from(stroke),
-                    shaped.thickness,
-                    gfx.theme.label_local
-                )
-            );
+        shaped.options.get_effective_thickness(0.1524);
+
+        for (const line of shaped.to_polylines(gfx.theme.label_local)) {
+            gfx.line(line);
         }
     }
 }
