@@ -65,9 +65,9 @@ export class LayerSet {
         this.#layer_list = [
             new Layer(this, ":Overlay"),
             new Layer(this, ":Symbol:Field"), // reference, value, other symbol fields
+            new Layer(this, ":Label"), // hierarchical, global, and local labels
             new Layer(this, ":Junction"), // regular junctions, bus junctions, no connects
             new Layer(this, ":Wire"), // wires and bus
-            new Layer(this, ":Label"), // hierarchical, global, and local labels
             new Layer(this, ":Symbol:Foreground"), // symbol outlines, pin names, pin numbers
             new Layer(this, ":Notes"), // Text, rectangles, etc. not inside of symbols.
             new Layer(this, ":Bitmap"),

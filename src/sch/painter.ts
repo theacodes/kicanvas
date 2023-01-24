@@ -282,6 +282,8 @@ class TextPainter extends ItemPainter {
 }
 
 class LabelPainter extends ItemPainter {
+    static readonly text_offset_ratio = 0.15;
+
     static classes = [sch_items.Label];
 
     static layers(item: sch_items.Label) {
@@ -298,32 +300,42 @@ class LabelPainter extends ItemPainter {
             return;
         }
 
-        let rotation = l.at.rotation;
+        const rotation = Angle.from_degrees(l.at.rotation).normalize();
 
-        if (rotation == 180 || rotation == -180) {
-            rotation = 0;
+        if (rotation.degrees == 180) {
+            rotation.degrees = 0;
+        } else if (rotation.degrees == 270) {
+            rotation.degrees = 90;
         }
 
+        const options = new TextOptions(
+            gfx.text_shaper.default_font,
+            l.effects.size,
+            l.effects.thickness,
+            l.effects.bold,
+            l.effects.italic,
+            l.effects.v_align,
+            l.effects.h_align,
+            l.effects.mirror
+        );
+
         const pos = l.at.position.copy();
-        pos.y -= l.effects.size.y * 0.15 + l.effects.thickness;
+        const offset =
+            l.effects.size.y * LabelPainter.text_offset_ratio +
+            options.get_effective_thickness(0.1524);
+
+        if (rotation.degrees == 0) {
+            pos.y -= offset;
+        } else {
+            pos.x -= offset;
+        }
 
         const shaped = gfx.text_shaper.paragraph(
             l.name,
             pos,
-            Angle.from_degrees(rotation),
-            new TextOptions(
-                gfx.text_shaper.default_font,
-                l.effects.size,
-                l.effects.thickness,
-                l.effects.bold,
-                l.effects.italic,
-                l.effects.v_align,
-                l.effects.h_align,
-                l.effects.mirror
-            )
+            rotation,
+            options
         );
-
-        shaped.options.get_effective_thickness(0.1524);
 
         for (const line of shaped.to_polylines(gfx.theme.label_local)) {
             gfx.line(line);
