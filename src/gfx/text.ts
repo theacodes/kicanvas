@@ -14,6 +14,8 @@ import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
 import { BBox } from "../math/bbox.js";
+import { Polyline } from "./primitives.js";
+import { Color } from "./color.js";
 
 class GlyphData {
     /**
@@ -54,7 +56,8 @@ export class Font {
      */
     glyph(chr: string, subsitute = "?"): GlyphData {
         return (
-            this.glyphs.at(chr.charCodeAt(0) - 32) ?? this.glyphs.at(subsitute.charCodeAt(0) - 32)
+            this.glyphs.at(chr.charCodeAt(0) - 32) ??
+            this.glyphs.at(subsitute.charCodeAt(0) - 32)
         );
     }
 
@@ -100,10 +103,10 @@ export class ShapedGlyph {
         this.position = position;
         this.size = size;
         this.tilt = tilt;
-        this.transform = Matrix3.translation(this.position.x, this.position.y).scale_self(
-            size.x,
-            size.y
-        );
+        this.transform = Matrix3.translation(
+            this.position.x,
+            this.position.y
+        ).scale_self(size.x, size.y);
     }
 
     /**
@@ -191,7 +194,7 @@ export class ShapedLine {
         bb.x =
             last.position.x +
             last.glyph.bbox.end[0] * last.size.x +
-            this.options.effective_thickness;
+            this.options.get_effective_thickness();
 
         bb.y = this.options.font.interline(this.options.size);
 
@@ -208,7 +211,10 @@ export class ShapedLine {
  * transforms needed to completely render text.
  */
 export class ShapedParagraph {
-    constructor(public readonly options: TextOptions, public readonly lines: ShapedLine[]) {}
+    constructor(
+        public readonly options: TextOptions,
+        public readonly lines: ShapedLine[]
+    ) {}
 
     get bbox(): BBox {
         const line_bboxes = [];
@@ -225,8 +231,14 @@ export class ShapedParagraph {
         }
     }
 
-    get thickness() {
-        return this.options.effective_thickness;
+    *to_polylines(color: Color) {
+        for (const stroke of this.strokes()) {
+            yield new Polyline(
+                Array.from(stroke),
+                this.options.thickness,
+                color
+            );
+        }
     }
 }
 
@@ -242,7 +254,8 @@ export class TextOptions {
         public italic: boolean = false,
         public v_align: "top" | "center" | "bottom" = "top",
         public h_align: "left" | "center" | "right" = "left",
-        public mirror: boolean = false
+        public mirror_x: boolean = false,
+        public mirror_y: boolean = false
     ) {}
 
     copy() {
@@ -254,36 +267,31 @@ export class TextOptions {
             this.italic,
             this.v_align,
             this.h_align,
-            this.mirror
+            this.mirror_x,
+            this.mirror_y
         );
         return t;
     }
 
-    get effective_thickness() {
+    get_effective_thickness(default_thickness = 0) {
         let thickness = this.thickness ?? 0;
 
         if (thickness < Number.MIN_VALUE) {
+            thickness = default_thickness;
+
             if (this.bold) {
                 thickness = this.size.x / 5;
-            } else {
+            } else if (thickness < Number.MIN_VALUE) {
                 thickness = this.size.x / 8;
             }
-        }
-
-        if (thickness < Number.MIN_VALUE) {
-            thickness = 0.154;
         }
 
         const scale = this.bold ? 4 : 6;
         const max_thickness = this.size.x / scale;
 
-        thickness = Math.min(thickness, max_thickness);
+        this.thickness = Math.min(thickness, max_thickness);
 
-        if (this.bold) {
-            thickness *= this.font.bold_factor;
-        }
-
-        return thickness;
+        return this.thickness;
     }
 }
 
@@ -314,7 +322,7 @@ export class TextShaper {
         const out: ShapedGlyph[] = [];
 
         const font = options.font;
-        const thickness = options.effective_thickness;
+        const thickness = options.get_effective_thickness();
         const line_offset = new Vec2(thickness / 2, 0);
         const char_offset = new Vec2(0, 0);
         const base_size = options.size.copy();
@@ -407,7 +415,10 @@ export class TextShaper {
             if (overbar_depth > -1) {
                 out.push(
                     new ShapedGlyph(
-                        this.default_font.overbar_for(glyph, options.italic && !last_had_overbar),
+                        this.default_font.overbar_for(
+                            glyph,
+                            options.italic && !last_had_overbar
+                        ),
                         new Vec2(glyph_postion.x, 0),
                         base_size
                     )
@@ -444,7 +455,9 @@ export class TextShaper {
 
         const line_spacing = options.font.interline(options.size);
         const total_height = (shaped_lines.length - 1) * line_spacing;
-        const matrix = Matrix3.translation(position.x, position.y).rotate_self(rotation);
+        const matrix = Matrix3.translation(position.x, position.y).rotate_self(
+            rotation
+        );
 
         switch (options.v_align) {
             case "top":
@@ -457,8 +470,11 @@ export class TextShaper {
                 matrix.translate_self(0, -total_height);
         }
 
-        if (options.mirror) {
+        if (options.mirror_x) {
             matrix.scale_self(-1, 1);
+        }
+        if (options.mirror_y) {
+            matrix.scale_self(1, -1);
         }
 
         for (const shaped_line of shaped_lines) {
