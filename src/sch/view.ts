@@ -27,7 +27,6 @@ export class View {
     #assign_items_to_layers() {
         for (const item of this.sch.items()) {
             for (const layer_name of this.painter.layers_for(item)) {
-                console.log(layer_name);
                 this.layers.by_name(layer_name).items.push(item);
             }
         }
