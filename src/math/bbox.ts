@@ -11,7 +11,6 @@ import { Vec2 } from "./vec2.js";
  * An axis-alignment bounding box (AABB)
  */
 export class BBox {
-
     /**
      * Create a bounding box
      */
@@ -20,7 +19,8 @@ export class BBox {
         public y: number = 0,
         public w: number = 0,
         public h: number = 0,
-        public context: any = null) { }
+        public context: any = null
+    ) {}
 
     copy() {
         return new BBox(this.x, this.y, this.w, this.h, this.context);
@@ -30,8 +30,12 @@ export class BBox {
      * Create a BBox given the top left and bottom right corners
      */
     static from_corners(
-        x1: number, y1: number, x2: number, y2: number, context: any = null) {
-
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        context: any = null
+    ) {
         if (x2 < x1) {
             [x1, x2] = [x2, x1];
         }
@@ -46,6 +50,10 @@ export class BBox {
      * Create a BBox that contains all the given points
      */
     static from_points(points: Vec2[], context: any = null) {
+        if (points.length == 0) {
+            return new BBox(0, 0, 0, 0);
+        }
+
         const start = points[0].copy();
         const end = points[0].copy();
 
