@@ -8,13 +8,14 @@ import { parse } from "../kicad/parser.js";
 import * as sch_items from "../kicad/sch_items.js";
 import { Viewport } from "../gfx/viewport.js";
 import { Canvas2DRenderer } from "../gfx/canvas2d_renderer.js";
-import { Painter } from "./painter.js";
 import * as color_theme from "../kicad/color_theme.js";
+import { View } from "./view.js";
 
 export class Viewer {
     #cvs: HTMLCanvasElement;
     #renderer: Canvas2DRenderer;
     #viewport: Viewport;
+    #view: View;
     sch: sch_items.KicadSch;
 
     constructor(canvas) {
@@ -40,11 +41,8 @@ export class Viewer {
         const sch_src = await (await window.fetch(url)).text();
         this.sch = new sch_items.KicadSch(parse(sch_src));
 
-        this.#renderer.start_layer("default", 0);
-        for (const item of this.sch.items()) {
-            Painter.paint(this.#renderer, item);
-        }
-        this.#renderer.end_layer();
+        this.#view = new View(this.#renderer, this.sch);
+        this.#view.setup();
 
         this.draw();
     }
@@ -55,10 +53,7 @@ export class Viewer {
         window.requestAnimationFrame(() => {
             const camera_matrix = this.#viewport.camera.matrix;
             this.#renderer.clear_canvas();
-
-            for (const layer of this.#renderer.layers) {
-                layer.draw(camera_matrix);
-            }
+            this.#view.draw(camera_matrix);
         });
     }
 }

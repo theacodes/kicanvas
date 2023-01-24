@@ -14,6 +14,7 @@ import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
+import { Layer } from "./layers";
 
 function color_maybe(
     color: Color,
@@ -30,21 +31,39 @@ function color_maybe(
 }
 
 /**
- * Painter base class
+ * Base class for all painters responsible for drawing a schematic item.
  */
-class GenericPainter {
+class ItemPainter {
     /**
      * List of item classes this painter can draw
      */
     static classes = [];
 
-    static paint(gfx: Renderer, item: unknown) {}
+    static layers(item: unknown) {
+        return [":Overlay"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        item: unknown
+    ) {}
 }
 
-class RectanglePainter extends GenericPainter {
+class RectanglePainter extends ItemPainter {
     static classes = [sch_items.Rectangle];
 
-    static paint(gfx: Renderer, r: sch_items.Rectangle) {
+    static layers(item: sch_items.Rectangle) {
+        return [":Notes"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        r: sch_items.Rectangle
+    ) {
         const color = color_maybe(
             r.stroke.color,
             gfx.state.stroke,
@@ -69,10 +88,19 @@ class RectanglePainter extends GenericPainter {
     }
 }
 
-class PolylinePainter extends GenericPainter {
+class PolylinePainter extends ItemPainter {
     static classes = [sch_items.Polyline];
 
-    static paint(gfx: Renderer, pl: sch_items.Polyline) {
+    static layers(item: sch_items.Polyline) {
+        return [":Notes"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        pl: sch_items.Polyline
+    ) {
         const color = color_maybe(
             pl.stroke.color,
             gfx.state.stroke,
@@ -93,18 +121,36 @@ class PolylinePainter extends GenericPainter {
     }
 }
 
-class WirePainter extends GenericPainter {
+class WirePainter extends ItemPainter {
     static classes = [sch_items.Wire];
 
-    static paint(gfx: Renderer, w: sch_items.Wire) {
+    static layers(item: sch_items.Wire) {
+        return [":Wire"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        w: sch_items.Wire
+    ) {
         gfx.line(new Polyline(w.pts, gfx.state.stroke_width, gfx.theme.wire));
     }
 }
 
-class CirclePainter extends GenericPainter {
+class CirclePainter extends ItemPainter {
     static classes = [sch_items.Circle];
 
-    static paint(gfx: Renderer, c: sch_items.Circle) {
+    static layers(item: sch_items.Circle) {
+        return [":Notes"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        c: sch_items.Circle
+    ) {
         const color = gfx.state.stroke ?? gfx.theme.note;
 
         gfx.arc(
@@ -124,10 +170,19 @@ class CirclePainter extends GenericPainter {
     }
 }
 
-class ArcPainter extends GenericPainter {
+class ArcPainter extends ItemPainter {
     static classes = [sch_items.Arc];
 
-    static paint(gfx: Renderer, a: sch_items.Arc) {
+    static layers(item: sch_items.Arc) {
+        return [":Notes"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        a: sch_items.Arc
+    ) {
         const color = gfx.state.stroke ?? gfx.theme.note;
 
         const arc = MathArc.from_three_points(
@@ -150,19 +205,37 @@ class ArcPainter extends GenericPainter {
     }
 }
 
-class JunctionPainter extends GenericPainter {
+class JunctionPainter extends ItemPainter {
     static classes = [sch_items.Junction];
 
-    static paint(gfx: Renderer, j: sch_items.Junction) {
+    static layers(item: sch_items.Junction) {
+        return [":Junction"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        j: sch_items.Junction
+    ) {
         const color = gfx.theme.junction;
         gfx.circle(new Circle(j.at.position, (j.diameter || 1) / 2, color));
     }
 }
 
-class TextPainter extends GenericPainter {
+class TextPainter extends ItemPainter {
     static classes = [sch_items.Text];
 
-    static paint(gfx: Renderer, t: sch_items.Text) {
+    static layers(item: sch_items.Text) {
+        return [":Notes"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        t: sch_items.Text
+    ) {
         if (t.effects.hide) {
             return;
         }
@@ -207,10 +280,19 @@ class TextPainter extends GenericPainter {
     }
 }
 
-class LabelPainter extends GenericPainter {
+class LabelPainter extends ItemPainter {
     static classes = [sch_items.Label];
 
-    static paint(gfx: Renderer, l: sch_items.Label) {
+    static layers(item: sch_items.Label) {
+        return [":Label"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        l: sch_items.Label
+    ) {
         if (l.effects.hide) {
             return;
         }
@@ -252,10 +334,19 @@ class LabelPainter extends GenericPainter {
     }
 }
 
-class PinPainter extends GenericPainter {
+class PinPainter extends ItemPainter {
     static classes = [sch_items.PinDefinition];
 
-    static paint(gfx: Renderer, p: sch_items.PinDefinition) {
+    static layers(item: sch_items.PinDefinition) {
+        return [":Symbol:Pin"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        p: sch_items.PinDefinition
+    ) {
         if (p.hide) {
             return;
         }
@@ -292,37 +383,76 @@ class PinPainter extends GenericPainter {
     }
 }
 
-class LibrarySymbolPainter extends GenericPainter {
+class LibrarySymbolPainter extends ItemPainter {
     static classes = [sch_items.LibrarySymbol];
 
-    static paint(gfx: Renderer, s: sch_items.LibrarySymbol) {
+    static layers(item: sch_items.LibrarySymbol) {
+        return [
+            ":Symbol:Foreground",
+            ":Symbol:Background",
+            ":Symbol:Field",
+            ":Symbol:Pin",
+        ];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        s: sch_items.LibrarySymbol
+    ) {
         for (const c of s.children) {
-            LibrarySymbolPainter.paint(gfx, c);
+            LibrarySymbolPainter.paint(painter, gfx, layer, c);
         }
 
         const outline_color = gfx.theme.component_outline;
         const fill_color = gfx.theme.component_body;
 
-        for (const g of s.graphics) {
-            if (g.fill == "outline") {
-                gfx.state.fill = outline_color;
-            } else {
-                gfx.state.fill = fill_color;
+        if (
+            layer.name == ":Symbol:Background" ||
+            layer.name == ":Symbol:Foreground"
+        ) {
+            for (const g of s.graphics) {
+                if (
+                    layer.name == ":Symbol:Background" &&
+                    g.fill == "background"
+                ) {
+                    gfx.state.fill = fill_color;
+                } else if (
+                    layer.name == ":Symbol:Foreground" &&
+                    g.fill == "outline"
+                ) {
+                    gfx.state.fill = outline_color;
+                } else {
+                    gfx.state.fill = Color.transparent;
+                }
+
+                gfx.state.stroke = outline_color;
+                painter.paint_item(layer, g);
             }
-            gfx.state.stroke = outline_color;
-            Painter.paint(gfx, g);
         }
 
-        for (const pin of Object.values(s.pins)) {
-            PinPainter.paint(gfx, pin);
+        if (layer.name == ":Symbol:Pin") {
+            for (const pin of Object.values(s.pins)) {
+                PinPainter.paint(painter, gfx, layer, pin);
+            }
         }
     }
 }
 
-class PropertyPainter extends GenericPainter {
+class PropertyPainter extends ItemPainter {
     static classes = [sch_items.Property];
 
-    static paint(gfx: Renderer, p: sch_items.Property) {
+    static layers(item: sch_items.Property) {
+        return ["Symbol:Field"];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        p: sch_items.Property
+    ) {
         if (p.effects.hide || !p.value) {
             return;
         }
@@ -427,10 +557,24 @@ class PropertyPainter extends GenericPainter {
     }
 }
 
-class SymbolInstancePainter extends GenericPainter {
+class SymbolInstancePainter extends ItemPainter {
     static classes = [sch_items.SymbolInstance];
 
-    static paint(gfx: Renderer, si: sch_items.SymbolInstance) {
+    static layers(item: sch_items.SymbolInstance) {
+        return [
+            ":Symbol:Foreground",
+            ":Symbol:Background",
+            ":Symbol:Field",
+            ":Symbol:Pin",
+        ];
+    }
+
+    static paint(
+        painter: Painter,
+        gfx: Renderer,
+        layer: Layer,
+        si: sch_items.SymbolInstance
+    ) {
         const matrix = Matrix3.identity();
         matrix.translate_self(si.at.position.x, si.at.position.y);
         matrix.scale_self(si.mirror == "y" ? -1 : 1, si.mirror == "x" ? 1 : -1);
@@ -439,12 +583,14 @@ class SymbolInstancePainter extends GenericPainter {
         gfx.state.push();
         gfx.state.multiply(matrix);
 
-        LibrarySymbolPainter.paint(gfx, si.lib_symbol);
+        LibrarySymbolPainter.paint(painter, gfx, layer, si.lib_symbol);
 
         gfx.state.pop();
 
-        for (const p of Object.values(si.properties)) {
-            PropertyPainter.paint(gfx, p);
+        if (layer.name == ":Symbol:Field") {
+            for (const p of Object.values(si.properties)) {
+                PropertyPainter.paint(painter, gfx, layer, p);
+            }
         }
     }
 }
@@ -464,7 +610,7 @@ const painters = [
     LabelPainter,
 ];
 
-const painter_for_class: Map<any, typeof GenericPainter> = new Map();
+const painter_for_class: Map<any, typeof ItemPainter> = new Map();
 
 for (const painter of painters) {
     for (const item_class of painter.classes) {
@@ -473,13 +619,45 @@ for (const painter of painters) {
 }
 
 export class Painter {
-    static paint(gfx: Renderer, item: any) {
+    constructor(public gfx: Renderer) {}
+
+    layers_for(item: any): string[] {
         const painter = painter_for_class.get(item.constructor);
 
         if (painter) {
-            painter.paint(gfx, item);
+            return painter.layers(item);
+        } else {
+            console.log("Unknown", item);
+            return [];
+        }
+    }
+
+    paint_item(layer: Layer, item: any) {
+        const painter = painter_for_class.get(item.constructor);
+
+        if (painter) {
+            painter.paint(this, this.gfx, layer, item);
         } else {
             console.log("Unknown", item);
         }
+    }
+
+    /**
+     * Paint all items on the given layer.
+     */
+    paint_layer(layer: Layer, depth = 0) {
+        const bboxes = new Map();
+
+        this.gfx.start_layer(layer.name, depth);
+
+        for (const item of layer.items) {
+            this.gfx.start_object();
+            this.paint_item(layer, item);
+            const bbox = this.gfx.end_object();
+            bboxes.set(item, bbox);
+        }
+
+        layer.graphics = this.gfx.end_layer();
+        layer.bboxes = bboxes;
     }
 }
