@@ -95,4 +95,12 @@ export class Angle {
 
         return a;
     }
+
+    /**
+     * @returns a new Angle that's reflected in the other direction, for
+     * example, 90 degrees ends up being -90 or 270 degrees (when normalized).
+     */
+    negative(): Angle {
+        return new Angle(-this.radians);
+    }
 }
