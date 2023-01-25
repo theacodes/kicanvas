@@ -7,8 +7,11 @@
 import { Angle, AngleLike } from "./angle.js";
 import { Matrix3 } from "./matrix3.js";
 
-
-export type Vec2Like = Vec2 | { x: number, y: number } | [number, number] | number;
+export type Vec2Like =
+    | Vec2
+    | { x: number; y: number }
+    | [number, number]
+    | number;
 
 /**
  * A 2-dimensional point vector
@@ -47,9 +50,7 @@ export class Vec2 {
         } else if (x instanceof Array) {
             x_prime = x[0];
             y = x[1];
-        } else if (
-            x instanceof Object && Object.hasOwn(x, "x")
-        ) {
+        } else if (x instanceof Object && Object.hasOwn(x, "x")) {
             this.x = x.x;
             this.y = x.y;
         }
@@ -87,8 +88,8 @@ export class Vec2 {
      */
     normalize(): Vec2 {
         const l = this.magnitude;
-        const x = this.x /= l;
-        const y = this.y /= l;
+        const x = (this.x /= l);
+        const y = (this.y /= l);
         return new Vec2(x, y);
     }
 
