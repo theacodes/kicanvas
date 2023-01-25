@@ -282,14 +282,11 @@ class TextPainter extends ItemPainter {
 }
 
 class LabelPainter extends ItemPainter {
+    static readonly default_thickness = 0.1524;
     static readonly text_offset_ratio = 0.15;
     static readonly label_size_ratio = 0.375;
 
-    static classes = [
-        sch_items.Label,
-        sch_items.HierarchicalLabel,
-        sch_items.GlobalLabel,
-    ];
+    static classes = [sch_items.Label];
 
     static layers(
         item:
@@ -300,7 +297,24 @@ class LabelPainter extends ItemPainter {
         return [":Label"];
     }
 
-    static get_offset(
+    static color(gfx) {
+        return gfx.theme.label_local;
+    }
+
+    static get_text_baseline_offset_dist(
+        l:
+            | sch_items.Label
+            | sch_items.HierarchicalLabel
+            | sch_items.GlobalLabel,
+        options: TextOptions
+    ) {
+        return (
+            l.effects.size.y * this.text_offset_ratio +
+            options.get_effective_thickness(this.default_thickness)
+        );
+    }
+
+    static get_text_offset(
         l:
             | sch_items.Label
             | sch_items.HierarchicalLabel
@@ -308,61 +322,12 @@ class LabelPainter extends ItemPainter {
         options: TextOptions
     ) {
         const offset = new Vec2(0, 0);
-        let offset_dist =
-            l.effects.size.y * LabelPainter.text_offset_ratio +
-            options.get_effective_thickness(0.1524);
+        const offset_dist = this.get_text_baseline_offset_dist(l, options);
 
-        if (l instanceof sch_items.Label) {
-            if (l.at.rotation == 0 || l.at.rotation == 180) {
-                offset.y = -offset_dist;
-            } else {
-                offset.x = -offset_dist;
-            }
-        } else if (l instanceof sch_items.HierarchicalLabel) {
-            offset_dist += l.effects.size.x;
-            switch (l.at.rotation) {
-                case 0:
-                    offset.x = offset_dist;
-                    break;
-                case 90:
-                    offset.y = -offset_dist;
-                    break;
-                case 180:
-                    offset.x = -offset_dist;
-                    break;
-                case 270:
-                    offset.y = offset_dist;
-                    break;
-            }
-        } else if (l instanceof sch_items.GlobalLabel) {
-            let horz = LabelPainter.label_size_ratio * options.size.y;
-            // magic number from KiCAD's SCH_GLOBALLABEL::GetSchematicTextOffset
-            // that centers the text so there's room for the overbar.
-            const vert = options.size.y * 0.0715;
-
-            if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
-                // accommodate triangular shaped tail
-                horz += options.size.y * 0.75;
-            }
-
-            switch (l.at.rotation) {
-                case 0:
-                    offset.x = horz;
-                    offset.y = vert;
-                    break;
-                case 90:
-                    offset.x = vert;
-                    offset.y = -horz;
-                    break;
-                case 180:
-                    offset.x = -horz;
-                    offset.y = vert;
-                    break;
-                case 270:
-                    offset.x = vert;
-                    offset.y = horz;
-                    break;
-            }
+        if (l.at.rotation == 0 || l.at.rotation == 180) {
+            offset.y = -offset_dist;
+        } else {
+            offset.x = -offset_dist;
         }
 
         return offset;
@@ -378,13 +343,7 @@ class LabelPainter extends ItemPainter {
             return;
         }
 
-        let color = gfx.theme.label_local;
-
-        if (l instanceof sch_items.HierarchicalLabel) {
-            color = gfx.theme.label_hier;
-        } else if (l instanceof sch_items.GlobalLabel) {
-            color = gfx.theme.label_global;
-        }
+        const color = this.color(gfx);
 
         const rotation = Angle.from_degrees(l.at.rotation).normalize();
 
@@ -405,7 +364,7 @@ class LabelPainter extends ItemPainter {
             l.effects.mirror
         );
 
-        const pos_offset = LabelPainter.get_offset(l, options);
+        const pos_offset = this.get_text_offset(l, options);
         const pos = l.at.position.add(pos_offset);
 
         const shaped = gfx.text_shaper.paragraph(
@@ -419,17 +378,28 @@ class LabelPainter extends ItemPainter {
             gfx.line(line);
         }
 
-        if (l instanceof sch_items.HierarchicalLabel) {
-            LabelPainter.paint_hierarchical_shape(
-                gfx,
-                l,
-                options.get_effective_thickness(0.1524)
-            );
-        } else if (l instanceof sch_items.GlobalLabel) {
-            LabelPainter.paint_global_shape(gfx, l, shaped);
-        }
+        this.paint_shape(gfx, l, shaped);
 
-        // debug
+        this.paint_debug(gfx, l, shaped);
+    }
+
+    static paint_shape(
+        gfx: Renderer,
+        l:
+            | sch_items.Label
+            | sch_items.GlobalLabel
+            | sch_items.HierarchicalLabel,
+        shaped: ShapedParagraph
+    ) {}
+
+    static paint_debug(
+        gfx: Renderer,
+        l:
+            | sch_items.Label
+            | sch_items.GlobalLabel
+            | sch_items.HierarchicalLabel,
+        shaped: ShapedParagraph
+    ) {
         gfx.circle(new Circle(l.at.position, 0.2, new Color(1, 0.2, 0.2, 1)));
         const bb = shaped.bbox;
         gfx.line(
@@ -446,99 +416,65 @@ class LabelPainter extends ItemPainter {
             )
         );
     }
+}
 
-    static paint_hierarchical_shape(
-        gfx: Renderer,
-        l: sch_items.HierarchicalLabel,
-        thickness: number
-    ) {
-        const s = l.effects.size.y;
-        const color = gfx.theme.label_hier;
+class GlobalLabelPainter extends LabelPainter {
+    // magic number from KiCAD's SCH_GLOBALLABEL::GetSchematicTextOffset
+    // that centers the text so there's room for the overbar.
+    static baseline_offset_ratio = 0.0715;
+    static triangle_offset_ratio = 0.75;
 
-        gfx.state.push();
-        gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
-        gfx.state.matrix.rotate_self(Angle.from_degrees(l.at.rotation));
+    static classes = [sch_items.GlobalLabel];
 
-        switch (l.shape) {
-            case "output":
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(0, s / 2),
-                            new Vec2(s / 2, s / 2),
-                            new Vec2(s, 0),
-                            new Vec2(s / 2, -s / 2),
-                            new Vec2(0, -s / 2),
-                            new Vec2(0, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+    static color(gfx) {
+        return gfx.theme.label_global;
+    }
+
+    static get_text_offset(l: sch_items.GlobalLabel, options: TextOptions) {
+        const offset = new Vec2(0, 0);
+
+        let horz = LabelPainter.label_size_ratio * options.size.y;
+        const vert = options.size.y * GlobalLabelPainter.baseline_offset_ratio;
+
+        if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
+            // accommodate triangular shaped tail
+            horz += options.size.y * GlobalLabelPainter.triangle_offset_ratio;
+        }
+
+        // TODO: Use vec2.rotate?
+        switch (l.at.rotation) {
+            case 0:
+                offset.x = horz;
+                offset.y = vert;
                 break;
-            case "input":
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(s, s / 2),
-                            new Vec2(s / 2, s / 2),
-                            new Vec2(0, 0),
-                            new Vec2(s / 2, -s / 2),
-                            new Vec2(s, -s / 2),
-                            new Vec2(s, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+            case 90:
+                offset.x = vert;
+                offset.y = -horz;
                 break;
-            case "bidirectional":
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(s / 2, s / 2),
-                            new Vec2(s, 0),
-                            new Vec2(s / 2, -s / 2),
-                            new Vec2(0, 0),
-                            new Vec2(s / 2, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+            case 180:
+                offset.x = -horz;
+                offset.y = vert;
                 break;
-
-            case "passive":
-            case "tri-state":
-            default:
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(0, s / 2),
-                            new Vec2(s, s / 2),
-                            new Vec2(s, -s / 2),
-                            new Vec2(0, -s / 2),
-                            new Vec2(0, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+            case 270:
+                offset.x = vert;
+                offset.y = horz;
                 break;
         }
 
-        gfx.state.pop();
+        return offset;
     }
 
-    static paint_global_shape(
+    static paint_shape(
         gfx: Renderer,
         l: sch_items.GlobalLabel,
         shaped: ShapedParagraph
     ) {
-        const color = gfx.theme.label_global;
-        const margin = shaped.options.size.y * LabelPainter.label_size_ratio;
+        const color = this.color(gfx);
+        const margin = shaped.options.size.y * this.label_size_ratio;
         const half_size = shaped.options.size.y / 2 + margin;
-        const thickness = shaped.options.get_effective_thickness(0.1524);
+        const thickness = shaped.options.get_effective_thickness(
+            this.default_thickness
+        );
 
         let length = 0;
         if (l.at.rotation == 90 || l.at.rotation == 270) {
@@ -613,6 +549,126 @@ class LabelPainter extends ItemPainter {
         gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
         gfx.state.matrix.rotate_self(Angle.from_degrees(rotation));
         gfx.line(line);
+        gfx.state.pop();
+    }
+}
+
+class HierarchicalLabelPainter extends LabelPainter {
+    static classes = [sch_items.HierarchicalLabel];
+
+    static color(gfx) {
+        return gfx.theme.label_hier;
+    }
+
+    static get_text_offset(
+        l: sch_items.HierarchicalLabel,
+        options: TextOptions
+    ): Vec2 {
+        const offset = new Vec2(0, 0);
+        let offset_dist = this.get_text_baseline_offset_dist(l, options);
+        offset_dist += l.effects.size.x;
+
+        switch (l.at.rotation) {
+            case 0:
+                offset.x = offset_dist;
+                break;
+            case 90:
+                offset.y = -offset_dist;
+                break;
+            case 180:
+                offset.x = -offset_dist;
+                break;
+            case 270:
+                offset.y = offset_dist;
+                break;
+        }
+
+        return offset;
+    }
+
+    static paint_shape(
+        gfx: Renderer,
+        l: sch_items.HierarchicalLabel,
+        shaped: ShapedParagraph
+    ): void {
+        const s = l.effects.size.y;
+        const color = this.color(gfx);
+        const thickness = shaped.options.get_effective_thickness(
+            this.default_thickness
+        );
+
+        gfx.state.push();
+        gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
+        gfx.state.matrix.rotate_self(Angle.from_degrees(l.at.rotation));
+
+        switch (l.shape) {
+            case "output":
+                gfx.line(
+                    new Polyline(
+                        [
+                            new Vec2(0, s / 2),
+                            new Vec2(s / 2, s / 2),
+                            new Vec2(s, 0),
+                            new Vec2(s / 2, -s / 2),
+                            new Vec2(0, -s / 2),
+                            new Vec2(0, s / 2),
+                        ],
+                        thickness,
+                        color
+                    )
+                );
+                break;
+            case "input":
+                gfx.line(
+                    new Polyline(
+                        [
+                            new Vec2(s, s / 2),
+                            new Vec2(s / 2, s / 2),
+                            new Vec2(0, 0),
+                            new Vec2(s / 2, -s / 2),
+                            new Vec2(s, -s / 2),
+                            new Vec2(s, s / 2),
+                        ],
+                        thickness,
+                        color
+                    )
+                );
+                break;
+            case "bidirectional":
+                gfx.line(
+                    new Polyline(
+                        [
+                            new Vec2(s / 2, s / 2),
+                            new Vec2(s, 0),
+                            new Vec2(s / 2, -s / 2),
+                            new Vec2(0, 0),
+                            new Vec2(s / 2, s / 2),
+                        ],
+                        thickness,
+                        color
+                    )
+                );
+                break;
+
+            case "passive":
+            case "tri-state":
+            default:
+                gfx.line(
+                    new Polyline(
+                        [
+                            new Vec2(0, s / 2),
+                            new Vec2(s, s / 2),
+                            new Vec2(s, -s / 2),
+                            new Vec2(0, -s / 2),
+                            new Vec2(0, s / 2),
+                        ],
+                        thickness,
+                        color
+                    )
+                );
+                break;
+        }
+
         gfx.state.pop();
     }
 }
@@ -891,6 +947,8 @@ const painters = [
     PropertyPainter,
     SymbolInstancePainter,
     LabelPainter,
+    GlobalLabelPainter,
+    HierarchicalLabelPainter,
 ];
 
 const painter_for_class: Map<any, typeof ItemPainter> = new Map();
