@@ -16,7 +16,7 @@ type ElementArray = [
     number,
     number,
     number,
-    number,
+    number
 ];
 
 /**
@@ -315,6 +315,23 @@ export class Matrix3 {
      * @returns a new matrix
      */
     rotate(angle: AngleLike) {
-        return this.copy().rotate(angle);
+        return this.copy().rotate_self(angle);
+    }
+
+    /**
+     * Returns the total translation (relative to identity) applied via this matrix.
+     */
+    get absolute_translation() {
+        return this.transform(new Vec2(0, 0));
+    }
+
+    /**
+     * Retruns the total rotation (relative to identity) applied via this matrix.
+     */
+    get absolute_rotation() {
+        const p0 = this.transform(new Vec2(0, 0));
+        const p1 = this.transform(new Vec2(1, 0));
+        const pn = p1.sub(p0);
+        return pn.angle.normalize();
     }
 }
