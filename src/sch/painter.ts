@@ -698,6 +698,7 @@ class LibrarySymbolPainter extends ItemPainter {
                 }
 
                 gfx.state.stroke = outline_color;
+
                 painter.paint_item(layer, g);
             }
         }

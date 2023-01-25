@@ -4,12 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BBox } from "../math/bbox.js";
-import { Matrix3 } from "../math/matrix3.js";
-import { Vec2 } from "../math/vec2.js";
-import { Color } from "./color.js";
-import { TextShaper } from "./text.js";
-import { Circle, Polyline, Polygon, Arc } from "./primitives.js";
+import { BBox } from "../math/bbox";
+import { Matrix3 } from "../math/matrix3";
+import { Vec2 } from "../math/vec2";
+import { Color } from "./color";
+import { TextShaper } from "./text";
+import { Circle, Polyline, Polygon, Arc } from "./primitives";
+import { Arc as MathArc } from "../math/arc";
 
 /**
  * KiCanvas' abstraction over various graphics backends.
@@ -146,14 +147,16 @@ export abstract class Renderer {
             return;
         }
 
-        arc.center = this.state.matrix.transform(arc.center);
+        const math_arc = new MathArc(
+            arc.center,
+            arc.radius,
+            arc.start_angle,
+            arc.end_angle,
+            arc.width
+        );
+        const points = math_arc.to_polyline();
 
-        // TODO: Use arc start/mid/end instead of just the whole circle
-        const radial = new Vec2(arc.radius, arc.radius);
-        this.add_object_points([
-            arc.center.add(radial),
-            arc.center.sub(radial),
-        ]);
+        this.line(new Polyline(points, arc.width, arc.color));
     }
 
     /**

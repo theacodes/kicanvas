@@ -6,7 +6,7 @@
 
 import { Renderer, RenderLayer, RenderStateStack } from "./renderer.js";
 import { Matrix3 } from "../math/matrix3.js";
-import { Arc, Circle, Polygon, Polyline } from "./primitives.js";
+import { Circle, Polygon, Polyline } from "./primitives.js";
 import { Color } from "./color.js";
 
 /**
@@ -109,29 +109,6 @@ export class Canvas2DRenderer extends Renderer {
         );
 
         this.#active_layer.commands.push(new DrawCommand(path, color, null, 0));
-    }
-
-    arc(arc: Arc) {
-        super.arc(arc);
-
-        if (!arc.color) {
-            return;
-        }
-
-        const color = (arc.color as Color).to_css();
-
-        const path = new Path2D();
-        path.arc(
-            arc.center.x,
-            arc.center.y,
-            arc.radius,
-            arc.start_angle.radians,
-            arc.end_angle.radians
-        );
-
-        this.#active_layer.commands.push(
-            new DrawCommand(path, null, color, arc.width)
-        );
     }
 
     line(line: Polyline) {
