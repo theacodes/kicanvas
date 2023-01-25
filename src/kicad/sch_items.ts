@@ -149,12 +149,15 @@ export class LibrarySymbol {
     graphics: any[] = [];
     pins: Record<string, PinDefinition> = {};
 
-    constructor(e: SExprParser) {
+    constructor(public parent: LibrarySymbol, e: SExprParser) {
         this.id = e.expect_string();
         this.power = e.maybe_expr("power") !== null;
         this.hide_pin_numbers = e.maybe_pair_atom("pin_numbers") === "hide";
+
         const pin_names = e.maybe_expr("pin_names");
-        this.pin_name_offset = pin_names?.maybe_pair_number("offset") || 0.508;
+        const pin_name_offset = pin_names?.maybe_pair_number("offset");
+        this.pin_name_offset = pin_name_offset ?? 0.508;
+
         this.hide_pin_names = pin_names
             ? pin_names.maybe_atom("hide") !== null
             : false;
@@ -173,7 +176,7 @@ export class LibrarySymbol {
                 continue;
             }
             if ((se = e.maybe_expr("symbol")) !== null) {
-                const s = new LibrarySymbol(se);
+                const s = new LibrarySymbol(this, se);
                 this.children.push(s);
                 continue;
             }
@@ -221,6 +224,19 @@ export class LibrarySymbol {
             })
             .reverse();
     }
+
+    get all_pins() {
+        let pins: Record<string, PinDefinition> = { ...this.pins };
+
+        for (const child of this.children) {
+            pins = {
+                ...pins,
+                ...child.all_pins,
+            };
+        }
+
+        return pins;
+    }
 }
 
 export class PinInstance {
@@ -233,7 +249,7 @@ export class PinInstance {
     }
 
     get definition(): PinDefinition {
-        return this.parent.lib_symbol.pins[this.name];
+        return this.parent.lib_symbol.all_pins[this.name];
     }
 }
 
@@ -256,7 +272,7 @@ export class SymbolInstance {
         this.lib_name = e.maybe_pair_string("lib_name");
         this.lib_id = e.expect_pair_string("lib_id");
         this.lib_symbol =
-            lib_symbols.get(this.lib_id) || lib_symbols.get(this.lib_name);
+            lib_symbols.get(this.lib_name) || lib_symbols.get(this.lib_id);
 
         this.at = new At(e.expect_expr("at"));
         this.mirror = e.maybe_pair_atom("mirror");
@@ -413,7 +429,7 @@ export class KicadSch {
         const lib_symbols_list = e.maybe_expr("lib_symbols");
         let se;
         while ((se = lib_symbols_list.maybe_expr("symbol")) !== null) {
-            const symbol = new LibrarySymbol(se);
+            const symbol = new LibrarySymbol(null, se);
             this.library_symbols.set(symbol.id, symbol);
         }
 
