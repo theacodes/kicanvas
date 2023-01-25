@@ -344,7 +344,6 @@ class LabelPainter extends ItemPainter {
         }
 
         const color = this.color(gfx);
-
         const rotation = Angle.from_degrees(l.at.rotation).normalize();
 
         if (rotation.degrees == 180) {
@@ -431,35 +430,17 @@ class GlobalLabelPainter extends LabelPainter {
     }
 
     static get_text_offset(l: sch_items.GlobalLabel, options: TextOptions) {
-        const offset = new Vec2(0, 0);
-
         let horz = LabelPainter.label_size_ratio * options.size.y;
-        const vert = options.size.y * GlobalLabelPainter.baseline_offset_ratio;
+        const vert = options.size.y * this.baseline_offset_ratio;
 
         if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
             // accommodate triangular shaped tail
-            horz += options.size.y * GlobalLabelPainter.triangle_offset_ratio;
+            horz += options.size.y * this.triangle_offset_ratio;
         }
 
-        // TODO: Use vec2.rotate?
-        switch (l.at.rotation) {
-            case 0:
-                offset.x = horz;
-                offset.y = vert;
-                break;
-            case 90:
-                offset.x = vert;
-                offset.y = -horz;
-                break;
-            case 180:
-                offset.x = -horz;
-                offset.y = vert;
-                break;
-            case 270:
-                offset.x = vert;
-                offset.y = horz;
-                break;
-        }
+        const offset = new Vec2(horz, vert).rotate(
+            Angle.from_degrees(l.at.rotation)
+        );
 
         return offset;
     }
@@ -476,12 +457,11 @@ class GlobalLabelPainter extends LabelPainter {
             this.default_thickness
         );
 
-        let length = 0;
-        if (l.at.rotation == 90 || l.at.rotation == 270) {
-            length = shaped.bbox.h + 2 * margin;
-        } else {
-            length = shaped.bbox.w + 2 * margin;
-        }
+        let length =
+            l.at.rotation == 90 || l.at.rotation == 270
+                ? shaped.bbox.h
+                : shaped.bbox.w;
+        length += 2 * margin;
 
         // hack: I'm not yet sure how kicad adds this extra length to the bbox.
         length += half_size * 0.5;
@@ -529,25 +509,11 @@ class GlobalLabelPainter extends LabelPainter {
             pt.x += x_offset;
         }
 
-        let rotation = 0;
-        switch (l.at.rotation) {
-            case 0:
-                rotation = 180;
-                break;
-            case 90:
-                rotation = 270;
-                break;
-            case 180:
-                rotation = 0;
-                break;
-            case 270:
-                rotation = 90;
-                break;
-        }
+        const rotation = Angle.from_degrees(l.at.rotation + 180);
 
         gfx.state.push();
         gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
-        gfx.state.matrix.rotate_self(Angle.from_degrees(rotation));
+        gfx.state.matrix.rotate_self(rotation);
         gfx.line(line);
         gfx.state.pop();
     }
@@ -564,26 +530,9 @@ class HierarchicalLabelPainter extends LabelPainter {
         l: sch_items.HierarchicalLabel,
         options: TextOptions
     ): Vec2 {
-        const offset = new Vec2(0, 0);
-        let offset_dist = this.get_text_baseline_offset_dist(l, options);
-        offset_dist += l.effects.size.x;
-
-        switch (l.at.rotation) {
-            case 0:
-                offset.x = offset_dist;
-                break;
-            case 90:
-                offset.y = -offset_dist;
-                break;
-            case 180:
-                offset.x = -offset_dist;
-                break;
-            case 270:
-                offset.y = offset_dist;
-                break;
-        }
-
-        return offset;
+        const offset_dist = this.get_text_baseline_offset_dist(l, options);
+        const offset = new Vec2(offset_dist + l.effects.size.x, 0);
+        return offset.rotate(Angle.from_degrees(l.at.rotation));
     }
 
     static paint_shape(
@@ -601,73 +550,55 @@ class HierarchicalLabelPainter extends LabelPainter {
         gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
         gfx.state.matrix.rotate_self(Angle.from_degrees(l.at.rotation));
 
+        let points: Vec2[];
+
         switch (l.shape) {
             case "output":
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(0, s / 2),
-                            new Vec2(s / 2, s / 2),
-                            new Vec2(s, 0),
-                            new Vec2(s / 2, -s / 2),
-                            new Vec2(0, -s / 2),
-                            new Vec2(0, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+                points = [
+                    new Vec2(0, s / 2),
+                    new Vec2(s / 2, s / 2),
+                    new Vec2(s, 0),
+                    new Vec2(s / 2, -s / 2),
+                    new Vec2(0, -s / 2),
+                    new Vec2(0, s / 2),
+                ];
                 break;
+
             case "input":
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(s, s / 2),
-                            new Vec2(s / 2, s / 2),
-                            new Vec2(0, 0),
-                            new Vec2(s / 2, -s / 2),
-                            new Vec2(s, -s / 2),
-                            new Vec2(s, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+                points = [
+                    new Vec2(s, s / 2),
+                    new Vec2(s / 2, s / 2),
+                    new Vec2(0, 0),
+                    new Vec2(s / 2, -s / 2),
+                    new Vec2(s, -s / 2),
+                    new Vec2(s, s / 2),
+                ];
                 break;
+
             case "bidirectional":
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(s / 2, s / 2),
-                            new Vec2(s, 0),
-                            new Vec2(s / 2, -s / 2),
-                            new Vec2(0, 0),
-                            new Vec2(s / 2, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+            case "tri-state":
+                points = [
+                    new Vec2(s / 2, s / 2),
+                    new Vec2(s, 0),
+                    new Vec2(s / 2, -s / 2),
+                    new Vec2(0, 0),
+                    new Vec2(s / 2, s / 2),
+                ];
                 break;
 
             case "passive":
-            case "tri-state":
             default:
-                gfx.line(
-                    new Polyline(
-                        [
-                            new Vec2(0, s / 2),
-                            new Vec2(s, s / 2),
-                            new Vec2(s, -s / 2),
-                            new Vec2(0, -s / 2),
-                            new Vec2(0, s / 2),
-                        ],
-                        thickness,
-                        color
-                    )
-                );
+                points = [
+                    new Vec2(0, s / 2),
+                    new Vec2(s, s / 2),
+                    new Vec2(s, -s / 2),
+                    new Vec2(0, -s / 2),
+                    new Vec2(0, s / 2),
+                ];
                 break;
         }
+
+        gfx.line(new Polyline(points, thickness, color));
 
         gfx.state.pop();
     }
