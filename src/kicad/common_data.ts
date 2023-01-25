@@ -175,7 +175,14 @@ export class Effects {
 
     copy() {
         const e = new Effects();
-        Object.assign(e, window.structuredClone(this));
+        e.size = this.size.copy();
+        e.thickness = this.thickness;
+        e.bold = this.bold;
+        e.italic = this.italic;
+        e.h_align = this.h_align;
+        e.v_align = this.v_align;
+        e.mirror = this.mirror;
+        e.hide = this.hide;
         return e;
     }
 }
