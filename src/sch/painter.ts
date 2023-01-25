@@ -8,6 +8,7 @@ import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/primitives";
 import { Renderer } from "../gfx/renderer";
 import { ShapedParagraph, TextOptions } from "../gfx/text";
+import { Effects } from "../kicad/common_data";
 import * as sch_items from "../kicad/sch_items";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
@@ -607,35 +608,266 @@ class HierarchicalLabelPainter extends LabelPainter {
 class PinPainter extends ItemPainter {
     static classes = [sch_items.PinDefinition];
 
-    static layers(item: sch_items.PinDefinition) {
-        return [":Symbol:Pin"];
+    static layers(item: sch_items.PinInstance) {
+        return [":Symbol:Pin", ":Symbol:Foreground"];
     }
 
     static paint(
         painter: Painter,
         gfx: Renderer,
         layer: Layer,
+        p: sch_items.PinInstance
+    ) {
+        const parent = p.parent;
+        const def = p.definition;
+
+        if (def.hide) {
+            return;
+        }
+
+        const local_matrix = gfx.state.matrix.copy();
+        local_matrix.translate_self(def.at.position.x, def.at.position.y);
+        local_matrix.rotate_self(Angle.deg_to_rad(-def.at.rotation));
+
+        gfx.state.push();
+        gfx.state.matrix = local_matrix;
+
+        if (layer.name == ":Symbol:Pin") {
+            this.paint_line(gfx, def);
+        }
+
+        gfx.state.pop();
+
+        if (layer.name == ":Symbol:Foreground") {
+            this.paint_labels(gfx, local_matrix, parent, def);
+        }
+    }
+
+    static orient_label(offset: Vec2, rotation: Angle, h_align: string) {
+        switch (rotation.degrees) {
+            case 0:
+                break;
+            case 180:
+                offset.x *= -1;
+                if (h_align == "left") {
+                    h_align = "right";
+                }
+                break;
+            case 90:
+                offset = new Vec2(offset.y, -offset.x);
+                break;
+            case 270:
+                offset = new Vec2(offset.y, offset.x);
+                if (h_align == "left") {
+                    h_align = "right";
+                }
+                break;
+        }
+        return { offset: offset, h_align: h_align };
+    }
+
+    static place_inside(
+        label_offset: number,
+        thickness: number,
+        pin_length: number,
+        rotation: Angle
+    ) {
+        const offset = new Vec2(label_offset - thickness / 2 + pin_length, 0);
+        const placement = this.orient_label(offset, rotation, "left");
+        return { v_align: "center", ...placement };
+    }
+
+    static place_above(
+        text_margin: number,
+        pin_thickness: number,
+        text_thickness: number,
+        pin_length: number,
+        rotation: Angle
+    ) {
+        const offset = new Vec2(
+            pin_length / 2,
+            -(text_margin + pin_thickness / 2 + text_thickness / 2)
+        );
+        const placement = this.orient_label(offset, rotation, "center");
+        return { v_align: "bottom", ...placement };
+    }
+
+    static place_below(
+        text_margin: number,
+        pin_thickness: number,
+        text_thickness: number,
+        pin_length: number,
+        rotation: Angle
+    ) {
+        const offset = new Vec2(
+            pin_length / 2,
+            text_margin + pin_thickness / 2 + text_thickness / 2
+        );
+        const placement = this.orient_label(offset, rotation, "center");
+        return { v_align: "top", ...placement };
+    }
+
+    static paint_labels(
+        gfx: Renderer,
+        local_matrix: Matrix3,
+        parent: sch_items.SymbolInstance,
         p: sch_items.PinDefinition
     ) {
         if (p.hide) {
             return;
         }
 
-        const matrix = Matrix3.identity();
-        matrix.translate_self(p.at.position.x, p.at.position.y);
-        matrix.rotate_self(Angle.deg_to_rad(-p.at.rotation));
+        const abs_pos = local_matrix.absolute_translation;
+        const abs_rotation = local_matrix.absolute_rotation
+            .negative()
+            .normalize();
+
+        const line_thickness = 0.1524;
+        const num_thickness = p.number_effects.thickness || line_thickness;
+        const name_thickness = p.number_effects.thickness || line_thickness;
+        const label_offset = parent.lib_symbol.pin_name_offset;
+        const hide_pin_names = parent.lib_symbol.hide_pin_names;
+        const hide_pin_numbers = parent.lib_symbol.hide_pin_numbers;
+        const text_margin = 0.6096 * 0.15; // 24 mils * ratio
+        const pin_length = p.length;
+
+        const num_effects = p.number_effects.copy();
+        num_effects.thickness = num_thickness;
+        const name_effects = p.name_effects.copy();
+        name_effects.thickness = name_thickness;
+
+        let name_placement;
+        let num_placement;
+
+        if (label_offset > 0) {
+            name_placement = this.place_inside(
+                label_offset,
+                name_thickness,
+                pin_length,
+                abs_rotation
+            );
+
+            num_placement = this.place_above(
+                text_margin,
+                line_thickness,
+                num_thickness,
+                pin_length,
+                abs_rotation
+            );
+        } else {
+            name_placement = this.place_above(
+                text_margin,
+                line_thickness,
+                name_thickness,
+                pin_length,
+                abs_rotation
+            );
+
+            num_placement = this.place_below(
+                text_margin,
+                line_thickness,
+                num_thickness,
+                pin_length,
+                abs_rotation
+            );
+        }
+
+        const num_pos = abs_pos.add(num_placement.offset);
+        const name_pos = abs_pos.add(name_placement.offset);
 
         gfx.state.push();
-        gfx.state.multiply(matrix);
+        gfx.state.matrix = Matrix3.identity();
+
+        if (!hide_pin_numbers) {
+            this.draw_label(
+                gfx,
+                p.number,
+                num_effects,
+                num_pos,
+                num_placement.h_align,
+                num_placement.v_align,
+                abs_rotation,
+                gfx.theme.pin_number
+            );
+        }
+
+        if (!hide_pin_names && p.name != "~") {
+            this.draw_label(
+                gfx,
+                p.name,
+                name_effects,
+                name_pos,
+                name_placement.h_align,
+                name_placement.v_align,
+                abs_rotation,
+                gfx.theme.pin_name
+            );
+        }
+
+        gfx.state.pop();
+    }
+
+    static draw_label(
+        gfx: Renderer,
+        text: string,
+        effects: Effects,
+        pos: Vec2,
+        h_align,
+        v_align,
+        rotation: Angle,
+        color: Color
+    ) {
+        const options = new TextOptions(
+            gfx.text_shaper.default_font,
+            effects.size,
+            effects.thickness,
+            false,
+            false,
+            v_align,
+            h_align
+        );
+
+        if (rotation.degrees == 180) {
+            rotation.degrees = 0;
+        } else if (rotation.degrees == 270) {
+            rotation.degrees = 90;
+        }
+
+        const shaped = gfx.text_shaper.paragraph(text, pos, rotation, options);
+
+        for (const line of shaped.to_polylines(color)) {
+            gfx.line(line);
+        }
+
+        // const bbox = shaped.bbox.grow(1);
+        // gfx.line(
+        //     new Polyline(
+        //         [
+        //             bbox.top_left,
+        //             bbox.top_right,
+        //             bbox.bottom_right,
+        //             bbox.bottom_left,
+        //             bbox.top_left,
+        //         ],
+        //         0.1,
+        //         new Color(0, 1, 1, 1)
+        //     )
+        // );
+
+        gfx.circle(new Circle(pos, 0.1, new Color(1, 1, 0, 1)));
+    }
+
+    static paint_line(gfx: Renderer, p: sch_items.PinDefinition) {
+        const target_pin_radius = 0.381; // 15 mils
 
         // Little connection circle
         gfx.arc(
             new Arc(
                 new Vec2(0, 0),
-                0.254,
+                target_pin_radius,
                 new Angle(0),
                 new Angle(Math.PI * 2),
-                gfx.state.stroke_width,
+                gfx.state.stroke_width / 2,
                 gfx.theme.pin
             )
         );
@@ -648,8 +880,6 @@ class PinPainter extends ItemPainter {
                 gfx.theme.pin
             )
         );
-
-        gfx.state.pop();
     }
 }
 
@@ -657,12 +887,7 @@ class LibrarySymbolPainter extends ItemPainter {
     static classes = [sch_items.LibrarySymbol];
 
     static layers(item: sch_items.LibrarySymbol) {
-        return [
-            ":Symbol:Foreground",
-            ":Symbol:Background",
-            ":Symbol:Field",
-            ":Symbol:Pin",
-        ];
+        return [":Symbol:Foreground", ":Symbol:Background", ":Symbol:Field"];
     }
 
     static paint(
@@ -700,12 +925,6 @@ class LibrarySymbolPainter extends ItemPainter {
                 gfx.state.stroke = outline_color;
 
                 painter.paint_item(layer, g);
-            }
-        }
-
-        if (layer.name == ":Symbol:Pin") {
-            for (const pin of Object.values(s.pins)) {
-                PinPainter.paint(painter, gfx, layer, pin);
             }
         }
     }
@@ -797,17 +1016,6 @@ class PropertyPainter extends ItemPainter {
             orient.degrees = 90;
         }
 
-        // debug: draw bounding box
-        // gfx.circle(bbox_center, 0.15, new Color(0, 1, 0, 1));
-        // gfx.circle(p.at.position, 0.25, new Color(0, 1, 1, 1));
-        // gfx.line([
-        //     bbox.top_left,
-        //     bbox.top_right,
-        //     bbox.bottom_right,
-        //     bbox.bottom_left,
-        //     bbox.top_left
-        // ], 0.1, new Color(0, 1, 0, 1));
-
         // Now draw the text using the BBox's center as the origin and
         // alignment set to center, center, which side-steps any weirdness
         // with text alignment.
@@ -855,6 +1063,12 @@ class SymbolInstancePainter extends ItemPainter {
         gfx.state.multiply(matrix);
 
         LibrarySymbolPainter.paint(painter, gfx, layer, si.lib_symbol);
+
+        if (layer.name == ":Symbol:Pin" || layer.name == ":Symbol:Foreground") {
+            for (const pin of Object.values(si.pins)) {
+                PinPainter.paint(painter, gfx, layer, pin);
+            }
+        }
 
         gfx.state.pop();
 
