@@ -12,13 +12,12 @@ class KicadSchematicDialogElement extends HTMLElement {
 
     async connectedCallback() {
         this.render();
-        $on(document, "kicad-schematic:item-selected", (e) => {
+        $on(window, "kicad-schematic:item-selected", (e) => {
             this.on_item_selected(e.target, e.detail);
         });
     }
 
     on_item_selected(sch, detail) {
-        console.log(sch, detail);
         this.render_properties(detail.properties);
         this.dialog.showModal();
     }

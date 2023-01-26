@@ -4,56 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { RenderLayer } from "../gfx/renderer.js";
-import { BBox } from "../math/bbox.js";
-
-/**
- * A graphical layer
- *
- * Graphical layers are responsible for tying the schematic items to graphics
- * generated using Painters.
- */
-export class Layer {
-    #layer_set: LayerSet;
-    name: string;
-    visible: boolean;
-
-    /**
-     * Schematic items that are visible on this layer.
-     */
-    items: any[];
-
-    /**
-     * The renderer-generated graphics for items on this layer.
-     * */
-    graphics: RenderLayer;
-
-    /** A map of schematic items to bounding boxes
-     * A schematic item can have graphics on multiple layers, the bounding box provided
-     * here is only valid for this layer.
-     */
-    bboxes: Map<any, BBox> = new Map();
-
-    /**
-     * Create a new Layer.
-     * @param  layer_set - the LayerSet that this Layer belongs to
-     * @param name - this layer's name
-     * @param visible - controls whether the layer is visible when rendering
-     */
-    constructor(layer_set: LayerSet, name: string, visible = true) {
-        this.#layer_set = layer_set;
-        this.name = name;
-        this.visible = visible;
-        this.items = [];
-    }
-
-    /**
-     * Get the overall bounding box of all items on the layer.
-     */
-    get bbox() {
-        return BBox.combine(this.bboxes.values(), this);
-    }
-}
+import { LayerSet as BaseLayerSet, Layer } from "../framework/layers.js";
 
 /**
  * Represents the complete set of layers used by a View to draw a schematic.
@@ -61,15 +12,14 @@ export class Layer {
  * While a schematic doesn't have physical layers like a board, it still has
  * "virtual" layers used to make sure things are drawn in the right order.
  */
-export class LayerSet {
-    #layer_list: Layer[] = [];
-    #layer_map: Map<string, Layer> = new Map();
-
+export class LayerSet extends BaseLayerSet {
     /**
      * Create a new LayerSet
      */
     constructor() {
-        this.#layer_list = [
+        super();
+
+        this.add(
             new Layer(this, ":Interactive", false), // Bounding boxes for clickable items
             new Layer(this, ":Overlay"),
             new Layer(this, ":Symbol:Field"), // reference, value, other symbol fields
@@ -81,27 +31,12 @@ export class LayerSet {
             new Layer(this, ":Bitmap"),
             new Layer(this, ":Symbol:Pin"), // symbol pins
             new Layer(this, ":Symbol:Background"), // symbol body fill
-            new Layer(this, ":Grid"),
-        ];
-
-        for (const l of this.#layer_list) {
-            this.#layer_map.set(l.name, l);
-        }
+            new Layer(this, ":Grid")
+        );
     }
 
-    /**
-     * @yields layers in the order they should be drawn
-     */
-    *in_display_order() {
-        for (const layer of this.#layer_list) {
-            yield layer;
-        }
-    }
-
-    /**
-     * Gets a Layer by name
-     */
-    by_name(name: string): Layer {
-        return this.#layer_map.get(name);
+    override *interactive_layers(): Generator<Layer, void, unknown> {
+        // Only the top interactive layer is clickable for schematics
+        yield this.by_name(":Interactive");
     }
 }

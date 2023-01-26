@@ -4,11 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Viewer } from "./viewer.js";
+import { SchematicViewer } from "./viewer.js";
 
 class KicadSchematicElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
-    viewer: Viewer;
+    viewer: SchematicViewer;
     selected = [];
 
     constructor() {
@@ -30,7 +30,7 @@ class KicadSchematicElement extends HTMLElement {
     async connectedCallback() {
         this.#renderShadowDOM();
 
-        this.viewer = new Viewer(this.#canvas);
+        this.viewer = new SchematicViewer(this.#canvas);
         await this.viewer.setup();
         await this.viewer.load(this.getAttribute("src"));
 

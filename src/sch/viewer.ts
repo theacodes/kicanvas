@@ -6,115 +6,95 @@
 
 import { parse } from "../kicad/parser.js";
 import * as sch_items from "../kicad/sch_items.js";
-import { Viewport } from "../gfx/viewport.js";
 import { Canvas2DRenderer } from "../gfx/canvas2d_renderer.js";
 import * as color_theme from "../kicad/color_theme.js";
-import { View } from "./view.js";
-import { Vec2 } from "../math/vec2.js";
-import { BBox } from "../math/bbox.js";
+import { Viewer } from "../framework/viewer.js";
+import { Renderer } from "../gfx/renderer.js";
+import { Painter } from "./painter.js";
+import { LayerSet } from "./layers.js";
+import { Color } from "../gfx/color.js";
 
-export class Viewer {
-    #cvs: HTMLCanvasElement;
-    #renderer: Canvas2DRenderer;
-    #viewport: Viewport;
-    #view: View;
-    sch: sch_items.KicadSch;
-    selected: sch_items.SymbolInstance;
-    selected_bbox: BBox;
+export class SchematicViewer extends Viewer {
+    schematic: sch_items.KicadSch;
+    #painter: Painter;
 
     constructor(canvas) {
-        this.#cvs = canvas;
-        this.#renderer = new Canvas2DRenderer(this.#cvs);
-        this.#renderer.theme = color_theme.schematic;
-        this.#renderer.state.fill = color_theme.schematic.note;
-        this.#renderer.state.stroke = color_theme.schematic.note;
-        this.#renderer.state.stroke_width = 0.1524;
+        super(canvas);
 
-        this.#cvs.addEventListener("click", (e) => {
-            const rect = this.#cvs.getBoundingClientRect();
-            const mouse = this.#viewport.screen_to_world(
-                new Vec2(e.clientX - rect.left, e.clientY - rect.top)
-            );
+        this.addEventListener("kicanvas:viewer:select", (e: CustomEvent) => {
+            const { mouse: _, items } = e.detail;
 
-            this.selected = null;
-
-            const interactive_layer = this.#view.layers.by_name(":Interactive");
-            for (const [item, bb] of interactive_layer.bboxes.entries()) {
-                if (bb.contains_point(mouse)) {
-                    this.selected_bbox = bb;
-                    this.selected = item as sch_items.SymbolInstance;
-                    break;
-                }
+            for (const { layer: _, bbox } of items) {
+                this.selected = bbox;
+                break;
             }
 
-            this.show_selected();
-            this.draw();
+            if (this.selected) {
+                canvas.dispatchEvent(
+                    new CustomEvent("kicad-schematic:item-selected", {
+                        bubbles: true,
+                        composed: true,
+                        detail: this.selected
+                            .context as sch_items.SymbolInstance,
+                    })
+                );
+            }
         });
     }
 
-    async setup() {
-        await this.#renderer.setup();
-
-        this.#viewport = new Viewport(this.#renderer, () => {
-            this.draw();
-        });
-
-        this.#viewport.enable_pan_and_zoom(0.3, 200);
+    override create_renderer(canvas: HTMLCanvasElement): Renderer {
+        const renderer = new Canvas2DRenderer(canvas);
+        renderer.theme = color_theme.schematic;
+        renderer.state.fill = color_theme.schematic.note;
+        renderer.state.stroke = color_theme.schematic.note;
+        renderer.state.stroke_width = 0.1524;
+        return renderer;
     }
 
-    async load(url) {
+    override async load(url: string | URL) {
         const sch_src = await (await window.fetch(url)).text();
-        this.sch = new sch_items.KicadSch(parse(sch_src));
+        this.schematic = new sch_items.KicadSch(parse(sch_src));
 
-        this.#view = new View(this.#renderer, this.sch);
-        this.#view.setup();
+        this.#painter = new Painter(this.renderer);
+        this.layers = new LayerSet();
+
+        for (const item of this.schematic.items()) {
+            for (const layer_name of this.#painter.layers_for(item)) {
+                this.layers.by_name(layer_name).items.push(item);
+            }
+        }
+
+        let depth = 0.001;
+        for (const layer of this.layers.in_display_order()) {
+            this.#painter.paint_layer(layer, depth);
+            depth += 0.001;
+        }
 
         this.#look_at_schematic();
-        this.draw();
+        this.draw_soon();
     }
 
     #look_at_schematic() {
-        const bb = this.#view.get_schematic_bbox();
-        this.#viewport.camera.bbox = bb;
+        const interactive = this.layers.by_name(":Interactive");
+        const bb = interactive.bbox;
+        this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
     }
 
-    show_selected() {
-        const overlay = this.#view.layers.by_name(":Overlay");
-
-        overlay.graphics?.clear();
-
-        if (!this.selected || !this.selected_bbox) {
-            return;
-        }
-
-        let bb = this.selected_bbox.copy();
-        bb = bb.grow(bb.w * 0.1);
-
-        this.#renderer.start_layer(overlay.name, 1);
-
-        this.#renderer.line(
-            bb.to_polyline(0.127, color_theme.schematic.shadow)
-        );
-        this.#renderer.polygon(
-            bb.to_polygon(color_theme.schematic.shadow.with_alpha(0.4))
-        );
-
-        overlay.graphics = this.#renderer.end_layer();
-
-        document.dispatchEvent(
-            new CustomEvent("kicad-schematic:item-selected", {
-                detail: this.selected,
-            })
-        );
+    override get selection_color(): Color {
+        return color_theme.schematic.shadow;
     }
 
     draw() {
-        if (!this.sch) return;
+        if (!this.layers) {
+            return;
+        }
 
-        window.requestAnimationFrame(() => {
-            const camera_matrix = this.#viewport.camera.matrix;
-            this.#renderer.clear_canvas();
-            this.#view.draw(camera_matrix);
-        });
+        const matrix = this.viewport.camera.matrix;
+
+        for (const layer of this.layers.in_display_order()) {
+            if (layer.visible && layer.graphics) {
+                layer.graphics.draw(matrix);
+            }
+        }
     }
 }
