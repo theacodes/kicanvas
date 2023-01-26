@@ -44,7 +44,13 @@ export class Viewer {
         this.#view = new View(this.#renderer, this.sch);
         this.#view.setup();
 
+        this.#look_at_schematic();
         this.draw();
+    }
+
+    #look_at_schematic() {
+        const bb = this.#view.get_schematic_bbox();
+        this.#viewport.camera.bbox = bb;
     }
 
     draw() {

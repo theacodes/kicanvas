@@ -6,6 +6,7 @@
 
 import { Renderer } from "../gfx/renderer.js";
 import { KicadSch } from "../kicad/sch_items";
+import { BBox } from "../math/bbox.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { LayerSet } from "./layers.js";
 import { Painter } from "./painter.js";
@@ -38,6 +39,12 @@ export class View {
             this.painter.paint_layer(layer, depth);
             depth -= 0.001;
         }
+    }
+
+    get_schematic_bbox(): BBox {
+        const interactive = this.layers.by_name(":Interactive");
+        const bb = interactive.bbox;
+        return bb.grow(bb.w * 0.1);
     }
 
     draw(matrix: Matrix3) {

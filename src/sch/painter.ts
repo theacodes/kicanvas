@@ -609,7 +609,7 @@ class PinPainter extends ItemPainter {
     static classes = [sch_items.PinDefinition];
 
     static layers(item: sch_items.PinInstance) {
-        return [":Symbol:Pin", ":Symbol:Foreground"];
+        return [":Symbol:Pin", ":Symbol:Foreground", ":Interactive"];
     }
 
     static paint(
@@ -632,7 +632,7 @@ class PinPainter extends ItemPainter {
         gfx.state.push();
         gfx.state.matrix = local_matrix;
 
-        if (layer.name == ":Symbol:Pin") {
+        if (layer.name == ":Symbol:Pin" || layer.name == ":Interactive") {
             this.paint_line(gfx, def);
         }
 
@@ -904,8 +904,11 @@ class LibrarySymbolPainter extends ItemPainter {
         const fill_color = gfx.theme.component_body;
 
         if (
-            layer.name == ":Symbol:Background" ||
-            layer.name == ":Symbol:Foreground"
+            [
+                ":Symbol:Background",
+                ":Symbol:Foreground",
+                ":Interactive",
+            ].includes(layer.name)
         ) {
             for (const g of s.graphics) {
                 if (
@@ -934,7 +937,7 @@ class PropertyPainter extends ItemPainter {
     static classes = [sch_items.Property];
 
     static layers(item: sch_items.Property) {
-        return ["Symbol:Field"];
+        return ["Symbol:Field", ":Interactive"];
     }
 
     static paint(
@@ -1030,8 +1033,13 @@ class PropertyPainter extends ItemPainter {
             text_options
         );
 
-        for (const stroke of shaped.strokes()) {
-            gfx.line(new Polyline(Array.from(stroke), 0.127, color));
+        if (layer.name == ":Interactive") {
+            for (const stroke of shaped.strokes()) {
+                gfx.line(new Polyline(Array.from(stroke), 0.127, color));
+            }
+        } else {
+            // drawing text is expensive, just draw the bbox for the interactive layer.
+            gfx.line(shaped.bbox.to_polyline(0.127, Color.white));
         }
     }
 }
@@ -1041,6 +1049,7 @@ class SymbolInstancePainter extends ItemPainter {
 
     static layers(item: sch_items.SymbolInstance) {
         return [
+            ":Interactive",
             ":Symbol:Foreground",
             ":Symbol:Background",
             ":Symbol:Field",
@@ -1054,6 +1063,11 @@ class SymbolInstancePainter extends ItemPainter {
         layer: Layer,
         si: sch_items.SymbolInstance
     ) {
+        if (layer.name == ":Interactive" && si.lib_symbol.power) {
+            // Don't draw power symbols on the interactive layer.
+            return;
+        }
+
         const matrix = Matrix3.identity();
         matrix.translate_self(si.at.position.x, si.at.position.y);
         matrix.scale_self(si.mirror == "y" ? -1 : 1, si.mirror == "x" ? 1 : -1);
@@ -1064,15 +1078,18 @@ class SymbolInstancePainter extends ItemPainter {
 
         LibrarySymbolPainter.paint(painter, gfx, layer, si.lib_symbol);
 
-        if (layer.name == ":Symbol:Pin" || layer.name == ":Symbol:Foreground") {
+        if (
+            [":Symbol:Pin", ":Symbol:Foreground", ":Interactive"].includes(
+                layer.name
+            )
+        ) {
             for (const pin of Object.values(si.pins)) {
                 PinPainter.paint(painter, gfx, layer, pin);
             }
         }
-
         gfx.state.pop();
 
-        if (layer.name == ":Symbol:Field") {
+        if (layer.name == ":Symbol:Field" || layer.name == ":Interactive") {
             for (const p of Object.values(si.properties)) {
                 PropertyPainter.paint(painter, gfx, layer, p);
             }
@@ -1138,10 +1155,18 @@ export class Painter {
         this.gfx.start_layer(layer.name, depth);
 
         for (const item of layer.items) {
-            this.gfx.start_object();
+            this.gfx.start_bbox();
+
             this.paint_item(layer, item);
-            const bbox = this.gfx.end_object();
+
+            let bbox = this.gfx.end_bbox(item);
+
             bboxes.set(item, bbox);
+
+            if (layer.name == ":Interactive" && bbox.valid) {
+                bbox = bbox.grow(1);
+                this.gfx.line(bbox.to_polyline(0.5, new Color(1, 1, 0, 1)));
+            }
         }
 
         layer.graphics = this.gfx.end_layer();

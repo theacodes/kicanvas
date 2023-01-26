@@ -19,7 +19,7 @@ import { Arc as MathArc } from "../math/arc";
  * drawing commands are issued to the renderer by a "painter" and the renderer
  * does not immediately draw the specified graphics. Instead, the renderer will
  * compile all of the drawing commands together into a "layer". These layers
- * can be actually rendered later.
+ * will be actually rendered later.
  *
  * This approach gives us a hell of a lot of speed in exchange for some memory
  * usage. All of the complex logic to turn schematic or board objects into
@@ -30,7 +30,7 @@ import { Arc as MathArc } from "../math/arc";
  *
  */
 export abstract class Renderer {
-    #object_points: Vec2[] = null;
+    #current_bbox: BBox = null;
 
     canvas: HTMLCanvasElement;
     state: RenderStateStack = new RenderStateStack();
@@ -63,33 +63,36 @@ export abstract class Renderer {
     abstract clear_canvas(): void;
 
     /**
-     * Mark the start of a new object.
-     *
-     * This is used to track bounding boxes of drawn objects.
+     * Start a new bbox for automatically tracking bounding boxes of drawn objects.
      */
-    start_object(): void {
-        this.#object_points = [];
+    start_bbox(): void {
+        this.#current_bbox = new BBox(0, 0, 0, 0);
     }
 
     /**
-     * Add points to the current object.
+     * Adds a bbox to the current bbox.
      */
-    add_object_points(pts: Iterable<Vec2>) {
-        this.#object_points?.push(...pts);
-    }
-
-    /**
-     * Mark the end of an object.
-     * @returns the drawn object's bounding box
-     */
-    end_object(): BBox {
-        if (this.#object_points == null) {
-            throw new Error("No current object");
+    add_bbox(bb: BBox) {
+        if (!this.#current_bbox) {
+            return;
         }
 
-        const bbox = BBox.from_points(this.#object_points);
-        this.#object_points = null;
-        return bbox;
+        this.#current_bbox = BBox.combine([this.#current_bbox, bb], bb.context);
+    }
+
+    /**
+     * Stop adding drawing to the current bbox and return it.
+     */
+    end_bbox(context: any): BBox {
+        const bb = this.#current_bbox;
+        if (bb == null) {
+            throw new Error("No current bbox");
+        }
+
+        bb.context = context;
+
+        this.#current_bbox = null;
+        return bb;
     }
 
     /**
@@ -129,10 +132,12 @@ export abstract class Renderer {
         circle.center = this.state.matrix.transform(circle.center);
 
         const radial = new Vec2(circle.radius, circle.radius);
-        this.add_object_points([
-            circle.center.add(radial),
-            circle.center.sub(radial),
-        ]);
+        this.add_bbox(
+            BBox.from_points([
+                circle.center.add(radial),
+                circle.center.sub(radial),
+            ])
+        );
     }
 
     /**
@@ -173,8 +178,9 @@ export abstract class Renderer {
 
         line.points = Array.from(this.state.matrix.transform_all(line.points));
 
-        // TODO: take width into account?
-        this.add_object_points(line.points);
+        let bbox = BBox.from_points(line.points);
+        bbox = bbox.grow(line.width);
+        this.add_bbox(bbox);
     }
 
     /**
@@ -193,7 +199,7 @@ export abstract class Renderer {
             this.state.matrix.transform_all(polygon.points)
         );
 
-        this.add_object_points(polygon.points);
+        this.add_bbox(BBox.from_points(polygon.points));
     }
 }
 

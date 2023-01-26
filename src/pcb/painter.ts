@@ -577,9 +577,9 @@ export class Painter {
         this.gfx.start_layer(layer.name, depth);
 
         for (const item of layer.items) {
-            this.gfx.start_object();
+            this.gfx.start_bbox();
             this.paint_item(layer, item);
-            const bbox = this.gfx.end_object();
+            const bbox = this.gfx.end_bbox(item);
             bboxes.set(item, bbox);
         }
 
