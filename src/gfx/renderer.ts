@@ -48,7 +48,7 @@ export abstract class Renderer {
     }
 
     get background_color(): Color {
-        return this.theme?.background ?? new Color(0, 0, 0, 1);
+        return (this.theme?.background as Color) ?? new Color(0, 0, 0, 1);
     }
 
     /**

@@ -69,7 +69,12 @@ export class Parser {
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            const element = this.accept([Token.ATOM, Token.STRING, Token.NUMBER, Token.OPEN]);
+            const element = this.accept([
+                Token.ATOM,
+                Token.STRING,
+                Token.NUMBER,
+                Token.OPEN,
+            ]);
 
             if (element === null) {
                 break;
@@ -138,7 +143,9 @@ export class SExprParser {
             if ([Token.ATOM, Token.STRING, Token.NUMBER].includes(value.type)) {
                 return value.value;
             } else {
-                throw new Error(`Can not unbox token type ${String(value.type)}`);
+                throw new Error(
+                    `Can not unbox token type ${String(value.type)}`
+                );
             }
         } else if (value instanceof SExprParser) {
             return value;
@@ -211,7 +218,9 @@ export class SExprParser {
         const val = this.maybe(type, match);
 
         if (val === null) {
-            throw new Error(`Expected ${String(type)} found ${JSON.stringify(this.element)}`);
+            throw new Error(
+                `Expected ${String(type)} found ${JSON.stringify(this.element)}`
+            );
         }
 
         return val;
@@ -254,7 +263,11 @@ export class SExprParser {
     expect_expr(name: string) {
         const e = this.maybe_expr(name);
         if (e === null) {
-            throw new Error(`Expected expression ${name}, have ${JSON.stringify(this.element)}`);
+            throw new Error(
+                `Expected expression ${name}, have ${JSON.stringify(
+                    this.element
+                )}`
+            );
         }
         return e;
     }
@@ -326,7 +339,9 @@ export class SExprParser {
     expect_pair(name: string, type: ElementType): Unboxable {
         const v = this.maybe_pair(name, type);
         if (v === null) {
-            throw new Error(`Expected pair ${name}, found ${JSON.stringify(this.element)}`);
+            throw new Error(
+                `Expected pair ${name}, found ${JSON.stringify(this.element)}`
+            );
         }
         return v;
     }

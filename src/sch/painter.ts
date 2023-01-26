@@ -68,7 +68,7 @@ class RectanglePainter extends ItemPainter {
         const color = color_maybe(
             r.stroke.color,
             gfx.state.stroke,
-            gfx.theme.note
+            gfx.theme.note as Color
         );
 
         const pts = [
@@ -105,7 +105,7 @@ class PolylinePainter extends ItemPainter {
         const color = color_maybe(
             pl.stroke.color,
             gfx.state.stroke,
-            gfx.theme.note
+            gfx.theme.note as Color
         );
 
         gfx.line(
@@ -135,7 +135,9 @@ class WirePainter extends ItemPainter {
         layer: Layer,
         w: sch_items.Wire
     ) {
-        gfx.line(new Polyline(w.pts, gfx.state.stroke_width, gfx.theme.wire));
+        gfx.line(
+            new Polyline(w.pts, gfx.state.stroke_width, gfx.theme.wire as Color)
+        );
     }
 }
 
@@ -152,7 +154,7 @@ class CirclePainter extends ItemPainter {
         layer: Layer,
         c: sch_items.Circle
     ) {
-        const color = gfx.state.stroke ?? gfx.theme.note;
+        const color = gfx.state.stroke ?? (gfx.theme.note as Color);
 
         gfx.arc(
             new Arc(
@@ -184,7 +186,7 @@ class ArcPainter extends ItemPainter {
         layer: Layer,
         a: sch_items.Arc
     ) {
-        const color = gfx.state.stroke ?? gfx.theme.note;
+        const color = gfx.state.stroke ?? (gfx.theme.note as Color);
 
         const arc = MathArc.from_three_points(
             a.start,
@@ -219,7 +221,7 @@ class JunctionPainter extends ItemPainter {
         layer: Layer,
         j: sch_items.Junction
     ) {
-        const color = gfx.theme.junction;
+        const color = gfx.theme.junction as Color;
         gfx.circle(new Circle(j.at.position, (j.diameter || 1) / 2, color));
     }
 }
@@ -787,7 +789,7 @@ class PinPainter extends ItemPainter {
                 num_placement.h_align,
                 num_placement.v_align,
                 abs_rotation,
-                gfx.theme.pin_number
+                gfx.theme.pin_number as Color
             );
         }
 
@@ -800,7 +802,7 @@ class PinPainter extends ItemPainter {
                 name_placement.h_align,
                 name_placement.v_align,
                 abs_rotation,
-                gfx.theme.pin_name
+                gfx.theme.pin_name as Color
             );
         }
 
@@ -839,21 +841,6 @@ class PinPainter extends ItemPainter {
             gfx.line(line);
         }
 
-        // const bbox = shaped.bbox.grow(1);
-        // gfx.line(
-        //     new Polyline(
-        //         [
-        //             bbox.top_left,
-        //             bbox.top_right,
-        //             bbox.bottom_right,
-        //             bbox.bottom_left,
-        //             bbox.top_left,
-        //         ],
-        //         0.1,
-        //         new Color(0, 1, 1, 1)
-        //     )
-        // );
-
         gfx.circle(new Circle(pos, 0.1, new Color(1, 1, 0, 1)));
     }
 
@@ -868,7 +855,7 @@ class PinPainter extends ItemPainter {
                 new Angle(0),
                 new Angle(Math.PI * 2),
                 gfx.state.stroke_width / 2,
-                gfx.theme.pin
+                gfx.theme.pin as Color
             )
         );
 
@@ -877,7 +864,7 @@ class PinPainter extends ItemPainter {
             new Polyline(
                 [new Vec2(0, 0), new Vec2(p.length, 0)],
                 gfx.state.stroke_width,
-                gfx.theme.pin
+                gfx.theme.pin as Color
             )
         );
     }
@@ -915,17 +902,17 @@ class LibrarySymbolPainter extends ItemPainter {
                     layer.name == ":Symbol:Background" &&
                     g.fill == "background"
                 ) {
-                    gfx.state.fill = fill_color;
+                    gfx.state.fill = fill_color as Color;
                 } else if (
                     layer.name == ":Symbol:Foreground" &&
                     g.fill == "outline"
                 ) {
-                    gfx.state.fill = outline_color;
+                    gfx.state.fill = outline_color as Color;
                 } else {
                     gfx.state.fill = Color.transparent;
                 }
 
-                gfx.state.stroke = outline_color;
+                gfx.state.stroke = outline_color as Color;
 
                 painter.paint_item(layer, g);
             }
@@ -950,13 +937,14 @@ class PropertyPainter extends ItemPainter {
             return;
         }
 
-        let color = gfx.theme.fields;
+        let color = gfx.theme.fields as Color;
+
         switch (p.key) {
             case "Reference":
-                color = gfx.theme.reference;
+                color = gfx.theme.reference as Color;
                 break;
             case "Value":
-                color = gfx.theme.value;
+                color = gfx.theme.value as Color;
                 break;
         }
 
@@ -1035,7 +1023,7 @@ class PropertyPainter extends ItemPainter {
 
         if (layer.name == ":Interactive") {
             // drawing text is expensive, just draw the bbox for the interactive layer.
-            gfx.line(shaped.bbox.to_polyline(0.127, Color.white));
+            gfx.line(Polyline.from_BBox(shaped.bbox, 0.127, Color.white));
         } else {
             for (const stroke of shaped.strokes()) {
                 gfx.line(new Polyline(Array.from(stroke), 0.127, color));
@@ -1165,7 +1153,9 @@ export class Painter {
 
             if (layer.name == ":Interactive" && bbox.valid) {
                 bbox = bbox.grow(1);
-                this.gfx.line(bbox.to_polyline(0.5, new Color(1, 1, 0, 1)));
+                this.gfx.line(
+                    Polyline.from_BBox(bbox, 0.5, new Color(1, 1, 0, 1))
+                );
             }
         }
 

@@ -7,6 +7,7 @@
 import { Color } from "../gfx/color.js";
 import { Layer as Layer, LayerSet as BaseLayerSet } from "../framework/layers";
 import { KicadPCB } from "../kicad/pcb_items.js";
+export { Layer };
 
 const max_inner_copper_layers = 30;
 

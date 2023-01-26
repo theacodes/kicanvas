@@ -4,7 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { LayerSet as BaseLayerSet, Layer } from "../framework/layers.js";
+import { LayerSet as BaseLayerSet, Layer } from "../framework/layers";
+export { Layer };
 
 /**
  * Represents the complete set of layers used by a View to draw a schematic.

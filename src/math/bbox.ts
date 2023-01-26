@@ -4,8 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../gfx/color.js";
-import { Polygon, Polyline } from "../gfx/primitives.js";
 import { Matrix3 } from "./matrix3.js";
 import { Vec2 } from "./vec2.js";
 
@@ -200,37 +198,5 @@ export class BBox {
         const x = Math.min(Math.max(v.x, this.x), this.x2);
         const y = Math.min(Math.max(v.y, this.y), this.y2);
         return new Vec2(x, y);
-    }
-
-    /**
-     * @returns a Polyline that can be used to draw an outline of this bbox.
-     */
-    to_polyline(width: number, color: Color) {
-        return new Polyline(
-            [
-                this.top_left,
-                this.top_right,
-                this.bottom_right,
-                this.bottom_left,
-                this.top_left,
-            ],
-            width,
-            color
-        );
-    }
-
-    /**
-     * @returns A Polygon that can be used to draw this bbox.
-     */
-    to_polygon(color: Color) {
-        return new Polygon(
-            [
-                this.top_left,
-                this.top_right,
-                this.bottom_right,
-                this.bottom_left,
-            ],
-            color
-        );
     }
 }

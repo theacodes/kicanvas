@@ -5,20 +5,6 @@
 */
 
 /**
- * Containers for efficiently rendering sets of basic geometric primitives.
- *
- * The highest-level and easiest to use interface is PrimitiveSet, which
- * provides a "layer" of mixed primitives.
- *
- * The core principle here is primitive sets. These sets collect all the data
- * necessary to render *multiple* primitives. Primitive sets are write-once.
- * Call set() with a list of primitive objects to tesselate them and upload
- * their data to the GPU. Use draw() to have the GPU render the tesselated
- * geometry. Use dispose() to free GPU resources.
- *
- */
-
-/**
  * Basic abstract geometric primitives that can be drawn using the Renderer
  * classes. These are dumb data structures- the actual code used to draw
  * them is implemented as part of the specific Renderer.
@@ -27,6 +13,7 @@
 import { Angle } from "../math/angle.js";
 import { Vec2 } from "../math/vec2.js";
 import { Color } from "./color.js";
+import { BBox } from "../math/bbox.js";
 
 type OptionalDefaultColor = Color | false | null;
 
@@ -70,7 +57,7 @@ export class Polyline {
     /**
      * Create a stroked polyline
      * @param points - line segment points
-     * @param width - thickness of the rendered line
+     * @param width - thickness of the rendered lines
      * @param color - stroke color
      */
     constructor(
@@ -78,6 +65,26 @@ export class Polyline {
         public width: number,
         public color: OptionalDefaultColor
     ) {}
+
+    /**
+     * Create a rectangular outline from a bounding box.
+     * @param bb
+     * @param width - thickness of the rendered lines
+     * @param color - fill color
+     */
+    static from_BBox(bb: BBox, width: number, color: Color) {
+        return new Polyline(
+            [
+                bb.top_left,
+                bb.top_right,
+                bb.bottom_right,
+                bb.bottom_left,
+                bb.top_left,
+            ],
+            width,
+            color
+        );
+    }
 }
 
 /** Filled polygon */
@@ -90,4 +97,16 @@ export class Polygon {
      * @param color - fill color
      */
     constructor(public points: Vec2[], public color: OptionalDefaultColor) {}
+
+    /**
+     * Create a filled polygon from a bounding box.
+     * @param bb
+     * @param color - fill color
+     */
+    static from_BBox(bb: BBox, color: Color) {
+        return new Polygon(
+            [bb.top_left, bb.top_right, bb.bottom_right, bb.bottom_left],
+            color
+        );
+    }
 }

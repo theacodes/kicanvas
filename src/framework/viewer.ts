@@ -10,6 +10,7 @@ import { Vec2 } from "../math/vec2.js";
 import { BBox } from "../math/bbox.js";
 import { Color } from "../gfx/color.js";
 import { LayerSet } from "./layers.js";
+import { Polygon, Polyline } from "../gfx/primitives.js";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;
@@ -97,10 +98,12 @@ export abstract class Viewer extends EventTarget {
             const bb = this.#selected.copy().grow(this.#selected.w * 0.1);
             this.renderer.start_layer(layer.name, 1);
 
-            this.renderer.line(bb.to_polyline(0.127, this.selection_color));
+            this.renderer.line(
+                Polyline.from_BBox(bb, 0.127, this.selection_color)
+            );
 
             this.renderer.polygon(
-                bb.to_polygon(this.selection_color.with_alpha(0.4))
+                Polygon.from_BBox(bb, this.selection_color.with_alpha(0.4))
             );
 
             layer.graphics = this.renderer.end_layer();
