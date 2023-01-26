@@ -4,11 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Viewer } from "./viewer.js";
+import { BoardViewer } from "./viewer.js";
 
 class KicadPCBElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
-    viewer: Viewer;
+    viewer: BoardViewer;
     selected = [];
 
     constructor() {
@@ -30,7 +30,7 @@ class KicadPCBElement extends HTMLElement {
     async connectedCallback() {
         this.#renderShadowDOM();
 
-        this.viewer = new Viewer(this.#canvas);
+        this.viewer = new BoardViewer(this.#canvas);
         await this.viewer.setup();
         await this.viewer.load(this.getAttribute("src"));
 
@@ -151,7 +151,7 @@ class KicadPCBLayerControls extends HTMLElement {
         );
         layer.visible = !layer.visible;
         button.setAttribute("visible", layer.visible ? "yes" : "no");
-        this.#target.viewer.draw();
+        this.#target.viewer.draw_soon();
     }
 }
 
