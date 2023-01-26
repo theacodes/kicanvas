@@ -106,4 +106,10 @@ export class Color {
     get is_transparent() {
         return this.a == 0;
     }
+
+    with_alpha(a) {
+        const c = this.copy();
+        c.a = a;
+        return c;
+    }
 }
