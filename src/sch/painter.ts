@@ -1034,12 +1034,12 @@ class PropertyPainter extends ItemPainter {
         );
 
         if (layer.name == ":Interactive") {
+            // drawing text is expensive, just draw the bbox for the interactive layer.
+            gfx.line(shaped.bbox.to_polyline(0.127, Color.white));
+        } else {
             for (const stroke of shaped.strokes()) {
                 gfx.line(new Polyline(Array.from(stroke), 0.127, color));
             }
-        } else {
-            // drawing text is expensive, just draw the bbox for the interactive layer.
-            gfx.line(shaped.bbox.to_polyline(0.127, Color.white));
         }
     }
 }

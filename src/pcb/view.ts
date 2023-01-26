@@ -15,7 +15,11 @@ export class View {
     painter: Painter;
     layers: LayerSet;
 
-    constructor(public gfx: Renderer, public board: KicadPCB, public color_theme) {
+    constructor(
+        public gfx: Renderer,
+        public board: KicadPCB,
+        public color_theme
+    ) {
         this.painter = new Painter(this.gfx);
         this.layers = new LayerSet(color_theme);
     }

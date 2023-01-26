@@ -70,7 +70,7 @@ export class LayerSet {
      */
     constructor() {
         this.#layer_list = [
-            new Layer(this, ":Interactive", true), // Bounding boxes for clickable items
+            new Layer(this, ":Interactive", false), // Bounding boxes for clickable items
             new Layer(this, ":Overlay"),
             new Layer(this, ":Symbol:Field"), // reference, value, other symbol fields
             new Layer(this, ":Label"), // hierarchical, global, and local labels

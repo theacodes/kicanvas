@@ -10,6 +10,8 @@ import { Viewport } from "../gfx/viewport.js";
 import { Canvas2DRenderer } from "../gfx/canvas2d_renderer.js";
 import * as color_theme from "../kicad/color_theme.js";
 import { View } from "./view.js";
+import { Vec2 } from "../math/vec2.js";
+import { BBox } from "../math/bbox.js";
 
 export class Viewer {
     #cvs: HTMLCanvasElement;
@@ -17,6 +19,8 @@ export class Viewer {
     #viewport: Viewport;
     #view: View;
     sch: sch_items.KicadSch;
+    selected: sch_items.SymbolInstance;
+    selected_bbox: BBox;
 
     constructor(canvas) {
         this.#cvs = canvas;
@@ -25,6 +29,28 @@ export class Viewer {
         this.#renderer.state.fill = color_theme.schematic.note;
         this.#renderer.state.stroke = color_theme.schematic.note;
         this.#renderer.state.stroke_width = 0.1524;
+
+        this.#cvs.addEventListener("click", (e) => {
+            const rect = this.#cvs.getBoundingClientRect();
+            const mouse = this.#viewport.screen_to_world(
+                new Vec2(e.clientX - rect.left, e.clientY - rect.top)
+            );
+
+            let selected;
+
+            const interactive_layer = this.#view.layers.by_name(":Interactive");
+            for (const [item, bb] of interactive_layer.bboxes.entries()) {
+                if (bb.contains_point(mouse)) {
+                    this.selected_bbox = bb;
+                    this.selected = item as sch_items.SymbolInstance;
+                    break;
+                }
+            }
+
+            console.log("Selected", selected);
+            this.show_selected();
+            this.draw();
+        });
     }
 
     async setup() {
@@ -51,6 +77,30 @@ export class Viewer {
     #look_at_schematic() {
         const bb = this.#view.get_schematic_bbox();
         this.#viewport.camera.bbox = bb;
+    }
+
+    show_selected() {
+        const overlay = this.#view.layers.by_name(":Overlay");
+
+        overlay.graphics?.clear();
+
+        if (!this.selected || !this.selected_bbox) {
+            return;
+        }
+
+        let bb = this.selected_bbox.copy();
+        bb = bb.grow(bb.w * 0.1);
+
+        this.#renderer.start_layer(overlay.name, 1);
+
+        this.#renderer.line(
+            bb.to_polyline(0.127, color_theme.schematic.shadow)
+        );
+        this.#renderer.polygon(
+            bb.to_polygon(color_theme.schematic.shadow.with_alpha(0.4))
+        );
+
+        overlay.graphics = this.#renderer.end_layer();
     }
 
     draw() {
