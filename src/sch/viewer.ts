@@ -36,7 +36,7 @@ export class Viewer {
                 new Vec2(e.clientX - rect.left, e.clientY - rect.top)
             );
 
-            let selected;
+            this.selected = null;
 
             const interactive_layer = this.#view.layers.by_name(":Interactive");
             for (const [item, bb] of interactive_layer.bboxes.entries()) {
@@ -47,7 +47,6 @@ export class Viewer {
                 }
             }
 
-            console.log("Selected", selected);
             this.show_selected();
             this.draw();
         });
@@ -101,6 +100,12 @@ export class Viewer {
         );
 
         overlay.graphics = this.#renderer.end_layer();
+
+        document.dispatchEvent(
+            new CustomEvent("kicad-schematic:item-selected", {
+                detail: this.selected,
+            })
+        );
     }
 
     draw() {

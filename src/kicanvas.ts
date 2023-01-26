@@ -6,3 +6,4 @@
 
 import "./pcb/element.ts";
 import "./sch/element.ts";
+import "./sch/dialog-element.ts";
