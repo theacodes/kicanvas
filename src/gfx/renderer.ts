@@ -35,7 +35,7 @@ export abstract class Renderer {
     canvas: HTMLCanvasElement;
     state: RenderStateStack = new RenderStateStack();
     text_shaper: TextShaper;
-    theme: Record<string, Color>;
+    theme: Record<string, Color | Record<string, Color>>;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
