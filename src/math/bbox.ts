@@ -5,7 +5,7 @@
 */
 
 import { Color } from "../gfx/color.js";
-import { Polyline } from "../gfx/primitives.js";
+import { Polygon, Polyline } from "../gfx/primitives.js";
 import { Matrix3 } from "./matrix3.js";
 import { Vec2 } from "./vec2.js";
 
@@ -215,6 +215,21 @@ export class BBox {
                 this.top_left,
             ],
             width,
+            color
+        );
+    }
+
+    /**
+     * @returns A Polygon that can be used to draw this bbox.
+     */
+    to_polygon(color: Color) {
+        return new Polygon(
+            [
+                this.top_left,
+                this.top_right,
+                this.bottom_right,
+                this.bottom_left,
+            ],
             color
         );
     }
