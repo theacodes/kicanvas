@@ -63,7 +63,13 @@ export abstract class Viewer extends EventTarget {
 
     abstract load(url: string | URL): Promise<void>;
 
-    protected abstract draw();
+    protected draw() {
+        if (!this.layers) {
+            return;
+        }
+
+        this.layers.render(this.viewport.camera.matrix);
+    }
 
     draw_soon() {
         if (!this.viewport) {
