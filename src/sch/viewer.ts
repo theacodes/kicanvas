@@ -10,13 +10,13 @@ import { Canvas2DRenderer } from "../gfx/canvas2d_renderer.js";
 import * as color_theme from "../kicad/color_theme.js";
 import { Viewer } from "../framework/viewer.js";
 import { Renderer } from "../gfx/renderer.js";
-import { Painter } from "./painter.js";
+import { SchematicPainter } from "./painter.js";
 import { LayerSet } from "./layers.js";
 import { Color } from "../gfx/color.js";
 
 export class SchematicViewer extends Viewer {
     schematic: sch_items.KicadSch;
-    #painter: Painter;
+    #painter: SchematicPainter;
 
     constructor(canvas) {
         super(canvas);
@@ -55,7 +55,7 @@ export class SchematicViewer extends Viewer {
         const sch_src = await (await window.fetch(url)).text();
         this.schematic = new sch_items.KicadSch(parse(sch_src));
 
-        this.#painter = new Painter(this.renderer);
+        this.#painter = new SchematicPainter(this.renderer);
         this.layers = new LayerSet();
 
         for (const item of this.schematic.items()) {

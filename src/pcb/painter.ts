@@ -555,7 +555,7 @@ for (const painter of painters) {
 /**
  * Painter handles painting all board items onto their respective graphics layers.
  */
-export class Painter {
+export class BoardPainter {
     /**
      * Create a Painter
      */

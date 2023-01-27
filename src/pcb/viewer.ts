@@ -11,12 +11,12 @@ import * as color_theme from "../kicad/color_theme";
 
 import { Viewer } from "../framework/viewer.js";
 import { Renderer } from "../gfx/renderer.js";
-import { Painter } from "./painter.js";
+import { BoardPainter } from "./painter.js";
 import { LayerSet } from "./layers.js";
 
 export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;
-    #painter: Painter;
+    #painter: BoardPainter;
 
     constructor(canvas) {
         super(canvas);
@@ -41,7 +41,7 @@ export class BoardViewer extends Viewer {
         const pcb_src = await (await window.fetch(url)).text();
         this.board = new pcb_items.KicadPCB(parse(pcb_src));
 
-        this.#painter = new Painter(this.renderer);
+        this.#painter = new BoardPainter(this.renderer);
         this.layers = new LayerSet(this.board, this.renderer.theme);
 
         for (const item of this.board.items) {

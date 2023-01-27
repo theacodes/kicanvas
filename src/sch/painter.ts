@@ -45,7 +45,7 @@ class ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         item: unknown
@@ -60,7 +60,7 @@ class RectanglePainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         r: sch_items.Rectangle
@@ -97,7 +97,7 @@ class PolylinePainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         pl: sch_items.Polyline
@@ -130,7 +130,7 @@ class WirePainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         w: sch_items.Wire
@@ -149,7 +149,7 @@ class CirclePainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         c: sch_items.Circle
@@ -181,7 +181,7 @@ class ArcPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         a: sch_items.Arc
@@ -216,7 +216,7 @@ class JunctionPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         j: sch_items.Junction
@@ -238,7 +238,7 @@ class TextPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         t: sch_items.Text
@@ -337,7 +337,7 @@ class LabelPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         l: sch_items.Label | sch_items.HierarchicalLabel
@@ -615,7 +615,7 @@ class PinPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         p: sch_items.PinInstance
@@ -878,7 +878,7 @@ class LibrarySymbolPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         s: sch_items.LibrarySymbol
@@ -928,7 +928,7 @@ class PropertyPainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         p: sch_items.Property
@@ -1046,7 +1046,7 @@ class SymbolInstancePainter extends ItemPainter {
     }
 
     static paint(
-        painter: Painter,
+        painter: SchematicPainter,
         gfx: Renderer,
         layer: Layer,
         si: sch_items.SymbolInstance
@@ -1110,7 +1110,7 @@ for (const painter of painters) {
     }
 }
 
-export class Painter {
+export class SchematicPainter {
     constructor(public gfx: Renderer) {}
 
     layers_for(item: any): string[] {
