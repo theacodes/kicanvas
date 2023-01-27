@@ -8,7 +8,7 @@ import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
 import { ShapedParagraph, TextOptions } from "../gfx/text";
-import { Effects } from "../kicad/common_data";
+import { Effects } from "../kicad/common";
 import * as sch_items from "../kicad/schematic";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";

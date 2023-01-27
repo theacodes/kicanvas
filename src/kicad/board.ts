@@ -12,7 +12,7 @@
 
 import { Vec2 } from "../math/vec2";
 import { SExprParser } from "./parser";
-import { At, Paper, TitleBlock, Effects } from "./common_data";
+import { At, Paper, TitleBlock, Effects } from "./common";
 
 export class Segment {
     start: Vec2;

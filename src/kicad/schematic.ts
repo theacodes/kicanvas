@@ -12,7 +12,7 @@
 
 import { Vec2 } from "../math/vec2";
 import { SExprParser } from "./parser";
-import { At, Effects, Paper, TitleBlock } from "./common_data";
+import { At, Effects, Paper, TitleBlock } from "./common";
 import { Color } from "../gfx/color";
 
 export class Property {
