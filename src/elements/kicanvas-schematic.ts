@@ -37,7 +37,7 @@ class KiCanvasSchematicElement extends HTMLElement {
         this.loaded = true;
         this.dispatchEvent(new CustomEvent("kicad-schematic:loaded"));
 
-        this.viewer.draw();
+        this.viewer.draw_soon();
     }
 
     #renderShadowDOM() {

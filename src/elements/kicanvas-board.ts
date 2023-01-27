@@ -37,7 +37,7 @@ class KiCanvasBoardElement extends HTMLElement {
         this.loaded = true;
         this.dispatchEvent(new CustomEvent("kicad-pcb:loaded"));
 
-        this.viewer.draw();
+        this.viewer.draw_soon();
     }
 
     #renderShadowDOM() {
