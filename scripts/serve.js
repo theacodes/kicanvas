@@ -7,7 +7,7 @@
 import { bundle } from "./bundle.js";
 
 let { options, context } = await bundle({
-    outdir: "www/kicanvas",
+    outfile: "www/kicanvas/kicanvas.js",
     sourcemap: true,
 });
 

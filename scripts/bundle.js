@@ -8,7 +8,7 @@ import esbuild from "esbuild";
 import { copy } from "esbuild-plugin-copy";
 import { resolve } from "path";
 
-export const ENTRY = resolve("src/kicanvas.ts");
+export const ENTRY = resolve("src/index.ts");
 
 export async function bundle(options = {}) {
     options = {
