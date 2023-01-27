@@ -5,8 +5,8 @@
 */
 
 import { PrimitiveSet } from "./vector";
-import { RenderLayer, Renderer } from "../renderer.js";
-import { Matrix3 } from "../../math/matrix3.js";
+import { RenderLayer, Renderer } from "../renderer";
+import { Matrix3 } from "../../math/matrix3";
 import { Circle, Polygon, Polyline } from "../shapes";
 
 /**

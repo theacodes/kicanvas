@@ -6,8 +6,8 @@
 
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
-import * as parser from "../src/parser.js";
-import * as items from "../src/items.js";
+import * as parser from "../src/parser";
+import * as items from "../src/items";
 
 Deno.test("At", () => {
     const at = new items.At(parser.parse("(1 2)"));
@@ -28,7 +28,7 @@ Deno.test("Full KicadSch", async () => {
     );
     const kicad_sch_text = await Deno.readTextFile(test_sch_location);
     const sexpr = parser.parse(kicad_sch_text);
-    const sch = new items.KicadSch(sexpr);;
+    const sch = new items.KicadSch(sexpr);
     for (const g of sch.iter_graphics()) {
         console.log(g.constructor);
     }

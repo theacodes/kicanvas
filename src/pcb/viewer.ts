@@ -4,15 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse } from "../kicad/parser.js";
-import * as pcb_items from "../kicad/pcb_items.js";
-import { WebGL2Renderer } from "../gfx/webgl/renderer.js";
+import { parse } from "../kicad/parser";
+import * as pcb_items from "../kicad/pcb_items";
+import { WebGL2Renderer } from "../gfx/webgl/renderer";
 import * as theme from "../kicad/theme";
 
-import { Viewer } from "../framework/viewer.js";
-import { Renderer } from "../gfx/renderer.js";
-import { BoardPainter } from "./painter.js";
-import { LayerSet } from "./layers.js";
+import { Viewer } from "../framework/viewer";
+import { Renderer } from "../gfx/renderer";
+import { BoardPainter } from "./painter";
+import { LayerSet } from "./layers";
 
 export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;

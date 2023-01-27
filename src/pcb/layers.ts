@@ -4,12 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../gfx/color.js";
+import { Color } from "../gfx/color";
 import {
     ViewLayer as ViewLayer,
     ViewLayerSet as BaseLayerSet,
 } from "../framework/view-layers";
-import { KicadPCB } from "../kicad/pcb_items.js";
+import { KicadPCB } from "../kicad/pcb_items";
 export { ViewLayer as Layer };
 
 const max_inner_copper_layers = 30;

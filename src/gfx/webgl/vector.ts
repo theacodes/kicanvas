@@ -21,13 +21,13 @@
  *
  */
 
-import earcut from "../../../third_party/earcut/earcut.js";
-import { VertexArray, ShaderProgram, Buffer } from "./helpers.js";
-import { Vec2 } from "../../math/vec2.js";
-import { Matrix3 } from "../../math/matrix3.js";
-import { Color } from "../color.js";
+import earcut from "../../../third_party/earcut/earcut";
+import { VertexArray, ShaderProgram, Buffer } from "./helpers";
+import { Vec2 } from "../../math/vec2";
+import { Matrix3 } from "../../math/matrix3";
+import { Color } from "../color";
 
-import { Circle, Polyline, Polygon } from "../shapes.js";
+import { Circle, Polyline, Polygon } from "../shapes";
 
 /**
  * Tesselator handles converting abstract primitives into triangles that

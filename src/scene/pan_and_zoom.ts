@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Matrix3 } from "../math/matrix3.js";
-import { Vec2 } from "../math/vec2.js";
-import { Camera2 } from "./camera2.js";
+import { Matrix3 } from "../math/matrix3";
+import { Vec2 } from "../math/vec2";
+import { Camera2 } from "./camera2";
 
 export type PanAndZoomCallback = () => void;
 

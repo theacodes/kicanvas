@@ -1,5 +1,5 @@
-import { Property } from "../kicad/sch_items.js";
-import { $make, $on, $q } from "../utils.js";
+import { Property } from "../kicad/sch_items";
+import { $make, $on, $q } from "../utils";
 
 class KicadSchematicDialogElement extends HTMLElement {
     constructor() {

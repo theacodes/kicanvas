@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Matrix3 } from "./matrix3.js";
-import { Vec2 } from "./vec2.js";
+import { Matrix3 } from "./matrix3";
+import { Vec2 } from "./vec2";
 
 /**
  * An axis-alignment bounding box (AABB)

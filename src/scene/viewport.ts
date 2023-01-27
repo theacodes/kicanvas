@@ -9,8 +9,8 @@ import { Matrix3 } from "../math/matrix3";
 import { Camera2 } from "./camera2";
 import { PanAndZoom } from "./pan_and_zoom";
 import { CanvasSizeObserver } from "./canvas_size_observer";
-import { Renderer } from "../gfx/renderer.js";
-import { Angle } from "../math/angle.js";
+import { Renderer } from "../gfx/renderer";
+import { Angle } from "../math/angle";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view

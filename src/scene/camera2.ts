@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Vec2 } from "../math/vec2.js";
-import { Matrix3 } from "../math/matrix3.js";
-import { Angle, AngleLike } from "../math/angle.js";
-import { BBox } from "../math/bbox.js";
+import { Vec2 } from "../math/vec2";
+import { Matrix3 } from "../math/matrix3";
+import { Angle, AngleLike } from "../math/angle";
+import { BBox } from "../math/bbox";
 
 /**
  * A camera in 2d space.

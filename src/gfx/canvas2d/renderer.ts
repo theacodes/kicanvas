@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Renderer, RenderLayer, RenderStateStack } from "../renderer.js";
-import { Matrix3 } from "../../math/matrix3.js";
-import { Circle, Polygon, Polyline } from "../shapes.js";
-import { Color } from "../color.js";
+import { Renderer, RenderLayer, RenderStateStack } from "../renderer";
+import { Matrix3 } from "../../math/matrix3";
+import { Circle, Polygon, Polyline } from "../shapes";
+import { Color } from "../color";
 
 /**
  * Canvas2d-based renderer.

@@ -10,16 +10,16 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import * as pcb_items from "../kicad/pcb_items.js";
-import { Arc } from "../math/arc.js";
-import { Vec2 } from "../math/vec2.js";
-import { Matrix3 } from "../math/matrix3.js";
-import { Angle } from "../math/angle.js";
-import { Renderer } from "../gfx/renderer.js";
-import { Layer } from "./layers.js";
-import { Color } from "../gfx/color.js";
-import { TextOptions } from "../gfx/text.js";
-import { Circle, Polygon, Polyline } from "../gfx/shapes.js";
+import * as pcb_items from "../kicad/pcb_items";
+import { Arc } from "../math/arc";
+import { Vec2 } from "../math/vec2";
+import { Matrix3 } from "../math/matrix3";
+import { Angle } from "../math/angle";
+import { Renderer } from "../gfx/renderer";
+import { Layer } from "./layers";
+import { Color } from "../gfx/color";
+import { TextOptions } from "../gfx/text";
+import { Circle, Polygon, Polyline } from "../gfx/shapes";
 
 /**
  * Painter base class

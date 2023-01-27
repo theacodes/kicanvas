@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { SchematicViewer } from "./viewer.js";
+import { SchematicViewer } from "./viewer";
 
 class KicadSchematicElement extends HTMLElement {
     #canvas: HTMLCanvasElement;

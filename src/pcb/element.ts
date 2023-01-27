@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BoardViewer } from "./viewer.js";
+import { BoardViewer } from "./viewer";
 
 class KicadPCBElement extends HTMLElement {
     #canvas: HTMLCanvasElement;

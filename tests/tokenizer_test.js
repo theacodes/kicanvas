@@ -5,7 +5,7 @@
 */
 
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
-import * as Tokenizer from "../src/tokenizer.js";
+import * as Tokenizer from "../src/tokenizer";
 
 const Token = Tokenizer.Token;
 const OPEN = Token.OPEN;

@@ -10,9 +10,9 @@
     - https://gitlab.com/edea-dev/edea/-/tree/main/edea
 */
 
-import { Color } from "../gfx/color.js";
-import { Vec2 } from "../math/vec2.js";
-import { Token, tokenize } from "./tokenizer.js";
+import { Color } from "../gfx/color";
+import { Vec2 } from "../math/vec2";
+import { Token, tokenize } from "./tokenizer";
 
 type TokenType = symbol | symbol[];
 

@@ -10,12 +10,12 @@
  * The primary interface here is TextShaper
  */
 
-import { Vec2 } from "../math/vec2.js";
-import { Matrix3 } from "../math/matrix3.js";
-import { Angle } from "../math/angle.js";
-import { BBox } from "../math/bbox.js";
-import { Polyline } from "./shapes.js";
-import { Color } from "./color.js";
+import { Vec2 } from "../math/vec2";
+import { Matrix3 } from "../math/matrix3";
+import { Angle } from "../math/angle";
+import { BBox } from "../math/bbox";
+import { Polyline } from "./shapes";
+import { Color } from "./color";
 
 class GlyphData {
     /**

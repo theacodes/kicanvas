@@ -4,13 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Viewport } from "../scene/viewport.js";
+import { Viewport } from "../scene/viewport";
 import { Renderer } from "../gfx/renderer";
-import { Vec2 } from "../math/vec2.js";
-import { BBox } from "../math/bbox.js";
-import { Color } from "../gfx/color.js";
-import { ViewLayerSet } from "./view-layers.js";
-import { Polygon, Polyline } from "../gfx/shapes.js";
+import { Vec2 } from "../math/vec2";
+import { BBox } from "../math/bbox";
+import { Color } from "../gfx/color";
+import { ViewLayerSet } from "./view-layers";
+import { Polygon, Polyline } from "../gfx/shapes";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;

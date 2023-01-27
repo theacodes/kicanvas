@@ -4,15 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse } from "../kicad/parser.js";
-import * as sch_items from "../kicad/sch_items.js";
-import { Canvas2DRenderer } from "../gfx/canvas2d/renderer.js";
-import * as theme from "../kicad/theme.js";
-import { Viewer } from "../framework/viewer.js";
-import { Renderer } from "../gfx/renderer.js";
-import { SchematicPainter } from "./painter.js";
-import { LayerSet } from "./layers.js";
-import { Color } from "../gfx/color.js";
+import { parse } from "../kicad/parser";
+import * as sch_items from "../kicad/sch_items";
+import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
+import * as theme from "../kicad/theme";
+import { Viewer } from "../framework/viewer";
+import { Renderer } from "../gfx/renderer";
+import { SchematicPainter } from "./painter";
+import { LayerSet } from "./layers";
+import { Color } from "../gfx/color";
 
 export class SchematicViewer extends Viewer {
     schematic: sch_items.KicadSch;
