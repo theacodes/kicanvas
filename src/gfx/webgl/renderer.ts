@@ -7,7 +7,7 @@
 import { PrimitiveSet } from "./vector";
 import { RenderLayer, Renderer } from "../renderer.js";
 import { Matrix3 } from "../../math/matrix3.js";
-import { Circle, Polygon, Polyline } from "../primitives";
+import { Circle, Polygon, Polyline } from "../shapes";
 
 /**
  * WebGL2-based renderer

@@ -5,7 +5,7 @@
 */
 
 import { Color } from "../gfx/color";
-import { Polygon, Polyline, Arc, Circle } from "../gfx/primitives";
+import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
 import { ShapedParagraph, TextOptions } from "../gfx/text";
 import { Effects } from "../kicad/common_data";

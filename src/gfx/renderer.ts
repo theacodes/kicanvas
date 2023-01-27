@@ -9,7 +9,7 @@ import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 import { Color } from "./color";
 import { TextShaper } from "./text";
-import { Circle, Polyline, Polygon, Arc } from "./primitives";
+import { Circle, Polyline, Polygon, Arc } from "./shapes";
 import { Arc as MathArc } from "../math/arc";
 
 /**

@@ -19,7 +19,7 @@ import { Renderer } from "../gfx/renderer.js";
 import { Layer } from "./layers.js";
 import { Color } from "../gfx/color.js";
 import { TextOptions } from "../gfx/text.js";
-import { Circle, Polygon, Polyline } from "../gfx/primitives.js";
+import { Circle, Polygon, Polyline } from "../gfx/shapes.js";
 
 /**
  * Painter base class

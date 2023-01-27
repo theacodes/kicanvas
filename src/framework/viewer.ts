@@ -10,7 +10,7 @@ import { Vec2 } from "../math/vec2.js";
 import { BBox } from "../math/bbox.js";
 import { Color } from "../gfx/color.js";
 import { ViewLayerSet } from "./view-layers.js";
-import { Polygon, Polyline } from "../gfx/primitives.js";
+import { Polygon, Polyline } from "../gfx/shapes.js";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;

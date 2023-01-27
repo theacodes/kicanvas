@@ -6,7 +6,7 @@
 
 import { Renderer, RenderLayer, RenderStateStack } from "../renderer.js";
 import { Matrix3 } from "../../math/matrix3.js";
-import { Circle, Polygon, Polyline } from "../primitives.js";
+import { Circle, Polygon, Polyline } from "../shapes.js";
 import { Color } from "../color.js";
 
 /**

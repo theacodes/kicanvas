@@ -27,7 +27,7 @@ import { Vec2 } from "../../math/vec2.js";
 import { Matrix3 } from "../../math/matrix3.js";
 import { Color } from "../color.js";
 
-import { Circle, Polyline, Polygon } from "../primitives.js";
+import { Circle, Polyline, Polygon } from "../shapes.js";
 
 /**
  * Tesselator handles converting abstract primitives into triangles that

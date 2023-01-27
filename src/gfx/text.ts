@@ -14,7 +14,7 @@ import { Vec2 } from "../math/vec2.js";
 import { Matrix3 } from "../math/matrix3.js";
 import { Angle } from "../math/angle.js";
 import { BBox } from "../math/bbox.js";
-import { Polyline } from "./primitives.js";
+import { Polyline } from "./shapes.js";
 import { Color } from "./color.js";
 
 class GlyphData {
