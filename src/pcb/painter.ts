@@ -16,7 +16,7 @@ import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
 import { Angle } from "../math/angle";
 import { Renderer } from "../gfx/renderer";
-import { Layer, LayerName } from "./layers";
+import { Layer, LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { TextOptions } from "../gfx/text";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
@@ -560,6 +560,23 @@ export class BoardPainter {
      * Create a Painter
      */
     constructor(public gfx: Renderer) {}
+
+    /**
+     * Paint an entire board.
+     */
+    paint(board: pcb_items.KicadPCB, layers: LayerSet) {
+        for (const item of board.items) {
+            for (const layer_name of this.get_layers_for(item)) {
+                layers.by_name(layer_name).items.push(item);
+            }
+        }
+
+        let depth = 0.001;
+        for (const layer of layers.in_display_order()) {
+            this.paint_layer(layer, depth);
+            depth += 0.001;
+        }
+    }
 
     /**
      * Get a list of layer names that an item will be painted on.

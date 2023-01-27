@@ -80,6 +80,6 @@ export class Viewport {
      * methods to display things at the right spot.
      */
     get view_matrix(): Matrix3 {
-        return this.camera.matrix.inverse();
+        return this.camera.matrix;
     }
 }

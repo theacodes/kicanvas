@@ -55,20 +55,10 @@ export class SchematicViewer extends Viewer {
         const sch_src = await (await window.fetch(url)).text();
         this.schematic = new sch_items.KicadSch(parse(sch_src));
 
-        this.#painter = new SchematicPainter(this.renderer);
         this.layers = new LayerSet();
+        this.#painter = new SchematicPainter(this.renderer);
 
-        for (const item of this.schematic.items()) {
-            for (const layer_name of this.#painter.layers_for(item)) {
-                this.layers.by_name(layer_name).items.push(item);
-            }
-        }
-
-        let depth = 0.001;
-        for (const layer of this.layers.in_display_order()) {
-            this.#painter.paint_layer(layer, depth);
-            depth += 0.001;
-        }
+        this.#painter.paint(this.schematic, this.layers);
 
         this.#look_at_schematic();
         this.draw_soon();
@@ -82,19 +72,5 @@ export class SchematicViewer extends Viewer {
 
     override get selection_color(): Color {
         return theme.schematic.shadow;
-    }
-
-    draw() {
-        if (!this.layers) {
-            return;
-        }
-
-        const matrix = this.viewport.camera.matrix;
-
-        for (const layer of this.layers.in_display_order()) {
-            if (layer.visible && layer.graphics) {
-                layer.graphics.draw(matrix);
-            }
-        }
     }
 }

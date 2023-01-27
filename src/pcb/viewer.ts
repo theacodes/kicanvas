@@ -44,17 +44,7 @@ export class BoardViewer extends Viewer {
         this.#painter = new BoardPainter(this.renderer);
         this.layers = new LayerSet(this.board, this.renderer.theme);
 
-        for (const item of this.board.items) {
-            for (const layer_name of this.#painter.get_layers_for(item)) {
-                this.layers.by_name(layer_name).items.push(item);
-            }
-        }
-
-        let depth = 0.001;
-        for (const layer of this.layers.in_display_order()) {
-            this.#painter.paint_layer(layer, depth);
-            depth += 0.001;
-        }
+        this.#painter.paint(this.board, this.layers as LayerSet);
 
         this.#look_at_board();
         this.draw_soon();
@@ -64,19 +54,5 @@ export class BoardViewer extends Viewer {
         const edge_cuts = this.layers.by_name(LayerName.edge_cuts);
         const board_bbox = edge_cuts.bbox;
         this.viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
-    }
-
-    draw() {
-        if (!this.layers) {
-            return;
-        }
-
-        const matrix = this.viewport.view_matrix;
-
-        for (const layer of this.layers.in_display_order()) {
-            if (layer.visible && layer.graphics) {
-                layer.graphics.draw(matrix);
-            }
-        }
     }
 }

@@ -15,7 +15,7 @@ import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
-import { Layer, LayerName } from "./layers";
+import { Layer, LayerName, LayerSet } from "./layers";
 
 function color_maybe(
     color: Color,
@@ -1128,6 +1128,23 @@ for (const painter of painters) {
 
 export class SchematicPainter {
     constructor(public gfx: Renderer) {}
+
+    /**
+     * Paint an entire schematic.
+     */
+    paint(schematic: sch_items.KicadSch, layers: LayerSet) {
+        for (const item of schematic.items()) {
+            for (const layer_name of this.layers_for(item)) {
+                layers.by_name(layer_name).items.push(item);
+            }
+        }
+
+        let depth = 0.001;
+        for (const layer of layers.in_display_order()) {
+            this.paint_layer(layer, depth);
+            depth += 0.001;
+        }
+    }
 
     layers_for(item: any): string[] {
         const painter = painter_for_class.get(item.constructor);
