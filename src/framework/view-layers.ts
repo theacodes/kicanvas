@@ -21,7 +21,7 @@ import { Vec2 } from "../math/vec2";
  * uses layers as well but largely to get the correct rendering order.
  */
 
-type VisibilityType = boolean | (() => boolean);
+export type VisibilityType = boolean | (() => boolean);
 
 /**
  * A view layer
