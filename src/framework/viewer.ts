@@ -9,14 +9,14 @@ import { Renderer } from "../gfx/renderer";
 import { Vec2 } from "../math/vec2.js";
 import { BBox } from "../math/bbox.js";
 import { Color } from "../gfx/color.js";
-import { LayerSet } from "./layers.js";
+import { ViewLayerSet } from "./view-layers.js";
 import { Polygon, Polyline } from "../gfx/primitives.js";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;
     renderer: Renderer;
     viewport: Viewport;
-    layers: LayerSet;
+    layers: ViewLayerSet;
     #selected: BBox;
 
     constructor(canvas: HTMLCanvasElement) {

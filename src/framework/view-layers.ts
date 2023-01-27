@@ -26,8 +26,8 @@ type VisibilityType = boolean | (() => boolean);
 /**
  * A view layer
  */
-export class Layer {
-    #layer_set: LayerSet;
+export class ViewLayer {
+    #layer_set: ViewLayerSet;
     #visible: VisibilityType;
     name: string;
 
@@ -60,7 +60,7 @@ export class Layer {
      * @param visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
      */
     constructor(
-        layer_set: LayerSet,
+        layer_set: ViewLayerSet,
         name: string,
         visible: VisibilityType = true,
         color: Color = Color.white
@@ -102,9 +102,9 @@ export class Layer {
 /**
  * Represents the complete set of view layers.
  */
-export class LayerSet {
-    #layer_list: Layer[] = [];
-    #layer_map: Map<string, Layer> = new Map();
+export class ViewLayerSet {
+    #layer_list: ViewLayer[] = [];
+    #layer_map: Map<string, ViewLayer> = new Map();
 
     /**
      * Create a new LayerSet
@@ -114,7 +114,7 @@ export class LayerSet {
     /**
      * Adds layers to the set. Layers should be added front to back.
      */
-    add(...layers: Layer[]) {
+    add(...layers: ViewLayer[]) {
         for (const layer of layers) {
             this.#layer_list.push(layer);
             this.#layer_map.set(layer.name, layer);
@@ -142,7 +142,7 @@ export class LayerSet {
     /**
      * Gets a Layer by name
      */
-    by_name(name: string): Layer {
+    by_name(name: string): ViewLayer {
         return this.#layer_map.get(name);
     }
 

@@ -5,9 +5,12 @@
 */
 
 import { Color } from "../gfx/color.js";
-import { Layer as Layer, LayerSet as BaseLayerSet } from "../framework/layers";
+import {
+    ViewLayer as ViewLayer,
+    ViewLayerSet as BaseLayerSet,
+} from "../framework/view-layers";
 import { KicadPCB } from "../kicad/pcb_items.js";
-export { Layer };
+export { ViewLayer as Layer };
 
 const max_inner_copper_layers = 30;
 
@@ -40,7 +43,12 @@ export class LayerSet extends BaseLayerSet {
 
         for (const layer_name of layer_names) {
             this.add(
-                new Layer(this, layer_name, true, this.color_for(layer_name))
+                new ViewLayer(
+                    this,
+                    layer_name,
+                    true,
+                    this.color_for(layer_name)
+                )
             );
         }
 
@@ -59,7 +67,7 @@ export class LayerSet extends BaseLayerSet {
         for (const layer_name of layer_names) {
             if (board.layers[layer_name]) {
                 this.add(
-                    new Layer(
+                    new ViewLayer(
                         this,
                         layer_name,
                         true,
@@ -69,7 +77,9 @@ export class LayerSet extends BaseLayerSet {
             }
         }
 
-        this.add(new Layer(this, ":Anchors", true, this.color_for(":Anchors")));
+        this.add(
+            new ViewLayer(this, ":Anchors", true, this.color_for(":Anchors"))
+        );
 
         layer_names = [
             ":Via:Holes",
@@ -82,7 +92,7 @@ export class LayerSet extends BaseLayerSet {
 
         for (const layer_name of layer_names) {
             this.add(
-                new Layer(
+                new ViewLayer(
                     this,
                     layer_name,
                     () => this.is_any_copper_layer_visible(),
@@ -92,14 +102,14 @@ export class LayerSet extends BaseLayerSet {
         }
 
         this.add(
-            new Layer(
+            new ViewLayer(
                 this,
                 ":Pads:Front",
                 () => this.by_name("F.Cu").visible,
                 this.color_for(":Pads:Front")
             ),
-            new Layer(this, "F.Cu", true, this.color_for("F.Cu")),
-            new Layer(
+            new ViewLayer(this, "F.Cu", true, this.color_for("F.Cu")),
+            new ViewLayer(
                 this,
                 ":Zones:F.Cu",
                 () => this.by_name("F.Cu").visible,
@@ -118,7 +128,12 @@ export class LayerSet extends BaseLayerSet {
 
         for (const layer_name of layer_names) {
             this.add(
-                new Layer(this, layer_name, true, this.color_for(layer_name))
+                new ViewLayer(
+                    this,
+                    layer_name,
+                    true,
+                    this.color_for(layer_name)
+                )
             );
         }
 
@@ -130,8 +145,13 @@ export class LayerSet extends BaseLayerSet {
             }
 
             this.add(
-                new Layer(this, layer_name, true, this.color_for(layer_name)),
-                new Layer(
+                new ViewLayer(
+                    this,
+                    layer_name,
+                    true,
+                    this.color_for(layer_name)
+                ),
+                new ViewLayer(
                     this,
                     `:Zones:${layer_name}`,
                     () => this.by_name(layer_name).visible,
@@ -141,14 +161,14 @@ export class LayerSet extends BaseLayerSet {
         }
 
         this.add(
-            new Layer(
+            new ViewLayer(
                 this,
                 ":Pads:Back",
                 () => this.by_name("B.Cu").visible,
                 this.color_for(":Pads:Back")
             ),
-            new Layer(this, "B.Cu", true, this.color_for("B.Cu")),
-            new Layer(
+            new ViewLayer(this, "B.Cu", true, this.color_for("B.Cu")),
+            new ViewLayer(
                 this,
                 ":Zones:B.Cu",
                 () => this.by_name("B.Cu").visible,
@@ -167,7 +187,12 @@ export class LayerSet extends BaseLayerSet {
 
         for (const layer_name of layer_names) {
             this.add(
-                new Layer(this, layer_name, true, this.color_for(layer_name))
+                new ViewLayer(
+                    this,
+                    layer_name,
+                    true,
+                    this.color_for(layer_name)
+                )
             );
         }
     }
@@ -248,7 +273,7 @@ export class LayerSet extends BaseLayerSet {
                     }
                 }
             } else {
-                const layer: Layer = this.by_name(name as string);
+                const layer: ViewLayer = this.by_name(name as string);
 
                 if (layer) {
                     yield layer;

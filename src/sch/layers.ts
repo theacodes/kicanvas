@@ -4,8 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { LayerSet as BaseLayerSet, Layer } from "../framework/layers";
-export { Layer };
+import {
+    ViewLayerSet as BaseLayerSet,
+    ViewLayer,
+} from "../framework/view-layers";
+export { ViewLayer as Layer };
 
 /**
  * Represents the complete set of layers used by a View to draw a schematic.
@@ -21,22 +24,22 @@ export class LayerSet extends BaseLayerSet {
         super();
 
         this.add(
-            new Layer(this, ":Interactive", false), // Bounding boxes for clickable items
-            new Layer(this, ":Overlay"),
-            new Layer(this, ":Symbol:Field"), // reference, value, other symbol fields
-            new Layer(this, ":Label"), // hierarchical, global, and local labels
-            new Layer(this, ":Junction"), // regular junctions, bus junctions, no connects
-            new Layer(this, ":Wire"), // wires and bus
-            new Layer(this, ":Symbol:Foreground"), // symbol outlines, pin names, pin numbers
-            new Layer(this, ":Notes"), // Text, rectangles, etc. not inside of symbols.
-            new Layer(this, ":Bitmap"),
-            new Layer(this, ":Symbol:Pin"), // symbol pins
-            new Layer(this, ":Symbol:Background"), // symbol body fill
-            new Layer(this, ":Grid")
+            new ViewLayer(this, ":Interactive", false), // Bounding boxes for clickable items
+            new ViewLayer(this, ":Overlay"),
+            new ViewLayer(this, ":Symbol:Field"), // reference, value, other symbol fields
+            new ViewLayer(this, ":Label"), // hierarchical, global, and local labels
+            new ViewLayer(this, ":Junction"), // regular junctions, bus junctions, no connects
+            new ViewLayer(this, ":Wire"), // wires and bus
+            new ViewLayer(this, ":Symbol:Foreground"), // symbol outlines, pin names, pin numbers
+            new ViewLayer(this, ":Notes"), // Text, rectangles, etc. not inside of symbols.
+            new ViewLayer(this, ":Bitmap"),
+            new ViewLayer(this, ":Symbol:Pin"), // symbol pins
+            new ViewLayer(this, ":Symbol:Background"), // symbol body fill
+            new ViewLayer(this, ":Grid")
         );
     }
 
-    override *interactive_layers(): Generator<Layer, void, unknown> {
+    override *interactive_layers(): Generator<ViewLayer, void, unknown> {
         // Only the top interactive layer is clickable for schematics
         yield this.by_name(":Interactive");
     }
