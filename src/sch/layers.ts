@@ -10,6 +10,30 @@ import {
 } from "../framework/view-layers";
 export { ViewLayer as Layer };
 
+export enum LayerNames {
+    // Bounding boxes for clickable items
+    interactive = ":Interactive",
+    overlay = ":Overlay",
+    // reference, value, other symbol fields
+    symbol_field = ":Symbol:Field",
+    // hierarchical, global, and local labels
+    label = ":Label",
+    // regular junctions, bus junctions, no connects
+    junction = ":Junction",
+    // wires and buses
+    wire = ":Wire",
+    // symbol outlines, pin names, pin numbers
+    symbol_foreground = ":Symbol:Foreground",
+    // Text, rectangles, etc. not inside of symbols.
+    notes = ":Notes",
+    bitmap = ":Bitmap",
+    // symbol pins
+    symbol_pin = ":Symbol:Pin",
+    // symbol body fill
+    symbol_background = ":Symbol:Background",
+    grid = ":Grid",
+}
+
 /**
  * Represents the complete set of layers used by a View to draw a schematic.
  *
@@ -23,24 +47,15 @@ export class LayerSet extends BaseLayerSet {
     constructor() {
         super();
 
-        this.add(
-            new ViewLayer(this, ":Interactive", false), // Bounding boxes for clickable items
-            new ViewLayer(this, ":Overlay"),
-            new ViewLayer(this, ":Symbol:Field"), // reference, value, other symbol fields
-            new ViewLayer(this, ":Label"), // hierarchical, global, and local labels
-            new ViewLayer(this, ":Junction"), // regular junctions, bus junctions, no connects
-            new ViewLayer(this, ":Wire"), // wires and bus
-            new ViewLayer(this, ":Symbol:Foreground"), // symbol outlines, pin names, pin numbers
-            new ViewLayer(this, ":Notes"), // Text, rectangles, etc. not inside of symbols.
-            new ViewLayer(this, ":Bitmap"),
-            new ViewLayer(this, ":Symbol:Pin"), // symbol pins
-            new ViewLayer(this, ":Symbol:Background"), // symbol body fill
-            new ViewLayer(this, ":Grid")
-        );
+        for (const name of Object.values(LayerNames)) {
+            this.add(new ViewLayer(this, name));
+        }
+
+        this.by_name(LayerNames.interactive).visible = false;
     }
 
     override *interactive_layers(): Generator<ViewLayer, void, unknown> {
         // Only the top interactive layer is clickable for schematics
-        yield this.by_name(":Interactive");
+        yield this.by_name(LayerNames.interactive);
     }
 }

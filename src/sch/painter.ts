@@ -15,7 +15,7 @@ import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
-import { Layer } from "./layers";
+import { Layer, LayerNames } from "./layers";
 
 function color_maybe(
     color: Color,
@@ -41,7 +41,7 @@ class ItemPainter {
     static classes = [];
 
     static layers(item: unknown) {
-        return [":Overlay"];
+        return [LayerNames.overlay];
     }
 
     static paint(
@@ -56,7 +56,7 @@ class RectanglePainter extends ItemPainter {
     static classes = [sch_items.Rectangle];
 
     static layers(item: sch_items.Rectangle) {
-        return [":Notes"];
+        return [LayerNames.notes];
     }
 
     static paint(
@@ -93,7 +93,7 @@ class PolylinePainter extends ItemPainter {
     static classes = [sch_items.Polyline];
 
     static layers(item: sch_items.Polyline) {
-        return [":Notes"];
+        return [LayerNames.notes];
     }
 
     static paint(
@@ -126,7 +126,7 @@ class WirePainter extends ItemPainter {
     static classes = [sch_items.Wire];
 
     static layers(item: sch_items.Wire) {
-        return [":Wire"];
+        return [LayerNames.wire];
     }
 
     static paint(
@@ -145,7 +145,7 @@ class CirclePainter extends ItemPainter {
     static classes = [sch_items.Circle];
 
     static layers(item: sch_items.Circle) {
-        return [":Notes"];
+        return [LayerNames.notes];
     }
 
     static paint(
@@ -177,7 +177,7 @@ class ArcPainter extends ItemPainter {
     static classes = [sch_items.Arc];
 
     static layers(item: sch_items.Arc) {
-        return [":Notes"];
+        return [LayerNames.notes];
     }
 
     static paint(
@@ -212,7 +212,7 @@ class JunctionPainter extends ItemPainter {
     static classes = [sch_items.Junction];
 
     static layers(item: sch_items.Junction) {
-        return [":Junction"];
+        return [LayerNames.junction];
     }
 
     static paint(
@@ -231,9 +231,9 @@ class TextPainter extends ItemPainter {
 
     static layers(item: sch_items.Text) {
         if (item.parent) {
-            return [":Symbol:Foreground"];
+            return [LayerNames.symbol_foreground];
         } else {
-            return [":Notes"];
+            return [LayerNames.notes];
         }
     }
 
@@ -297,7 +297,7 @@ class LabelPainter extends ItemPainter {
             | sch_items.HierarchicalLabel
             | sch_items.GlobalLabel
     ) {
-        return [":Label"];
+        return [LayerNames.label];
     }
 
     static color(gfx) {
@@ -611,7 +611,11 @@ class PinPainter extends ItemPainter {
     static classes = [sch_items.PinDefinition];
 
     static layers(item: sch_items.PinInstance) {
-        return [":Symbol:Pin", ":Symbol:Foreground", ":Interactive"];
+        return [
+            LayerNames.symbol_pin,
+            LayerNames.symbol_foreground,
+            LayerNames.interactive,
+        ];
     }
 
     static paint(
@@ -634,13 +638,16 @@ class PinPainter extends ItemPainter {
         gfx.state.push();
         gfx.state.matrix = local_matrix;
 
-        if (layer.name == ":Symbol:Pin" || layer.name == ":Interactive") {
+        if (
+            layer.name == LayerNames.symbol_pin ||
+            layer.name == LayerNames.interactive
+        ) {
             this.paint_line(gfx, def);
         }
 
         gfx.state.pop();
 
-        if (layer.name == ":Symbol:Foreground") {
+        if (layer.name == LayerNames.symbol_foreground) {
             this.paint_labels(gfx, local_matrix, parent, def);
         }
     }
@@ -874,7 +881,11 @@ class LibrarySymbolPainter extends ItemPainter {
     static classes = [sch_items.LibrarySymbol];
 
     static layers(item: sch_items.LibrarySymbol) {
-        return [":Symbol:Foreground", ":Symbol:Background", ":Symbol:Field"];
+        return [
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_field,
+        ];
     }
 
     static paint(
@@ -892,19 +903,19 @@ class LibrarySymbolPainter extends ItemPainter {
 
         if (
             [
-                ":Symbol:Background",
-                ":Symbol:Foreground",
-                ":Interactive",
-            ].includes(layer.name)
+                LayerNames.symbol_background,
+                LayerNames.symbol_foreground,
+                LayerNames.interactive,
+            ].includes(layer.name as LayerNames)
         ) {
             for (const g of s.graphics) {
                 if (
-                    layer.name == ":Symbol:Background" &&
+                    layer.name == LayerNames.symbol_background &&
                     g.fill == "background"
                 ) {
                     gfx.state.fill = fill_color as Color;
                 } else if (
-                    layer.name == ":Symbol:Foreground" &&
+                    layer.name == LayerNames.symbol_foreground &&
                     g.fill == "outline"
                 ) {
                     gfx.state.fill = outline_color as Color;
@@ -924,7 +935,7 @@ class PropertyPainter extends ItemPainter {
     static classes = [sch_items.Property];
 
     static layers(item: sch_items.Property) {
-        return ["Symbol:Field", ":Interactive"];
+        return [LayerNames.symbol_field, LayerNames.interactive];
     }
 
     static paint(
@@ -1021,7 +1032,7 @@ class PropertyPainter extends ItemPainter {
             text_options
         );
 
-        if (layer.name == ":Interactive") {
+        if (layer.name == LayerNames.interactive) {
             // drawing text is expensive, just draw the bbox for the interactive layer.
             gfx.line(Polyline.from_BBox(shaped.bbox, 0.127, Color.white));
         } else {
@@ -1037,11 +1048,11 @@ class SymbolInstancePainter extends ItemPainter {
 
     static layers(item: sch_items.SymbolInstance) {
         return [
-            ":Interactive",
-            ":Symbol:Foreground",
-            ":Symbol:Background",
-            ":Symbol:Field",
-            ":Symbol:Pin",
+            LayerNames.interactive,
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_background,
+            LayerNames.symbol_field,
+            LayerNames.symbol_pin,
         ];
     }
 
@@ -1051,7 +1062,7 @@ class SymbolInstancePainter extends ItemPainter {
         layer: Layer,
         si: sch_items.SymbolInstance
     ) {
-        if (layer.name == ":Interactive" && si.lib_symbol.power) {
+        if (layer.name == LayerNames.interactive && si.lib_symbol.power) {
             // Don't draw power symbols on the interactive layer.
             return;
         }
@@ -1067,9 +1078,11 @@ class SymbolInstancePainter extends ItemPainter {
         LibrarySymbolPainter.paint(painter, gfx, layer, si.lib_symbol);
 
         if (
-            [":Symbol:Pin", ":Symbol:Foreground", ":Interactive"].includes(
-                layer.name
-            )
+            [
+                LayerNames.symbol_pin,
+                LayerNames.symbol_foreground,
+                LayerNames.interactive,
+            ].includes(layer.name as LayerNames)
         ) {
             for (const pin of Object.values(si.pins)) {
                 PinPainter.paint(painter, gfx, layer, pin);
@@ -1077,7 +1090,10 @@ class SymbolInstancePainter extends ItemPainter {
         }
         gfx.state.pop();
 
-        if (layer.name == ":Symbol:Field" || layer.name == ":Interactive") {
+        if (
+            layer.name == LayerNames.symbol_field ||
+            layer.name == LayerNames.interactive
+        ) {
             for (const p of Object.values(si.properties)) {
                 PropertyPainter.paint(painter, gfx, layer, p);
             }
@@ -1151,7 +1167,7 @@ export class SchematicPainter {
 
             bboxes.set(item, bbox);
 
-            if (layer.name == ":Interactive" && bbox.valid) {
+            if (layer.name == LayerNames.interactive && bbox.valid) {
                 bbox = bbox.grow(1);
                 this.gfx.line(
                     Polyline.from_BBox(bbox, 0.5, new Color(1, 1, 0, 1))
