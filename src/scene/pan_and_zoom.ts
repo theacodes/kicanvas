@@ -8,7 +8,7 @@ import { Matrix3 } from "../math/matrix3.js";
 import { Vec2 } from "../math/vec2.js";
 import { Camera2 } from "./camera2.js";
 
-export type PanAndZoomCallback = (() => void);
+export type PanAndZoomCallback = () => void;
 
 /**
  * Interactive Pan and Zoom helper
@@ -35,7 +35,6 @@ export class PanAndZoom {
         public min_zoom = 0.5,
         public max_zoom = 10
     ) {
-
         this.target.addEventListener("mousedown", (e) => {
             e.preventDefault();
             this.#rect = this.target.getBoundingClientRect();

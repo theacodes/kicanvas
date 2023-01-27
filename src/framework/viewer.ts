@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Viewport } from "../gfx/viewport.js";
+import { Viewport } from "../scene/viewport.js";
 import { Renderer } from "../gfx/renderer";
 import { Vec2 } from "../math/vec2.js";
 import { BBox } from "../math/bbox.js";

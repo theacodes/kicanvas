@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { PrimitiveSet } from "./webgl_graphics";
-import { RenderLayer, Renderer } from "./renderer.js";
-import { Matrix3 } from "../math/matrix3.js";
-import { Arc, Circle, Polygon, Polyline } from "./primitives";
+import { PrimitiveSet } from "./vector";
+import { RenderLayer, Renderer } from "../renderer.js";
+import { Matrix3 } from "../../math/matrix3.js";
+import { Arc, Circle, Polygon, Polyline } from "../primitives";
 
 /**
  * WebGL2-based renderer

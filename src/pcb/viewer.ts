@@ -6,7 +6,7 @@
 
 import { parse } from "../kicad/parser.js";
 import * as pcb_items from "../kicad/pcb_items.js";
-import { WebGL2Renderer } from "../gfx/webgl2_renderer.js";
+import { WebGL2Renderer } from "../gfx/webgl/renderer.js";
 import * as theme from "../kicad/theme";
 
 import { Viewer } from "../framework/viewer.js";

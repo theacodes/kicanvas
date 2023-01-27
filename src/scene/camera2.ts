@@ -18,7 +18,6 @@ import { BBox } from "../math/bbox.js";
  * graphics backend you're using.
  */
 export class Camera2 {
-
     /**
      * Create a camera
      * @param {Vec2} viewport_size - The width and height of the viewport
@@ -30,8 +29,8 @@ export class Camera2 {
         public viewport_size: Vec2 = new Vec2(0, 0),
         public center: Vec2 = new Vec2(0, 0),
         public zoom: number = 1,
-        public rotation: Angle = new Angle(0),
-    ) { }
+        public rotation: Angle = new Angle(0)
+    ) {}
 
     /**
      * Relative translation

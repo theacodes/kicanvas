@@ -4,12 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Vec2 } from "../math/vec2.js";
-import { Matrix3 } from "../math/matrix3.js";
-import { Camera2 } from "./camera2.js";
-import { PanAndZoom } from "./pan_and_zoom.js";
-import { CanvasSizeObserver } from "./canvas_size_observer.js";
-import { Renderer } from "./renderer.js";
+import { Vec2 } from "../math/vec2";
+import { Matrix3 } from "../math/matrix3";
+import { Camera2 } from "./camera2";
+import { PanAndZoom } from "./pan_and_zoom";
+import { CanvasSizeObserver } from "./canvas_size_observer";
+import { Renderer } from "../gfx/renderer.js";
 import { Angle } from "../math/angle.js";
 
 /**
@@ -26,20 +26,18 @@ export class Viewport {
      * Create a Scene
      * @param callback - a callback used to re-draw the viewport when it changes.
      */
-    constructor(public renderer: Renderer, public callback: (() => void)) {
+    constructor(public renderer: Renderer, public callback: () => void) {
         this.camera = new Camera2(
             new Vec2(0, 0),
             new Vec2(0, 0),
             1,
-            new Angle(0));
-
-        new CanvasSizeObserver(
-            this.renderer.canvas,
-            (cw, ch, lw, lh) => {
-                this.resize(cw, ch, lw, lh);
-                this.callback();
-            }
+            new Angle(0)
         );
+
+        new CanvasSizeObserver(this.renderer.canvas, (cw, ch, lw, lh) => {
+            this.resize(cw, ch, lw, lh);
+            this.callback();
+        });
 
         this.resize(
             this.renderer.canvas.clientWidth,
@@ -52,7 +50,12 @@ export class Viewport {
     /**
      * Resize the viewport
      */
-    resize(logical_w: number, logical_h: number, display_w: number, display_h: number) {
+    resize(
+        logical_w: number,
+        logical_h: number,
+        display_w: number,
+        display_h: number
+    ) {
         this.renderer.set_viewport(0, 0, display_w, display_h);
 
         if (this.width != logical_w || this.height != logical_h) {

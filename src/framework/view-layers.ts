@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../gfx/color.js";
-import { RenderLayer } from "../gfx/renderer.js";
-import { BBox } from "../math/bbox.js";
-import { Vec2 } from "../math/vec2.js";
+import { Color } from "../gfx/color";
+import { RenderLayer } from "../gfx/renderer";
+import { BBox } from "../math/bbox";
+import { Vec2 } from "../math/vec2";
 
 /**
  * View layers
