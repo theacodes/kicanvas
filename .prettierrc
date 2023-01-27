@@ -1,6 +1,16 @@
 {
-  "parser": "typescript",
   "tabWidth": 4,
   "useTabs": false,
-  "printWidth": 80
+  "printWidth": 80,
+  "overrides": [
+    {
+      "files": [
+        "*.js",
+        "*.ts"
+      ],
+      "options": {
+        "parser": "typescript"
+      }
+    }
+  ]
 }
