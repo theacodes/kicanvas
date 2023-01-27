@@ -9,7 +9,7 @@ import {
     ViewLayer as ViewLayer,
     ViewLayerSet as BaseLayerSet,
 } from "../framework/view-layers";
-import { KicadPCB } from "../kicad/pcb_items";
+import { KicadPCB } from "../kicad/board";
 export { ViewLayer as Layer };
 
 const max_inner_copper_layers = 30;

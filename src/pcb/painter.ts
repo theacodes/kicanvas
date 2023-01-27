@@ -10,7 +10,7 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import * as pcb_items from "../kicad/pcb_items";
+import * as pcb_items from "../kicad/board";
 import { Arc } from "../math/arc";
 import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";

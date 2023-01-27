@@ -5,7 +5,7 @@
 */
 
 import { parse } from "../kicad/parser";
-import * as pcb_items from "../kicad/pcb_items";
+import * as pcb_items from "../kicad/board";
 import { WebGL2Renderer } from "../gfx/webgl/renderer";
 import * as theme from "../kicad/theme";
 

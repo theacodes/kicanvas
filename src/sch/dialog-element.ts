@@ -1,4 +1,4 @@
-import { Property } from "../kicad/sch_items";
+import { Property } from "../kicad/schematic";
 import { $make, $on, $q } from "../utils";
 
 class KicadSchematicDialogElement extends HTMLElement {

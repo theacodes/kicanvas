@@ -5,7 +5,7 @@
 */
 
 import { parse } from "../kicad/parser";
-import * as sch_items from "../kicad/sch_items";
+import * as sch_items from "../kicad/schematic";
 import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
 import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";

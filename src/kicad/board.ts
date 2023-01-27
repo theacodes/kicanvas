@@ -93,7 +93,9 @@ export class Zone {
             if (layers == "F&B.Cu") {
                 this.layers = ["F.Cu", "B.Cu"];
             } else {
-                this.layers = Array.from(e.expect_expr("layers").rest()) as string[];
+                this.layers = Array.from(
+                    e.expect_expr("layers").rest()
+                ) as string[];
             }
         }
 
@@ -337,7 +339,7 @@ export class FpCircle {
 }
 
 export class GrText {
-    text: string
+    text: string;
     original_text: string;
     at: At;
     layer: string;
@@ -359,7 +361,7 @@ export class GrText {
 export class FpText {
     parent: Footprint;
     type: string;
-    text: string
+    text: string;
     original_text: string;
     at: At;
     unlocked: boolean;
@@ -463,7 +465,13 @@ export class Dimension {
     }
 }
 
-export type LayerItems = Dimension | Footprint | GrArc | GrCircle | GrLine | GrPoly;
+export type LayerItems =
+    | Dimension
+    | Footprint
+    | GrArc
+    | GrCircle
+    | GrLine
+    | GrPoly;
 
 export class Layer {
     ordinal: number;
@@ -528,7 +536,7 @@ export class Pad {
     roundrect_rratio: number;
     chamfer_ratio: number;
     chamfer: number;
-    net: { number: number, name: string };
+    net: { number: number; name: string };
     pinfunction: string;
     pintype: string;
     solder_mask_margin: number;
@@ -660,7 +668,16 @@ export class Footprint {
     thermal_gap: number;
     attr: string[];
     models: Model[];
-    items: (Pad | Zone | FpText | FpArc | FpCircle | FpLine | FpPoly | FpRect)[];
+    items: (
+        | Pad
+        | Zone
+        | FpText
+        | FpArc
+        | FpCircle
+        | FpLine
+        | FpPoly
+        | FpRect
+    )[];
 
     constructor(pcb: KicadPCB, e: SExprParser) {
         this.library_link = e.expect_string();
@@ -878,7 +895,9 @@ class PcbPlotParams {
         this.outputformat = e.expect_pair_number("outputformat");
         this.mirror = e.expect_pair_atom("mirror") == "true" ? true : false;
         this.drillshape = e.expect_pair_number("drillshape");
-        this.scaleselection = e.expect_pair("scaleselection", null) ? true : false;
+        this.scaleselection = e.expect_pair("scaleselection", null)
+            ? true
+            : false;
         this.outputdirectory = e.expect_pair_string("outputdirectory");
     }
 }
@@ -918,7 +937,23 @@ class Setup {
     }
 }
 
-export type PCBItem = Footprint | Segment | Arc | Zone | Via | GrLine | FpLine | GrArc | FpArc | GrPoly | FpPoly | GrCircle | FpCircle | GrText | FpText | Dimension;
+export type PCBItem =
+    | Footprint
+    | Segment
+    | Arc
+    | Zone
+    | Via
+    | GrLine
+    | FpLine
+    | GrArc
+    | FpArc
+    | GrPoly
+    | FpPoly
+    | GrCircle
+    | FpCircle
+    | GrText
+    | FpText
+    | Dimension;
 
 export class KicadPCB {
     layers: Record<string, Layer> = {};
@@ -1028,7 +1063,10 @@ export class KicadPCB {
         }
     }
 
-    expand_text_vars(text: string, context: { properties?: Record<string, string> } = {}): string {
+    expand_text_vars(
+        text: string,
+        context: { properties?: Record<string, string> } = {}
+    ): string {
         const vars = {};
         Object.assign(
             vars,
