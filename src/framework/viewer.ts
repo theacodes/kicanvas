@@ -42,7 +42,7 @@ export abstract class Viewer extends EventTarget {
     #setup_events() {
         this.canvas.addEventListener("click", (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const mouse = this.viewport.screen_to_world(
+            const mouse = this.viewport.camera.screen_to_world(
                 new Vec2(e.clientX - rect.left, e.clientY - rect.top)
             );
 

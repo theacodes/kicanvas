@@ -7,7 +7,7 @@
 import { PrimitiveSet } from "./vector";
 import { RenderLayer, Renderer } from "../renderer.js";
 import { Matrix3 } from "../../math/matrix3.js";
-import { Arc, Circle, Polygon, Polyline } from "../primitives";
+import { Circle, Polygon, Polyline } from "../primitives";
 
 /**
  * WebGL2-based renderer
@@ -18,6 +18,9 @@ export class WebGL2Renderer extends Renderer {
 
     /** The layer currently being drawn to. */
     #active_layer: WebGL2RenderLayer = null;
+
+    /** Projection matrix for clip -> screen */
+    projection_matrix: Matrix3;
 
     /** WebGL backend */
     gl: WebGL2RenderingContext;
@@ -58,18 +61,29 @@ export class WebGL2Renderer extends Renderer {
         gl.clearDepth(0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        this.set_viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.update_viewport();
 
         await PrimitiveSet.load_shaders(gl);
     }
 
-    /**
-     * Update the WebGL2 context's viewport. Should be called whenever the size
-     * of the underlying canvas element changes.
-     */
-    set_viewport(x: number, y: number, w: number, h: number) {
-        if (this.gl == null) throw new Error("Uninitialized");
-        this.gl.viewport(x, y, w, h);
+    update_viewport() {
+        if (!this.gl) {
+            return;
+        }
+
+        const dpr = window.devicePixelRatio;
+        const rect = this.canvas.getBoundingClientRect();
+
+        const logical_w = rect.width;
+        const logical_h = rect.height;
+        const pixel_w = Math.round(rect.width * dpr);
+        const pixel_h = Math.round(rect.height * dpr);
+
+        this.canvas.width = pixel_w;
+        this.canvas.height = pixel_h;
+
+        this.gl.viewport(0, 0, pixel_w, pixel_h);
+        this.projection_matrix = Matrix3.orthographic(logical_w, logical_h);
     }
 
     clear_canvas() {
@@ -107,16 +121,6 @@ export class WebGL2Renderer extends Renderer {
         this.#active_layer.geometry.add_circle(circle);
     }
 
-    arc(arc: Arc) {
-        super.arc(arc);
-
-        if (!arc.color) {
-            return;
-        }
-
-        // TODO
-    }
-
     line(line: Polyline) {
         super.line(line);
 
@@ -151,7 +155,7 @@ export class WebGL2Renderer extends Renderer {
 
 class WebGL2RenderLayer extends RenderLayer {
     constructor(
-        public readonly renderer: Renderer,
+        public readonly renderer: WebGL2Renderer,
         public readonly name: string,
         public readonly depth: number,
         public geometry: PrimitiveSet
@@ -164,6 +168,9 @@ class WebGL2RenderLayer extends RenderLayer {
     }
 
     draw(transform: Matrix3) {
-        this.geometry.draw(transform, this.depth);
+        const total_transform = this.renderer.projection_matrix.multiply(
+            transform.inverse()
+        );
+        this.geometry.draw(total_transform, this.depth);
     }
 }

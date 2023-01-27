@@ -57,10 +57,10 @@ export class Canvas2DRenderer extends Renderer {
         }
 
         this.ctx2d = ctx2d;
-        this.set_viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.update_viewport();
     }
 
-    set_viewport(x: number, y: number, w: number, h: number) {
+    update_viewport() {
         const dpr = window.devicePixelRatio;
         const rect = this.canvas.getBoundingClientRect();
         this.canvas.width = Math.round(rect.width * dpr);

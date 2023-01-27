@@ -20,7 +20,6 @@ export class Viewport {
     width: number;
     height: number;
     camera: Camera2;
-    projection: Matrix3;
 
     /**
      * Create a Scene
@@ -56,12 +55,10 @@ export class Viewport {
         display_w: number,
         display_h: number
     ) {
-        this.renderer.set_viewport(0, 0, display_w, display_h);
-
         if (this.width != logical_w || this.height != logical_h) {
+            this.renderer.update_viewport();
             this.width = logical_w;
             this.height = logical_h;
-            this.projection = Matrix3.orthographic(this.width, this.height);
             this.camera.viewport_size = new Vec2(this.width, this.height);
         }
     }
@@ -78,35 +75,11 @@ export class Viewport {
         );
     }
 
+    /**
+     * The matrix representing this viewport. This can be passed into rendering
+     * methods to display things at the right spot.
+     */
     get view_matrix(): Matrix3 {
         return this.camera.matrix.inverse();
-    }
-
-    get view_projection_matrix(): Matrix3 {
-        return this.projection.multiply(this.view_matrix.inverse());
-    }
-
-    /**
-     * Get clip space coordinates from screen coordinates
-     */
-    screen_to_clip(v: Vec2): Vec2 {
-        const x = 2 * (v.x / this.width) - 1;
-        const y = -(2 * (v.y / this.height) - 1);
-
-        return new Vec2(x, y);
-    }
-
-    /**
-     * Get world space coordinates from clip coordinates
-     */
-    clip_to_world(v: Vec2): Vec2 {
-        return this.view_projection_matrix.inverse().transform(v);
-    }
-
-    /**
-     * Get screen space coordinates from world coordinates
-     */
-    screen_to_world(v: Vec2): Vec2 {
-        return this.clip_to_world(this.screen_to_clip(v));
     }
 }

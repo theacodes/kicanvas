@@ -52,10 +52,11 @@ export abstract class Renderer {
     }
 
     /**
-     * Update the canvas and context with the new size. Should be called whenever the size
-     * of the underlying canvas element changes.
+     * Update the canvas and context with the new viewport size. Should be
+     * called whenever the size of the underlying canvas element changes.
+     * Typically, this is done via CanvasResizeObserver.
      */
-    abstract set_viewport(x: number, y: number, w: number, h: number): void;
+    abstract update_viewport(): void;
 
     /**
      * Clear the canvas. Typically called at the start of a frame.

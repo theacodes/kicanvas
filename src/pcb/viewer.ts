@@ -71,7 +71,7 @@ export class BoardViewer extends Viewer {
             return;
         }
 
-        const matrix = this.viewport.view_projection_matrix;
+        const matrix = this.viewport.view_matrix;
 
         for (const layer of this.layers.in_display_order()) {
             if (layer.visible && layer.graphics) {
