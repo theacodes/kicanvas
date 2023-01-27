@@ -2,14 +2,14 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="./board.css" />
+  <link rel="stylesheet" href="./style.css" />
   <!-- <script src="https://greggman.github.io/webgl-lint/webgl-lint.js"></script> -->
 </head>
 
 <body>
-  <div class="kicad-pcb-container">
-    <kicad-pcb id="demo" src="./examples/starfish.kicad_pcb"></kicad-pcb>
-    <kicad-pcb-layer-controls for="demo"></kicad-pcb-layer-controls>
+  <div class="kicanvas-container">
+    <kicanvas-board id="demo" src="./examples/starfish.kicad_pcb"></kicanvas-board>
+    <kicanvas-layer-controls for="demo"></kicanvas-layer-controls>
   </div>
   <script type="module" src="./kicanvas/kicanvas.js"></script>
 </body>

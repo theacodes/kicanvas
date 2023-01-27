@@ -1,7 +1,7 @@
 import { Property } from "../kicad/schematic";
 import { $make, $on, $q } from "../utils";
 
-class KicadSchematicDialogElement extends HTMLElement {
+class KiCanvasDialogElement extends HTMLElement {
     constructor() {
         super();
     }
@@ -53,7 +53,4 @@ class KicadSchematicDialogElement extends HTMLElement {
     }
 }
 
-window.customElements.define(
-    "kicad-schematic-dialog",
-    KicadSchematicDialogElement
-);
+window.customElements.define("kicanvas-dialog", KiCanvasDialogElement);

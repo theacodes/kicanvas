@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import "./pcb/element.ts";
-import "./sch/element.ts";
-import "./sch/dialog-element.ts";
+import "./elements/kicanvas-board";
+import "./elements/kicanvas-layer-controls";
+import "./elements/kicanvas-schematic";
+import "./elements/kicanvas-dialog";

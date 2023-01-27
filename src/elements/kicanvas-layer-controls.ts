@@ -1,70 +1,4 @@
-/*
-    Copyright (c) 2022 Alethea Katherine Flowers.
-    Published under the standard MIT License.
-    Full text available at: https://opensource.org/licenses/MIT
-*/
-
-import { BoardViewer } from "./viewer";
-
-class KicadPCBElement extends HTMLElement {
-    #canvas: HTMLCanvasElement;
-    viewer: BoardViewer;
-    selected = [];
-
-    constructor() {
-        super();
-    }
-
-    get loaded() {
-        return this.hasAttribute("loaded");
-    }
-
-    set loaded(value) {
-        if (value) {
-            this.setAttribute("loaded", "");
-        } else {
-            this.removeAttribute("loaded");
-        }
-    }
-
-    async connectedCallback() {
-        this.#renderShadowDOM();
-
-        this.viewer = new BoardViewer(this.#canvas);
-        await this.viewer.setup();
-        await this.viewer.load(this.getAttribute("src"));
-
-        this.loaded = true;
-        this.dispatchEvent(new CustomEvent("kicad-pcb:loaded"));
-
-        this.viewer.draw();
-    }
-
-    #renderShadowDOM() {
-        const template = document.createElement("template");
-        template.innerHTML = `
-            <style>
-                :host {
-                    display: block;
-                }
-
-                canvas {
-                    width: 100%;
-                    height: 100%;
-                }
-            </style>
-            <canvas></canvas>
-        `;
-
-        const root = this.attachShadow({ mode: "open" });
-        root.appendChild(template.content.cloneNode(true));
-        this.#canvas = root.querySelector("canvas");
-    }
-}
-
-window.customElements.define("kicad-pcb", KicadPCBElement);
-
-class KicadPCBLayerControls extends HTMLElement {
+export class KiCanvasLayerControls extends HTMLElement {
     #target;
 
     constructor() {
@@ -72,7 +6,8 @@ class KicadPCBLayerControls extends HTMLElement {
     }
 
     async connectedCallback() {
-        this.#target = document.querySelector(`#${this.getAttribute("for")}`);
+        const target_id = this.getAttribute("for");
+        this.#target = document.getElementById(target_id);
 
         if (this.#target.loaded) {
             this.#renderShadowDOM();
@@ -155,4 +90,4 @@ class KicadPCBLayerControls extends HTMLElement {
     }
 }
 
-window.customElements.define("kicad-pcb-layer-controls", KicadPCBLayerControls);
+window.customElements.define("kicanvas-layer-controls", KiCanvasLayerControls);

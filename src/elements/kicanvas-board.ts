@@ -4,11 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { SchematicViewer } from "./viewer";
+import { BoardViewer } from "../pcb/viewer";
 
-class KicadSchematicElement extends HTMLElement {
+class KiCanvasBoardElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
-    viewer: SchematicViewer;
+    viewer: BoardViewer;
     selected = [];
 
     constructor() {
@@ -30,12 +30,12 @@ class KicadSchematicElement extends HTMLElement {
     async connectedCallback() {
         this.#renderShadowDOM();
 
-        this.viewer = new SchematicViewer(this.#canvas);
+        this.viewer = new BoardViewer(this.#canvas);
         await this.viewer.setup();
         await this.viewer.load(this.getAttribute("src"));
 
         this.loaded = true;
-        this.dispatchEvent(new CustomEvent("kicad-schematic:loaded"));
+        this.dispatchEvent(new CustomEvent("kicad-pcb:loaded"));
 
         this.viewer.draw();
     }
@@ -62,4 +62,4 @@ class KicadSchematicElement extends HTMLElement {
     }
 }
 
-window.customElements.define("kicad-schematic", KicadSchematicElement);
+window.customElements.define("kicanvas-board", KiCanvasBoardElement);
