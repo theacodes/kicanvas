@@ -7,7 +7,7 @@
 import { parse } from "../kicad/parser.js";
 import * as pcb_items from "../kicad/pcb_items.js";
 import { WebGL2Renderer } from "../gfx/webgl2_renderer.js";
-import * as color_theme from "../kicad/color_theme";
+import * as theme from "../kicad/theme";
 
 import { Viewer } from "../framework/viewer.js";
 import { Renderer } from "../gfx/renderer.js";
@@ -33,7 +33,7 @@ export class BoardViewer extends Viewer {
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new WebGL2Renderer(canvas);
-        renderer.theme = color_theme.board;
+        renderer.theme = theme.board;
         return renderer;
     }
 

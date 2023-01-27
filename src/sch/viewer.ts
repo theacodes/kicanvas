@@ -7,7 +7,7 @@
 import { parse } from "../kicad/parser.js";
 import * as sch_items from "../kicad/sch_items.js";
 import { Canvas2DRenderer } from "../gfx/canvas2d_renderer.js";
-import * as color_theme from "../kicad/color_theme.js";
+import * as theme from "../kicad/theme.js";
 import { Viewer } from "../framework/viewer.js";
 import { Renderer } from "../gfx/renderer.js";
 import { SchematicPainter } from "./painter.js";
@@ -44,9 +44,9 @@ export class SchematicViewer extends Viewer {
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new Canvas2DRenderer(canvas);
-        renderer.theme = color_theme.schematic;
-        renderer.state.fill = color_theme.schematic.note;
-        renderer.state.stroke = color_theme.schematic.note;
+        renderer.theme = theme.schematic;
+        renderer.state.fill = theme.schematic.note;
+        renderer.state.stroke = theme.schematic.note;
         renderer.state.stroke_width = 0.1524;
         return renderer;
     }
@@ -81,7 +81,7 @@ export class SchematicViewer extends Viewer {
     }
 
     override get selection_color(): Color {
-        return color_theme.schematic.shadow;
+        return theme.schematic.shadow;
     }
 
     draw() {
