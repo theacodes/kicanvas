@@ -10,7 +10,7 @@ import {
 } from "../framework/view-layers";
 export { ViewLayer as Layer };
 
-export enum LayerNames {
+export enum LayerName {
     // Bounding boxes for clickable items
     interactive = ":Interactive",
     overlay = ":Overlay",
@@ -47,15 +47,15 @@ export class LayerSet extends BaseLayerSet {
     constructor() {
         super();
 
-        for (const name of Object.values(LayerNames)) {
+        for (const name of Object.values(LayerName)) {
             this.add(new ViewLayer(this, name));
         }
 
-        this.by_name(LayerNames.interactive).visible = false;
+        this.by_name(LayerName.interactive).visible = false;
     }
 
     override *interactive_layers(): Generator<ViewLayer, void, unknown> {
         // Only the top interactive layer is clickable for schematics
-        yield this.by_name(LayerNames.interactive);
+        yield this.by_name(LayerName.interactive);
     }
 }

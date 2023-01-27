@@ -11,7 +11,7 @@ import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";
 import { Renderer } from "../gfx/renderer";
 import { SchematicPainter } from "./painter";
-import { LayerSet } from "./layers";
+import { LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 
 export class SchematicViewer extends Viewer {
@@ -75,7 +75,7 @@ export class SchematicViewer extends Viewer {
     }
 
     #look_at_schematic() {
-        const interactive = this.layers.by_name(":Interactive");
+        const interactive = this.layers.by_name(LayerName.interactive);
         const bb = interactive.bbox;
         this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
     }
