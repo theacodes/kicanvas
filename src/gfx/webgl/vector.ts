@@ -311,7 +311,7 @@ export class CircleSet {
         this.vertex_count = position_array.length / 2;
     }
 
-    draw() {
+    render() {
         if (!this.vertex_count) {
             return;
         }
@@ -411,7 +411,7 @@ export class PolylineSet {
         this.vertex_count = position_idx / 2;
     }
 
-    draw() {
+    render() {
         if (!this.vertex_count) {
             return;
         }
@@ -531,7 +531,7 @@ export class PolygonSet {
         this.vertex_count = vertex_data_idx / 2;
     }
 
-    draw() {
+    render() {
         if (!this.vertex_count) {
             return;
         }
@@ -637,26 +637,26 @@ export class PrimitiveSet {
      * @param matrix - complete view/projection matrix
      * @param depth - used for depth testing
      */
-    draw(matrix: Matrix3, depth = 0) {
+    render(matrix: Matrix3, depth = 0) {
         if (this.#polygon_set) {
             this.#polygon_set.shader.bind();
             this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
             this.#polygon_set.shader.u_depth.f1(depth);
-            this.#polygon_set.draw();
+            this.#polygon_set.render();
         }
 
         if (this.#circle_set) {
             this.#circle_set.shader.bind();
             this.#circle_set.shader.u_matrix.mat3f(false, matrix.elements);
             this.#circle_set.shader.u_depth.f1(depth);
-            this.#circle_set.draw();
+            this.#circle_set.render();
         }
 
         if (this.#polyline_set) {
             this.#polyline_set.shader.bind();
             this.#polyline_set.shader.u_matrix.mat3f(false, matrix.elements);
             this.#polyline_set.shader.u_depth.f1(depth);
-            this.#polyline_set.draw();
+            this.#polyline_set.render();
         }
     }
 }

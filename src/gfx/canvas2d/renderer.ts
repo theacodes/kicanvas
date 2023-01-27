@@ -182,7 +182,7 @@ class DrawCommand {
         public stroke_width: number
     ) {}
 
-    draw(ctx: CanvasRenderingContext2D) {
+    render(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = this.fill;
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.stroke_width;
@@ -209,7 +209,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         this.commands = [];
     }
 
-    draw(transform: Matrix3) {
+    render(transform: Matrix3) {
         const ctx = (this.renderer as Canvas2DRenderer).ctx2d;
         ctx.save();
 
@@ -220,7 +220,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         ctx.setTransform(accumulated_transform.to_DOMMatrix());
 
         for (const command of this.commands) {
-            command.draw(ctx);
+            command.render(ctx);
         }
 
         ctx.restore();

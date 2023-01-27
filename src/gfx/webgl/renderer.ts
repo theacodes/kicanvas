@@ -167,10 +167,9 @@ class WebGL2RenderLayer extends RenderLayer {
         this.geometry.dispose();
     }
 
-    draw(transform: Matrix3) {
-        const total_transform = this.renderer.projection_matrix.multiply(
-            transform.inverse()
-        );
-        this.geometry.draw(total_transform, this.depth);
+    render(transform: Matrix3) {
+        const total_transform =
+            this.renderer.projection_matrix.multiply(transform);
+        this.geometry.render(total_transform, this.depth);
     }
 }

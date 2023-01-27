@@ -219,7 +219,7 @@ export abstract class RenderLayer {
 
     abstract clear(): void;
 
-    abstract draw(camera: Matrix3): void;
+    abstract render(camera: Matrix3): void;
 }
 
 export class RenderState {
