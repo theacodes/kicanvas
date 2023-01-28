@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { DropTarget } from "../framework/drag-drop";
 import { SchematicViewer } from "../sch/viewer";
 
 class KiCanvasSchematicElement extends HTMLElement {
@@ -32,7 +33,20 @@ class KiCanvasSchematicElement extends HTMLElement {
 
         this.viewer = new SchematicViewer(this.#canvas);
         await this.viewer.setup();
-        await this.viewer.load(this.getAttribute("src"));
+
+        if (this.getAttribute("src")) {
+            this.#load(this.getAttribute("src"));
+        } else {
+            new DropTarget(this, ["kicad_sch"], (files) => {
+                this.#load(files[0]);
+            });
+        }
+    }
+
+    async #load(src) {
+        console.log("Loading", src);
+
+        await this.viewer.load(src);
 
         this.loaded = true;
         this.dispatchEvent(new CustomEvent("kicad-schematic:loaded"));

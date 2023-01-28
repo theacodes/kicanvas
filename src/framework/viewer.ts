@@ -61,7 +61,7 @@ export abstract class Viewer extends EventTarget {
         });
     }
 
-    abstract load(url: string | URL): Promise<void>;
+    abstract load(url: string | URL | File): Promise<void>;
 
     protected draw() {
         if (!this.layers) {

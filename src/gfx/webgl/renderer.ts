@@ -163,8 +163,12 @@ class WebGL2RenderLayer extends RenderLayer {
         super(renderer, name, depth);
     }
 
+    dispose(): void {
+        this.clear();
+    }
+
     clear() {
-        this.geometry.dispose();
+        this.geometry?.dispose();
     }
 
     render(transform: Matrix3) {

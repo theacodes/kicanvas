@@ -11,7 +11,7 @@ import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";
 import { Renderer } from "../gfx/renderer";
 import { SchematicPainter } from "./painter";
-import { LayerName, LayerSet } from "./layers";
+import { LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 
 export class SchematicViewer extends Viewer {
@@ -51,9 +51,19 @@ export class SchematicViewer extends Viewer {
         return renderer;
     }
 
-    override async load(url: string | URL) {
-        const sch_src = await (await window.fetch(url)).text();
-        this.schematic = new sch_items.KicadSch(parse(sch_src));
+    override async load(src: string | URL | File) {
+        let sch_text;
+        if (src instanceof File) {
+            sch_text = await src.text();
+        } else {
+            sch_text = await (await window.fetch(src)).text();
+        }
+
+        this.schematic = new sch_items.KicadSch(parse(sch_text));
+
+        if (this.layers) {
+            this.layers.dispose();
+        }
 
         this.layers = new LayerSet();
         this.#painter = new SchematicPainter(this.renderer, this.layers);
@@ -65,8 +75,7 @@ export class SchematicViewer extends Viewer {
     }
 
     #look_at_schematic() {
-        const interactive = this.layers.by_name(LayerName.interactive);
-        const bb = interactive.bbox;
+        const bb = this.layers.bbox;
         this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
     }
 

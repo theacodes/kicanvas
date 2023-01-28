@@ -73,6 +73,12 @@ export class ViewLayer {
         this.items = [];
     }
 
+    dispose() {
+        if (this.graphics) {
+            this.graphics.dispose();
+        }
+    }
+
     get visible(): boolean {
         if (this.#visible instanceof Function) {
             return this.#visible();
@@ -111,6 +117,15 @@ export class ViewLayerSet {
      * Create a new LayerSet
      */
     constructor() {}
+
+    /**
+     * Dispose of any resources held by layers
+     */
+    dispose() {
+        for (const layer of this.#layer_list) {
+            layer.dispose();
+        }
+    }
 
     /**
      * Adds layers to the set. Layers should be added front to back.
@@ -178,5 +193,17 @@ export class ViewLayerSet {
                 yield { layer, bbox };
             }
         }
+    }
+
+    /**
+     * @return a bounding box encompassing all elements from all layers.
+     */
+    get bbox() {
+        const bboxes = [];
+        for (const layer of this.in_order()) {
+            bboxes.push(layer.bbox);
+        }
+
+        return BBox.combine(bboxes);
     }
 }

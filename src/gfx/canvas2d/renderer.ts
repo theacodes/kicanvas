@@ -205,6 +205,10 @@ class Canvas2dRenderLayer extends RenderLayer {
         super(renderer, name, depth);
     }
 
+    dispose(): void {
+        this.clear();
+    }
+
     clear() {
         this.commands = [];
     }

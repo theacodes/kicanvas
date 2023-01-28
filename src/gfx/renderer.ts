@@ -217,6 +217,8 @@ export abstract class RenderLayer {
         }
     }
 
+    abstract dispose(): void;
+
     abstract clear(): void;
 
     abstract render(camera: Matrix3): void;
