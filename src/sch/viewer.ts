@@ -56,9 +56,9 @@ export class SchematicViewer extends Viewer {
         this.schematic = new sch_items.KicadSch(parse(sch_src));
 
         this.layers = new LayerSet();
-        this.#painter = new SchematicPainter(this.renderer);
+        this.#painter = new SchematicPainter(this.renderer, this.layers);
 
-        this.#painter.paint(this.schematic, this.layers);
+        this.#painter.paint(this.schematic);
 
         this.#look_at_schematic();
         this.draw_soon();
