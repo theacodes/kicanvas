@@ -50,7 +50,10 @@ export class Canvas2DRenderer extends Renderer {
         // correctly.
         this.canvas.style.backgroundColor = this.background_color.to_css();
 
-        const ctx2d = this.canvas.getContext("2d", { alpha: false });
+        const ctx2d = this.canvas.getContext("2d", {
+            alpha: false,
+            desynchronized: true,
+        });
 
         if (ctx2d == null) {
             throw new Error("Unable to create Canvas2d context");
@@ -175,6 +178,8 @@ export class Canvas2DRenderer extends Renderer {
 }
 
 class DrawCommand {
+    public path_count = 1;
+
     constructor(
         public path: Path2D,
         public fill: string | null,
@@ -211,6 +216,29 @@ class Canvas2dRenderLayer extends RenderLayer {
 
     clear() {
         this.commands = [];
+    }
+
+    push_path(
+        path: Path2D,
+        fill: string | null,
+        stroke: string | null,
+        stroke_width: number
+    ) {
+        const last_command = this.commands.at(-1);
+
+        if (
+            (last_command?.path_count < 20,
+            last_command?.fill == fill &&
+                last_command?.stroke == stroke &&
+                last_command?.stroke_width == stroke_width)
+        ) {
+            last_command.path.addPath(path);
+            last_command.path_count++;
+        } else {
+            this.commands.push(
+                new DrawCommand(path, fill, stroke, stroke_width)
+            );
+        }
     }
 
     render(transform: Matrix3) {
