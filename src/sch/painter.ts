@@ -15,7 +15,7 @@ import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
-import { Layer, LayerName, LayerSet } from "./layers";
+import { ViewLayer, LayerName, LayerSet } from "./layers";
 
 function color_maybe(
     color: Color,
@@ -47,7 +47,7 @@ class ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         item: unknown
     ) {}
 }
@@ -62,7 +62,7 @@ class RectanglePainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         r: sch_items.Rectangle
     ) {
         const color = color_maybe(
@@ -99,7 +99,7 @@ class PolylinePainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         pl: sch_items.Polyline
     ) {
         const color = color_maybe(
@@ -132,7 +132,7 @@ class WirePainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         w: sch_items.Wire
     ) {
         gfx.line(
@@ -151,7 +151,7 @@ class CirclePainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         c: sch_items.Circle
     ) {
         const color = gfx.state.stroke ?? (gfx.theme.note as Color);
@@ -183,7 +183,7 @@ class ArcPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         a: sch_items.Arc
     ) {
         const color = gfx.state.stroke ?? (gfx.theme.note as Color);
@@ -218,7 +218,7 @@ class JunctionPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         j: sch_items.Junction
     ) {
         const color = gfx.theme.junction as Color;
@@ -240,7 +240,7 @@ class TextPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         t: sch_items.Text
     ) {
         if (t.effects.hide) {
@@ -339,7 +339,7 @@ class LabelPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         l: sch_items.Label | sch_items.HierarchicalLabel
     ) {
         if (l.effects.hide) {
@@ -621,7 +621,7 @@ class PinPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         p: sch_items.PinInstance
     ) {
         const parent = p.parent;
@@ -891,7 +891,7 @@ class LibrarySymbolPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         s: sch_items.LibrarySymbol
     ) {
         for (const c of s.children) {
@@ -941,7 +941,7 @@ class PropertyPainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         p: sch_items.Property
     ) {
         if (p.effects.hide || !p.value) {
@@ -1059,7 +1059,7 @@ class SymbolInstancePainter extends ItemPainter {
     static paint(
         painter: SchematicPainter,
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         si: sch_items.SymbolInstance
     ) {
         if (layer.name == LayerName.interactive && si.lib_symbol.power) {
@@ -1157,7 +1157,7 @@ export class SchematicPainter {
         }
     }
 
-    paint_item(layer: Layer, item: any) {
+    paint_item(layer: ViewLayer, item: any) {
         const painter = painter_for_class.get(item.constructor);
 
         if (painter) {
@@ -1170,7 +1170,7 @@ export class SchematicPainter {
     /**
      * Paint all items on the given layer.
      */
-    paint_layer(layer: Layer, depth = 0) {
+    paint_layer(layer: ViewLayer, depth = 0) {
         const bboxes = new Map();
 
         this.gfx.start_layer(layer.name, depth);

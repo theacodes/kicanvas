@@ -8,7 +8,7 @@ import {
     ViewLayerSet as BaseLayerSet,
     ViewLayer,
 } from "../framework/view-layers";
-export { ViewLayer as Layer };
+export { ViewLayer };
 
 export enum LayerName {
     // Bounding boxes for clickable items

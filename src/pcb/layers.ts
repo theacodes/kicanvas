@@ -11,9 +11,7 @@ import {
     ViewLayerSet as BaseLayerSet,
 } from "../framework/view-layers";
 import { KicadPCB } from "../kicad/board";
-export { ViewLayer as Layer };
-
-const max_inner_copper_layers = 30;
+export { ViewLayer };
 
 /** Board view layer names
  *
@@ -133,6 +131,41 @@ const hole_layers = [
     LayerName.via_microvia,
 ];
 
+const copper_layers = [
+    LayerName.f_cu,
+    LayerName.in1_cu,
+    LayerName.in2_cu,
+    LayerName.in3_cu,
+    LayerName.in4_cu,
+    LayerName.in5_cu,
+    LayerName.in6_cu,
+    LayerName.in7_cu,
+    LayerName.in8_cu,
+    LayerName.in9_cu,
+    LayerName.in10_cu,
+    LayerName.in11_cu,
+    LayerName.in12_cu,
+    LayerName.in13_cu,
+    LayerName.in14_cu,
+    LayerName.in15_cu,
+    LayerName.in16_cu,
+    LayerName.in17_cu,
+    LayerName.in18_cu,
+    LayerName.in19_cu,
+    LayerName.in20_cu,
+    LayerName.in21_cu,
+    LayerName.in22_cu,
+    LayerName.in23_cu,
+    LayerName.in24_cu,
+    LayerName.in25_cu,
+    LayerName.in26_cu,
+    LayerName.in27_cu,
+    LayerName.in28_cu,
+    LayerName.in29_cu,
+    LayerName.in30_cu,
+    LayerName.b_cu,
+];
+
 /**
  * Board view layer set
  */
@@ -226,55 +259,42 @@ export class LayerSet extends BaseLayerSet {
      *      displayed in the layer selection UI
      */
     *in_ui_order() {
-        const inner_copper = Symbol("inner_copper");
-
         const order = [
-            "F.Cu",
-            inner_copper,
-            "B.Cu",
-            "F.Adhes",
-            "B.Adhes",
-            "F.Paste",
-            "B.Paste",
-            "F.SilkS",
-            "B.SilkS",
-            "F.Mask",
-            "B.Mask",
-            "Dwgs.User",
-            "Cmts.User",
-            "Eco1.User",
-            "Eco2.User",
-            "Edge.Cuts",
-            "Margin",
-            "F.CrtYd",
-            "B.CrtYd",
-            "F.Fab",
-            "B.Fab",
-            "User.1",
-            "User.2",
-            "User.3",
-            "User.4",
-            "User.5",
-            "User.6",
-            "User.7",
-            "User.8",
-            "User.9",
+            ...copper_layers,
+            LayerName.f_adhes,
+            LayerName.b_adhes,
+            LayerName.f_paste,
+            LayerName.b_paste,
+            LayerName.f_silks,
+            LayerName.b_silks,
+            LayerName.f_mask,
+            LayerName.b_mask,
+            LayerName.dwgs_user,
+            LayerName.cmts_user,
+            LayerName.eco1_user,
+            LayerName.eco2_user,
+            LayerName.edge_cuts,
+            LayerName.margin,
+            LayerName.f_crtyd,
+            LayerName.b_crtyd,
+            LayerName.f_fab,
+            LayerName.b_fab,
+            LayerName.user_1,
+            LayerName.user_2,
+            LayerName.user_3,
+            LayerName.user_4,
+            LayerName.user_5,
+            LayerName.user_6,
+            LayerName.user_7,
+            LayerName.user_8,
+            LayerName.user_9,
         ];
 
         for (const name of order) {
-            if (name == inner_copper) {
-                for (let i = 1; i <= max_inner_copper_layers; i++) {
-                    const layer = this.by_name(`In${i}.Cu`);
-                    if (layer) {
-                        yield layer;
-                    }
-                }
-            } else {
-                const layer: ViewLayer = this.by_name(name as string);
+            const layer: ViewLayer = this.by_name(name as string);
 
-                if (layer) {
-                    yield layer;
-                }
+            if (layer) {
+                yield layer;
             }
         }
     }
@@ -283,8 +303,9 @@ export class LayerSet extends BaseLayerSet {
      * @returns true if any copper layer is enabled and visible.
      */
     is_any_copper_layer_visible(): boolean {
-        for (const l of this.in_display_order()) {
-            if (l.name.endsWith(".Cu") && l.visible) {
+        for (const name of copper_layers) {
+            const layer = this.by_name(name);
+            if (layer?.visible) {
                 return true;
             }
         }

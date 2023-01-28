@@ -16,7 +16,7 @@ import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
 import { Angle } from "../math/angle";
 import { Renderer } from "../gfx/renderer";
-import { Layer, LayerName, LayerSet } from "./layers";
+import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { TextOptions } from "../gfx/text";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
@@ -40,7 +40,7 @@ class GenericPainter {
     /**
      * Paint the given item on the specified layer
      */
-    static paint(gfx: Renderer, layer: Layer, item: any) {}
+    static paint(gfx: Renderer, layer: ViewLayer, item: any) {}
 }
 
 class LinePainter extends GenericPainter {
@@ -48,7 +48,7 @@ class LinePainter extends GenericPainter {
 
     static paint(
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         s: pcb_items.GrLine | pcb_items.FpLine
     ) {
         const points = [s.start, s.end];
@@ -61,7 +61,7 @@ class RectPainter extends GenericPainter {
 
     static paint(
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         r: pcb_items.GrRect | pcb_items.FpRect
     ) {
         const color = layer.color;
@@ -86,7 +86,7 @@ class PolyPainter extends GenericPainter {
 
     static paint(
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         p: pcb_items.GrPoly | pcb_items.FpPoly
     ) {
         const color = layer.color;
@@ -106,7 +106,7 @@ class ArcPainter extends GenericPainter {
 
     static paint(
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         a: pcb_items.GrArc | pcb_items.FpArc
     ) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
@@ -120,7 +120,7 @@ class CirclePainter extends GenericPainter {
 
     static paint(
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         c: pcb_items.GrCircle | pcb_items.FpCircle
     ) {
         const color = layer.color;
@@ -148,7 +148,7 @@ class CirclePainter extends GenericPainter {
 class TraceSegmentPainter extends GenericPainter {
     static classes = [pcb_items.Segment];
 
-    static paint(gfx: Renderer, layer: Layer, s: pcb_items.Segment) {
+    static paint(gfx: Renderer, layer: ViewLayer, s: pcb_items.Segment) {
         const points = [s.start, s.end];
         gfx.line(new Polyline(points, s.width, layer.color));
     }
@@ -157,7 +157,7 @@ class TraceSegmentPainter extends GenericPainter {
 class TraceArcPainter extends GenericPainter {
     static classes = [pcb_items.Arc];
 
-    static paint(gfx: Renderer, layer: Layer, a: pcb_items.Arc) {
+    static paint(gfx: Renderer, layer: ViewLayer, a: pcb_items.Arc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         gfx.line(new Polyline(points, arc.width, layer.color));
@@ -171,7 +171,7 @@ class ViaPainter extends GenericPainter {
         return [LayerName.via_holes, LayerName.via_through];
     }
 
-    static paint(gfx: Renderer, layer: Layer, v: pcb_items.Via) {
+    static paint(gfx: Renderer, layer: ViewLayer, v: pcb_items.Via) {
         const color = layer.color;
         if (layer.name == LayerName.via_through) {
             gfx.circle(new Circle(v.at, v.size / 2, color));
@@ -188,7 +188,7 @@ class ZonePainter extends GenericPainter {
         return z.layers.map((l) => `:Zones:${l}`);
     }
 
-    static paint(gfx: Renderer, layer: Layer, z: pcb_items.Zone) {
+    static paint(gfx: Renderer, layer: ViewLayer, z: pcb_items.Zone) {
         if (!z.filled_polygons) {
             return;
         }
@@ -248,7 +248,7 @@ class PadPainter extends GenericPainter {
         return layers;
     }
 
-    static paint(gfx: Renderer, layer: Layer, pad: pcb_items.Pad) {
+    static paint(gfx: Renderer, layer: ViewLayer, pad: pcb_items.Pad) {
         const color = layer.color;
 
         const position_mat = Matrix3.translation(
@@ -439,7 +439,7 @@ class TextPainter extends GenericPainter {
 
     static paint(
         gfx: Renderer,
-        layer: Layer,
+        layer: ViewLayer,
         t: pcb_items.GrText | pcb_items.FpText
     ) {
         let rotation = t.at.rotation;
@@ -487,7 +487,7 @@ class DimensionPainter extends GenericPainter {
         return [];
     }
 
-    static paint(gfx: Renderer, layer: Layer, d: pcb_items.Dimension) {}
+    static paint(gfx: Renderer, layer: ViewLayer, d: pcb_items.Dimension) {}
 }
 
 class FootprintPainter extends GenericPainter {
@@ -506,7 +506,7 @@ class FootprintPainter extends GenericPainter {
         return Array.from(layers.values()) as string[];
     }
 
-    static paint(gfx: Renderer, layer: Layer, fp: pcb_items.Footprint) {
+    static paint(gfx: Renderer, layer: ViewLayer, fp: pcb_items.Footprint) {
         const matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
@@ -588,7 +588,7 @@ export class BoardPainter {
     /**
      * Paint all items on the given layer.
      */
-    paint_layer(layer: Layer, depth = 0) {
+    paint_layer(layer: ViewLayer, depth = 0) {
         const bboxes = new Map();
 
         this.gfx.start_layer(layer.name, depth);
@@ -607,7 +607,7 @@ export class BoardPainter {
     /**
      * Paint a single item on a given layer.
      */
-    paint_item(layer: Layer, item) {
+    paint_item(layer: ViewLayer, item) {
         painter_for_class.get(item.constructor).paint(this.gfx, layer, item);
     }
 }
