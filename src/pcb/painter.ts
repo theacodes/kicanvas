@@ -20,50 +20,29 @@ import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { TextOptions } from "../gfx/text";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
+import { ItemPainter, DocumentPainter } from "../framework/painter";
 
-/**
- * Painter base class
- */
-class GenericPainter {
-    /**
-     * List of item classes this painter can draw
-     */
-    static classes = [];
+class LinePainter extends ItemPainter {
+    classes = [pcb_items.GrLine, pcb_items.FpLine];
 
-    /**
-     * List of layer names that the given item appears on
-     */
-    static layers(item: any) {
+    layers_for(item: pcb_items.GrLine | pcb_items.FpLine) {
         return [item.layer];
     }
 
-    /**
-     * Paint the given item on the specified layer
-     */
-    static paint(gfx: Renderer, layer: ViewLayer, item: any) {}
-}
-
-class LinePainter extends GenericPainter {
-    static classes = [pcb_items.GrLine, pcb_items.FpLine];
-
-    static paint(
-        gfx: Renderer,
-        layer: ViewLayer,
-        s: pcb_items.GrLine | pcb_items.FpLine
-    ) {
+    paint(layer: ViewLayer, s: pcb_items.GrLine | pcb_items.FpLine) {
         const points = [s.start, s.end];
-        gfx.line(new Polyline(points, s.width, layer.color));
+        this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
-class RectPainter extends GenericPainter {
-    static classes = [pcb_items.GrRect, pcb_items.FpRect];
+class RectPainter extends ItemPainter {
+    classes = [pcb_items.GrRect, pcb_items.FpRect];
 
-    static paint(
-        gfx: Renderer,
-        layer: ViewLayer,
-        r: pcb_items.GrRect | pcb_items.FpRect
-    ) {
+    layers_for(item: pcb_items.GrRect | pcb_items.FpRect) {
+        return [item.layer];
+    }
+
+    paint(layer: ViewLayer, r: pcb_items.GrRect | pcb_items.FpRect) {
         const color = layer.color;
         const points = [
             r.start,
@@ -73,56 +52,56 @@ class RectPainter extends GenericPainter {
             r.start,
         ];
 
-        gfx.line(new Polyline(points, r.width, color));
+        this.gfx.line(new Polyline(points, r.width, color));
 
         if (r.fill) {
-            gfx.polygon(new Polygon(points, color));
+            this.gfx.polygon(new Polygon(points, color));
         }
     }
 }
 
-class PolyPainter extends GenericPainter {
-    static classes = [pcb_items.GrPoly, pcb_items.FpPoly];
+class PolyPainter extends ItemPainter {
+    classes = [pcb_items.GrPoly, pcb_items.FpPoly];
 
-    static paint(
-        gfx: Renderer,
-        layer: ViewLayer,
-        p: pcb_items.GrPoly | pcb_items.FpPoly
-    ) {
+    layers_for(item: pcb_items.GrPoly | pcb_items.FpPoly) {
+        return [item.layer];
+    }
+
+    paint(layer: ViewLayer, p: pcb_items.GrPoly | pcb_items.FpPoly) {
         const color = layer.color;
 
         if (p.width) {
-            gfx.line(new Polyline([...p.pts, p.pts[0]], p.width, color));
+            this.gfx.line(new Polyline([...p.pts, p.pts[0]], p.width, color));
         }
 
         if (p.fill) {
-            gfx.polygon(new Polygon(p.pts, color));
+            this.gfx.polygon(new Polygon(p.pts, color));
         }
     }
 }
 
-class ArcPainter extends GenericPainter {
-    static classes = [pcb_items.GrArc, pcb_items.FpArc];
+class ArcPainter extends ItemPainter {
+    classes = [pcb_items.GrArc, pcb_items.FpArc];
 
-    static paint(
-        gfx: Renderer,
-        layer: ViewLayer,
-        a: pcb_items.GrArc | pcb_items.FpArc
-    ) {
+    layers_for(item: pcb_items.GrArc | pcb_items.FpArc) {
+        return [item.layer];
+    }
+
+    paint(layer: ViewLayer, a: pcb_items.GrArc | pcb_items.FpArc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
-        gfx.line(new Polyline(points, arc.width, layer.color));
+        this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
-class CirclePainter extends GenericPainter {
-    static classes = [pcb_items.GrCircle, pcb_items.FpCircle];
+class CirclePainter extends ItemPainter {
+    classes = [pcb_items.GrCircle, pcb_items.FpCircle];
 
-    static paint(
-        gfx: Renderer,
-        layer: ViewLayer,
-        c: pcb_items.GrCircle | pcb_items.FpCircle
-    ) {
+    layers_for(item: pcb_items.GrCircle | pcb_items.FpCircle) {
+        return [item.layer];
+    }
+
+    paint(layer: ViewLayer, c: pcb_items.GrCircle | pcb_items.FpCircle) {
         const color = layer.color;
 
         const radius = c.center.sub(c.end).magnitude;
@@ -135,60 +114,68 @@ class CirclePainter extends GenericPainter {
         );
 
         if (c.fill) {
-            gfx.circle(
+            this.gfx.circle(
                 new Circle(arc.center, arc.radius + (c.width ?? 0), color)
             );
         } else {
             const points = arc.to_polyline();
-            gfx.line(new Polyline(points, arc.width, color));
+            this.gfx.line(new Polyline(points, arc.width, color));
         }
     }
 }
 
-class TraceSegmentPainter extends GenericPainter {
-    static classes = [pcb_items.Segment];
+class TraceSegmentPainter extends ItemPainter {
+    classes = [pcb_items.Segment];
 
-    static paint(gfx: Renderer, layer: ViewLayer, s: pcb_items.Segment) {
+    layers_for(item: pcb_items.Segment) {
+        return [item.layer];
+    }
+
+    paint(layer: ViewLayer, s: pcb_items.Segment) {
         const points = [s.start, s.end];
-        gfx.line(new Polyline(points, s.width, layer.color));
+        this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
-class TraceArcPainter extends GenericPainter {
-    static classes = [pcb_items.Arc];
+class TraceArcPainter extends ItemPainter {
+    classes = [pcb_items.Arc];
 
-    static paint(gfx: Renderer, layer: ViewLayer, a: pcb_items.Arc) {
+    layers_for(item: pcb_items.Arc) {
+        return [item.layer];
+    }
+
+    paint(layer: ViewLayer, a: pcb_items.Arc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
-        gfx.line(new Polyline(points, arc.width, layer.color));
+        this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
-class ViaPainter extends GenericPainter {
-    static classes = [pcb_items.Via];
+class ViaPainter extends ItemPainter {
+    classes = [pcb_items.Via];
 
-    static layers(v: pcb_items.Via): string[] {
+    layers_for(v: pcb_items.Via): string[] {
         return [LayerName.via_holes, LayerName.via_through];
     }
 
-    static paint(gfx: Renderer, layer: ViewLayer, v: pcb_items.Via) {
+    paint(layer: ViewLayer, v: pcb_items.Via) {
         const color = layer.color;
         if (layer.name == LayerName.via_through) {
-            gfx.circle(new Circle(v.at, v.size / 2, color));
+            this.gfx.circle(new Circle(v.at, v.size / 2, color));
         } else if (layer.name == LayerName.via_holes) {
-            gfx.circle(new Circle(v.at, v.drill / 2, color));
+            this.gfx.circle(new Circle(v.at, v.drill / 2, color));
         }
     }
 }
 
-class ZonePainter extends GenericPainter {
-    static classes = [pcb_items.Zone];
+class ZonePainter extends ItemPainter {
+    classes = [pcb_items.Zone];
 
-    static layers(z: pcb_items.Zone): string[] {
+    layers_for(z: pcb_items.Zone): string[] {
         return z.layers.map((l) => `:Zones:${l}`);
     }
 
-    static paint(gfx: Renderer, layer: ViewLayer, z: pcb_items.Zone) {
+    paint(layer: ViewLayer, z: pcb_items.Zone) {
         if (!z.filled_polygons) {
             return;
         }
@@ -204,15 +191,15 @@ class ZonePainter extends GenericPainter {
                 layer.color.b,
                 layer.color.a * 0.5
             );
-            gfx.polygon(new Polygon(p.pts, color));
+            this.gfx.polygon(new Polygon(p.pts, color));
         }
     }
 }
 
-class PadPainter extends GenericPainter {
-    static classes = [pcb_items.Pad];
+class PadPainter extends ItemPainter {
+    classes = [pcb_items.Pad];
 
-    static layers(pad: pcb_items.Pad): string[] {
+    layers_for(pad: pcb_items.Pad): string[] {
         // TODO: Port KiCAD's logic over.
         const layers: string[] = [];
 
@@ -248,7 +235,7 @@ class PadPainter extends GenericPainter {
         return layers;
     }
 
-    static paint(gfx: Renderer, layer: ViewLayer, pad: pcb_items.Pad) {
+    paint(layer: ViewLayer, pad: pcb_items.Pad) {
         const color = layer.color;
 
         const position_mat = Matrix3.translation(
@@ -258,15 +245,15 @@ class PadPainter extends GenericPainter {
         position_mat.rotate_self(-Angle.deg_to_rad(pad.parent.at.rotation));
         position_mat.rotate_self(Angle.deg_to_rad(pad.at.rotation));
 
-        gfx.state.push();
-        gfx.state.multiply(position_mat);
+        this.gfx.state.push();
+        this.gfx.state.multiply(position_mat);
 
         const center = new Vec2(0, 0);
 
         if (layer.name == LayerName.pad_holes && pad.drill != null) {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
-                gfx.circle(
+                this.gfx.circle(
                     new Circle(drill_pos, pad.drill.diameter / 2, color)
                 );
             } else {
@@ -290,7 +277,7 @@ class PadPainter extends GenericPainter {
                 const drill_start = drill_pos.sub(half_len);
                 const drill_end = drill_pos.add(half_len);
 
-                gfx.line(
+                this.gfx.line(
                     new Polyline(
                         [drill_start, drill_end],
                         half_width * 2,
@@ -306,7 +293,7 @@ class PadPainter extends GenericPainter {
 
             switch (shape) {
                 case "circle":
-                    gfx.circle(new Circle(center, pad.size.x / 2, color));
+                    this.gfx.circle(new Circle(center, pad.size.x / 2, color));
                     break;
                 case "rect":
                     {
@@ -316,7 +303,7 @@ class PadPainter extends GenericPainter {
                             new Vec2(pad.size.x / 2, pad.size.y / 2),
                             new Vec2(-pad.size.x / 2, pad.size.y / 2),
                         ];
-                        gfx.polygon(new Polygon(rect_points, color));
+                        this.gfx.polygon(new Polygon(rect_points, color));
                     }
                     break;
                 case "roundrect":
@@ -359,16 +346,16 @@ class PadPainter extends GenericPainter {
                             ),
                         ];
 
-                        // gfx.push_transform(offset_mat);
-                        gfx.polygon(new Polygon(rect_points, color));
-                        gfx.line(
+                        // this.gfx.push_transform(offset_mat);
+                        this.gfx.polygon(new Polygon(rect_points, color));
+                        this.gfx.line(
                             new Polyline(
                                 [...rect_points, rect_points[0]],
                                 rounding * 2,
                                 color
                             )
                         );
-                        // gfx.pop_transform();
+                        // this.gfx.pop_transform();
                     }
                     break;
 
@@ -395,9 +382,11 @@ class PadPainter extends GenericPainter {
                         const pad_end = pad_pos.add(half_len);
 
                         if (pad_start.equals(pad_end)) {
-                            gfx.circle(new Circle(pad_pos, half_width, color));
+                            this.gfx.circle(
+                                new Circle(pad_pos, half_width, color)
+                            );
                         } else {
-                            gfx.line(
+                            this.gfx.line(
                                 new Polyline(
                                     [pad_start, pad_end],
                                     half_width * 2,
@@ -415,21 +404,19 @@ class PadPainter extends GenericPainter {
 
             if (pad.shape == "custom" && pad.primitives) {
                 for (const prim of pad.primitives) {
-                    painter_for_class
-                        .get(prim.constructor)
-                        .paint(gfx, layer, prim);
+                    this.view_painter.paint_item(layer, prim);
                 }
             }
         }
 
-        gfx.state.pop();
+        this.gfx.state.pop();
     }
 }
 
-class TextPainter extends GenericPainter {
-    static classes = [pcb_items.GrText, pcb_items.FpText];
+class TextPainter extends ItemPainter {
+    classes = [pcb_items.GrText, pcb_items.FpText];
 
-    static layers(t: pcb_items.GrText | pcb_items.FpText) {
+    layers_for(t: pcb_items.GrText | pcb_items.FpText) {
         if (t instanceof pcb_items.FpText && t.hide) {
             return [];
         } else {
@@ -437,11 +424,7 @@ class TextPainter extends GenericPainter {
         }
     }
 
-    static paint(
-        gfx: Renderer,
-        layer: ViewLayer,
-        t: pcb_items.GrText | pcb_items.FpText
-    ) {
+    paint(layer: ViewLayer, t: pcb_items.GrText | pcb_items.FpText) {
         let rotation = t.at.rotation;
 
         if (rotation == 180 || rotation == -180) {
@@ -452,12 +435,12 @@ class TextPainter extends GenericPainter {
             rotation -= t.parent.at.rotation ?? 0;
         }
 
-        const shaped = gfx.text_shaper.paragraph(
+        const shaped = this.gfx.text_shaper.paragraph(
             t.text,
             t.at.position,
             Angle.from_degrees(rotation),
             new TextOptions(
-                gfx.text_shaper.default_font,
+                this.gfx.text_shaper.default_font,
                 t.effects.size,
                 t.effects.thickness,
                 t.effects.bold,
@@ -469,7 +452,7 @@ class TextPainter extends GenericPainter {
         );
 
         for (const stroke of shaped.strokes()) {
-            gfx.line(
+            this.gfx.line(
                 new Polyline(
                     Array.from(stroke),
                     t.effects.thickness ?? 0.127,
@@ -480,25 +463,23 @@ class TextPainter extends GenericPainter {
     }
 }
 
-class DimensionPainter extends GenericPainter {
-    static classes = [pcb_items.Dimension];
+class DimensionPainter extends ItemPainter {
+    classes = [pcb_items.Dimension];
 
-    static layers(d: pcb_items.Dimension): string[] {
+    layers_for(d: pcb_items.Dimension): string[] {
         return [];
     }
 
-    static paint(gfx: Renderer, layer: ViewLayer, d: pcb_items.Dimension) {}
+    paint(layer: ViewLayer, d: pcb_items.Dimension) {}
 }
 
-class FootprintPainter extends GenericPainter {
-    static classes = [pcb_items.Footprint];
+class FootprintPainter extends ItemPainter {
+    classes = [pcb_items.Footprint];
 
-    static layers(fp: pcb_items.Footprint): string[] {
+    layers_for(fp: pcb_items.Footprint): string[] {
         const layers = new Set();
         for (const item of fp.items) {
-            const item_layers = painter_for_class
-                .get(item.constructor)
-                .layers(item);
+            const item_layers = this.view_painter.layers_for(item);
             for (const layer of item_layers) {
                 layers.add(layer);
             }
@@ -506,108 +487,46 @@ class FootprintPainter extends GenericPainter {
         return Array.from(layers.values()) as string[];
     }
 
-    static paint(gfx: Renderer, layer: ViewLayer, fp: pcb_items.Footprint) {
+    paint(layer: ViewLayer, fp: pcb_items.Footprint) {
         const matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y
         ).rotate_self(Angle.deg_to_rad(fp.at.rotation));
 
-        gfx.state.push();
-        gfx.state.multiply(matrix);
+        this.gfx.state.push();
+        this.gfx.state.multiply(matrix);
 
         for (const item of fp.items) {
-            const item_layers = Array.from(
-                painter_for_class.get(item.constructor).layers(item)
-            );
+            const item_layers = this.view_painter.layers_for(item);
             if (item_layers.includes(layer.name)) {
-                painter_for_class.get(item.constructor).paint(gfx, layer, item);
+                this.view_painter.paint_item(layer, item);
             }
         }
 
-        gfx.state.pop();
+        this.gfx.state.pop();
     }
 }
 
-const painters = [
-    LinePainter,
-    RectPainter,
-    PolyPainter,
-    ArcPainter,
-    CirclePainter,
-    TraceSegmentPainter,
-    TraceArcPainter,
-    ViaPainter,
-    ZonePainter,
-    PadPainter,
-    FootprintPainter,
-    TextPainter,
-    DimensionPainter,
-];
-
-const painter_for_class: Map<any, typeof GenericPainter> = new Map();
-
-for (const painter of painters) {
-    for (const item_class of painter.classes) {
-        painter_for_class.set(item_class, painter);
-    }
-}
-
-/**
- * Painter handles painting all board items onto their respective graphics layers.
- */
-export class BoardPainter {
+export class BoardPainter extends DocumentPainter {
     /**
      * Create a Painter
      */
-    constructor(public gfx: Renderer) {}
-
-    /**
-     * Paint an entire board.
-     */
-    paint(board: pcb_items.KicadPCB, layers: LayerSet) {
-        for (const item of board.items) {
-            for (const layer_name of this.get_layers_for(item)) {
-                layers.by_name(layer_name).items.push(item);
-            }
-        }
-
-        let depth = 0.001;
-        for (const layer of layers.in_display_order()) {
-            this.paint_layer(layer, depth);
-            depth += 0.001;
-        }
-    }
-
-    /**
-     * Get a list of layer names that an item will be painted on.
-     */
-    get_layers_for(item): string[] {
-        return painter_for_class.get(item.constructor).layers(item);
-    }
-
-    /**
-     * Paint all items on the given layer.
-     */
-    paint_layer(layer: ViewLayer, depth = 0) {
-        const bboxes = new Map();
-
-        this.gfx.start_layer(layer.name, depth);
-
-        for (const item of layer.items) {
-            this.gfx.start_bbox();
-            this.paint_item(layer, item);
-            const bbox = this.gfx.end_bbox(item);
-            bboxes.set(item, bbox);
-        }
-
-        layer.graphics = this.gfx.end_layer();
-        layer.bboxes = bboxes;
-    }
-
-    /**
-     * Paint a single item on a given layer.
-     */
-    paint_item(layer: ViewLayer, item) {
-        painter_for_class.get(item.constructor).paint(this.gfx, layer, item);
+    constructor(gfx: Renderer, layers: LayerSet) {
+        super(gfx, layers);
+        this.painter_list = [
+            new LinePainter(this, gfx),
+            new RectPainter(this, gfx),
+            new PolyPainter(this, gfx),
+            new ArcPainter(this, gfx),
+            new CirclePainter(this, gfx),
+            new TraceSegmentPainter(this, gfx),
+            new TraceArcPainter(this, gfx),
+            new ViaPainter(this, gfx),
+            new ZonePainter(this, gfx),
+            new PadPainter(this, gfx),
+            new FootprintPainter(this, gfx),
+            new TextPainter(this, gfx),
+            new DimensionPainter(this, gfx),
+        ];
     }
 }

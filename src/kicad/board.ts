@@ -959,7 +959,7 @@ export class KicadPCB {
     layers: Record<string, Layer> = {};
     footprints: Footprint[] = [];
     properties: Record<string, string> = {};
-    items: PCBItem[] = [];
+    #items: PCBItem[] = [];
 
     version: number;
     generator: string;
@@ -1007,59 +1007,65 @@ export class KicadPCB {
             } else if ((se = e.maybe_expr("segment")) !== null) {
                 const seg = new Segment(se);
                 // this.layers[seg.layer].items.push(seg);
-                this.items.push(seg);
+                this.#items.push(seg);
                 continue;
             } else if ((se = e.maybe_expr("arc")) !== null) {
                 const arc = new Arc(se);
                 // this.layers[arc.layer].items.push(arc);
-                this.items.push(arc);
+                this.#items.push(arc);
                 continue;
             } else if ((se = e.maybe_expr("zone")) !== null) {
                 const zone = new Zone(se);
-                this.items.push(zone);
+                this.#items.push(zone);
                 continue;
             } else if ((se = e.maybe_expr("via")) !== null) {
                 const via = new Via(se);
-                this.items.push(via);
+                this.#items.push(via);
                 continue;
             } else if ((se = e.maybe_expr("gr_text")) !== null) {
                 const text = new GrText(se);
                 text.original_text = text.text;
                 text.text = this.expand_text_vars(text.text);
-                this.items.push(text);
+                this.#items.push(text);
                 continue;
             } else if ((se = e.maybe_expr("gr_circle")) !== null) {
                 const circle = new GrCircle(se);
-                this.items.push(circle);
+                this.#items.push(circle);
                 continue;
             } else if ((se = e.maybe_expr("gr_arc")) !== null) {
                 const arc = new GrArc(se);
-                this.items.push(arc);
+                this.#items.push(arc);
                 continue;
             } else if ((se = e.maybe_expr("gr_rect")) !== null) {
                 const rect = new GrRect(se);
-                this.items.push(rect);
+                this.#items.push(rect);
                 continue;
             } else if ((se = e.maybe_expr("gr_poly")) !== null) {
                 const poly = new GrPoly(se);
-                this.items.push(poly);
+                this.#items.push(poly);
                 continue;
             } else if ((se = e.maybe_expr("gr_line")) !== null) {
                 const line = new GrLine(se);
-                this.items.push(line);
+                this.#items.push(line);
                 continue;
             } else if ((se = e.maybe_expr("dimension")) !== null) {
                 const dim = new Dimension(se);
-                this.items.push(dim);
+                this.#items.push(dim);
                 continue;
             } else if ((se = e.maybe_expr("footprint")) !== null) {
                 const fp = new Footprint(this, se);
                 // this.footprints.push(fp);
-                this.items.push(fp);
+                this.#items.push(fp);
                 continue;
             }
             console.log("unknown", e.element);
             break;
+        }
+    }
+
+    *items() {
+        for (const item of this.#items) {
+            yield item;
         }
     }
 

@@ -41,10 +41,13 @@ export class BoardViewer extends Viewer {
         const pcb_src = await (await window.fetch(url)).text();
         this.board = new pcb_items.KicadPCB(parse(pcb_src));
 
-        this.#painter = new BoardPainter(this.renderer);
         this.layers = new LayerSet(this.board, this.renderer.theme);
+        this.#painter = new BoardPainter(
+            this.renderer,
+            this.layers as LayerSet
+        );
 
-        this.#painter.paint(this.board, this.layers as LayerSet);
+        this.#painter.paint(this.board);
 
         this.#look_at_board();
         this.draw_soon();

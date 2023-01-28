@@ -100,4 +100,8 @@ export abstract class DocumentPainter {
     painter_for(item: unknown): ItemPainter {
         return this.painters.get(item.constructor);
     }
+
+    layers_for(item: unknown): string[] {
+        return this.painters.get(item.constructor).layers_for(item);
+    }
 }
