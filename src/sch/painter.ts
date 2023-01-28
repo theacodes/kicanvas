@@ -186,6 +186,44 @@ class JunctionPainter extends ItemPainter {
     }
 }
 
+class NoConnectPainter extends ItemPainter {
+    classes = [sch_items.NoConnect];
+
+    layers_for(item: sch_items.NoConnect) {
+        return [LayerName.junction];
+    }
+
+    paint(layer: ViewLayer, nc: sch_items.NoConnect): void {
+        const color = this.gfx.theme.no_connect as Color;
+        const width = 0.1524;
+        const size = 1.2192 / 2;
+
+        this.gfx.state.push();
+        this.gfx.state.matrix.translate_self(
+            nc.at.position.x,
+            nc.at.position.y
+        );
+
+        this.gfx.line(
+            new Polyline(
+                [new Vec2(-size, -size), new Vec2(size, size)],
+                width,
+                color
+            )
+        );
+
+        this.gfx.line(
+            new Polyline(
+                [new Vec2(size, -size), new Vec2(-size, size)],
+                width,
+                color
+            )
+        );
+
+        this.gfx.state.pop();
+    }
+}
+
 class TextPainter extends ItemPainter {
     classes = [sch_items.Text];
 
@@ -1034,6 +1072,7 @@ export class SchematicPainter extends DocumentPainter {
             new CirclePainter(this, gfx),
             new ArcPainter(this, gfx),
             new JunctionPainter(this, gfx),
+            new NoConnectPainter(this, gfx),
             new TextPainter(this, gfx),
             new PinPainter(this, gfx),
             new LibrarySymbolPainter(this, gfx),
