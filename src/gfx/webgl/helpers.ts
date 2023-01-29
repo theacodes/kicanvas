@@ -50,7 +50,10 @@ class Uniform {
  * A shader program consisting of a vertex shader, fragment shader, and uniforms.
  */
 export class ShaderProgram {
-    static #shader_cache = {};
+    static #shader_cache: WeakMap<
+        WebGL2RenderingContext,
+        Map<string, ShaderProgram>
+    > = new WeakMap();
 
     program: WebGLProgram;
 
@@ -106,13 +109,25 @@ export class ShaderProgram {
         vert_url: URL | string,
         frag_url: URL | string
     ): Promise<ShaderProgram> {
-        if (!this.#shader_cache[name]) {
-            const vert = await (await fetch(new URL(vert_url, import.meta.url))).text();
-            const frag = await (await fetch(new URL(frag_url, import.meta.url))).text();
-            this.#shader_cache[name] = new ShaderProgram(gl, name, vert, frag);
+        if (!ShaderProgram.#shader_cache.has(gl)) {
+            ShaderProgram.#shader_cache.set(gl, new Map());
+        }
+        const cache = ShaderProgram.#shader_cache.get(gl);
+
+        if (!cache.has(name)) {
+            const vert = await (
+                await fetch(new URL(vert_url, import.meta.url))
+            ).text();
+            const frag = await (
+                await fetch(new URL(frag_url, import.meta.url))
+            ).text();
+
+            const prog = new ShaderProgram(gl, name, vert, frag);
+
+            cache.set(name, prog);
         }
 
-        return this.#shader_cache[name];
+        return cache.get(name);
     }
 
     /**
@@ -149,7 +164,11 @@ export class ShaderProgram {
      *
      * Typically not used directly, use load() instead.
      */
-    static link(gl: WebGL2RenderingContext, vertex: WebGLShader, fragment: WebGLShader) {
+    static link(
+        gl: WebGL2RenderingContext,
+        vertex: WebGLShader,
+        fragment: WebGLShader
+    ) {
         const program = gl.createProgram();
 
         if (program == null) {
@@ -174,7 +193,8 @@ export class ShaderProgram {
         this.uniforms = {};
         for (
             let u_n = 0;
-            u_n < this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS);
+            u_n <
+            this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS);
             u_n++
         ) {
             const info = this.gl.getActiveUniform(this.program, u_n);
@@ -185,7 +205,10 @@ export class ShaderProgram {
                 );
             }
 
-            const location = this.gl.getUniformLocation(this.program, info.name);
+            const location = this.gl.getUniformLocation(
+                this.program,
+                info.name
+            );
 
             this[info.name] = this.uniforms[info.name] = new Uniform(
                 this.gl,
@@ -200,7 +223,11 @@ export class ShaderProgram {
         this.attribs = {};
         for (
             let a_n = 0;
-            a_n < this.gl.getProgramParameter(this.program, this.gl.ACTIVE_ATTRIBUTES);
+            a_n <
+            this.gl.getProgramParameter(
+                this.program,
+                this.gl.ACTIVE_ATTRIBUTES
+            );
             a_n++
         ) {
             const info = this.gl.getActiveAttrib(this.program, a_n);
@@ -212,7 +239,10 @@ export class ShaderProgram {
             }
 
             this.attribs[info.name] = info;
-            this[info.name] = this.gl.getAttribLocation(this.program, info.name);
+            this[info.name] = this.gl.getAttribLocation(
+                this.program,
+                info.name
+            );
         }
     }
 
@@ -283,7 +313,14 @@ export class VertexArray {
         const b = new Buffer(this.gl, target);
 
         b.bind();
-        this.gl.vertexAttribPointer(attrib, size, type, normalized, stride, offset);
+        this.gl.vertexAttribPointer(
+            attrib,
+            size,
+            type,
+            normalized,
+            stride,
+            offset
+        );
         this.gl.enableVertexAttribArray(attrib);
 
         this.buffers.push(b);
@@ -303,7 +340,11 @@ export type TypedArray =
     | Float32Array
     | Float64Array;
 
-export type TypedArrayLike = TypedArray | DataView | ArrayBuffer | SharedArrayBuffer;
+export type TypedArrayLike =
+    | TypedArray
+    | DataView
+    | ArrayBuffer
+    | SharedArrayBuffer;
 
 /**
  * Manages a buffer of GPU data like vertices or colors
@@ -316,7 +357,10 @@ export class Buffer {
      * @param target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
      */
-    constructor(public gl: WebGL2RenderingContext, public target: GLenum = null) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        public target: GLenum = null
+    ) {
         this.gl = gl;
         this.target = target ?? gl.ARRAY_BUFFER;
         this.#buf = gl.createBuffer();
@@ -351,6 +395,9 @@ export class Buffer {
      */
     get length(): number {
         this.bind();
-        return this.gl.getBufferParameter(this.target, this.gl.BUFFER_SIZE) as number;
+        return this.gl.getBufferParameter(
+            this.target,
+            this.gl.BUFFER_SIZE
+        ) as number;
     }
 }
