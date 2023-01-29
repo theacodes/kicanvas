@@ -6,7 +6,7 @@
 
 import { BoardViewer } from "../pcb/viewer";
 
-class KiCanvasBoardElement extends HTMLElement {
+export class KiCanvasBoardElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
     viewer: BoardViewer;
     selected = [];
@@ -30,12 +30,26 @@ class KiCanvasBoardElement extends HTMLElement {
     async connectedCallback() {
         this.#renderShadowDOM();
 
+        if (this.getAttribute("src")) {
+            this.load(this.getAttribute("src"));
+        }
+    }
+
+    async disconnectedCallback() {
+        if (this.viewer) {
+            this.viewer.dispose();
+        }
+        this.selected = null;
+    }
+
+    async load(src) {
         this.viewer = new BoardViewer(this.#canvas);
+
         await this.viewer.setup();
-        await this.viewer.load(this.getAttribute("src"));
+        await this.viewer.load(src);
 
         this.loaded = true;
-        this.dispatchEvent(new CustomEvent("kicad-pcb:loaded"));
+        this.dispatchEvent(new CustomEvent("kicanvas:loaded"));
 
         this.viewer.draw_soon();
     }

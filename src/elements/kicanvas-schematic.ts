@@ -4,10 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { DropTarget } from "../framework/drag-drop";
 import { SchematicViewer } from "../sch/viewer";
 
-class KiCanvasSchematicElement extends HTMLElement {
+export class KiCanvasSchematicElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
     selected = [];
@@ -31,25 +30,26 @@ class KiCanvasSchematicElement extends HTMLElement {
     async connectedCallback() {
         this.#renderShadowDOM();
 
-        this.viewer = new SchematicViewer(this.#canvas);
-        await this.viewer.setup();
-
         if (this.getAttribute("src")) {
-            this.#load(this.getAttribute("src"));
-        } else {
-            new DropTarget(this, ["kicad_sch"], (files) => {
-                this.#load(files[0]);
-            });
+            this.load(this.getAttribute("src"));
         }
     }
 
-    async #load(src) {
-        console.log("Loading", src);
+    async disconnectedCallback() {
+        if (this.viewer) {
+            this.viewer.dispose();
+        }
+        this.selected = null;
+    }
 
+    async load(src) {
+        this.viewer = new SchematicViewer(this.#canvas);
+
+        await this.viewer.setup();
         await this.viewer.load(src);
 
         this.loaded = true;
-        this.dispatchEvent(new CustomEvent("kicad-schematic:loaded"));
+        this.dispatchEvent(new CustomEvent("kicanvas:loaded"));
 
         this.viewer.draw_soon();
     }
