@@ -63,6 +63,10 @@ export class Canvas2DRenderer extends Renderer {
         this.update_viewport();
     }
 
+    dispose() {
+        this.ctx2d = null;
+    }
+
     update_viewport() {
         const dpr = window.devicePixelRatio;
         const rect = this.canvas.getBoundingClientRect();

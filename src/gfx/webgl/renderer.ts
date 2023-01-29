@@ -66,6 +66,15 @@ export class WebGL2Renderer extends Renderer {
         await PrimitiveSet.load_shaders(gl);
     }
 
+    dispose() {
+        for (const layer of this.layers) {
+            layer.dispose();
+        }
+        if (this.gl) {
+            this.gl = null;
+        }
+    }
+
     update_viewport() {
         if (!this.gl) {
             return;
