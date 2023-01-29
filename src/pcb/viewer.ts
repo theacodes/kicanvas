@@ -37,9 +37,15 @@ export class BoardViewer extends Viewer {
         return renderer;
     }
 
-    override async load(url: string | URL) {
-        const pcb_src = await (await window.fetch(url)).text();
-        this.board = new pcb_items.KicadPCB(parse(pcb_src));
+    override async load(src: string | URL | File) {
+        let pcb_text;
+        if (src instanceof File) {
+            pcb_text = await src.text();
+        } else {
+            pcb_text = await (await window.fetch(src)).text();
+        }
+
+        this.board = new pcb_items.KicadPCB(parse(pcb_text));
 
         this.layers = new LayerSet(this.board, this.renderer.theme);
         this.#painter = new BoardPainter(
