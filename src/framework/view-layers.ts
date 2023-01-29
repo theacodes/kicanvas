@@ -125,6 +125,8 @@ export class ViewLayerSet {
         for (const layer of this.#layer_list) {
             layer.dispose();
         }
+        this.#layer_list = null;
+        this.#layer_map = null;
     }
 
     /**

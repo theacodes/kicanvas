@@ -25,6 +25,16 @@ export abstract class Viewer extends EventTarget {
         this.renderer = this.create_renderer(canvas);
     }
 
+    dispose() {
+        this.#selected = null;
+        this.viewport.dispose();
+        this.viewport = null;
+        this.layers.dispose();
+        this.layers = null;
+        this.renderer.dispose();
+        this.renderer = null;
+    }
+
     abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
 
     async setup() {
