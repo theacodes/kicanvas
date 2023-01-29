@@ -4,7 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-type ResizeObserverCallback = ((clientWidth: number, clientHeight: number, pixelWidth: number, pixelHeight: number) => void);
+type ResizeObserverCallback = (
+    clientWidth: number,
+    clientHeight: number,
+    pixelWidth: number,
+    pixelHeight: number
+) => void;
 
 /**
  * Like ResizeObserver, but specific to HTMLCanvasElement.
@@ -14,13 +19,23 @@ type ResizeObserverCallback = ((clientWidth: number, clientHeight: number, pixel
  * appropriately
  */
 export class CanvasSizeObserver {
+    #observer: ResizeObserver;
+
     /**
      * Create a CanvasSizeObserver
      */
-    constructor(public canvas: HTMLCanvasElement, private callback: ResizeObserverCallback) {
-        new ResizeObserver(() => {
+    constructor(
+        public canvas: HTMLCanvasElement,
+        private callback: ResizeObserverCallback
+    ) {
+        this.#observer = new ResizeObserver(() => {
             this.resize();
-        }).observe(canvas);
+        });
+        this.#observer.observe(canvas);
+    }
+
+    dispose() {
+        this.#observer.disconnect();
     }
 
     /** Resizes the canvas

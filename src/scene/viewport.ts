@@ -17,6 +17,7 @@ import { Angle } from "../math/angle";
  * into a scene.
  */
 export class Viewport {
+    #observer: CanvasSizeObserver;
     width: number;
     height: number;
     camera: Camera2;
@@ -33,10 +34,13 @@ export class Viewport {
             new Angle(0)
         );
 
-        new CanvasSizeObserver(this.renderer.canvas, (cw, ch, lw, lh) => {
-            this.resize(cw, ch, lw, lh);
-            this.callback();
-        });
+        this.#observer = new CanvasSizeObserver(
+            this.renderer.canvas,
+            (cw, ch, lw, lh) => {
+                this.resize(cw, ch, lw, lh);
+                this.callback();
+            }
+        );
 
         this.resize(
             this.renderer.canvas.clientWidth,
@@ -44,6 +48,10 @@ export class Viewport {
             this.renderer.canvas.width,
             this.renderer.canvas.height
         );
+    }
+
+    dispose() {
+        this.#observer.dispose();
     }
 
     /**
