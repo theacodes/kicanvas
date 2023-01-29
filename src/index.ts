@@ -8,3 +8,4 @@ import "./elements/kicanvas-board";
 import "./elements/kicanvas-layer-controls";
 import "./elements/kicanvas-schematic";
 import "./elements/kicanvas-dialog";
+import "./elements/kicanvas-app";
