@@ -106,8 +106,8 @@ export class ShaderProgram {
     static async load(
         gl: WebGL2RenderingContext,
         name: string,
-        vert_url: URL | string,
-        frag_url: URL | string
+        vert_src: URL | string,
+        frag_src: URL | string
     ): Promise<ShaderProgram> {
         if (!ShaderProgram.#shader_cache.has(gl)) {
             ShaderProgram.#shader_cache.set(gl, new Map());
@@ -115,14 +115,14 @@ export class ShaderProgram {
         const cache = ShaderProgram.#shader_cache.get(gl);
 
         if (!cache.has(name)) {
-            const vert = await (
-                await fetch(new URL(vert_url, import.meta.url))
-            ).text();
-            const frag = await (
-                await fetch(new URL(frag_url, import.meta.url))
-            ).text();
+            if (vert_src instanceof URL) {
+                vert_src = await (await fetch(vert_src)).text();
+            }
+            if (frag_src instanceof URL) {
+                frag_src = await (await fetch(frag_src)).text();
+            }
 
-            const prog = new ShaderProgram(gl, name, vert, frag);
+            const prog = new ShaderProgram(gl, name, vert_src, frag_src);
 
             cache.set(name, prog);
         }

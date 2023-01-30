@@ -26,8 +26,11 @@ import { VertexArray, ShaderProgram, Buffer } from "./helpers";
 import { Vec2 } from "../../math/vec2";
 import { Matrix3 } from "../../math/matrix3";
 import { Color } from "../color";
-
 import { Circle, Polyline, Polygon } from "../shapes";
+import polygon_frag_shader_src from "./polygon.frag.glsl";
+import polygon_vert_shader_src from "./polygon.vert.glsl";
+import polyline_frag_shader_src from "./polyline.frag.glsl";
+import polyline_vert_shader_src from "./polyline.vert.glsl";
 
 /**
  * Tesselator handles converting abstract primitives into triangles that
@@ -268,8 +271,8 @@ export class CircleSet {
         this.shader = await ShaderProgram.load(
             gl,
             "polyline",
-            "./resources/polyline.vert.glsl",
-            "./resources/polyline.frag.glsl"
+            polyline_vert_shader_src,
+            polyline_frag_shader_src
         );
     }
 
@@ -338,8 +341,8 @@ export class PolylineSet {
         this.shader = await ShaderProgram.load(
             gl,
             "polyline",
-            "./resources/polyline.vert.glsl",
-            "./resources/polyline.frag.glsl"
+            polyline_vert_shader_src,
+            polyline_frag_shader_src
         );
     }
 
@@ -437,8 +440,8 @@ export class PolygonSet {
         this.shader = await ShaderProgram.load(
             gl,
             "polygon",
-            "./resources/polygon.vert.glsl",
-            "./resources/polygon.frag.glsl"
+            polygon_vert_shader_src,
+            polygon_frag_shader_src
         );
     }
 

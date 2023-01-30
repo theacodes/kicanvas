@@ -19,6 +19,7 @@ export async function bundle(options = {}) {
         sourcemap: false,
         loader: {
             ".js": "ts",
+            ".glsl": "text",
         },
         plugins: [
             copy({
