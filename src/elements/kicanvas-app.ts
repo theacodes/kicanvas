@@ -9,6 +9,7 @@ import * as theme from "../kicad/theme";
 import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
+import "./kicanvas-dialog";
 
 class KiCanvasAppElement extends HTMLElement {
     #view_elm: KiCanvasSchematicElement | KiCanvasBoardElement;
@@ -113,6 +114,7 @@ class KiCanvasAppElement extends HTMLElement {
                 }
             </style>
             <overlay>Drag & drop your kicad schematic or board file here.</overlay>
+            <kicanvas-dialog></kicanvas-dialog>
         `;
 
         const root = this.attachShadow({ mode: "open" });

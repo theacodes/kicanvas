@@ -40,36 +40,3 @@ kicanvas-schematic {
     height: 100%;
     width: 100%;
 }
-
-kicanvas-dialog dialog {
-    font-size: 1.2rem;
-    margin: auto;
-    width: 30rem;
-    max-width: 80vw;
-    border: none;
-    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    padding: 1.6rem;
-}
-
-kicanvas-dialog .property {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-
-kicanvas-dialog .property input {
-    font-size: 1.1rem;
-}
-
-kicanvas-dialog button {
-    margin-top: 1.5rem;
-    margin-bottom: 0.25rem;
-    display: block;
-    width: 100%;
-    border: 1px solid transparent;
-    background: #17a2b8;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-}

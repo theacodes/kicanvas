@@ -1,30 +1,75 @@
 import { Property } from "../kicad/schematic";
 import { $make, $on, $q } from "../utils";
 
-class KiCanvasDialogElement extends HTMLElement {
+export class KiCanvasDialogElement extends HTMLElement {
     constructor() {
         super();
     }
 
     get dialog() {
-        return $q(this, "dialog");
+        return $q(this.shadowRoot, "dialog");
     }
 
     async connectedCallback() {
-        this.render();
+        this.#render();
         $on(window, "kicad-schematic:item-selected", (e) => {
-            this.on_item_selected(e.target, e.detail);
+            this.onItemSelected(e.target, e.detail);
         });
     }
 
-    on_item_selected(sch, detail) {
-        this.render_properties(detail.properties);
+    onItemSelected(element, detail) {
+        this.#renderSelectedProperties(detail.properties);
         this.dialog.showModal();
     }
 
-    render() {
+    #render() {
         const template = $make("template", {
             innerHTML: `
+                <style>
+                    dialog {
+                        font-size: 1.2rem;
+                        margin: auto;
+                        width: 30rem;
+                        max-width: 80vw;
+                        border: none;
+                        box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                        padding: 1.6rem;
+                    }
+
+                    dialog::backdrop {
+                        background: rgba(0, 0, 0, 0.66);
+                    }
+
+                    .property {
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .property input {
+                        font-family: inherit;
+                        font-size: 1.2rem;
+                        text-overflow: ellipsis;
+                        padding: 0.5rem 0.5rem;
+                        border: 1px solid #17a2b8;
+                        border-radius: 0.25rem;
+                    }
+
+                    button {
+                        font-family: inherit;
+                        font-size: 1.2rem;
+                        margin-top: 1.5rem;
+                        margin-bottom: 0.25rem;
+                        display: block;
+                        width: 100%;
+                        border: 1px solid transparent;
+                        background: #17a2b8;
+                        color: white;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.25rem;
+                    }
+                </style>
                 <dialog>
                     <form method="dialog">
                         <div class="properties"></div>
@@ -33,11 +78,12 @@ class KiCanvasDialogElement extends HTMLElement {
                 </dialog>`,
         });
 
-        this.append(template.content.cloneNode(true));
+        const root = this.attachShadow({ mode: "open" });
+        root.appendChild(template.content.cloneNode(true));
     }
 
-    render_properties(properties: Record<string, Property>) {
-        const parent = $q(this, ".properties");
+    #renderSelectedProperties(properties: Record<string, Property>) {
+        const parent = $q(this.shadowRoot, ".properties");
         parent.innerHTML = "";
 
         for (const [_, prop] of Object.entries(properties)) {
