@@ -4,9 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { CustomElement, html } from "../framework/elements";
+import { Footprint } from "../kicad/board";
 import { KiCanvasBoardElement } from "./kicanvas-board";
+import styles from "./kicanvas-info-bar.css";
 
-export class KiCanvasInfoBarElement extends HTMLElement {
+export class KiCanvasInfoBarElement extends CustomElement {
+    static styles = styles;
+
+    #footprint: Footprint;
     target: KiCanvasBoardElement;
 
     constructor() {
@@ -25,19 +31,14 @@ export class KiCanvasInfoBarElement extends HTMLElement {
             throw new Error("No target for <kicanvas-info-bar>");
         }
 
-        if (this.target.loaded) {
-            this.#renderShadowDOM();
-        } else {
-            this.target.addEventListener("kicanvas:loaded", () => {
-                this.#renderShadowDOM();
-            });
-            this.target.addEventListener(
-                "kicad-board:item-selected",
-                (e: CustomEvent) => {
-                    this.#onItemSelected(e.target, e.detail);
-                }
-            );
-        }
+        super.connectedCallback();
+
+        this.target.addEventListener(
+            "kicad-board:item-selected",
+            (e: CustomEvent) => {
+                this.#onItemSelected(e.target, e.detail);
+            }
+        );
     }
 
     disconnectedCallback() {
@@ -45,76 +46,33 @@ export class KiCanvasInfoBarElement extends HTMLElement {
     }
 
     #onItemSelected(element, detail) {
-        this.#renderProperties(detail);
+        console.log("Selected", detail);
+        this.#footprint = detail as Footprint;
+        this.update();
     }
 
-    #renderProperties(fp) {
-        console.log(fp);
-        this.shadowRoot.querySelector("ul")?.remove();
+    async render() {
+        if (!this.#footprint) {
+            return html`<ul>
+                <li>Nothing selected</li>
+            </ul>`;
+        }
 
-        const list_elem = document.createElement("ul");
-
-        list_elem.innerHTML = `
-        <li>${fp.properties.reference}</li>
-        <li>${fp.properties.value}</li>
-        <li>${fp.library_link}</li>
-        <li>X: ${fp.at.position.x.toFixed(3)}, Y: ${fp.at.position.y.toFixed(
-            3
-        )}</li>
-        <li>${fp.attr.map((e) => e.replaceAll("_", " ")).join(", ")}</li>
-        <li>${fp.descr ?? ""}</li>
-        `;
-
-        this.shadowRoot.appendChild(list_elem);
-    }
-
-    #renderShadowDOM() {
-        const template = document.createElement("template");
-        template.innerHTML = `
-            <style>
-                *,
-                *::before,
-                *::after {
-                    box-sizing: border-box;
-                }
-
-                * {
-                    margin: 0;
-                }
-
-                :host {
-                    box-sizing: border-box;
-                    margin: 0;
-                    flex-shrink: 0;
-                    background-color: #222;
-                    padding: 0.5rem 0rem;
-                    color: white;
-                    font-family: inherit;
-                }
-
-                ul {
-                    list-style-type: none;
-                    display: flex;
-                    flex-direction: column;
-                    flex-wrap: wrap;
-                    height: 3.4em;
-                    padding: 0.25rem 1rem;
-                    max-width: fit-content;
-                }
-
-                li {
-                    display: block;
-                    margin-right: 2rem;
-                    max-width: 33vw;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            </style>
-            <ul></ul>
-        `;
-
-        const root = this.attachShadow({ mode: "open" });
-        root.appendChild(template.content.cloneNode(true));
+        return html`<ul>
+            <li>${this.#footprint.properties.reference}</li>
+            <li>${this.#footprint.properties.value}</li>
+            <li>${this.#footprint.library_link}</li>
+            <li>
+                X: ${this.#footprint.at.position.x.toFixed(3)}, Y:
+                ${this.#footprint.at.position.y.toFixed(3)}
+            </li>
+            <li>
+                ${this.#footprint.attr
+                    .map((e) => e.replaceAll("_", " "))
+                    .join(", ")}
+            </li>
+            <li>${this.#footprint.descr ?? ""}</li>
+        </ul>`;
     }
 }
 

@@ -68,6 +68,15 @@ export class CustomElement extends HTMLElement {
         return html``;
     }
 
+    async update() {
+        for (const child of this.shadowRoot.children) {
+            if (child.tagName != "STYLE") {
+                child.remove();
+            }
+        }
+        this.shadowRoot.appendChild(await this.render(this.shadowRoot));
+    }
+
     async #renderInitialContent() {
         const static_this = this.constructor as typeof CustomElement;
 

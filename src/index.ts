@@ -6,6 +6,7 @@
 
 import "./elements/kicanvas-board";
 import "./elements/kicanvas-layer-controls";
+import "./elements/kicanvas-info-bar";
 import "./elements/kicanvas-schematic";
 import "./elements/kicanvas-dialog";
 import "./elements/kicanvas-app";
