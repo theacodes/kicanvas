@@ -50,11 +50,15 @@ export class PanAndZoom {
             this.#continue_pan(this.#relative_mouse_pos(e));
         });
 
-        this.target.addEventListener("wheel", (e) => {
-            e.preventDefault();
-            this.#rect = this.target.getBoundingClientRect();
-            this.#handle_zoom(e.deltaY, this.#relative_mouse_pos(e));
-        });
+        this.target.addEventListener(
+            "wheel",
+            (e) => {
+                e.preventDefault();
+                this.#rect = this.target.getBoundingClientRect();
+                this.#handle_zoom(e.deltaY, this.#relative_mouse_pos(e));
+            },
+            { passive: false }
+        );
     }
 
     #relative_mouse_pos(e) {
