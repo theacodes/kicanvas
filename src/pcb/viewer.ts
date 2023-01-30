@@ -24,9 +24,23 @@ export class BoardViewer extends Viewer {
         this.addEventListener("kicanvas:viewer:select", (e: CustomEvent) => {
             const { mouse: _, items } = e.detail;
 
+            this.selected = null;
+
             for (const { layer: _, bbox } of items) {
-                this.selected = bbox;
-                break;
+                if (bbox.context instanceof pcb_items.Footprint) {
+                    this.selected = bbox;
+                    break;
+                }
+            }
+
+            if (this.selected) {
+                canvas.dispatchEvent(
+                    new CustomEvent("kicad-board:item-selected", {
+                        bubbles: true,
+                        composed: true,
+                        detail: this.selected.context,
+                    })
+                );
             }
         });
     }
@@ -63,5 +77,9 @@ export class BoardViewer extends Viewer {
         const edge_cuts = this.layers.by_name(LayerName.edge_cuts);
         const board_bbox = edge_cuts.bbox;
         this.viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
+    }
+
+    override get selection_color() {
+        return theme.board.cursor;
     }
 }

@@ -9,11 +9,11 @@ import * as theme from "../kicad/theme";
 import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
+import { KiCanvasInfoBarElement } from "./kicanvas-info-bar";
 import "./kicanvas-dialog";
 
 class KiCanvasAppElement extends HTMLElement {
     #view_elm: KiCanvasSchematicElement | KiCanvasBoardElement;
-    #controls_elm: KiCanvasLayerControlsElement;
 
     constructor() {
         super();
@@ -29,32 +29,46 @@ class KiCanvasAppElement extends HTMLElement {
     async load(src: File) {
         this.setAttribute("loading", "");
 
-        if (this.#view_elm) {
-            this.#view_elm.remove();
-        }
-        if (this.#controls_elm) {
-            this.#controls_elm.remove();
-        }
+        this.shadowRoot.querySelector("main")?.remove();
+        const main_elm = document.createElement("main");
 
         const extension = src.name.split(".").at(-1);
 
         switch (extension) {
             case "kicad_sch":
-                this.#view_elm = document.createElement(
-                    "kicanvas-schematic"
-                ) as KiCanvasSchematicElement;
-                this.shadowRoot.appendChild(this.#view_elm);
+                main_elm.innerHTML =
+                    "<kicanvas-schematic></kicanvas-schematic>";
+                this.shadowRoot.appendChild(main_elm);
+                this.#view_elm =
+                    this.shadowRoot.querySelector("kicanvas-schematic");
                 break;
+
             case "kicad_pcb":
-                this.#view_elm = document.createElement(
-                    "kicanvas-board"
-                ) as KiCanvasBoardElement;
-                this.shadowRoot.appendChild(this.#view_elm);
-                this.#controls_elm = document.createElement(
-                    "kicanvas-layer-controls"
-                ) as KiCanvasLayerControlsElement;
-                this.#controls_elm.target = this.#view_elm;
-                this.shadowRoot.appendChild(this.#controls_elm);
+                {
+                    main_elm.innerHTML = `
+                <div class="split-horizontal">
+                    <div class="split-vertical">
+                        <kicanvas-board></kicanvas-board>
+                    </div>
+                </div>`;
+
+                    this.shadowRoot.appendChild(main_elm);
+                    this.#view_elm =
+                        this.shadowRoot.querySelector("kicanvas-board");
+
+                    const layer_controls = document.createElement(
+                        "kicanvas-layer-controls"
+                    ) as KiCanvasLayerControlsElement;
+                    layer_controls.target = this
+                        .#view_elm as KiCanvasBoardElement;
+                    this.#view_elm.after(layer_controls);
+
+                    const info_bar = document.createElement(
+                        "kicanvas-info-bar"
+                    ) as KiCanvasInfoBarElement;
+                    info_bar.target = this.#view_elm as KiCanvasBoardElement;
+                    this.#view_elm.parentElement.after(info_bar);
+                }
                 break;
             default:
                 throw new Error(`Unable to display file ${src.name}`);
@@ -112,7 +126,25 @@ class KiCanvasAppElement extends HTMLElement {
                     align-items: center;
                     justify-content: center;
                 }
+
+                .split-horizontal {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    max-height: 100%;
+                    overflow: hidden;
+                }
+
+                .split-vertical {
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    max-width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }
             </style>
+
             <overlay>Drag & drop your kicad schematic or board file here.</overlay>
             <kicanvas-dialog></kicanvas-dialog>
         `;

@@ -44,7 +44,6 @@ export class KiCanvasLayerControlsElement extends HTMLElement {
         const buttons = [];
 
         for (const layer of layers.in_ui_order()) {
-            console.log(layer);
             const visible = layer.visible ? "yes" : "no";
             const css_color = layer.color.to_css();
             buttons.push(`
@@ -95,7 +94,7 @@ export class KiCanvasLayerControlsElement extends HTMLElement {
                 }
 
                 button[visible="no"] {
-                    color: #aaa;
+                    color: #888;
                 }
 
                 button .color {

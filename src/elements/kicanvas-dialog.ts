@@ -13,11 +13,11 @@ export class KiCanvasDialogElement extends HTMLElement {
     async connectedCallback() {
         this.#render();
         $on(window, "kicad-schematic:item-selected", (e) => {
-            this.onItemSelected(e.target, e.detail);
+            this.#onItemSelected(e.target, e.detail);
         });
     }
 
-    onItemSelected(element, detail) {
+    #onItemSelected(element, detail) {
         this.#renderSelectedProperties(detail.properties);
         this.dialog.showModal();
     }

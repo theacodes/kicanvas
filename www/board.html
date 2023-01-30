@@ -8,8 +8,13 @@
 
 <body>
   <div class="kicanvas-container">
-    <kicanvas-board id="demo" src="./examples/starfish.kicad_pcb"></kicanvas-board>
-    <kicanvas-layer-controls for="demo"></kicanvas-layer-controls>
+    <div class="split-horizontal">
+      <div class="split-vertical">
+        <kicanvas-board id="demo" src="./examples/starfish.kicad_pcb"></kicanvas-board>
+        <kicanvas-layer-controls for="demo" class="sidebar"></kicanvas-layer-controls>
+      </div>
+      <kicanvas-info-bar for="demo"></kicanvas-info-bar>
+    </div>
   </div>
   <script type="module" src="./kicanvas/kicanvas.js"></script>
 </body>
