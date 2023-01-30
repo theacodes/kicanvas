@@ -39,17 +39,19 @@ export function html(
     const template = document.createElement(`template`);
     template.innerHTML = out;
 
-    const slots = template.content.querySelectorAll("slot[replace]");
+    const content = document.importNode(template.content, true);
+
+    const slots = content.querySelectorAll("slot[replace]");
     for (let i = 0; i < slots.length; i++) {
         const slot = slots[i];
         const replacement = replacements[i];
         slot.replaceWith(replacement);
     }
 
-    if (template.content.childElementCount == 1) {
-        return template.content.firstElementChild;
+    if (content.childElementCount == 1) {
+        return content.firstElementChild;
     } else {
-        return template.content;
+        return content;
     }
 }
 
