@@ -20,6 +20,7 @@ export async function bundle(options = {}) {
         loader: {
             ".js": "ts",
             ".glsl": "text",
+            ".css": "text",
         },
         plugins: [
             copy({
