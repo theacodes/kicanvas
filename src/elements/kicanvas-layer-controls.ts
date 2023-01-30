@@ -4,10 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { html, CustomElement } from "../framework/elements";
 import { LayerSet } from "../pcb/layers";
 import { KiCanvasBoardElement } from "./kicanvas-board";
+import styles from "./kicanvas-layer-controls.css";
 
-export class KiCanvasLayerControlsElement extends HTMLElement {
+export class KiCanvasLayerControlsElement extends CustomElement {
+    static styles = styles;
+
     target: KiCanvasBoardElement;
 
     constructor() {
@@ -27,10 +31,10 @@ export class KiCanvasLayerControlsElement extends HTMLElement {
         }
 
         if (this.target.loaded) {
-            this.#renderShadowDOM();
+            super.connectedCallback();
         } else {
             this.target.addEventListener("kicanvas:loaded", () => {
-                this.#renderShadowDOM();
+                super.connectedCallback();
             });
         }
     }
@@ -39,85 +43,27 @@ export class KiCanvasLayerControlsElement extends HTMLElement {
         this.target = null;
     }
 
-    #renderShadowDOM() {
+    override async render() {
         const layers = this.target.viewer.layers as LayerSet;
         const buttons = [];
 
         for (const layer of layers.in_ui_order()) {
             const visible = layer.visible ? "yes" : "no";
             const css_color = layer.color.to_css();
-            buttons.push(`
+            buttons.push(html`
                 <button type="button" name="${layer.name}" visible="${visible}">
                     <span class="color" style="background-color: ${css_color};"></span>
                     <span class="name">${layer.name}</name>
                 </button>`);
         }
 
-        const template = document.createElement("template");
-        template.innerHTML = `
-            <style>
-                *,
-                *::before,
-                *::after {
-                    box-sizing: border-box;
-                }
+        const content = html`${buttons}`;
 
-                * {
-                    margin: 0;
-                }
-
-                :host {
-                    box-sizing: border-box;
-                    margin: 0;
-                    flex-shrink: 1;
-                    display: flex;
-                    flex-direction: column;
-                    background-color: #222;
-                    padding: 0.5rem 0rem;
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                }
-
-                button {
-                    color: white;
-                    background: transparent;
-                    padding: 0.5rem 1rem;
-                    text-align: left;
-                    border: 0 none;
-                    display: flex;
-                    flex-direction: row;
-                    width: 100%;
-                }
-
-                button:hover {
-                    background-color: #333;
-                }
-
-                button[visible="no"] {
-                    color: #888;
-                }
-
-                button .color {
-                    flex-shrink: 0;
-                    display: block;
-                    width: 1rem;
-                    height: 1rem;
-                    margin-right: 0.5rem;
-                }
-
-                button .span {
-                    display: block;
-                    flex-shrink: 0;
-                }
-            </style>
-            ${buttons.join("\n")}
-        `;
-
-        const root = this.attachShadow({ mode: "open" });
-        root.appendChild(template.content.cloneNode(true));
-        root.addEventListener("click", (e) => {
+        this.shadowRoot.addEventListener("click", (e) => {
             this.#onClick(e);
         });
+
+        return content;
     }
 
     #onClick(e) {

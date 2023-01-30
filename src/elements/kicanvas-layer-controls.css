@@ -1,0 +1,53 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+}
+
+:host {
+    box-sizing: border-box;
+    margin: 0;
+    flex-shrink: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #222;
+    padding: 0.5rem 0rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+button {
+    color: white;
+    background: transparent;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    border: 0 none;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #333;
+}
+
+button[visible="no"] {
+    color: #888;
+}
+
+button .color {
+    flex-shrink: 0;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+button .span {
+    display: block;
+    flex-shrink: 0;
+}
