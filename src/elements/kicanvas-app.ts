@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2022 Alethea Katherine Flowers.
+    Copyright (c) 2023 Alethea Katherine Flowers.
     Published under the standard MIT License.
     Full text available at: https://opensource.org/licenses/MIT
 */
@@ -8,9 +8,11 @@ import { DropTarget } from "../framework/drag-drop";
 import * as theme from "../kicad/theme";
 import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 import { KiCanvasBoardElement } from "./kicanvas-board";
+import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
 
 class KiCanvasAppElement extends HTMLElement {
     #view_elm: KiCanvasSchematicElement | KiCanvasBoardElement;
+    #controls_elm: KiCanvasLayerControlsElement;
 
     constructor() {
         super();
@@ -29,24 +31,33 @@ class KiCanvasAppElement extends HTMLElement {
         if (this.#view_elm) {
             this.#view_elm.remove();
         }
+        if (this.#controls_elm) {
+            this.#controls_elm.remove();
+        }
 
         const extension = src.name.split(".").at(-1);
-        let element_name;
 
         switch (extension) {
             case "kicad_sch":
-                element_name = "kicanvas-schematic";
+                this.#view_elm = document.createElement(
+                    "kicanvas-schematic"
+                ) as KiCanvasSchematicElement;
+                this.shadowRoot.appendChild(this.#view_elm);
                 break;
             case "kicad_pcb":
-                element_name = "kicanvas-board";
+                this.#view_elm = document.createElement(
+                    "kicanvas-board"
+                ) as KiCanvasBoardElement;
+                this.shadowRoot.appendChild(this.#view_elm);
+                this.#controls_elm = document.createElement(
+                    "kicanvas-layer-controls"
+                ) as KiCanvasLayerControlsElement;
+                this.#controls_elm.target = this.#view_elm;
+                this.shadowRoot.appendChild(this.#controls_elm);
                 break;
             default:
                 throw new Error(`Unable to display file ${src.name}`);
         }
-
-        this.#view_elm = document.createElement(element_name);
-
-        this.shadowRoot.appendChild(this.#view_elm);
 
         await this.#view_elm.load(src);
 
@@ -58,8 +69,20 @@ class KiCanvasAppElement extends HTMLElement {
         const template = document.createElement("template");
         template.innerHTML = `
             <style>
+                *,
+                *::before,
+                *::after {
+                    box-sizing: border-box;
+                }
+
+                * {
+                    margin: 0;
+                }
+
                 :host {
-                    display: block;
+                    box-sizing: border-box;
+                    margin: 0;
+                    display: flex;
                     position: relative;
                     width: 100%;
                     height: 100%;
@@ -72,8 +95,9 @@ class KiCanvasAppElement extends HTMLElement {
                 }
 
                 kicanvas-schematic, kicanvas-board {
-                    width: 100%;
+                    width: auto;
                     height: 100%;
+                    flex: 1;
                 }
 
                 overlay {

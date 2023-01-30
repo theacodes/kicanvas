@@ -60,6 +60,7 @@ export class KiCanvasBoardElement extends HTMLElement {
             <style>
                 :host {
                     display: block;
+                    touch-action: none;
                 }
 
                 canvas {

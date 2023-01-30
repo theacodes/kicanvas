@@ -41,15 +41,6 @@ kicanvas-schematic {
     width: 100%;
 }
 
-kicanvas-layer-controls {
-    flex-shrink: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: #222;
-    padding: 0.5rem 0rem;
-    overflow-y: scroll;
-}
-
 kicanvas-dialog dialog {
     font-size: 1.2rem;
     margin: auto;
