@@ -7,6 +7,7 @@
         /* Modules */
         "module": "es2022", /* Specify what module code is generated. */
         "isolatedModules": true,
+        "allowImportingTsExtensions": true,
         /* JavaScript Support */
         "allowJs": true, /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
         "checkJs": true, /* Enable error reporting in type-checked JavaScript files. */

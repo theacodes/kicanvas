@@ -20,4 +20,5 @@
     ],
     "debug.console.closeOnEnd": true,
     "debug.terminal.clearBeforeReusing": true,
+    "typescript.tsdk": "node_modules/typescript/lib",
 }
