@@ -110,12 +110,12 @@ class CirclePainter extends ItemPainter {
             radius,
             new Angle(0),
             new Angle(2 * Math.PI),
-            c.width
+            c.width,
         );
 
         if (c.fill) {
             this.gfx.circle(
-                new Circle(arc.center, arc.radius + (c.width ?? 0), color)
+                new Circle(arc.center, arc.radius + (c.width ?? 0), color),
             );
         } else {
             const points = arc.to_polyline();
@@ -189,7 +189,7 @@ class ZonePainter extends ItemPainter {
                 layer.color.r,
                 layer.color.g,
                 layer.color.b,
-                layer.color.a * 0.5
+                layer.color.a * 0.5,
             );
             this.gfx.polygon(new Polygon(p.pts, color));
         }
@@ -221,7 +221,8 @@ class PadPainter extends ItemPainter {
         switch (pad.type) {
             case "thru_hole":
                 layers.push(LayerName.pad_holewalls);
-            // falls through
+                layers.push(LayerName.pad_holes);
+                break;
             case "np_thru_hole":
                 layers.push(LayerName.pad_holes);
                 break;
@@ -240,7 +241,7 @@ class PadPainter extends ItemPainter {
 
         const position_mat = Matrix3.translation(
             pad.at.position.x,
-            pad.at.position.y
+            pad.at.position.y,
         );
         position_mat.rotate_self(-Angle.deg_to_rad(pad.parent.at.rotation));
         position_mat.rotate_self(Angle.deg_to_rad(pad.at.rotation));
@@ -254,23 +255,23 @@ class PadPainter extends ItemPainter {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 this.gfx.circle(
-                    new Circle(drill_pos, pad.drill.diameter / 2, color)
+                    new Circle(drill_pos, pad.drill.diameter / 2, color),
                 );
             } else {
                 const half_size = new Vec2(
                     pad.drill.diameter / 2,
-                    (pad.drill.width ?? 0) / 2
+                    (pad.drill.width ?? 0) / 2,
                 );
 
                 const half_width = Math.min(half_size.x, half_size.y);
 
                 let half_len = new Vec2(
                     half_size.x - half_width,
-                    half_size.y - half_width
+                    half_size.y - half_width,
                 );
 
                 half_len = Matrix3.rotation(
-                    Angle.deg_to_rad(pad.at.rotation)
+                    Angle.deg_to_rad(pad.at.rotation),
                 ).transform(half_len);
 
                 const drill_pos = center.add(pad.drill.offset);
@@ -281,8 +282,8 @@ class PadPainter extends ItemPainter {
                     new Polyline(
                         [drill_start, drill_end],
                         half_width * 2,
-                        color
-                    )
+                        color,
+                    ),
                 );
             }
         } else {
@@ -318,7 +319,7 @@ class PadPainter extends ItemPainter {
                             (pad.roundrect_rratio ?? 0);
                         let half_size = new Vec2(
                             pad.size.x / 2,
-                            pad.size.y / 2
+                            pad.size.y / 2,
                         );
                         half_size = half_size.sub(new Vec2(rounding, rounding));
 
@@ -330,19 +331,19 @@ class PadPainter extends ItemPainter {
                         const rect_points = [
                             new Vec2(
                                 -half_size.x - trap_delta.y,
-                                half_size.y + trap_delta.x
+                                half_size.y + trap_delta.x,
                             ),
                             new Vec2(
                                 half_size.x + trap_delta.y,
-                                half_size.y - trap_delta.x
+                                half_size.y - trap_delta.x,
                             ),
                             new Vec2(
                                 half_size.x - trap_delta.y,
-                                -half_size.y + trap_delta.x
+                                -half_size.y + trap_delta.x,
                             ),
                             new Vec2(
                                 -half_size.x + trap_delta.y,
-                                -half_size.y - trap_delta.x
+                                -half_size.y - trap_delta.x,
                             ),
                         ];
 
@@ -352,8 +353,8 @@ class PadPainter extends ItemPainter {
                             new Polyline(
                                 [...rect_points, rect_points[0]],
                                 rounding * 2,
-                                color
-                            )
+                                color,
+                            ),
                         );
                         // this.gfx.pop_transform();
                     }
@@ -363,35 +364,35 @@ class PadPainter extends ItemPainter {
                     {
                         const half_size = new Vec2(
                             pad.size.x / 2,
-                            pad.size.y / 2
+                            pad.size.y / 2,
                         );
                         const half_width = Math.min(half_size.x, half_size.y);
                         let half_len = new Vec2(
                             half_size.x - half_width,
-                            half_size.y - half_width
+                            half_size.y - half_width,
                         );
 
                         half_len = Matrix3.rotation(
-                            Angle.deg_to_rad(pad.at.rotation)
+                            Angle.deg_to_rad(pad.at.rotation),
                         ).transform(half_len);
 
                         const pad_pos = center.add(
-                            pad.drill?.offset || new Vec2(0, 0)
+                            pad.drill?.offset || new Vec2(0, 0),
                         );
                         const pad_start = pad_pos.sub(half_len);
                         const pad_end = pad_pos.add(half_len);
 
                         if (pad_start.equals(pad_end)) {
                             this.gfx.circle(
-                                new Circle(pad_pos, half_width, color)
+                                new Circle(pad_pos, half_width, color),
                             );
                         } else {
                             this.gfx.line(
                                 new Polyline(
                                     [pad_start, pad_end],
                                     half_width * 2,
-                                    color
-                                )
+                                    color,
+                                ),
                             );
                         }
                     }
@@ -447,8 +448,8 @@ class TextPainter extends ItemPainter {
                 t.effects.italic,
                 "center",
                 t.effects.h_align,
-                t.effects.mirror
-            )
+                t.effects.mirror,
+            ),
         );
 
         for (const stroke of shaped.strokes()) {
@@ -456,8 +457,8 @@ class TextPainter extends ItemPainter {
                 new Polyline(
                     Array.from(stroke),
                     t.effects.thickness ?? 0.127,
-                    layer.color
-                )
+                    layer.color,
+                ),
             );
         }
     }
@@ -490,7 +491,7 @@ class FootprintPainter extends ItemPainter {
     paint(layer: ViewLayer, fp: pcb_items.Footprint) {
         const matrix = Matrix3.translation(
             fp.at.position.x,
-            fp.at.position.y
+            fp.at.position.y,
         ).rotate_self(Angle.deg_to_rad(fp.at.rotation));
 
         this.gfx.state.push();
