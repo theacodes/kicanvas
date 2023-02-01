@@ -1,4 +1,4 @@
-import { type List } from "./tokenizer.ts";
+import { listify, type List } from "./tokenizer.ts";
 import { Vec2 } from "../math/vec2.ts";
 
 enum Kind {
@@ -69,7 +69,7 @@ export const T = {
     },
     object(...defs: PropertyDefinition[]): TypeProcessor {
         return (obj: Obj, name: string, e: Expr) => {
-            return parse_expr(e, P.start(name), ...defs);
+            return parse_expr(e as List, P.start(name), ...defs);
         };
     },
     vec2(obj: Obj, name: string, e: Expr): Vec2 {
@@ -241,7 +241,16 @@ export const P = {
     },
 };
 
-export function parse_expr(expr, ...defs) {
+export type Parseable = string | List;
+
+export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
+    if (typeof expr == "string") {
+        expr = listify(expr);
+        if (expr.length == 1 && Array.isArray(expr[0])) {
+            expr = expr[0];
+        }
+    }
+
     const defs_map = new Map();
 
     let start_def;

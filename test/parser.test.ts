@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { listify } from "../src/kicad/tokenizer";
+import { List, listify } from "../src/kicad/tokenizer";
 import { T, P, parse_expr } from "../src/kicad/newparser";
 import { Vec2 } from "../src/math/vec2";
 
@@ -229,7 +229,7 @@ suite("Parser", function () {
         const expr = listify(src);
 
         const res = parse_expr(
-            expr[0],
+            expr[0] as List,
             P.start("example"),
             P.positional("text", T.string),
             P.positional("size", T.number),
