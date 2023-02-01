@@ -29,5 +29,6 @@ module.exports = {
                 varsIgnorePattern: "([Ii]gnored)|([Uu]nused)|(_)",
             },
         ],
+        "mocha/max-top-level-suites": "off",
     },
 };
