@@ -10,7 +10,7 @@ import { KiCanvasBoardElement } from "./kicanvas-board";
 import styles from "./kicanvas-layer-controls.css";
 
 export class KiCanvasLayerControlsElement extends CustomElement {
-    static styles = styles;
+    static override styles = styles;
 
     target: KiCanvasBoardElement;
 
@@ -18,11 +18,11 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         super();
     }
 
-    async connectedCallback() {
+    override async connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
             this.target = document.getElementById(
-                target_id
+                target_id,
             ) as KiCanvasBoardElement;
         }
 
@@ -73,7 +73,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         }
 
         const layer = this.target.viewer.layers.by_name(
-            button.getAttribute("name")
+            button.getAttribute("name"),
         );
         layer.visible = !layer.visible;
         button.setAttribute("visible", layer.visible ? "yes" : "no");
@@ -83,5 +83,5 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
 window.customElements.define(
     "kicanvas-layer-controls",
-    KiCanvasLayerControlsElement
+    KiCanvasLayerControlsElement,
 );

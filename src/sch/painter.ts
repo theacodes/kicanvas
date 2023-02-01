@@ -21,7 +21,7 @@ import { ItemPainter, DocumentPainter } from "../framework/painter";
 function color_maybe(
     color: Color,
     fallback_color: Color,
-    fail_color: Color = new Color(1, 0, 0, 1)
+    fail_color: Color = new Color(1, 0, 0, 1),
 ) {
     if (!color.is_transparent) {
         return color;
@@ -43,7 +43,7 @@ class RectanglePainter extends ItemPainter {
         const color = color_maybe(
             r.stroke.color,
             this.gfx.state.stroke,
-            this.gfx.theme.note as Color
+            this.gfx.theme.note as Color,
         );
 
         const pts = [
@@ -62,8 +62,8 @@ class RectanglePainter extends ItemPainter {
             new Polyline(
                 pts,
                 r.stroke.width || this.gfx.state.stroke_width,
-                color
-            )
+                color,
+            ),
         );
     }
 }
@@ -79,15 +79,15 @@ class PolylinePainter extends ItemPainter {
         const color = color_maybe(
             pl.stroke.color,
             this.gfx.state.stroke,
-            this.gfx.theme.note as Color
+            this.gfx.theme.note as Color,
         );
 
         this.gfx.line(
             new Polyline(
                 pl.pts,
                 pl.stroke.width || this.gfx.state.stroke_width,
-                color
-            )
+                color,
+            ),
         );
 
         if (pl.fill !== "none") {
@@ -108,8 +108,8 @@ class WirePainter extends ItemPainter {
             new Polyline(
                 w.pts,
                 this.gfx.state.stroke_width,
-                this.gfx.theme.wire as Color
-            )
+                this.gfx.theme.wire as Color,
+            ),
         );
     }
 }
@@ -131,8 +131,8 @@ class CirclePainter extends ItemPainter {
                 new Angle(0),
                 new Angle(Math.PI * 2),
                 c.stroke.width || this.gfx.state.stroke_width,
-                color
-            )
+                color,
+            ),
         );
 
         if (c.fill != "none") {
@@ -155,7 +155,7 @@ class ArcPainter extends ItemPainter {
             a.start,
             a.mid,
             a.end,
-            a.stroke.width
+            a.stroke.width,
         );
 
         this.gfx.arc(
@@ -165,8 +165,8 @@ class ArcPainter extends ItemPainter {
                 arc.start_angle,
                 arc.end_angle,
                 a.stroke.width || this.gfx.state.stroke_width,
-                color
-            )
+                color,
+            ),
         );
     }
 }
@@ -181,7 +181,7 @@ class JunctionPainter extends ItemPainter {
     paint(layer: ViewLayer, j: sch_items.Junction) {
         const color = this.gfx.theme.junction as Color;
         this.gfx.circle(
-            new Circle(j.at.position, (j.diameter || 1) / 2, color)
+            new Circle(j.at.position, (j.diameter || 1) / 2, color),
         );
     }
 }
@@ -201,23 +201,23 @@ class NoConnectPainter extends ItemPainter {
         this.gfx.state.push();
         this.gfx.state.matrix.translate_self(
             nc.at.position.x,
-            nc.at.position.y
+            nc.at.position.y,
         );
 
         this.gfx.line(
             new Polyline(
                 [new Vec2(-size, -size), new Vec2(size, size)],
                 width,
-                color
-            )
+                color,
+            ),
         );
 
         this.gfx.line(
             new Polyline(
                 [new Vec2(size, -size), new Vec2(-size, size)],
                 width,
-                color
-            )
+                color,
+            ),
         );
 
         this.gfx.state.pop();
@@ -258,7 +258,7 @@ class TextPainter extends ItemPainter {
             t.effects.italic,
             t.effects.v_align,
             t.effects.h_align,
-            t.effects.mirror
+            t.effects.mirror,
         );
 
         pos.y -=
@@ -268,7 +268,7 @@ class TextPainter extends ItemPainter {
             t.text,
             pos,
             rotation,
-            options
+            options,
         );
 
         for (const line of shaped.to_polylines(this.gfx.state.stroke)) {
@@ -288,7 +288,7 @@ class LabelPainter extends ItemPainter {
         item:
             | sch_items.Label
             | sch_items.HierarchicalLabel
-            | sch_items.GlobalLabel
+            | sch_items.GlobalLabel,
     ) {
         return [LayerName.label];
     }
@@ -302,7 +302,7 @@ class LabelPainter extends ItemPainter {
             | sch_items.Label
             | sch_items.HierarchicalLabel
             | sch_items.GlobalLabel,
-        options: TextOptions
+        options: TextOptions,
     ) {
         return (
             l.effects.size.y * LabelPainter.text_offset_ratio +
@@ -315,7 +315,7 @@ class LabelPainter extends ItemPainter {
             | sch_items.Label
             | sch_items.HierarchicalLabel
             | sch_items.GlobalLabel,
-        options: TextOptions
+        options: TextOptions,
     ) {
         const offset = new Vec2(0, 0);
         const offset_dist = this.get_text_baseline_offset_dist(l, options);
@@ -351,7 +351,7 @@ class LabelPainter extends ItemPainter {
             l.effects.italic,
             l.effects.v_align,
             l.effects.h_align,
-            l.effects.mirror
+            l.effects.mirror,
         );
 
         const pos_offset = this.get_text_offset(l, options);
@@ -361,7 +361,7 @@ class LabelPainter extends ItemPainter {
             l.name,
             pos,
             rotation,
-            options
+            options,
         );
 
         for (const line of shaped.to_polylines(color)) {
@@ -377,7 +377,7 @@ class LabelPainter extends ItemPainter {
             | sch_items.Label
             | sch_items.GlobalLabel
             | sch_items.HierarchicalLabel,
-        shaped: ShapedParagraph
+        shaped: ShapedParagraph,
     ) {}
 
     paint_debug(
@@ -385,10 +385,10 @@ class LabelPainter extends ItemPainter {
             | sch_items.Label
             | sch_items.GlobalLabel
             | sch_items.HierarchicalLabel,
-        shaped: ShapedParagraph
+        shaped: ShapedParagraph,
     ) {
         this.gfx.circle(
-            new Circle(l.at.position, 0.2, new Color(1, 0.2, 0.2, 1))
+            new Circle(l.at.position, 0.2, new Color(1, 0.2, 0.2, 1)),
         );
         const bb = shaped.bbox;
         this.gfx.line(
@@ -401,8 +401,8 @@ class LabelPainter extends ItemPainter {
                     bb.top_left,
                 ],
                 0.1,
-                new Color(1, 0.2, 0.2, 0.2)
-            )
+                new Color(1, 0.2, 0.2, 0.2),
+            ),
         );
     }
 }
@@ -413,13 +413,13 @@ class GlobalLabelPainter extends LabelPainter {
     static baseline_offset_ratio = 0.0715;
     static triangle_offset_ratio = 0.75;
 
-    classes = [sch_items.GlobalLabel];
+    override classes = [sch_items.GlobalLabel];
 
-    get color() {
+    override get color() {
         return this.gfx.theme.label_global as Color;
     }
 
-    get_text_offset(l: sch_items.GlobalLabel, options: TextOptions) {
+    override get_text_offset(l: sch_items.GlobalLabel, options: TextOptions) {
         let horz = LabelPainter.label_size_ratio * options.size.y;
         const vert = options.size.y * GlobalLabelPainter.baseline_offset_ratio;
 
@@ -429,19 +429,19 @@ class GlobalLabelPainter extends LabelPainter {
         }
 
         const offset = new Vec2(horz, vert).rotate(
-            Angle.from_degrees(l.at.rotation)
+            Angle.from_degrees(l.at.rotation),
         );
 
         return offset;
     }
 
-    paint_shape(l: sch_items.GlobalLabel, shaped: ShapedParagraph) {
+    override paint_shape(l: sch_items.GlobalLabel, shaped: ShapedParagraph) {
         const color = this.color;
         const margin =
             shaped.options.size.y * GlobalLabelPainter.label_size_ratio;
         const half_size = shaped.options.size.y / 2 + margin;
         const thickness = shaped.options.get_effective_thickness(
-            GlobalLabelPainter.default_thickness
+            GlobalLabelPainter.default_thickness,
         );
 
         let length =
@@ -467,7 +467,7 @@ class GlobalLabelPainter extends LabelPainter {
                 new Vec2(0, 0),
             ],
             thickness,
-            color
+            color,
         );
 
         let x_offset = 0;
@@ -507,26 +507,29 @@ class GlobalLabelPainter extends LabelPainter {
 }
 
 class HierarchicalLabelPainter extends LabelPainter {
-    classes = [sch_items.HierarchicalLabel];
+    override classes = [sch_items.HierarchicalLabel];
 
-    get color() {
+    override get color() {
         return this.gfx.theme.label_hier as Color;
     }
 
-    get_text_offset(
+    override get_text_offset(
         l: sch_items.HierarchicalLabel,
-        options: TextOptions
+        options: TextOptions,
     ): Vec2 {
         const offset_dist = this.get_text_baseline_offset_dist(l, options);
         const offset = new Vec2(offset_dist + l.effects.size.x, 0);
         return offset.rotate(Angle.from_degrees(l.at.rotation));
     }
 
-    paint_shape(l: sch_items.HierarchicalLabel, shaped: ShapedParagraph): void {
+    override paint_shape(
+        l: sch_items.HierarchicalLabel,
+        shaped: ShapedParagraph,
+    ): void {
         const s = l.effects.size.y;
         const color = this.color;
         const thickness = shaped.options.get_effective_thickness(
-            HierarchicalLabelPainter.default_thickness
+            HierarchicalLabelPainter.default_thickness,
         );
 
         this.gfx.state.push();
@@ -654,7 +657,7 @@ class PinPainter extends ItemPainter {
         label_offset: number,
         thickness: number,
         pin_length: number,
-        rotation: Angle
+        rotation: Angle,
     ) {
         const offset = new Vec2(label_offset - thickness / 2 + pin_length, 0);
         const placement = this.orient_label(offset, rotation, "left");
@@ -666,11 +669,11 @@ class PinPainter extends ItemPainter {
         pin_thickness: number,
         text_thickness: number,
         pin_length: number,
-        rotation: Angle
+        rotation: Angle,
     ) {
         const offset = new Vec2(
             pin_length / 2,
-            -(text_margin + pin_thickness / 2 + text_thickness / 2)
+            -(text_margin + pin_thickness / 2 + text_thickness / 2),
         );
         const placement = this.orient_label(offset, rotation, "center");
         return { v_align: "bottom", ...placement };
@@ -681,11 +684,11 @@ class PinPainter extends ItemPainter {
         pin_thickness: number,
         text_thickness: number,
         pin_length: number,
-        rotation: Angle
+        rotation: Angle,
     ) {
         const offset = new Vec2(
             pin_length / 2,
-            text_margin + pin_thickness / 2 + text_thickness / 2
+            text_margin + pin_thickness / 2 + text_thickness / 2,
         );
         const placement = this.orient_label(offset, rotation, "center");
         return { v_align: "top", ...placement };
@@ -694,7 +697,7 @@ class PinPainter extends ItemPainter {
     paint_name_and_number(
         local_matrix: Matrix3,
         parent: sch_items.SymbolInstance,
-        p: sch_items.PinDefinition
+        p: sch_items.PinDefinition,
     ) {
         if (p.hide) {
             return;
@@ -727,7 +730,7 @@ class PinPainter extends ItemPainter {
                 label_offset,
                 name_thickness,
                 pin_length,
-                abs_rotation
+                abs_rotation,
             );
 
             num_placement = this.place_above(
@@ -735,7 +738,7 @@ class PinPainter extends ItemPainter {
                 line_thickness,
                 num_thickness,
                 pin_length,
-                abs_rotation
+                abs_rotation,
             );
         } else {
             name_placement = this.place_above(
@@ -743,7 +746,7 @@ class PinPainter extends ItemPainter {
                 line_thickness,
                 name_thickness,
                 pin_length,
-                abs_rotation
+                abs_rotation,
             );
 
             num_placement = this.place_below(
@@ -751,7 +754,7 @@ class PinPainter extends ItemPainter {
                 line_thickness,
                 num_thickness,
                 pin_length,
-                abs_rotation
+                abs_rotation,
             );
         }
 
@@ -769,7 +772,7 @@ class PinPainter extends ItemPainter {
                 num_placement.h_align,
                 num_placement.v_align,
                 abs_rotation,
-                this.gfx.theme.pin_number as Color
+                this.gfx.theme.pin_number as Color,
             );
         }
 
@@ -781,7 +784,7 @@ class PinPainter extends ItemPainter {
                 name_placement.h_align,
                 name_placement.v_align,
                 abs_rotation,
-                this.gfx.theme.pin_name as Color
+                this.gfx.theme.pin_name as Color,
             );
         }
 
@@ -795,7 +798,7 @@ class PinPainter extends ItemPainter {
         h_align,
         v_align,
         rotation: Angle,
-        color: Color
+        color: Color,
     ) {
         const options = new TextOptions(
             this.gfx.text_shaper.default_font,
@@ -804,7 +807,7 @@ class PinPainter extends ItemPainter {
             false,
             false,
             v_align,
-            h_align
+            h_align,
         );
 
         if (rotation.degrees == 180) {
@@ -817,7 +820,7 @@ class PinPainter extends ItemPainter {
             text,
             pos,
             rotation,
-            options
+            options,
         );
 
         for (const line of shaped.to_polylines(color)) {
@@ -838,8 +841,8 @@ class PinPainter extends ItemPainter {
                 new Angle(0),
                 new Angle(Math.PI * 2),
                 this.gfx.state.stroke_width / 2,
-                this.gfx.theme.pin as Color
-            )
+                this.gfx.theme.pin as Color,
+            ),
         );
 
         // Connecting line
@@ -847,8 +850,8 @@ class PinPainter extends ItemPainter {
             new Polyline(
                 [new Vec2(0, 0), new Vec2(p.length, 0)],
                 this.gfx.state.stroke_width,
-                this.gfx.theme.pin as Color
-            )
+                this.gfx.theme.pin as Color,
+            ),
         );
     }
 }
@@ -944,7 +947,7 @@ class PropertyPainter extends ItemPainter {
             p.effects.italic,
             p.effects.v_align,
             p.effects.h_align,
-            p.effects.mirror
+            p.effects.mirror,
         );
 
         // Prepare a transformation based on the parent's location,
@@ -954,7 +957,7 @@ class PropertyPainter extends ItemPainter {
         parent_matrix.translate_self(p.at.position.x, p.at.position.y);
         parent_matrix.scale_self(
             parent.mirror == "y" ? -1 : 1,
-            parent.mirror == "x" ? -1 : 1
+            parent.mirror == "x" ? -1 : 1,
         );
 
         // Figure out the total rotation of this text including the
@@ -969,7 +972,7 @@ class PropertyPainter extends ItemPainter {
             p.value,
             new Vec2(0, 0),
             orient,
-            text_options
+            text_options,
         ).bbox;
 
         bbox = bbox.transform(parent_matrix).grow(0.512);
@@ -995,7 +998,7 @@ class PropertyPainter extends ItemPainter {
             p.value,
             bbox_center,
             orient,
-            text_options
+            text_options,
         );
 
         if (layer.name == LayerName.interactive) {

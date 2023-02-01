@@ -35,7 +35,7 @@ export class WebGL2Renderer extends Renderer {
     /**
      * Create and configure the WebGL2 context.
      */
-    async setup() {
+    override async setup() {
         await super.setup();
 
         // just in case the browser still gives us a backbuffer with alpha,
@@ -106,7 +106,7 @@ export class WebGL2Renderer extends Renderer {
             this,
             name,
             depth,
-            new PrimitiveSet(this.gl)
+            new PrimitiveSet(this.gl),
         );
     }
 
@@ -120,7 +120,7 @@ export class WebGL2Renderer extends Renderer {
         return this.#layers.at(-1);
     }
 
-    circle(circle: Circle) {
+    override circle(circle: Circle) {
         super.circle(circle);
 
         if (!circle.color) {
@@ -130,7 +130,7 @@ export class WebGL2Renderer extends Renderer {
         this.#active_layer.geometry.add_circle(circle);
     }
 
-    line(line: Polyline) {
+    override line(line: Polyline) {
         super.line(line);
 
         if (!line.color) {
@@ -140,7 +140,7 @@ export class WebGL2Renderer extends Renderer {
         this.#active_layer.geometry.add_line(line);
     }
 
-    polygon(polygon: Polygon) {
+    override polygon(polygon: Polygon) {
         super.polygon(polygon);
 
         if (!polygon.color) {
@@ -164,10 +164,10 @@ export class WebGL2Renderer extends Renderer {
 
 class WebGL2RenderLayer extends RenderLayer {
     constructor(
-        public readonly renderer: WebGL2Renderer,
-        public readonly name: string,
-        public readonly depth: number,
-        public geometry: PrimitiveSet
+        public override readonly renderer: WebGL2Renderer,
+        public override readonly name: string,
+        public override readonly depth: number,
+        public geometry: PrimitiveSet,
     ) {
         super(renderer, name, depth);
     }

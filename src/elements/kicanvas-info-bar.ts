@@ -10,7 +10,7 @@ import { KiCanvasBoardElement } from "./kicanvas-board";
 import styles from "./kicanvas-info-bar.css";
 
 export class KiCanvasInfoBarElement extends CustomElement {
-    static styles = styles;
+    static override styles = styles;
 
     #footprint: Footprint;
     target: KiCanvasBoardElement;
@@ -19,7 +19,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
         super();
     }
 
-    async connectedCallback() {
+    override async connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
             this.target = document.getElementById(
@@ -51,7 +51,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
         this.update();
     }
 
-    async render() {
+    override async render() {
         if (!this.#footprint) {
             return html`<ul>
                 <li>Nothing selected</li>

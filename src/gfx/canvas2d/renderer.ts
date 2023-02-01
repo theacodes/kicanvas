@@ -28,7 +28,7 @@ export class Canvas2DRenderer extends Renderer {
     #active_layer: Canvas2dRenderLayer = null;
 
     /** State */
-    state: RenderStateStack = new RenderStateStack();
+    override state: RenderStateStack = new RenderStateStack();
 
     ctx2d: CanvasRenderingContext2D;
 
@@ -42,7 +42,7 @@ export class Canvas2DRenderer extends Renderer {
     /**
      * Create and configure the 2D Canvas context.
      */
-    async setup() {
+    override async setup() {
         await super.setup();
 
         // just in case the browser still gives us a backbuffer with alpha,
@@ -97,7 +97,7 @@ export class Canvas2DRenderer extends Renderer {
         return this.#layers.at(-1);
     }
 
-    circle(circle: Circle) {
+    override circle(circle: Circle) {
         super.circle(circle);
 
         if (!circle.color) {
@@ -112,13 +112,13 @@ export class Canvas2DRenderer extends Renderer {
             circle.center.y,
             circle.radius,
             0,
-            Math.PI * 2
+            Math.PI * 2,
         );
 
         this.#active_layer.commands.push(new DrawCommand(path, color, null, 0));
     }
 
-    line(line: Polyline) {
+    override line(line: Polyline) {
         super.line(line);
 
         if (!line.color) {
@@ -140,11 +140,11 @@ export class Canvas2DRenderer extends Renderer {
         }
 
         this.#active_layer.commands.push(
-            new DrawCommand(path, null, color, line.width)
+            new DrawCommand(path, null, color, line.width),
         );
     }
 
-    polygon(polygon: Polygon) {
+    override polygon(polygon: Polygon) {
         super.polygon(polygon);
 
         if (!polygon.color) {
@@ -188,7 +188,7 @@ class DrawCommand {
         public path: Path2D,
         public fill: string | null,
         public stroke: string | null,
-        public stroke_width: number
+        public stroke_width: number,
     ) {}
 
     render(ctx: CanvasRenderingContext2D) {
@@ -206,10 +206,10 @@ class DrawCommand {
 
 class Canvas2dRenderLayer extends RenderLayer {
     constructor(
-        public readonly renderer: Renderer,
-        public readonly name: string,
-        public readonly depth: number = 0,
-        public commands: DrawCommand[] = []
+        public override readonly renderer: Renderer,
+        public override readonly name: string,
+        public override readonly depth: number = 0,
+        public commands: DrawCommand[] = [],
     ) {
         super(renderer, name, depth);
     }
@@ -226,7 +226,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         path: Path2D,
         fill: string | null,
         stroke: string | null,
-        stroke_width: number
+        stroke_width: number,
     ) {
         const last_command = this.commands.at(-1);
 
@@ -240,7 +240,7 @@ class Canvas2dRenderLayer extends RenderLayer {
             last_command.path_count++;
         } else {
             this.commands.push(
-                new DrawCommand(path, fill, stroke, stroke_width)
+                new DrawCommand(path, fill, stroke, stroke_width),
             );
         }
     }
@@ -250,7 +250,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         ctx.save();
 
         const accumulated_transform = Matrix3.from_DOMMatrix(
-            ctx.getTransform()
+            ctx.getTransform(),
         );
         accumulated_transform.multiply_self(transform);
         ctx.setTransform(accumulated_transform.to_DOMMatrix());

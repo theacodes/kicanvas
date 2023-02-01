@@ -14,13 +14,13 @@ import { CustomElement, html } from "../framework/elements";
 import styles from "./kicanvas-app.css";
 
 class KiCanvasAppElement extends CustomElement {
-    static styles = styles;
+    static override styles = styles;
 
     constructor() {
         super();
     }
 
-    async connectedCallback() {
+    override async connectedCallback() {
         super.connectedCallback();
 
         new DropTarget(this, ["kicad_sch", "kicad_pcb"], (files) => {
@@ -80,7 +80,7 @@ class KiCanvasAppElement extends CustomElement {
         this.removeAttribute("loading");
     }
 
-    async render() {
+    override async render() {
         this.style.backgroundColor = theme.schematic.background.to_css();
         this.style.color = theme.schematic.note.to_css();
 

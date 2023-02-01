@@ -841,7 +841,7 @@ export class Line extends GraphicItem {
     end: Vec2;
     width: number;
 
-    constructor(expr: Parseable, public parent?: Footprint) {
+    constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         const static_this = this.constructor as typeof Line;
@@ -862,11 +862,11 @@ export class Line extends GraphicItem {
 }
 
 export class GrLine extends Line {
-    static expr_start = "gr_line";
+    static override expr_start = "gr_line";
 }
 
 export class FpLine extends Line {
-    static expr_start = "fp_line";
+    static override expr_start = "fp_line";
 }
 
 export class Circle extends GraphicItem {
@@ -876,7 +876,7 @@ export class Circle extends GraphicItem {
     width: number;
     fill: string;
 
-    constructor(expr: Parseable, public parent?: Footprint) {
+    constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         const static_this = this.constructor as typeof Circle;
@@ -898,11 +898,11 @@ export class Circle extends GraphicItem {
 }
 
 export class GrCircle extends Circle {
-    static expr_start = "gr_circle";
+    static override expr_start = "gr_circle";
 }
 
 export class FpCircle extends Circle {
-    static expr_start = "fp_circle";
+    static override expr_start = "fp_circle";
 }
 
 export class Arc extends GraphicItem {
@@ -912,7 +912,7 @@ export class Arc extends GraphicItem {
     end: Vec2;
     width: number;
 
-    constructor(expr: Parseable, public parent?: Footprint) {
+    constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         const static_this = this.constructor as typeof Arc;
@@ -934,11 +934,11 @@ export class Arc extends GraphicItem {
 }
 
 export class GrArc extends Arc {
-    static expr_start = "gr_arc";
+    static override expr_start = "gr_arc";
 }
 
 export class FpArc extends Arc {
-    static expr_start = "fp_arc";
+    static override expr_start = "fp_arc";
 }
 
 export class Poly extends GraphicItem {
@@ -948,7 +948,7 @@ export class Poly extends GraphicItem {
     width: number;
     fill: string;
 
-    constructor(expr: Parseable, public parent?: Footprint) {
+    constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         const static_this = this.constructor as typeof Poly;
@@ -969,15 +969,15 @@ export class Poly extends GraphicItem {
 }
 
 export class FilledPolygon extends Poly {
-    static expr_start = "filled_polygon";
+    static override expr_start = "filled_polygon";
 }
 
 export class GrPoly extends Poly {
-    static expr_start = "gr_poly";
+    static override expr_start = "gr_poly";
 }
 
 export class FpPoly extends Poly {
-    static expr_start = "fp_poly";
+    static override expr_start = "fp_poly";
 }
 
 export class Rect extends GraphicItem {
@@ -988,7 +988,7 @@ export class Rect extends GraphicItem {
     width: number;
     fill: string;
 
-    constructor(expr: Parseable, public parent?: Footprint) {
+    constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         const static_this = this.constructor as typeof Rect;
@@ -1010,11 +1010,11 @@ export class Rect extends GraphicItem {
 }
 
 export class GrRect extends Rect {
-    static expr_start = "gr_rect";
+    static override expr_start = "gr_rect";
 }
 
 export class FpRect extends Rect {
-    static expr_start = "fp_rect";
+    static override expr_start = "fp_rect";
 }
 
 export class Text {
@@ -1041,7 +1041,7 @@ export class Text {
 export class FpText extends Text {
     type: string;
 
-    constructor(expr: Parseable, public parent?: Footprint) {
+    constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         Object.assign(
@@ -1060,7 +1060,10 @@ export class FpText extends Text {
 }
 
 export class GrText extends Text {
-    constructor(expr: Parseable, public parent?: Footprint | Dimension) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint | Dimension,
+    ) {
         super();
 
         Object.assign(
