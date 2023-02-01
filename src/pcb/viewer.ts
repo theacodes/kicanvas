@@ -21,8 +21,8 @@ export class BoardViewer extends Viewer {
     constructor(canvas) {
         super(canvas);
 
-        this.addEventListener("kicanvas:viewer:select", (e: CustomEvent) => {
-            const { mouse: _, items } = e.detail;
+        this.addEventListener("kicanvas:viewer:select", (e: Event) => {
+            const { mouse: _, items } = (e as CustomEvent).detail;
 
             this.selected = null;
 
@@ -39,7 +39,7 @@ export class BoardViewer extends Viewer {
                         bubbles: true,
                         composed: true,
                         detail: this.selected.context,
-                    })
+                    }),
                 );
             }
         });
@@ -64,7 +64,7 @@ export class BoardViewer extends Viewer {
         this.layers = new LayerSet(this.board, this.renderer.theme);
         this.#painter = new BoardPainter(
             this.renderer,
-            this.layers as LayerSet
+            this.layers as LayerSet,
         );
 
         this.#painter.paint(this.board);

@@ -21,8 +21,8 @@ export class SchematicViewer extends Viewer {
     constructor(canvas) {
         super(canvas);
 
-        this.addEventListener("kicanvas:viewer:select", (e: CustomEvent) => {
-            const { mouse: _, items } = e.detail;
+        this.addEventListener("kicanvas:viewer:select", (e: Event) => {
+            const { mouse: _, items } = (e as CustomEvent).detail;
 
             for (const { layer: _, bbox } of items) {
                 this.selected = bbox;
@@ -36,7 +36,7 @@ export class SchematicViewer extends Viewer {
                         composed: true,
                         detail: this.selected
                             .context as sch_items.SymbolInstance,
-                    })
+                    }),
                 );
             }
         });

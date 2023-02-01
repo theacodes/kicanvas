@@ -18,12 +18,12 @@ enum Kind {
     expr,
 }
 
-type Expr = number | string | List;
+type ListOrAtom = number | string | List;
 type Obj = Record<string, any>;
 type Item = {
-    new (e: Expr, ...args: any[]): any;
+    new (e: Parseable, ...args: any[]): any;
 };
-type TypeProcessor = (obj: Obj, name: string, e: Expr) => any;
+type TypeProcessor = (obj: Obj, name: string, e: ListOrAtom) => any;
 type PropertyDefinition = {
     name: string;
     kind: Kind;
@@ -37,10 +37,10 @@ type PropertyDefinition = {
  * data type requested by the property definition.
  */
 export const T = {
-    any(obj: Obj, name: string, e: Expr): any {
+    any(obj: Obj, name: string, e: ListOrAtom): any {
         return e;
     },
-    boolean(obj: Obj, name: string, e: Expr): boolean {
+    boolean(obj: Obj, name: string, e: ListOrAtom): boolean {
         switch (e) {
             case "false":
             case "no":
@@ -52,27 +52,27 @@ export const T = {
                 return e ? true : false;
         }
     },
-    string(obj: Obj, name: string, e: Expr): string {
+    string(obj: Obj, name: string, e: ListOrAtom): string {
         if (typeof e == "string") {
             return e;
         }
     },
-    number(obj: Obj, name: string, e: Expr): number {
+    number(obj: Obj, name: string, e: ListOrAtom): number {
         if (typeof e == "number") {
             return e;
         }
     },
     item(type: Item, ...args: any[]): TypeProcessor {
-        return (obj: Obj, name: string, e: Expr): any => {
-            return new type(e, ...args);
+        return (obj: Obj, name: string, e: ListOrAtom): any => {
+            return new type(e as Parseable, ...args);
         };
     },
     object(...defs: PropertyDefinition[]): TypeProcessor {
-        return (obj: Obj, name: string, e: Expr) => {
+        return (obj: Obj, name: string, e: ListOrAtom) => {
             return parse_expr(e as List, P.start(name), ...defs);
         };
     },
-    vec2(obj: Obj, name: string, e: Expr): Vec2 {
+    vec2(obj: Obj, name: string, e: ListOrAtom): Vec2 {
         return new Vec2(e[1], e[2]);
     },
 };
@@ -116,7 +116,7 @@ export const P = {
             kind: Kind.pair,
             name: name,
             accepts: [name],
-            fn: (obj: Obj, name: string, e: Expr) => {
+            fn: (obj: Obj, name: string, e: ListOrAtom) => {
                 return typefn(obj, name, e[1]);
             },
         };
@@ -129,7 +129,7 @@ export const P = {
             kind: Kind.list,
             name: name,
             accepts: [name],
-            fn: (obj: Obj, name: string, e: Expr) => {
+            fn: (obj: Obj, name: string, e: ListOrAtom) => {
                 return (e as List[]).slice(1).map((n) => typefn(obj, name, n));
             },
         };
@@ -147,7 +147,7 @@ export const P = {
             kind: Kind.item_list,
             name: name,
             accepts: [accept],
-            fn: (obj: Obj, name: string, e: Expr) => {
+            fn: (obj: Obj, name: string, e: ListOrAtom) => {
                 const list = obj[name] ?? [];
                 list.push(typefn(obj, name, e));
                 return list;
@@ -167,7 +167,7 @@ export const P = {
             kind: Kind.item_list,
             name: name,
             accepts: [accept],
-            fn: (obj: Obj, name: string, e: Expr) => {
+            fn: (obj: Obj, name: string, e: ListOrAtom) => {
                 const rec = obj[name] ?? {};
                 rec[e[1]] = typefn(obj, name, e[2]);
                 return rec;
@@ -194,7 +194,7 @@ export const P = {
             kind: Kind.atom,
             name: name,
             accepts: values,
-            fn(obj: Obj, name: string, e: Expr) {
+            fn(obj: Obj, name: string, e: ListOrAtom) {
                 // Handle "(atom)" as "atom".
                 if (Array.isArray(e) && e.length == 1) {
                     e = e[0];

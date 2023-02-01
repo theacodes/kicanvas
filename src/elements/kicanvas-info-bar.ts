@@ -23,7 +23,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
         if (!this.target) {
             const target_id = this.getAttribute("for");
             this.target = document.getElementById(
-                target_id
+                target_id,
             ) as KiCanvasBoardElement;
         }
 
@@ -35,9 +35,9 @@ export class KiCanvasInfoBarElement extends CustomElement {
 
         this.target.addEventListener(
             "kicad-board:item-selected",
-            (e: CustomEvent) => {
-                this.#onItemSelected(e.target, e.detail);
-            }
+            (e: Event) => {
+                this.#onItemSelected(e.target, (e as CustomEvent).detail);
+            },
         );
     }
 
