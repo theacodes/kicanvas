@@ -15,8 +15,10 @@
         "decidegrees",
         "gfx",
         "kicanvas",
+        "listify",
         "sexpr",
-        "Tesselator"
+        "Tesselator",
+        "typefn"
     ],
     "debug.console.closeOnEnd": true,
     "debug.terminal.clearBeforeReusing": true,
