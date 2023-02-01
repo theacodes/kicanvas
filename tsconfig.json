@@ -43,6 +43,7 @@
     },
     "include": [
         "./src/**/*",
+        "./test/**/*",
         "third_party/earcut"
     ],
     "exclude": [

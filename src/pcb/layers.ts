@@ -6,7 +6,7 @@
 
 import { Color } from "../gfx/color";
 import {
-    VisibilityType,
+    type VisibilityType,
     ViewLayer,
     ViewLayerSet as BaseLayerSet,
 } from "../framework/view-layers";
@@ -221,8 +221,8 @@ export class LayerSet extends BaseLayerSet {
                     this,
                     layer_name,
                     visible,
-                    this.color_for(layer_name)
-                )
+                    this.color_for(layer_name),
+                ),
             );
         }
     }

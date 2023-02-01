@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle, AngleLike } from "./angle.ts";
+import { Angle, type AngleLike } from "./angle.ts";
 import { Matrix3 } from "./matrix3.ts";
 
 export type Vec2Like =

@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { List, listify } from "../src/kicad/tokenizer";
+import { type List, listify } from "../src/kicad/tokenizer";
 import { T, P, parse_expr } from "../src/kicad/newparser";
 import { Vec2 } from "../src/math/vec2";
 

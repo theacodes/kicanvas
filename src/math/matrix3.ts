@@ -5,7 +5,7 @@
 */
 
 import { Vec2 } from "./vec2";
-import { Angle, AngleLike } from "./angle";
+import { Angle, type AngleLike } from "./angle";
 
 type ElementArray = [
     number,
@@ -16,7 +16,7 @@ type ElementArray = [
     number,
     number,
     number,
-    number
+    number,
 ];
 
 /**

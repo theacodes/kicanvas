@@ -6,7 +6,7 @@
 
 import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
-import { Angle, AngleLike } from "../math/angle";
+import { Angle, type AngleLike } from "../math/angle";
 import { BBox } from "../math/bbox";
 
 /**
@@ -29,7 +29,7 @@ export class Camera2 {
         public viewport_size: Vec2 = new Vec2(0, 0),
         public center: Vec2 = new Vec2(0, 0),
         public zoom: number = 1,
-        public rotation: Angle = new Angle(0)
+        public rotation: Angle = new Angle(0),
     ) {}
 
     /**
@@ -71,7 +71,7 @@ export class Camera2 {
         const m = this.matrix.inverse();
         const start = m.transform(new Vec2(0, 0));
         const end = m.transform(
-            new Vec2(this.viewport_size.x, this.viewport_size.y)
+            new Vec2(this.viewport_size.x, this.viewport_size.y),
         );
         return new BBox(start.x, start.y, end.x - start.x, end.y - start.y);
     }
