@@ -28,9 +28,9 @@ export type VisibilityType = boolean | (() => boolean);
  * A view layer
  */
 export class ViewLayer {
-    #layer_set: ViewLayerSet;
-    #visible: VisibilityType;
+    layer_set: ViewLayerSet;
     name: string;
+    #visible: VisibilityType;
 
     /**
      * The layer color can be used by Painters as a default or fallback color
@@ -64,9 +64,9 @@ export class ViewLayer {
         layer_set: ViewLayerSet,
         name: string,
         visible: VisibilityType = true,
-        color: Color = Color.white
+        color: Color = Color.white,
     ) {
-        this.#layer_set = layer_set;
+        this.layer_set = layer_set;
         this.name = name;
         this.color = color;
         this.#visible = visible;

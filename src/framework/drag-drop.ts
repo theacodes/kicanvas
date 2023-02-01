@@ -6,16 +6,16 @@
 
 export class DropTarget {
     constructor(
-        private elm: HTMLElement,
-        private exts: string[],
-        private callback: (FileList) => void
+        elm: HTMLElement,
+        exts: string[],
+        callback: (FileList) => void,
     ) {
         elm.addEventListener(
             "dragenter",
             (e) => {
                 e.preventDefault();
             },
-            false
+            false,
         );
 
         elm.addEventListener(
@@ -24,7 +24,7 @@ export class DropTarget {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "move";
             },
-            false
+            false,
         );
 
         elm.addEventListener(
@@ -45,7 +45,7 @@ export class DropTarget {
                     callback(files);
                 }
             },
-            false
+            false,
         );
     }
 }
