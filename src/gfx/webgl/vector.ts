@@ -71,7 +71,7 @@ class Tesselator {
         dest: Float32Array,
         color: Color,
         offset: number,
-        length: number
+        length: number,
     ) {
         if (!color) {
             color = new Color(1, 0, 0, 1);
@@ -89,7 +89,7 @@ class Tesselator {
     static tesselate_segment(
         p1: Vec2,
         p2: Vec2,
-        width: number
+        width: number,
     ): [Vec2, Vec2, Vec2, Vec2] {
         const line = p2.sub(p1);
         const norm = line.normal.normalize();
@@ -136,13 +136,13 @@ class Tesselator {
             position_data.set(this.quad_to_triangles(quad), vertex_index * 2);
             cap_data.set(
                 Array(this.vertices_per_quad).fill(cap_region),
-                vertex_index
+                vertex_index,
             );
             this.populate_color_data(
                 color_data,
                 color as Color,
                 vertex_index * 4,
-                this.vertices_per_quad * 4
+                this.vertices_per_quad * 4,
             );
 
             vertex_index += this.vertices_per_quad;
@@ -190,14 +190,14 @@ class Tesselator {
 
             cap_data.set(
                 Array(this.vertices_per_quad).fill(cap_region),
-                vertex_index
+                vertex_index,
             );
 
             this.populate_color_data(
                 color_data,
                 c.color as Color,
                 vertex_index * 4,
-                this.vertices_per_quad * 4
+                this.vertices_per_quad * 4,
             );
 
             vertex_index += this.vertices_per_quad;
@@ -216,7 +216,7 @@ class Tesselator {
      */
     static triangulate_polygon(polygon: Polygon) {
         if (polygon.vertices) {
-            return;
+            return polygon;
         }
 
         const points = polygon.points;
@@ -231,7 +231,7 @@ class Tesselator {
         if (points.length == 3) {
             polygon.points = [];
             polygon.vertices = new Float32Array(points_flattened);
-            return;
+            return polygon;
         }
 
         const triangle_indexes = earcut(points_flattened);
@@ -272,7 +272,7 @@ export class CircleSet {
             gl,
             "polyline",
             polyline_vert_shader_src,
-            polyline_frag_shader_src
+            polyline_frag_shader_src,
         );
     }
 
@@ -282,7 +282,7 @@ export class CircleSet {
      */
     constructor(
         public gl: WebGL2RenderingContext,
-        public shader: ShaderProgram = null
+        public shader: ShaderProgram = null,
     ) {
         this.shader ??= CircleSet.shader;
         this.vao = new VertexArray(gl);
@@ -342,7 +342,7 @@ export class PolylineSet {
             gl,
             "polyline",
             polyline_vert_shader_src,
-            polyline_frag_shader_src
+            polyline_frag_shader_src,
         );
     }
 
@@ -353,7 +353,7 @@ export class PolylineSet {
      */
     constructor(
         public gl: WebGL2RenderingContext,
-        public shader: ShaderProgram = null
+        public shader: ShaderProgram = null,
     ) {
         this.shader ??= PolylineSet.shader;
         this.vao = new VertexArray(gl);
@@ -441,7 +441,7 @@ export class PolygonSet {
             gl,
             "polygon",
             polygon_vert_shader_src,
-            polygon_frag_shader_src
+            polygon_frag_shader_src,
         );
     }
 
@@ -452,7 +452,7 @@ export class PolygonSet {
      */
     constructor(
         public gl: WebGL2RenderingContext,
-        public shader: ShaderProgram = null
+        public shader: ShaderProgram = null,
     ) {
         this.shader ??= PolygonSet.shader;
         this.vao = new VertexArray(gl);
@@ -480,7 +480,7 @@ export class PolygonSet {
     static polyline_from_triangles(
         triangles: Float32Array,
         width: number,
-        color: Color
+        color: Color,
     ): Polyline[] {
         const lines = [];
         for (let i = 0; i < triangles.length; i += 6) {
@@ -524,7 +524,7 @@ export class PolygonSet {
                 color_data,
                 polygon.color as Color,
                 color_data_idx,
-                polygon_vertex_count * 4
+                polygon_vertex_count * 4,
             );
             color_data_idx += polygon_vertex_count * 4;
         }

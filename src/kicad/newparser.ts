@@ -55,11 +55,15 @@ export const T = {
     string(obj: Obj, name: string, e: ListOrAtom): string {
         if (typeof e == "string") {
             return e;
+        } else {
+            return undefined;
         }
     },
     number(obj: Obj, name: string, e: ListOrAtom): number {
         if (typeof e == "number") {
             return e;
+        } else {
+            return undefined;
         }
     },
     item(type: Item, ...args: any[]): TypeProcessor {
