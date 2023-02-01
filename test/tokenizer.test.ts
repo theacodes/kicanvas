@@ -6,9 +6,10 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import * as Tokenizer from "../src/kicad/tokenizer";
+import * as tokenizer from "../src/kicad/tokenizer";
 
-const Token = Tokenizer.Token;
+const Token = tokenizer.Token;
+const Tokenizer = tokenizer.Tokenizer;
 const OPEN = Token.OPEN;
 const CLOSE = Token.CLOSE;
 const ATOM = Token.ATOM;
@@ -33,18 +34,18 @@ function assert_tokens(parsed_tokens, expected_tokens) {
     }
 }
 
-suite("tokenizer", function () {
+suite("Tokens", function () {
     test("atoms", function () {
-        let tokens = Tokenizer.tokenize("(abc)");
+        let tokens = tokenizer.tokenize("(abc)");
         assert_tokens(tokens, [OPEN_TOKEN, [ATOM, "abc"], CLOSE_TOKEN]);
-        tokens = Tokenizer.tokenize("(abc def)");
+        tokens = tokenizer.tokenize("(abc def)");
         assert_tokens(tokens, [
             OPEN_TOKEN,
             [ATOM, "abc"],
             [ATOM, "def"],
             CLOSE_TOKEN,
         ]);
-        tokens = Tokenizer.tokenize("(abc (def))");
+        tokens = tokenizer.tokenize("(abc (def))");
         assert_tokens(tokens, [
             OPEN_TOKEN,
             [ATOM, "abc"],
@@ -53,7 +54,7 @@ suite("tokenizer", function () {
             CLOSE_TOKEN,
             CLOSE_TOKEN,
         ]);
-        tokens = Tokenizer.tokenize("(a1 b2 c3 d4 e5)");
+        tokens = tokenizer.tokenize("(a1 b2 c3 d4 e5)");
         assert_tokens(tokens, [
             OPEN_TOKEN,
             [ATOM, "a1"],
@@ -66,26 +67,59 @@ suite("tokenizer", function () {
     });
 
     test("numbers", function () {
-        let tokens = Tokenizer.tokenize("(0)");
+        let tokens = tokenizer.tokenize("(0)");
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, 0], CLOSE_TOKEN]);
-        tokens = Tokenizer.tokenize("(123)");
+        tokens = tokenizer.tokenize("(123)");
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, 123], CLOSE_TOKEN]);
-        tokens = Tokenizer.tokenize("(-123)");
+        tokens = tokenizer.tokenize("(-123)");
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, -123], CLOSE_TOKEN]);
-        tokens = Tokenizer.tokenize("(-1234.5678)");
+        tokens = tokenizer.tokenize("(-1234.5678)");
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, -1234.5678], CLOSE_TOKEN]);
-        tokens = Tokenizer.tokenize("(+1234.5678)");
+        tokens = tokenizer.tokenize("(+1234.5678)");
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, 1234.5678], CLOSE_TOKEN]);
     });
 
     test("strings", function () {
-        let tokens = Tokenizer.tokenize('("Hello, world!")');
+        let tokens = tokenizer.tokenize('("Hello, world!")');
         assert_tokens(tokens, [
             OPEN_TOKEN,
             [STRING, "Hello, world!"],
             CLOSE_TOKEN,
         ]);
-        tokens = Tokenizer.tokenize('("a\\"b")');
+        tokens = tokenizer.tokenize('("a\\"b")');
         assert_tokens(tokens, [OPEN_TOKEN, [STRING, 'a\\"b'], CLOSE_TOKEN]);
+    });
+});
+
+suite("Tokenizer", function () {
+    test("simple lists", function () {
+        let t: tokenizer.Tokenizer;
+
+        const cases: [string, any[]][] = [
+            ["(1 2 3)", [[1, 2, 3]]],
+            ["(a b c)", [["a", "b", "c"]]],
+            ["(1 a B)", [[1, "a", "B"]]],
+            ['(meep 1 "two")', [["meep", 1, "two"]]],
+            ["(a kebab-case)", [["a", "kebab-case"]]],
+            ["(a D+)", [["a", "D+"]]],
+        ];
+
+        for (const [src, expected] of cases) {
+            t = new Tokenizer(src);
+            assert.deepEqual(t.list, expected);
+        }
+    });
+    test("nested lists", function () {
+        let t: tokenizer.Tokenizer;
+
+        const cases: [string, any[]][] = [
+            ["(1 (2))", [[1, [2]]]],
+            ["(1 (2 (a)) b (c))", [[1, [2, ["a"]], "b", ["c"]]]],
+        ];
+
+        for (const [src, expected] of cases) {
+            t = new Tokenizer(src);
+            assert.deepEqual(t.list, expected);
+        }
     });
 });

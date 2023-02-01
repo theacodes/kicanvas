@@ -20,7 +20,7 @@ export class Token {
     /**
      * Create a new Token
      */
-    constructor(public type: symbol, public value: any = null) { }
+    constructor(public type: symbol, public value: any = null) {}
 }
 
 function is_digit(c: string) {
@@ -76,7 +76,7 @@ export function* tokenize(input: string) {
             } else {
                 throw `Unexpected character at index ${i}: ${c}\nContext: ${error_context(
                     input,
-                    i
+                    i,
                 )}`;
             }
         } else if (state === "atom") {
@@ -85,6 +85,7 @@ export function* tokenize(input: string) {
                 is_digit(c) ||
                 [
                     "-",
+                    "+",
                     "_",
                     ".",
                     "*",
@@ -108,8 +109,8 @@ export function* tokenize(input: string) {
                 throw new Error(
                     `Unexpected character while tokenizing atom at index ${i}: ${c}\nContext: ${error_context(
                         input,
-                        i
-                    )}`
+                        i,
+                    )}`,
                 );
             }
         } else if (state === "number") {
@@ -132,7 +133,7 @@ export function* tokenize(input: string) {
             } else if (c === ")" || is_whitespace(c)) {
                 yield new Token(
                     Token.NUMBER,
-                    parseFloat(input.substring(start_idx, i))
+                    parseFloat(input.substring(start_idx, i)),
                 );
                 state = null;
                 if (c === ")") {
@@ -143,8 +144,8 @@ export function* tokenize(input: string) {
                 throw new Error(
                     `Unexpected character at index ${i}: ${c}, expected numeric.\nContext: ${error_context(
                         input,
-                        i
-                    )}`
+                        i,
+                    )}`,
                 );
             }
         } else if (state === "hex") {
@@ -170,7 +171,7 @@ export function* tokenize(input: string) {
                     Token.STRING,
                     input
                         .substring((start_idx ?? 0) + 1, i)
-                        .replaceAll("\\n", "\n")
+                        .replaceAll("\\n", "\n"),
                 );
                 state = null;
                 escaping = false;
@@ -185,5 +186,42 @@ export function* tokenize(input: string) {
         } else {
             throw `Unknown tokenizer state ${state}`;
         }
+    }
+}
+
+function* listify(tokens) {
+    let token;
+
+    while ((token = tokens.next().value)) {
+        switch (token.type) {
+            case Token.ATOM:
+            case Token.STRING:
+            case Token.NUMBER:
+                yield token.value;
+                break;
+            case Token.OPEN:
+                yield Array.from(listify(tokens));
+                break;
+            case Token.CLOSE:
+                return;
+        }
+    }
+}
+
+type List = (string | number | List)[];
+
+export class Tokenizer {
+    #tokens: Generator<Token>;
+
+    constructor(src: string) {
+        this.#tokens = tokenize(src);
+    }
+
+    get tokens() {
+        return this.#tokens;
+    }
+
+    get list(): List {
+        return Array.from(listify(this.#tokens));
     }
 }
