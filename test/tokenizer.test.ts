@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2022 Alethea Katherine Flowers.
+    Copyright (c) 2023 Alethea Katherine Flowers.
     Published under the standard MIT License.
     Full text available at: https://opensource.org/licenses/MIT
 */
@@ -9,7 +9,6 @@ import { assert } from "@esm-bundle/chai";
 import * as tokenizer from "../src/kicad/tokenizer";
 
 const Token = tokenizer.Token;
-const Tokenizer = tokenizer.Tokenizer;
 const OPEN = Token.OPEN;
 const CLOSE = Token.CLOSE;
 const ATOM = Token.ATOM;
@@ -20,21 +19,31 @@ const CLOSE_TOKEN = [CLOSE, undefined];
 
 function assert_tokens(parsed_tokens, expected_tokens) {
     for (const expected of expected_tokens) {
-        const parsed = parsed_tokens.next().value;
+        const parsed = parsed_tokens.next()?.value;
         assert.equal(
-            parsed.type,
+            parsed?.type,
             expected[0],
-            `Expected token ${expected[0].description}: ${expected[1]} found ${parsed.type.description}: ${parsed.value}.`,
+            `Expected token ${expected[0].description}: ${expected[1]} found ${parsed?.type.description}: ${parsed?.value}.`,
         );
         assert.equal(
-            parsed.value,
+            parsed?.value,
             expected[1],
-            `Expected token ${expected[0].description}: ${expected[1]} found ${parsed.type.description}:${parsed.value}.`,
+            `Expected token ${expected[0].description}: ${expected[1]} found ${parsed?.type.description}:${parsed?.value}.`,
         );
     }
 }
 
 suite("Tokens", function () {
+    test("bare", function () {
+        const tokens = tokenizer.tokenize('1 a "c" 4');
+        assert_tokens(tokens, [
+            [NUMBER, 1],
+            [ATOM, "a"],
+            [STRING, "c"],
+            [NUMBER, 4],
+        ]);
+    });
+
     test("atoms", function () {
         let tokens = tokenizer.tokenize("(abc)");
         assert_tokens(tokens, [OPEN_TOKEN, [ATOM, "abc"], CLOSE_TOKEN]);
@@ -91,10 +100,8 @@ suite("Tokens", function () {
     });
 });
 
-suite("Tokenizer", function () {
+suite("Listify", function () {
     test("simple lists", function () {
-        let t: tokenizer.Tokenizer;
-
         const cases: [string, any[]][] = [
             ["(1 2 3)", [[1, 2, 3]]],
             ["(a b c)", [["a", "b", "c"]]],
@@ -105,21 +112,19 @@ suite("Tokenizer", function () {
         ];
 
         for (const [src, expected] of cases) {
-            t = new Tokenizer(src);
-            assert.deepEqual(t.list, expected);
+            const l = tokenizer.listify(src);
+            assert.deepEqual(l, expected);
         }
     });
     test("nested lists", function () {
-        let t: tokenizer.Tokenizer;
-
         const cases: [string, any[]][] = [
             ["(1 (2))", [[1, [2]]]],
             ["(1 (2 (a)) b (c))", [[1, [2, ["a"]], "b", ["c"]]]],
         ];
 
         for (const [src, expected] of cases) {
-            t = new Tokenizer(src);
-            assert.deepEqual(t.list, expected);
+            const l = tokenizer.listify(src);
+            assert.deepEqual(l, expected);
         }
     });
 });

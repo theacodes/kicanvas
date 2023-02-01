@@ -10,6 +10,8 @@
     - https://gitlab.com/edea-dev/edea/-/tree/main/edea
 */
 
+const EOF = "\x04";
+
 export class Token {
     static OPEN = Symbol("opn");
     static CLOSE = Symbol("clo");
@@ -32,7 +34,7 @@ function is_alpha(c: string) {
 }
 
 function is_whitespace(c: string) {
-    return c === " " || c === "\n" || c === "\r" || c === "\t";
+    return c === EOF || c === " " || c === "\n" || c === "\r" || c === "\t";
 }
 
 function error_context(input: string, index: number) {
@@ -50,8 +52,9 @@ export function* tokenize(input: string) {
     let start_idx = null;
     let escaping = false;
 
-    for (let i = 0; i < input.length; i++) {
-        const c = input[i];
+    for (let i = 0; i < input.length + 1; i++) {
+        const c = i < input.length ? input[i] : EOF;
+
         if (state === null) {
             if (c === "(") {
                 yield open_token;
@@ -189,39 +192,33 @@ export function* tokenize(input: string) {
     }
 }
 
-function* listify(tokens) {
+function* listify_tokens(tokens: Generator<Token>) {
     let token;
+    let it;
 
-    while ((token = tokens.next().value)) {
-        switch (token.type) {
+    while (true) {
+        it = tokens.next();
+        token = it.value;
+
+        switch (token?.type) {
             case Token.ATOM:
             case Token.STRING:
             case Token.NUMBER:
                 yield token.value;
                 break;
             case Token.OPEN:
-                yield Array.from(listify(tokens));
+                yield Array.from(listify_tokens(tokens));
                 break;
             case Token.CLOSE:
+            case undefined:
                 return;
         }
     }
 }
 
-type List = (string | number | List)[];
+export type List = (string | number | List)[];
 
-export class Tokenizer {
-    #tokens: Generator<Token>;
-
-    constructor(src: string) {
-        this.#tokens = tokenize(src);
-    }
-
-    get tokens() {
-        return this.#tokens;
-    }
-
-    get list(): List {
-        return Array.from(listify(this.#tokens));
-    }
+export function listify(src: string): List {
+    const tokens = tokenize(src);
+    return Array.from(listify_tokens(tokens));
 }
