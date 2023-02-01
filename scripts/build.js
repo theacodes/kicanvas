@@ -11,7 +11,7 @@ let { options, context } = await bundle({
     minify: true,
 });
 
-console.log(`Building to ${options.outdir}`);
+console.log(`Building to ${options.outfile}`);
 let result = await context.rebuild();
 
 console.log(`Build complete!`);

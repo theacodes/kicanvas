@@ -7,18 +7,22 @@
     "test": "tests"
   },
   "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
+    "@web/dev-server-esbuild": "^0.3.3",
+    "@web/test-runner": "^0.15.0",
     "esbuild": "^0.17.3",
     "esbuild-plugin-copy": "^2.0.2",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-mocha": "^10.1.0",
     "prettier": "^2.8.3",
     "typescript": "^5.0.0-beta",
     "typescript-lit-html-plugin": "^0.9.0"
   },
   "scripts": {
-    "test": "jest",
+    "test": "web-test-runner --config web-test-runner.config.mjs test/*.test.ts --node-resolve",
     "lint": "eslint --config .eslintrc.cjs src/ --ext .js,.ts",
     "serve": "node scripts/serve.js",
     "build": "tsc -p tsconfig.json && node scripts/build.js",

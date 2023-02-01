@@ -17,5 +17,5 @@ let { host, port } = await context.serve({
     servedir: "./www",
 });
 
-console.log(`Watching and building to ${options.outdir}`);
+console.log(`Watching and building to ${options.outfile}`);
 console.log(`Serving at http://${host}:${port}`);

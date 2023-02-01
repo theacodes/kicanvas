@@ -3,11 +3,12 @@
         /* Visit https://aka.ms/tsconfig to read more about this file */
         /* Language and Environment */
         "target": "es2022", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+        "moduleResolution": "bundler",
         // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
         /* Modules */
         "module": "es2022", /* Specify what module code is generated. */
-        "isolatedModules": true,
         "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
         /* JavaScript Support */
         "allowJs": true, /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
         "checkJs": true, /* Enable error reporting in type-checked JavaScript files. */
