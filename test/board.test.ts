@@ -12,6 +12,7 @@ import paper_pcb_src from "./files/paper.kicad_pcb";
 import shapes_pcb_src from "./files/shapes.kicad_pcb";
 import text_pcb_src from "./files/text.kicad_pcb";
 import traces_pcb_src from "./files/traces.kicad_pcb";
+import dimensions_pcb_src from "./files/dimensions.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -333,5 +334,81 @@ suite("board parser", function () {
             layer: "F.Cu",
             net: 2,
         } as Partial<board.LineSegment>);
+    });
+
+    test("pcb with dimensions", function () {
+        const pcb = new board.KicadPCB(dimensions_pcb_src);
+
+        assert.equal(pcb.drawings.length, 5);
+
+        assert.deepInclude(pcb.drawings[0], {
+            type: "aligned",
+            layer: "F.Cu",
+            pts: [
+                { x: 0, y: 4 },
+                { x: 10, y: 4 },
+            ],
+            height: 0,
+            format: {
+                prefix: "pre",
+                suffix: "post",
+                units: 2,
+                units_format: 2,
+                precision: 3,
+                override_value: "val",
+                suppress_zeroes: true,
+            },
+            style: {
+                thickness: 0.5,
+                arrow_length: 2.54,
+                text_position_mode: 1,
+                extension_height: 0.58642,
+                extension_offset: 1,
+                keep_text_aligned: true,
+                text_frame: undefined,
+            },
+        } as Partial<board.Dimension>);
+
+        assert.deepInclude((pcb.drawings[0] as board.Dimension).gr_text, {
+            text: "preval (mm)post",
+            at: { position: { x: 5, y: 4 }, rotation: 0 },
+            layer: { name: "F.Cu" },
+            effects: {
+                font: {
+                    face: undefined,
+                    size: { x: 2, y: 2 },
+                    thickness: 0.5,
+                    bold: false,
+                    italic: false,
+                },
+                justify: {
+                    horizontal: "left",
+                    vertical: "center",
+                    mirror: true,
+                },
+                hide: undefined,
+            },
+        } as Partial<board.GrText>);
+
+        assert.deepInclude(pcb.drawings[2], {
+            type: "leader",
+            style: {
+                thickness: 0.2,
+                arrow_length: 1.27,
+                text_position_mode: 0,
+                extension_offset: 0.5,
+                text_frame: 0,
+                keep_text_aligned: undefined,
+                extension_height: undefined,
+            },
+        } as Partial<board.Dimension>);
+
+        assert.deepInclude(pcb.drawings[3], {
+            type: "center",
+        } as Partial<board.Dimension>);
+
+        assert.deepInclude(pcb.drawings[4], {
+            type: "orthogonal",
+        } as Partial<board.Dimension>);
     });
 });

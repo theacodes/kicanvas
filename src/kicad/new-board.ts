@@ -8,6 +8,15 @@ import { parse_expr, P, T, type Parseable } from "./newparser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import type { List } from "./tokenizer.ts";
 
+export type Drawing =
+    | GrLine
+    | GrCircle
+    | GrArc
+    | GrPoly
+    | GrRect
+    | GrText
+    | Dimension;
+
 export class KicadPCB {
     version: number;
     generator?: string;
@@ -21,8 +30,7 @@ export class KicadPCB {
     zones: Zone[] = [];
     segments: (LineSegment | ArcSegment)[] = [];
     vias: Via[] = [];
-    dimensions: Dimension[] = [];
-    drawings: (GrLine | GrCircle | GrArc | GrPoly | GrRect | GrText)[] = [];
+    drawings: Drawing[] = [];
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -43,7 +51,7 @@ export class KicadPCB {
                 P.collection("segments", "segment", T.item(LineSegment)),
                 P.collection("segments", "arc", T.item(ArcSegment)),
                 P.collection("vias", "via", T.item(Via)),
-                P.collection("dimensions", "dimension", T.item(Dimension)),
+                P.collection("drawings", "dimension", T.item(Dimension)),
                 P.collection("drawings", "gr_line", T.item(GrLine)),
                 P.collection("drawings", "gr_circle", T.item(GrCircle)),
                 P.collection("drawings", "gr_arc", T.item(GrArc)),
@@ -651,7 +659,7 @@ export class Dimension {
     height: number;
     orientation: number;
     leader_length: number;
-    text: GrText;
+    gr_text: GrText;
     format: DimensionFormat;
     style: DimensionStyle;
 
@@ -697,7 +705,7 @@ export class DimensionFormat {
     units_format: DimensionFormatUnitsFormat;
     precision: number;
     override_value: string;
-    suppress_zeros = false;
+    suppress_zeroes = false;
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -711,7 +719,7 @@ export class DimensionFormat {
                 P.pair("units_format", T.number),
                 P.pair("precision", T.number),
                 P.pair("override_value", T.string),
-                P.atom("suppress_zeros"),
+                P.atom("suppress_zeroes"),
             ),
         );
     }
