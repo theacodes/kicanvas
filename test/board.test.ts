@@ -11,6 +11,7 @@ import empty_pcb_src from "./files/empty.kicad_pcb";
 import paper_pcb_src from "./files/paper.kicad_pcb";
 import shapes_pcb_src from "./files/shapes.kicad_pcb";
 import text_pcb_src from "./files/text.kicad_pcb";
+import traces_pcb_src from "./files/traces.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -264,5 +265,73 @@ suite("board parser", function () {
                 },
             },
         } as Partial<board.GrText>);
+    });
+
+    test("pcb with traces", function () {
+        const pcb = new board.KicadPCB(traces_pcb_src);
+
+        assert.equal(pcb.nets.length, 3);
+        assert.include(pcb.nets[0], { number: 0, name: "" });
+        assert.include(pcb.nets[1], { number: 1, name: "one" });
+        assert.include(pcb.nets[2], { number: 2, name: "two" });
+
+        assert.equal(pcb.segments.length, 7);
+        assert.deepInclude(pcb.segments[0], {
+            locked: true,
+            start: { x: 1, y: 0 },
+            end: { x: 1, y: 10 },
+            width: 0.5,
+            layer: "F.Cu",
+            net: 0,
+        } as Partial<board.LineSegment>);
+        assert.deepInclude(pcb.segments[1], {
+            locked: false,
+            start: { x: 0, y: 0 },
+            end: { x: 0, y: 10 },
+            width: 0.25,
+            layer: "F.Cu",
+            net: 0,
+        } as Partial<board.LineSegment>);
+        assert.deepInclude(pcb.segments[2], {
+            locked: true,
+            start: { x: 5, y: 0 },
+            end: { x: 5, y: 10 },
+            width: 0.5,
+            layer: "F.Cu",
+            net: 0,
+        } as Partial<board.LineSegment>);
+        assert.deepInclude(pcb.segments[3], {
+            locked: true,
+            start: { x: 6, y: 10 },
+            mid: { x: 8.928932, y: 2.928932 },
+            end: { x: 16, y: 0 },
+            width: 0.25,
+            layer: "F.Cu",
+            net: 0,
+        } as Partial<board.ArcSegment>);
+        assert.deepInclude(pcb.segments[4], {
+            locked: false,
+            start: { x: 3, y: 0 },
+            end: { x: 3, y: 10 },
+            width: 0.5,
+            layer: "B.Cu",
+            net: 0,
+        } as Partial<board.LineSegment>);
+        assert.deepInclude(pcb.segments[5], {
+            locked: false,
+            start: { x: 2, y: 0 },
+            end: { x: 2, y: 10 },
+            width: 0.25,
+            layer: "B.Cu",
+            net: 1,
+        } as Partial<board.LineSegment>);
+        assert.deepInclude(pcb.segments[6], {
+            locked: false,
+            start: { x: 4, y: 0 },
+            end: { x: 4, y: 10 },
+            width: 0.25,
+            layer: "F.Cu",
+            net: 2,
+        } as Partial<board.LineSegment>);
     });
 });
