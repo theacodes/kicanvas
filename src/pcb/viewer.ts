@@ -4,7 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse } from "../kicad/parser";
 import * as pcb_items from "../kicad/board";
 import { WebGL2Renderer } from "../gfx/webgl/renderer";
 import * as theme from "../kicad/theme";
@@ -59,7 +58,7 @@ export class BoardViewer extends Viewer {
             pcb_text = await (await window.fetch(src)).text();
         }
 
-        this.board = new pcb_items.KicadPCB(parse(pcb_text));
+        this.board = new pcb_items.KicadPCB(pcb_text);
 
         this.layers = new LayerSet(this.board, this.renderer.theme);
         this.#painter = new BoardPainter(

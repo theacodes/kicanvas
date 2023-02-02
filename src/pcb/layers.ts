@@ -180,16 +180,21 @@ export class LayerSet extends BaseLayerSet {
 
         this.theme = theme;
 
+        const board_layers = new Map();
+        for (const l of board.layers) {
+            board_layers.set(l.canonical_name, l);
+        }
+
         for (const layer_name of Object.values(LayerName)) {
             // Skip physical layers that aren't present on the board.
-            if (!layer_name.startsWith(":") && !board.layers[layer_name]) {
+            if (!layer_name.startsWith(":") && !board_layers.has(layer_name)) {
                 continue;
             }
 
             // Skip virtual zone layers for physical layers that aren't present on the board.
             if (
                 layer_name.startsWith(":Zones:") &&
-                !board.layers[layer_name.slice(7)]
+                !board_layers.has(layer_name.slice(7))
             ) {
                 continue;
             }

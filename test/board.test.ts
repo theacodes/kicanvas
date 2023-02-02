@@ -5,7 +5,7 @@
 */
 
 import { assert } from "@esm-bundle/chai";
-import * as board from "../src/kicad/new-board";
+import * as board from "../src/kicad/board";
 
 import empty_pcb_src from "./files/empty.kicad_pcb";
 import paper_pcb_src from "./files/paper.kicad_pcb";

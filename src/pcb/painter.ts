@@ -125,26 +125,26 @@ class CirclePainter extends ItemPainter {
 }
 
 class TraceSegmentPainter extends ItemPainter {
-    classes = [pcb_items.Segment];
+    classes = [pcb_items.LineSegment];
 
-    layers_for(item: pcb_items.Segment) {
+    layers_for(item: pcb_items.LineSegment) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, s: pcb_items.Segment) {
+    paint(layer: ViewLayer, s: pcb_items.LineSegment) {
         const points = [s.start, s.end];
         this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
 class TraceArcPainter extends ItemPainter {
-    classes = [pcb_items.Arc];
+    classes = [pcb_items.ArcSegment];
 
-    layers_for(item: pcb_items.Arc) {
+    layers_for(item: pcb_items.ArcSegment) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, a: pcb_items.Arc) {
+    paint(layer: ViewLayer, a: pcb_items.ArcSegment) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         this.gfx.line(new Polyline(points, arc.width, layer.color));
@@ -161,9 +161,9 @@ class ViaPainter extends ItemPainter {
     paint(layer: ViewLayer, v: pcb_items.Via) {
         const color = layer.color;
         if (layer.name == LayerName.via_through) {
-            this.gfx.circle(new Circle(v.at, v.size / 2, color));
+            this.gfx.circle(new Circle(v.at.position, v.size / 2, color));
         } else if (layer.name == LayerName.via_holes) {
-            this.gfx.circle(new Circle(v.at, v.drill / 2, color));
+            this.gfx.circle(new Circle(v.at.position, v.drill / 2, color));
         }
     }
 }
@@ -172,7 +172,8 @@ class ZonePainter extends ItemPainter {
     classes = [pcb_items.Zone];
 
     layers_for(z: pcb_items.Zone): string[] {
-        return z.layers.map((l) => `:Zones:${l}`);
+        const layers = z.layers ?? [z.layer];
+        return layers.map((l) => `:Zones:${l}`);
     }
 
     paint(layer: ViewLayer, z: pcb_items.Zone) {
@@ -421,7 +422,7 @@ class TextPainter extends ItemPainter {
         if (t instanceof pcb_items.FpText && t.hide) {
             return [];
         } else {
-            return [t.layer];
+            return [t.layer.name];
         }
     }
 
@@ -442,13 +443,13 @@ class TextPainter extends ItemPainter {
             Angle.from_degrees(rotation),
             new TextOptions(
                 this.gfx.text_shaper.default_font,
-                t.effects.size,
-                t.effects.thickness,
-                t.effects.bold,
-                t.effects.italic,
+                t.effects.font.size,
+                t.effects.font.thickness,
+                t.effects.font.bold,
+                t.effects.font.italic,
                 "center",
-                t.effects.h_align,
-                t.effects.mirror,
+                t.effects.justify.horizontal,
+                t.effects.justify.mirror,
             ),
         );
 
@@ -456,7 +457,7 @@ class TextPainter extends ItemPainter {
             this.gfx.line(
                 new Polyline(
                     Array.from(stroke),
-                    t.effects.thickness ?? 0.127,
+                    t.effects.font.thickness ?? 0.127,
                     layer.color,
                 ),
             );
@@ -479,7 +480,7 @@ class FootprintPainter extends ItemPainter {
 
     layers_for(fp: pcb_items.Footprint): string[] {
         const layers = new Set();
-        for (const item of fp.items) {
+        for (const item of fp.items()) {
             const item_layers = this.view_painter.layers_for(item);
             for (const layer of item_layers) {
                 layers.add(layer);
@@ -497,7 +498,7 @@ class FootprintPainter extends ItemPainter {
         this.gfx.state.push();
         this.gfx.state.multiply(matrix);
 
-        for (const item of fp.items) {
+        for (const item of fp.items()) {
             const item_layers = this.view_painter.layers_for(item);
             if (item_layers.includes(layer.name)) {
                 this.view_painter.paint_item(layer, item);
