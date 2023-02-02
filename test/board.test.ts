@@ -13,6 +13,7 @@ import shapes_pcb_src from "./files/shapes.kicad_pcb";
 import text_pcb_src from "./files/text.kicad_pcb";
 import traces_pcb_src from "./files/traces.kicad_pcb";
 import dimensions_pcb_src from "./files/dimensions.kicad_pcb";
+import zones_pcb_src from "./files/zones.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -410,5 +411,77 @@ suite("board parser", function () {
         assert.deepInclude(pcb.drawings[4], {
             type: "orthogonal",
         } as Partial<board.Dimension>);
+    });
+
+    test("pcb with zones", function () {
+        const pcb = new board.KicadPCB(zones_pcb_src);
+
+        assert.equal(pcb.zones.length, 3);
+
+        const zone1 = pcb.zones[0];
+        assert.deepInclude(zone1, {
+            net: 0,
+            net_name: "",
+            layer: "F.Cu",
+            hatch: { style: "edge", pitch: 0.508 },
+            connect_pads: { clearance: 0.508 },
+            min_thickness: 0.254,
+            filled_areas_thickness: false,
+        } as Partial<board.Zone>);
+        assert.deepInclude(zone1.fill, {
+            fill: true,
+            thermal_gap: 0.508,
+            thermal_bridge_width: 0.508,
+        } as Partial<board.ZoneFill>);
+        assert.deepInclude(zone1.polygons[0], {
+            pts: [
+                { x: 5, y: 5 },
+                { x: 0, y: 5 },
+                { x: 0, y: 0 },
+                { x: 5, y: 0 },
+            ],
+        } as Partial<board.Poly>);
+        assert.deepInclude(zone1.filled_polygons[0], {
+            layer: "F.Cu",
+            island: true,
+        } as Partial<board.FilledPolygon>);
+
+        const zone2 = pcb.zones[1];
+        assert.deepInclude(zone2, {
+            locked: true,
+            name: "name",
+            hatch: { style: "none", pitch: 0.508 },
+            priority: 1,
+            connect_pads: { type: "thru_hole_only", clearance: 1 },
+        } as Partial<board.Zone>);
+        assert.deepInclude(zone2.fill, {
+            fill: true,
+            mode: "hatch",
+            thermal_gap: 0.6,
+            thermal_bridge_width: 0.7,
+            smoothing: { style: "chamfer" },
+            radius: 2,
+            island_removal_mode: 2,
+            island_area_min: 0.1,
+            hatch_smoothing_level: 1,
+            hatch_smoothing_value: 0.2,
+            hatch_border_algorithm: "hatch_thickness",
+            hatch_min_hole_area: 0.3,
+        } as Partial<board.ZoneFill>);
+
+        const zone3 = pcb.zones[2];
+        assert.deepInclude(zone3, {
+            layer: "B.Cu",
+            name: "keepout",
+            hatch: { style: "full", pitch: 0.508 },
+            connect_pads: { clearance: 0 },
+            keepout: {
+                tracks: "not_allowed",
+                vias: "not_allowed",
+                pads: "not_allowed",
+                copperpour: "not_allowed",
+                footprints: "not_allowed",
+            },
+        } as Partial<board.Zone>);
     });
 });

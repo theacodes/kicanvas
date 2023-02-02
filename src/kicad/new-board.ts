@@ -173,8 +173,10 @@ export class Via {
 }
 
 export class Zone {
+    locked = false;
     net: number;
     net_name: string;
+    name: string;
     layer: string;
     layers: string[];
     hatch: { style: "none" | "edge" | "full"; pitch: number };
@@ -184,11 +186,11 @@ export class Zone {
         clearance: number;
     };
     min_thickness: number;
-    filled_areas_thickness: any;
-    keepout: any;
-    fill: any;
-    polygon: Poly;
-    filled_polygons: any[];
+    filled_areas_thickness: boolean;
+    keepout: ZoneKeepout;
+    fill: ZoneFill;
+    polygons: Poly[];
+    filled_polygons: FilledPolygon[];
     tstamp: string;
 
     constructor(expr: Parseable) {
@@ -197,9 +199,11 @@ export class Zone {
             parse_expr(
                 expr,
                 P.start("zone"),
+                P.atom("locked"),
                 P.pair("net", T.number),
                 P.pair("net_name", T.string),
                 P.pair("net_name", T.string),
+                P.pair("name", T.string),
                 P.pair("layer", T.string),
                 P.list("layers", T.string),
                 P.object(
@@ -217,7 +221,7 @@ export class Zone {
                 P.pair("filled_areas_thickness", T.boolean),
                 P.item("keepout", ZoneKeepout),
                 P.item("fill", ZoneFill),
-                P.item("polygon", Poly),
+                P.collection("polygons", "polygon", T.item(Poly)),
                 P.collection(
                     "filled_polygons",
                     "filled_polygon",
@@ -253,10 +257,13 @@ export class ZoneKeepout {
 
 export class ZoneFill {
     fill = false;
-    mode: "solid" | "hatched" = "solid";
+    mode: "solid" | "hatch" = "solid";
     thermal_gap: number;
     thermal_bridge_width: number;
-    smoothing: { style: string; radius: number };
+    smoothing: {
+        style: "none" | "chamfer" | "fillet";
+        radius: number;
+    };
     radius: number;
     island_removal_mode: 0 | 1 | 2;
     island_area_min: number;
@@ -264,8 +271,8 @@ export class ZoneFill {
     hatch_gap: number;
     hatch_orientation: number;
     hatch_smoothing_level: 0 | 1 | 2 | 3;
-    hatch_smoothing_values: number;
-    hatch_border_algorithm: 0 | 1;
+    hatch_smoothing_value: number;
+    hatch_border_algorithm: "hatch_thickness" | "min_thickness";
     hatch_min_hole_area: number;
 
     constructor(expr: Parseable) {
@@ -274,26 +281,26 @@ export class ZoneFill {
             parse_expr(
                 expr,
                 P.start("fill"),
-                P.atom("fill", ["yes"]),
+                P.positional("fill", T.boolean),
                 P.pair("mode", T.string),
                 P.pair("thermal_gap", T.number),
                 P.pair("thermal_bridge_width", T.number),
-                P.pair("smoothing", T.number),
-                P.pair(
-                    "island_removal_mode",
+                P.expr(
+                    "smoothing",
                     T.object(
                         P.positional("style", T.string),
                         P.pair("radius", T.number),
                     ),
                 ),
                 P.pair("radius", T.number),
+                P.pair("island_removal_mode", T.number),
                 P.pair("island_area_min", T.number),
                 P.pair("hatch_thickness", T.number),
                 P.pair("hatch_gap", T.number),
                 P.pair("hatch_orientation", T.number),
                 P.pair("hatch_smoothing_level", T.number),
-                P.pair("hatch_smoothing_values", T.number),
-                P.pair("hatch_border_algorithm", T.number),
+                P.pair("hatch_smoothing_value", T.number),
+                P.pair("hatch_border_algorithm", T.string),
                 P.pair("hatch_min_hole_area", T.number),
             ),
         );
@@ -954,6 +961,7 @@ export class Poly extends GraphicItem {
     pts: Vec2[];
     width: number;
     fill: string;
+    island: boolean;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -966,6 +974,7 @@ export class Poly extends GraphicItem {
                 expr,
                 P.start(static_this.expr_start),
                 P.pair("layer", T.string),
+                P.atom("island"),
                 P.list("pts", T.vec2),
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
