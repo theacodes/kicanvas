@@ -14,6 +14,7 @@ import text_pcb_src from "./files/text.kicad_pcb";
 import traces_pcb_src from "./files/traces.kicad_pcb";
 import dimensions_pcb_src from "./files/dimensions.kicad_pcb";
 import zones_pcb_src from "./files/zones.kicad_pcb";
+import vias_pcb_src from "./files/vias.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -483,5 +484,54 @@ suite("board parser", function () {
                 footprints: "not_allowed",
             },
         } as Partial<board.Zone>);
+    });
+
+    test("pcb with vias", function () {
+        const pcb = new board.KicadPCB(vias_pcb_src);
+
+        assert.equal(pcb.vias.length, 5);
+
+        assert.deepInclude(pcb.vias[0], {
+            type: "through-hole",
+            locked: true,
+            at: { position: { x: 2, y: 0 }, rotation: 0 },
+            size: 2,
+            drill: 1,
+            layers: ["F.Cu", "B.Cu"],
+            free: true,
+            net: 0,
+        } as Partial<board.Via>);
+        assert.deepInclude(pcb.vias[1], {
+            type: "micro",
+            locked: false,
+            at: { position: { x: 4, y: 0 }, rotation: 0 },
+            size: 2,
+            drill: 1,
+            layers: ["F.Cu", "In1.Cu"],
+            free: true,
+            net: 0,
+        } as Partial<board.Via>);
+        assert.deepInclude(pcb.vias[2], {
+            type: "through-hole",
+            locked: false,
+            at: { position: { x: 0, y: 0 }, rotation: 0 },
+            size: 0.8,
+            drill: 0.4,
+            layers: ["F.Cu", "B.Cu"],
+            free: true,
+            net: 0,
+        } as Partial<board.Via>);
+        assert.deepInclude(pcb.vias[4], {
+            type: "blind",
+            locked: false,
+            at: { position: { x: 6, y: 0 }, rotation: 0 },
+            size: 2,
+            drill: 1,
+            layers: ["In2.Cu", "B.Cu"],
+            remove_unused_layers: true,
+            keep_end_layers: true,
+            free: true,
+            net: 0,
+        } as Partial<board.Via>);
     });
 });

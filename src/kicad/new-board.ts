@@ -139,8 +139,8 @@ export class ArcSegment {
 }
 
 export class Via {
-    type: "blind" | "buried" | "micro" | "through-hole" = "through-hole";
-    at: Vec2;
+    type: "blind" | "micro" | "through-hole" = "through-hole";
+    at: At;
     size: number;
     drill: number;
     layers: string[];
@@ -157,7 +157,8 @@ export class Via {
             parse_expr(
                 expr,
                 P.start("via"),
-                P.vec2("at"),
+                P.atom("type", ["blind", "micro", "through-hole"]),
+                P.item("at", At),
                 P.pair("size", T.number),
                 P.pair("drill", T.number),
                 P.list("layers", T.string),
