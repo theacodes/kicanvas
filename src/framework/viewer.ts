@@ -17,7 +17,7 @@ export abstract class Viewer extends EventTarget {
     renderer: Renderer;
     viewport: Viewport;
     layers: ViewLayerSet;
-    #selected: BBox;
+    #selected: BBox | null;
 
     constructor(canvas: HTMLCanvasElement) {
         super();
@@ -28,11 +28,11 @@ export abstract class Viewer extends EventTarget {
     dispose() {
         this.#selected = null;
         this.viewport.dispose();
-        this.viewport = null;
+        this.viewport = undefined!;
         this.layers.dispose();
-        this.layers = null;
+        this.layers = undefined!;
         this.renderer.dispose();
-        this.renderer = null;
+        this.renderer = undefined!;
     }
 
     abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
@@ -53,7 +53,7 @@ export abstract class Viewer extends EventTarget {
         this.canvas.addEventListener("click", (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const mouse = this.viewport.camera.screen_to_world(
-                new Vec2(e.clientX - rect.left, e.clientY - rect.top)
+                new Vec2(e.clientX - rect.left, e.clientY - rect.top),
             );
 
             this.selected = null;
@@ -66,7 +66,7 @@ export abstract class Viewer extends EventTarget {
                         mouse: mouse,
                         items: items,
                     },
-                })
+                }),
             );
         });
     }
@@ -92,12 +92,12 @@ export abstract class Viewer extends EventTarget {
         });
     }
 
-    get selected() {
+    get selected(): BBox | null {
         return this.#selected;
     }
 
-    set selected(bb: BBox) {
-        this.#selected = bb?.copy();
+    set selected(bb: BBox | null) {
+        this.#selected = bb?.copy() || null;
         this.paint_selected();
     }
 
@@ -106,7 +106,7 @@ export abstract class Viewer extends EventTarget {
     }
 
     paint_selected() {
-        const layer = this.layers.by_name(":Overlay");
+        const layer = this.layers.by_name(":Overlay")!;
 
         layer.graphics?.clear();
 
@@ -115,11 +115,11 @@ export abstract class Viewer extends EventTarget {
             this.renderer.start_layer(layer.name, 1);
 
             this.renderer.line(
-                Polyline.from_BBox(bb, 0.127, this.selection_color)
+                Polyline.from_BBox(bb, 0.127, this.selection_color),
             );
 
             this.renderer.polygon(
-                Polygon.from_BBox(bb, this.selection_color.with_alpha(0.4))
+                Polygon.from_BBox(bb, this.selection_color.with_alpha(0.4)),
             );
 
             layer.graphics = this.renderer.end_layer();

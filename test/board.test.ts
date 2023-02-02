@@ -43,9 +43,9 @@ suite("board parser", function () {
             user_name: undefined,
         });
 
-        assert.equal(pcb.setup.pad_to_mask_clearance, 0);
+        assert.equal(pcb.setup?.pad_to_mask_clearance, 0);
 
-        assert.deepInclude(pcb.setup.pcbplotparams, {
+        assert.deepInclude(pcb.setup?.pcbplotparams, {
             layerselection: 0x00010fcffffffff,
             disableapertmacros: false,
             usegerberextensions: false,
@@ -203,7 +203,7 @@ suite("board parser", function () {
                     mirror: false,
                 },
             },
-        } as Partial<board.GrText>);
+        } as any);
 
         assert.deepInclude(pcb.drawings[1], {
             text: "Text 5",
@@ -224,7 +224,7 @@ suite("board parser", function () {
                     mirror: false,
                 },
             },
-        } as Partial<board.GrText>);
+        } as any);
 
         assert.deepInclude(pcb.drawings[2], {
             text: "Text 7",
@@ -245,7 +245,7 @@ suite("board parser", function () {
                     mirror: false,
                 },
             },
-        } as Partial<board.GrText>);
+        } as any);
 
         assert.deepInclude(pcb.drawings[3], {
             text: "Text 2",
@@ -266,7 +266,7 @@ suite("board parser", function () {
                     mirror: false,
                 },
             },
-        } as Partial<board.GrText>);
+        } as any);
     });
 
     test("pcb with traces", function () {
@@ -368,7 +368,7 @@ suite("board parser", function () {
                 keep_text_aligned: true,
                 text_frame: undefined,
             },
-        } as Partial<board.Dimension>);
+        } as any);
 
         assert.deepInclude((pcb.drawings[0] as board.Dimension).gr_text, {
             text: "preval (mm)post",
@@ -389,7 +389,7 @@ suite("board parser", function () {
                 },
                 hide: undefined,
             },
-        } as Partial<board.GrText>);
+        } as any);
 
         assert.deepInclude(pcb.drawings[2], {
             type: "leader",
@@ -402,7 +402,7 @@ suite("board parser", function () {
                 keep_text_aligned: undefined,
                 extension_height: undefined,
             },
-        } as Partial<board.Dimension>);
+        } as any);
 
         assert.deepInclude(pcb.drawings[3], {
             type: "center",
@@ -418,7 +418,7 @@ suite("board parser", function () {
 
         assert.equal(pcb.zones.length, 3);
 
-        const zone1 = pcb.zones[0];
+        const zone1 = pcb.zones[0]!;
         assert.deepInclude(zone1, {
             net: 0,
             net_name: "",
@@ -446,7 +446,7 @@ suite("board parser", function () {
             island: true,
         } as Partial<board.FilledPolygon>);
 
-        const zone2 = pcb.zones[1];
+        const zone2 = pcb.zones[1]!;
         assert.deepInclude(zone2, {
             locked: true,
             name: "name",
@@ -469,7 +469,7 @@ suite("board parser", function () {
             hatch_min_hole_area: 0.3,
         } as Partial<board.ZoneFill>);
 
-        const zone3 = pcb.zones[2];
+        const zone3 = pcb.zones[2]!;
         assert.deepInclude(zone3, {
             layer: "B.Cu",
             name: "keepout",

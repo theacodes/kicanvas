@@ -18,7 +18,7 @@ export abstract class ItemPainter {
 
     constructor(
         protected view_painter: DocumentPainter,
-        protected gfx: Renderer
+        protected gfx: Renderer,
     ) {}
 
     abstract layers_for(item: unknown): string[];
@@ -97,11 +97,11 @@ export abstract class DocumentPainter {
         painter?.paint(layer, item);
     }
 
-    painter_for(item: unknown): ItemPainter {
+    painter_for(item: any): ItemPainter | undefined {
         return this.painters.get(item.constructor);
     }
 
-    layers_for(item: unknown): string[] {
-        return this.painters.get(item.constructor).layers_for(item);
+    layers_for(item: any): string[] {
+        return this.painters.get(item.constructor)?.layers_for(item) || [];
     }
 }

@@ -9,7 +9,7 @@ import { BoardViewer } from "../pcb/viewer";
 export class KiCanvasBoardElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
     viewer: BoardViewer;
-    selected = [];
+    selected: any[] = [];
 
     constructor() {
         super();
@@ -39,7 +39,7 @@ export class KiCanvasBoardElement extends HTMLElement {
         if (this.viewer) {
             this.viewer.dispose();
         }
-        this.selected = null;
+        this.selected = [];
     }
 
     async load(src) {
@@ -73,7 +73,7 @@ export class KiCanvasBoardElement extends HTMLElement {
 
         const root = this.attachShadow({ mode: "open" });
         root.appendChild(template.content.cloneNode(true));
-        this.#canvas = root.querySelector("canvas");
+        this.#canvas = root.querySelector("canvas")!;
     }
 }
 

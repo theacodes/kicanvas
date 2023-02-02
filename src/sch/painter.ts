@@ -477,18 +477,18 @@ class GlobalLabelPainter extends LabelPainter {
         switch (l.shape) {
             case "input":
                 x_offset = -half_size;
-                line.points[0].x += half_size;
-                line.points[6].x += half_size;
+                line.points[0]!.x += half_size;
+                line.points[6]!.x += half_size;
                 break;
             case "output":
-                line.points[3].x -= half_size;
+                line.points[3]!.x -= half_size;
                 break;
             case "bidirectional":
             case "tri_state":
                 x_offset = -half_size;
-                line.points[0].x += half_size;
-                line.points[6].x += half_size;
-                line.points[3].x -= half_size;
+                line.points[0]!.x += half_size;
+                line.points[6]!.x += half_size;
+                line.points[3]!.x -= half_size;
                 break;
             default:
                 break;

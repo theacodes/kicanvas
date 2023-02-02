@@ -22,9 +22,11 @@ export class KiCanvasInfoBarElement extends CustomElement {
     override async connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
-            this.target = document.getElementById(
-                target_id,
-            ) as KiCanvasBoardElement;
+            if (target_id) {
+                this.target = document.getElementById(
+                    target_id,
+                ) as KiCanvasBoardElement;
+            }
         }
 
         if (!this.target) {
@@ -42,7 +44,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
     }
 
     disconnectedCallback() {
-        this.target = null;
+        this.target = undefined!;
     }
 
     #onItemSelected(element, detail) {

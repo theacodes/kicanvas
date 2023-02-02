@@ -21,9 +21,11 @@ export class KiCanvasLayerControlsElement extends CustomElement {
     override async connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
-            this.target = document.getElementById(
-                target_id,
-            ) as KiCanvasBoardElement;
+            if (target_id) {
+                this.target = document.getElementById(
+                    target_id,
+                ) as KiCanvasBoardElement;
+            }
         }
 
         if (!this.target) {
@@ -40,26 +42,28 @@ export class KiCanvasLayerControlsElement extends CustomElement {
     }
 
     disconnectedCallback() {
-        this.target = null;
+        this.target = undefined!;
     }
 
     override async render() {
         const layers = this.target.viewer.layers as LayerSet;
-        const buttons = [];
+        const buttons: HTMLElement[] = [];
 
         for (const layer of layers.in_ui_order()) {
             const visible = layer.visible ? "yes" : "no";
             const css_color = layer.color.to_css();
-            buttons.push(html`
+            buttons.push(
+                html`
                 <button type="button" name="${layer.name}" visible="${visible}">
                     <span class="color" style="background-color: ${css_color};"></span>
                     <span class="name">${layer.name}</name>
-                </button>`);
+                </button>` as HTMLElement,
+            );
         }
 
         const content = html`${buttons}`;
 
-        this.shadowRoot.addEventListener("click", (e) => {
+        this.shadowRoot!.addEventListener("click", (e) => {
             this.#onClick(e);
         });
 
@@ -74,7 +78,8 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
         const layer = this.target.viewer.layers.by_name(
             button.getAttribute("name"),
-        );
+        )!;
+
         layer.visible = !layer.visible;
         button.setAttribute("visible", layer.visible ? "yes" : "no");
         this.target.viewer.draw_soon();

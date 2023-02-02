@@ -125,8 +125,8 @@ export class ViewLayerSet {
         for (const layer of this.#layer_list) {
             layer.dispose();
         }
-        this.#layer_list = null;
-        this.#layer_map = null;
+        this.#layer_list = undefined!;
+        this.#layer_map = undefined!;
     }
 
     /**
@@ -164,14 +164,14 @@ export class ViewLayerSet {
      */
     *in_display_order() {
         for (let i = this.#layer_list.length - 1; i >= 0; i--) {
-            yield this.#layer_list[i];
+            yield this.#layer_list[i]!;
         }
     }
 
     /**
      * Gets a Layer by name
      */
-    by_name(name: string): ViewLayer {
+    by_name(name: string): ViewLayer | undefined {
         return this.#layer_map.get(name);
     }
 
@@ -201,7 +201,7 @@ export class ViewLayerSet {
      * @return a bounding box encompassing all elements from all layers.
      */
     get bbox() {
-        const bboxes = [];
+        const bboxes: BBox[] = [];
         for (const layer of this.in_order()) {
             bboxes.push(layer.bbox);
         }

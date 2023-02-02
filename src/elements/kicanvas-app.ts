@@ -31,7 +31,7 @@ class KiCanvasAppElement extends CustomElement {
     async load(src: File) {
         this.setAttribute("loading", "");
 
-        this.shadowRoot.querySelector("main")?.remove();
+        this.shadowRoot!.querySelector("main")?.remove();
 
         const extension = src.name.split(".").at(-1);
 
@@ -72,7 +72,7 @@ class KiCanvasAppElement extends CustomElement {
                 throw new Error(`Unable to display file ${src.name}`);
         }
 
-        this.shadowRoot.appendChild(content);
+        this.shadowRoot!.appendChild(content);
 
         await view_elem.load(src);
 

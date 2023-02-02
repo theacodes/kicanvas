@@ -9,7 +9,7 @@ import { SchematicViewer } from "../sch/viewer";
 export class KiCanvasSchematicElement extends HTMLElement {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
-    selected = [];
+    selected: any[] = [];
 
     constructor() {
         super();
@@ -39,7 +39,7 @@ export class KiCanvasSchematicElement extends HTMLElement {
         if (this.viewer) {
             this.viewer.dispose();
         }
-        this.selected = null;
+        this.selected = [];
     }
 
     async load(src) {
@@ -73,7 +73,7 @@ export class KiCanvasSchematicElement extends HTMLElement {
 
         const root = this.attachShadow({ mode: "open" });
         root.appendChild(template.content.cloneNode(true));
-        this.#canvas = root.querySelector("canvas");
+        this.#canvas = root.querySelector("canvas")!;
     }
 }
 

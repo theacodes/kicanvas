@@ -5,13 +5,11 @@
 */
 
 export async function $onload() {
-    const p: Promise<void> = (
-        new Promise((resolve) => {
-            window.addEventListener("load", () => {
-                resolve();
-            });
-        })
-    );
+    const p: Promise<void> = new Promise((resolve) => {
+        window.addEventListener("load", () => {
+            resolve();
+        });
+    });
     return p;
 }
 
@@ -31,7 +29,7 @@ export function $s(el_or_selector, selector = undefined) {
     }
 }
 
-export function $q(el_or_selector, selector = undefined) {
+export function $q(el_or_selector, selector?: string) {
     if (typeof el_or_selector === "string") {
         return document.querySelector(el_or_selector);
     } else {
@@ -74,7 +72,7 @@ export function $event(e, name, detail, bubble = true) {
         new CustomEvent(name, {
             detail: detail,
             bubbles: bubble,
-        })
+        }),
     );
 }
 
