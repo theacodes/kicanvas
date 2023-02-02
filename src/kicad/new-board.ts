@@ -1137,7 +1137,7 @@ export class Pad {
     thermal_width: number;
     thermal_gap: number;
     zone_connect: number;
-    drill: Drill;
+    drill: PadDrill;
     net: Net;
     options: PadOptions;
     primitives: (GrLine | GrCircle | GrArc | GrRect | GrPoly)[];
@@ -1175,7 +1175,7 @@ export class Pad {
             P.pair("thermal_gap", T.number),
             P.pair("zone_connect", T.number),
             P.pair("tstamp", T.string),
-            P.item("drill", Drill),
+            P.item("drill", PadDrill),
             P.item("net", Net),
             P.item("options", PadOptions),
             P.expr("primitives", (obj, name, expr) => {
@@ -1196,7 +1196,7 @@ export class Pad {
     }
 }
 
-export class Drill {
+export class PadDrill {
     oval = false;
     diameter = 0;
     width = 0;
