@@ -8,6 +8,7 @@ import { assert } from "@esm-bundle/chai";
 import * as board from "../src/kicad/board";
 
 import empty_pcb_src from "./files/empty.kicad_pcb";
+import properties_pcb_src from "./files/properties.kicad_pcb";
 import paper_pcb_src from "./files/paper.kicad_pcb";
 import shapes_pcb_src from "./files/shapes.kicad_pcb";
 import text_pcb_src from "./files/text.kicad_pcb";
@@ -84,6 +85,20 @@ suite("board parser", function () {
 
         assert.equal(pcb.nets.length, 1);
         assert.deepInclude(pcb.nets[0], { number: 0, name: "" });
+    });
+
+    test("pcb with properties", function () {
+        const pcb = new board.KicadPCB(properties_pcb_src);
+
+        assert.equal(pcb.properties.length, 2);
+        assert.deepEqual(pcb.properties[0], {
+            name: "var1",
+            value: "var 1 value",
+        });
+        assert.deepEqual(pcb.properties[1], {
+            name: "var2",
+            value: "var 2 value",
+        });
     });
 
     test("pcb with paper settings & title block", function () {

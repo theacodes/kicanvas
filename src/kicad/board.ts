@@ -24,6 +24,7 @@ export class KicadPCB {
     paper?: Paper;
     title_block?: TitleBlock;
     setup?: Setup;
+    properties: Property[] = [];
     layers: Layer[] = [];
     nets: Net[] = [];
     footprints: Footprint[] = [];
@@ -45,6 +46,7 @@ export class KicadPCB {
                 P.item("title_block", TitleBlock),
                 P.list("layers", T.item(Layer)),
                 P.item("setup", Setup),
+                P.collection("properties", "property", T.item(Property)),
                 P.collection("nets", "net", T.item(Net)),
                 P.collection("footprints", "footprint", T.item(Footprint)),
                 P.collection("zones", "zone", T.item(Zone)),
@@ -63,11 +65,32 @@ export class KicadPCB {
     }
 
     *items() {
-        yield* this.drawings ?? [];
-        yield* this.vias ?? [];
-        yield* this.segments ?? [];
-        yield* this.zones ?? [];
-        yield* this.footprints ?? [];
+        yield* this.drawings;
+        yield* this.vias;
+        yield* this.segments;
+        yield* this.zones;
+        yield* this.footprints;
+    }
+
+    // get text_vars() {
+    //     const vars = new Map(this.title_block.text_vars);
+    // }
+}
+
+export class Property {
+    name: string;
+    value: string;
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("property"),
+                P.positional("name", T.string),
+                P.positional("value", T.string),
+            ),
+        );
     }
 }
 
