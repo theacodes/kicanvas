@@ -1122,7 +1122,12 @@ export class Pad {
     layers: string[];
     roundrect_rratio: number;
     chamfer_ratio: number;
-    chamfer: number;
+    chamfer?: {
+        top_left?: boolean;
+        top_right?: boolean;
+        bottom_right?: boolean;
+        bottom_left?: boolean;
+    };
     pinfunction: string;
     pintype: string;
     solder_mask_margin: number;
@@ -1151,7 +1156,15 @@ export class Pad {
             P.list("layers", T.string),
             P.pair("roundrect_rratio", T.number),
             P.pair("chamfer_ratio", T.number),
-            P.pair("chamfer", T.number),
+            P.expr(
+                "chamfer",
+                T.object(
+                    P.atom("top_right"),
+                    P.atom("top_left"),
+                    P.atom("bottom_right"),
+                    P.atom("bottom_left"),
+                ),
+            ),
             P.pair("pinfunction", T.string),
             P.pair("pintype", T.string),
             P.pair("solder_mask_margin", T.number),

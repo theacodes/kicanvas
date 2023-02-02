@@ -16,6 +16,7 @@ import dimensions_pcb_src from "./files/dimensions.kicad_pcb";
 import zones_pcb_src from "./files/zones.kicad_pcb";
 import vias_pcb_src from "./files/vias.kicad_pcb";
 import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
+import footprint_pads_pcb_src from "./files/footprint-pads.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -733,5 +734,214 @@ suite("board parser", function () {
             },
         } as Partial<board.Zone>);
         assert.isFalse(zone.fill.fill);
+    });
+
+    test("footprint with pads", function () {
+        const pcb = new board.KicadPCB(footprint_pads_pcb_src);
+        assert.equal(pcb.footprints.length, 13);
+
+        const pad1 = pcb.footprints[0].pads[0];
+        assert.deepInclude(pad1, {
+            number: "1",
+            type: "smd",
+            shape: "circle",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+        } as Partial<board.Pad>);
+
+        const pad2 = pcb.footprints[1].pads[0];
+        assert.deepInclude(pad2, {
+            number: "1",
+            type: "smd",
+            shape: "roundrect",
+            at: { position: { x: 0, y: 0 }, rotation: 90, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            roundrect_rratio: 0.25,
+            chamfer_ratio: 0.2,
+            chamfer: {
+                top_left: true,
+                bottom_right: true,
+            },
+        } as Partial<board.Pad>);
+
+        const pad3 = pcb.footprints[2].pads[0];
+        assert.deepInclude(pad3, {
+            number: "1",
+            type: "smd",
+            shape: "roundrect",
+            at: { position: { x: 0, y: 0 }, rotation: 90, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            roundrect_rratio: 0.4,
+        } as Partial<board.Pad>);
+
+        const pad4 = pcb.footprints[3].pads[0];
+        assert.deepInclude(pad4, {
+            number: "1",
+            type: "smd",
+            shape: "custom",
+            at: { position: { x: 0, y: 0 }, rotation: 90, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            options: {
+                clearance: "outline",
+                anchor: "circle",
+            },
+        } as Partial<board.Pad>);
+        assert.equal(pad4.primitives.length, 1);
+        assert.deepInclude(pad4.primitives[0], {
+            width: 0.2,
+            fill: "yes",
+            pts: [
+                { x: -2, y: 1 },
+                { x: 0, y: -1 },
+                { x: 2, y: 1 },
+            ],
+        } as Partial<board.GrPoly>);
+
+        const pad5 = pcb.footprints[4].pads[0];
+        assert.deepInclude(pad5, {
+            number: "1",
+            type: "thru_hole",
+            shape: "oval",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 3, y: 6 },
+            layers: ["*.Cu", "*.Mask"],
+            drill: {
+                oval: true,
+                diameter: 2,
+                width: 5,
+                offset: { x: 0, y: 0 },
+            },
+        } as Partial<board.Pad>);
+
+        const pad6 = pcb.footprints[5].pads[0];
+        assert.deepInclude(pad6, {
+            number: "1",
+            type: "thru_hole",
+            shape: "circle",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 3, y: 3 },
+            layers: ["*.Cu", "*.Mask"],
+            drill: {
+                oval: false,
+                diameter: 2,
+                width: 0,
+                offset: { x: 0, y: 0 },
+            },
+        } as Partial<board.Pad>);
+
+        const pad7 = pcb.footprints[6].pads[0];
+        assert.deepInclude(pad7, {
+            number: "1",
+            type: "thru_hole",
+            shape: "rect",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 2, y: 2 },
+            layers: ["*.Cu", "*.Mask"],
+            drill: {
+                oval: false,
+                diameter: 1,
+                width: 0,
+                offset: { x: 0, y: 0 },
+            },
+        } as Partial<board.Pad>);
+
+        const pad8 = pcb.footprints[7].pads[0];
+        assert.deepInclude(pad8, {
+            number: "1",
+            type: "smd",
+            shape: "rect",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+        } as Partial<board.Pad>);
+
+        const pad9 = pcb.footprints[8].pads[0];
+        assert.deepInclude(pad9, {
+            number: "1",
+            type: "smd",
+            shape: "roundrect",
+            at: { position: { x: 0, y: 0 }, rotation: 90, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            roundrect_rratio: 0,
+            chamfer_ratio: 0.2,
+            chamfer: {
+                top_left: true,
+                bottom_right: true,
+            },
+        } as Partial<board.Pad>);
+
+        const pad10 = pcb.footprints[9].pads[0];
+        assert.deepInclude(pad10, {
+            number: "1",
+            type: "smd",
+            shape: "trapezoid",
+            at: { position: { x: 0, y: 0 }, rotation: 90, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            rect_delta: { x: 0.5, y: 0 },
+        } as Partial<board.Pad>);
+
+        const pad11 = pcb.footprints[10].pads[0];
+        assert.deepInclude(pad11, {
+            number: "1",
+            type: "smd",
+            shape: "custom",
+            at: { position: { x: 0, y: 0 }, rotation: 90, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            options: {
+                clearance: "outline",
+                anchor: "rect",
+            },
+        } as Partial<board.Pad>);
+        assert.equal(pad11.primitives.length, 2);
+        assert.deepInclude(pad11.primitives[0], {
+            width: 0.2,
+            fill: "yes",
+            pts: [
+                { x: -2, y: 1 },
+                { x: 0, y: -1 },
+                { x: 2, y: 1 },
+            ],
+        } as Partial<board.GrPoly>);
+        assert.deepInclude(pad11.primitives[1], {
+            center: { x: 0, y: 0 },
+            end: { x: 2.8, y: 0 },
+            width: 1,
+            fill: "none",
+        } as Partial<board.GrCircle>);
+
+        const pad12 = pcb.footprints[11].pads[0];
+        assert.deepInclude(pad12, {
+            number: "1",
+            type: "thru_hole",
+            shape: "oval",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 3, y: 6 },
+            drill: {
+                oval: true,
+                diameter: 2,
+                width: 5,
+                offset: { x: 1, y: 3 },
+            },
+            layers: ["*.Cu", "*.Mask"],
+        } as Partial<board.Pad>);
+
+        const pad13 = pcb.footprints[12].pads[0];
+        assert.deepInclude(pad13, {
+            number: "",
+            type: "smd",
+            shape: "circle",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            size: { x: 1, y: 1 },
+            layers: ["F.Cu", "F.Mask"],
+            solder_mask_margin: 0.5,
+            clearance: 0.5,
+        } as Partial<board.Pad>);
     });
 });
