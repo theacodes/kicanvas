@@ -43,7 +43,7 @@ class RectanglePainter extends ItemPainter {
         const color = color_maybe(
             r.stroke.color,
             this.gfx.state.stroke,
-            this.gfx.theme.note as Color,
+            this.gfx.theme["note"] as Color,
         );
 
         const pts = [
@@ -79,7 +79,7 @@ class PolylinePainter extends ItemPainter {
         const color = color_maybe(
             pl.stroke.color,
             this.gfx.state.stroke,
-            this.gfx.theme.note as Color,
+            this.gfx.theme["note"] as Color,
         );
 
         this.gfx.line(
@@ -108,7 +108,7 @@ class WirePainter extends ItemPainter {
             new Polyline(
                 w.pts,
                 this.gfx.state.stroke_width,
-                this.gfx.theme.wire as Color,
+                this.gfx.theme["wire"] as Color,
             ),
         );
     }
@@ -122,7 +122,8 @@ class CirclePainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, c: sch_items.Circle) {
-        const color = this.gfx.state.stroke ?? (this.gfx.theme.note as Color);
+        const color =
+            this.gfx.state.stroke ?? (this.gfx.theme["note"] as Color);
 
         this.gfx.arc(
             new Arc(
@@ -149,7 +150,8 @@ class ArcPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, a: sch_items.Arc) {
-        const color = this.gfx.state.stroke ?? (this.gfx.theme.note as Color);
+        const color =
+            this.gfx.state.stroke ?? (this.gfx.theme["note"] as Color);
 
         const arc = MathArc.from_three_points(
             a.start,
@@ -179,7 +181,7 @@ class JunctionPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, j: sch_items.Junction) {
-        const color = this.gfx.theme.junction as Color;
+        const color = this.gfx.theme["junction"] as Color;
         this.gfx.circle(
             new Circle(j.at.position, (j.diameter || 1) / 2, color),
         );
@@ -194,7 +196,7 @@ class NoConnectPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, nc: sch_items.NoConnect): void {
-        const color = this.gfx.theme.no_connect as Color;
+        const color = this.gfx.theme["no_connect"] as Color;
         const width = 0.1524;
         const size = 1.2192 / 2;
 
@@ -294,7 +296,7 @@ class LabelPainter extends ItemPainter {
     }
 
     get color() {
-        return this.gfx.theme.label_local as Color;
+        return this.gfx.theme["label_local"] as Color;
     }
 
     get_text_baseline_offset_dist(
@@ -416,7 +418,7 @@ class GlobalLabelPainter extends LabelPainter {
     override classes = [sch_items.GlobalLabel];
 
     override get color() {
-        return this.gfx.theme.label_global as Color;
+        return this.gfx.theme["label_global"] as Color;
     }
 
     override get_text_offset(l: sch_items.GlobalLabel, options: TextOptions) {
@@ -510,7 +512,7 @@ class HierarchicalLabelPainter extends LabelPainter {
     override classes = [sch_items.HierarchicalLabel];
 
     override get color() {
-        return this.gfx.theme.label_hier as Color;
+        return this.gfx.theme["label_hier"] as Color;
     }
 
     override get_text_offset(
@@ -772,7 +774,7 @@ class PinPainter extends ItemPainter {
                 num_placement.h_align,
                 num_placement.v_align,
                 abs_rotation,
-                this.gfx.theme.pin_number as Color,
+                this.gfx.theme["pin_number"] as Color,
             );
         }
 
@@ -784,7 +786,7 @@ class PinPainter extends ItemPainter {
                 name_placement.h_align,
                 name_placement.v_align,
                 abs_rotation,
-                this.gfx.theme.pin_name as Color,
+                this.gfx.theme["pin_name"] as Color,
             );
         }
 
@@ -841,7 +843,7 @@ class PinPainter extends ItemPainter {
                 new Angle(0),
                 new Angle(Math.PI * 2),
                 this.gfx.state.stroke_width / 2,
-                this.gfx.theme.pin as Color,
+                this.gfx.theme["pin"] as Color,
             ),
         );
 
@@ -850,7 +852,7 @@ class PinPainter extends ItemPainter {
             new Polyline(
                 [new Vec2(0, 0), new Vec2(p.length, 0)],
                 this.gfx.state.stroke_width,
-                this.gfx.theme.pin as Color,
+                this.gfx.theme["pin"] as Color,
             ),
         );
     }
@@ -872,8 +874,8 @@ class LibrarySymbolPainter extends ItemPainter {
             this.paint(layer, c);
         }
 
-        const outline_color = this.gfx.theme.component_outline;
-        const fill_color = this.gfx.theme.component_body;
+        const outline_color = this.gfx.theme["component_outline"];
+        const fill_color = this.gfx.theme["component_body"];
 
         if (
             [
@@ -917,14 +919,14 @@ class PropertyPainter extends ItemPainter {
             return;
         }
 
-        let color = this.gfx.theme.fields as Color;
+        let color = this.gfx.theme["fields"] as Color;
 
         switch (p.key) {
             case "Reference":
-                color = this.gfx.theme.reference as Color;
+                color = this.gfx.theme["reference"] as Color;
                 break;
             case "Value":
-                color = this.gfx.theme.value as Color;
+                color = this.gfx.theme["value"] as Color;
                 break;
         }
 

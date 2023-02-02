@@ -286,9 +286,9 @@ export class CircleSet {
     ) {
         this.shader ??= CircleSet.shader;
         this.vao = new VertexArray(gl);
-        this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
-        this.color_buf = this.vao.buffer(this.shader.a_color, 4);
+        this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
+        this.cap_region_buf = this.vao.buffer(this.shader["a_cap_region"], 1);
+        this.color_buf = this.vao.buffer(this.shader["a_color"], 4);
         this.vertex_count = 0;
     }
 
@@ -357,9 +357,9 @@ export class PolylineSet {
     ) {
         this.shader ??= PolylineSet.shader;
         this.vao = new VertexArray(gl);
-        this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.cap_region_buf = this.vao.buffer(this.shader.a_cap_region, 1);
-        this.color_buf = this.vao.buffer(this.shader.a_color, 4);
+        this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
+        this.cap_region_buf = this.vao.buffer(this.shader["a_cap_region"], 1);
+        this.color_buf = this.vao.buffer(this.shader["a_color"], 4);
         this.vertex_count = 0;
     }
 
@@ -456,8 +456,8 @@ export class PolygonSet {
     ) {
         this.shader ??= PolygonSet.shader;
         this.vao = new VertexArray(gl);
-        this.position_buf = this.vao.buffer(this.shader.a_position, 2);
-        this.color_buf = this.vao.buffer(this.shader.a_color, 4);
+        this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
+        this.color_buf = this.vao.buffer(this.shader["a_color"], 4);
         this.vertex_count = 0;
     }
 
@@ -643,22 +643,22 @@ export class PrimitiveSet {
     render(matrix: Matrix3, depth = 0) {
         if (this.#polygon_set) {
             this.#polygon_set.shader.bind();
-            this.#polygon_set.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#polygon_set.shader.u_depth.f1(depth);
+            this.#polygon_set.shader["u_matrix"].mat3f(false, matrix.elements);
+            this.#polygon_set.shader["u_depth"].f1(depth);
             this.#polygon_set.render();
         }
 
         if (this.#circle_set) {
             this.#circle_set.shader.bind();
-            this.#circle_set.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#circle_set.shader.u_depth.f1(depth);
+            this.#circle_set.shader["u_matrix"].mat3f(false, matrix.elements);
+            this.#circle_set.shader["u_depth"].f1(depth);
             this.#circle_set.render();
         }
 
         if (this.#polyline_set) {
             this.#polyline_set.shader.bind();
-            this.#polyline_set.shader.u_matrix.mat3f(false, matrix.elements);
-            this.#polyline_set.shader.u_depth.f1(depth);
+            this.#polyline_set.shader["u_matrix"].mat3f(false, matrix.elements);
+            this.#polyline_set.shader["u_depth"].f1(depth);
             this.#polyline_set.render();
         }
     }

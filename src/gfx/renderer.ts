@@ -50,7 +50,7 @@ export abstract class Renderer {
     abstract dispose();
 
     get background_color(): Color {
-        return (this.theme?.background as Color) ?? new Color(0, 0, 0, 1);
+        return (this.theme?.["background"] as Color) ?? new Color(0, 0, 0, 1);
     }
 
     /**
@@ -139,7 +139,7 @@ export abstract class Renderer {
             BBox.from_points([
                 circle.center.add(radial),
                 circle.center.sub(radial),
-            ])
+            ]),
         );
     }
 
@@ -160,7 +160,7 @@ export abstract class Renderer {
             arc.radius,
             arc.start_angle,
             arc.end_angle,
-            arc.width
+            arc.width,
         );
         const points = math_arc.to_polyline();
 
@@ -199,7 +199,7 @@ export abstract class Renderer {
         }
 
         polygon.points = Array.from(
-            this.state.matrix.transform_all(polygon.points)
+            this.state.matrix.transform_all(polygon.points),
         );
 
         this.add_bbox(BBox.from_points(polygon.points));
@@ -210,11 +210,11 @@ export abstract class RenderLayer {
     constructor(
         public readonly renderer: Renderer,
         public readonly name: string,
-        public readonly depth: number = 0
+        public readonly depth: number = 0,
     ) {
         if (depth < 0 || depth > 1) {
             throw new Error(
-                `Invalid depth value ${depth}, depth should be between 0 and 1.`
+                `Invalid depth value ${depth}, depth should be between 0 and 1.`,
             );
         }
     }
@@ -231,7 +231,7 @@ export class RenderState {
         public matrix: Matrix3 = Matrix3.identity(),
         public fill: Color = Color.black,
         public stroke: Color = Color.black,
-        public stroke_width: number = 0
+        public stroke_width: number = 0,
     ) {}
 
     copy() {
@@ -239,7 +239,7 @@ export class RenderState {
             this.matrix.copy(),
             this.fill?.copy(),
             this.stroke?.copy(),
-            this.stroke_width
+            this.stroke_width,
         );
     }
 }

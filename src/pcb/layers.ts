@@ -233,13 +233,13 @@ export class LayerSet extends BaseLayerSet {
     color_for(layer_name: string): Color {
         switch (layer_name) {
             case ":Via:Holes":
-                return this.theme.via_hole;
+                return this.theme["via_hole"];
             case ":Via:Through":
-                return this.theme.via_through;
+                return this.theme["via_through"];
             case ":Pad:Holes":
-                return this.theme.background;
+                return this.theme["background"];
             case ":Pad:HoleWalls":
-                return this.theme.pad_through_hole;
+                return this.theme["pad_through_hole"];
         }
 
         let name = layer_name;
@@ -248,7 +248,7 @@ export class LayerSet extends BaseLayerSet {
 
         if (name.endsWith("_cu")) {
             name = name.replace("_cu", "");
-            return this.theme.copper[name];
+            return this.theme["copper"][name];
         }
 
         return this.theme[name] ?? Color.white;
