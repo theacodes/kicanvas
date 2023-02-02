@@ -10,6 +10,7 @@ import * as board from "../src/kicad/new-board";
 import empty_pcb_src from "./files/empty.kicad_pcb";
 import paper_pcb_src from "./files/paper.kicad_pcb";
 import shapes_pcb_src from "./files/shapes.kicad_pcb";
+import text_pcb_src from "./files/text.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -173,5 +174,95 @@ suite("board parser", function () {
             width: 0.5,
             fill: "solid",
         } as Partial<board.GrPoly>);
+    });
+
+    test("pcb with text", function () {
+        const pcb = new board.KicadPCB(text_pcb_src);
+
+        assert.equal(pcb.drawings.length, 10);
+
+        assert.deepInclude(pcb.drawings[0], {
+            text: "Text 9",
+            at: { position: { x: 0, y: 9 }, rotation: 0 },
+            layer: { name: "Dwgs.User" },
+            effects: {
+                hide: undefined,
+                font: {
+                    face: undefined,
+                    size: { x: 1, y: 1 },
+                    thickness: 0.25,
+                    italic: false,
+                    bold: false,
+                },
+                justify: {
+                    horizontal: "center",
+                    vertical: "center",
+                    mirror: false,
+                },
+            },
+        } as Partial<board.GrText>);
+
+        assert.deepInclude(pcb.drawings[1], {
+            text: "Text 5",
+            at: { position: { x: 0, y: 4 }, rotation: 0 },
+            layer: { name: "Dwgs.User" },
+            effects: {
+                hide: undefined,
+                font: {
+                    face: undefined,
+                    size: { x: 1, y: 1 },
+                    thickness: 0.25,
+                    italic: true,
+                    bold: false,
+                },
+                justify: {
+                    horizontal: "right",
+                    vertical: "center",
+                    mirror: false,
+                },
+            },
+        } as Partial<board.GrText>);
+
+        assert.deepInclude(pcb.drawings[2], {
+            text: "Text 7",
+            at: { position: { x: 0, y: 6 }, rotation: 180 },
+            layer: { name: "Dwgs.User" },
+            effects: {
+                hide: undefined,
+                font: {
+                    face: undefined,
+                    size: { x: 1, y: 1 },
+                    thickness: 0.25,
+                    italic: true,
+                    bold: false,
+                },
+                justify: {
+                    horizontal: "center",
+                    vertical: "center",
+                    mirror: false,
+                },
+            },
+        } as Partial<board.GrText>);
+
+        assert.deepInclude(pcb.drawings[3], {
+            text: "Text 2",
+            at: { position: { x: 0, y: 1 }, rotation: 0 },
+            layer: { name: "Dwgs.User" },
+            effects: {
+                hide: undefined,
+                font: {
+                    face: undefined,
+                    size: { x: 1, y: 1 },
+                    thickness: 0.25,
+                    italic: false,
+                    bold: false,
+                },
+                justify: {
+                    horizontal: "center",
+                    vertical: "center",
+                    mirror: false,
+                },
+            },
+        } as Partial<board.GrText>);
     });
 });
