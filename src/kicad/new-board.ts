@@ -637,9 +637,8 @@ export class At {
     rotation = 0;
 
     constructor(expr: Parseable) {
-        [this.position.x, this.position.y, this.rotation = 0] = expr.slice(
-            1,
-        ) as number[];
+        [this.position.x = 0, this.position.y = 0, this.rotation = 0] =
+            expr.slice(1) as number[];
     }
 }
 
@@ -1144,7 +1143,7 @@ export class Pad {
                     P.collection("items", "gr_rect", T.item(GrRect, this)),
                     P.collection("items", "gr_poly", T.item(GrPoly, this)),
                 );
-                return parsed["items"];
+                return parsed?.["items"];
             }),
         );
 
