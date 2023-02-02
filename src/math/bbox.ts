@@ -19,7 +19,7 @@ export class BBox {
         public y: number = 0,
         public w: number = 0,
         public h: number = 0,
-        public context: any = null
+        public context?: any,
     ) {}
 
     copy() {
@@ -34,7 +34,7 @@ export class BBox {
         y1: number,
         x2: number,
         y2: number,
-        context: any = null
+        context?: any,
     ) {
         if (x2 < x1) {
             [x1, x2] = [x2, x1];
@@ -49,13 +49,14 @@ export class BBox {
     /**
      * Create a BBox that contains all the given points
      */
-    static from_points(points: Vec2[], context: any = null) {
+    static from_points(points: Vec2[], context?: any) {
         if (points.length == 0) {
             return new BBox(0, 0, 0, 0);
         }
 
-        const start = points[0].copy();
-        const end = points[0].copy();
+        const first_pt = points[0]!;
+        const start = first_pt.copy();
+        const end = first_pt.copy();
 
         for (const p of points) {
             start.x = Math.min(start.x, p.x);
@@ -70,7 +71,7 @@ export class BBox {
     /**
      * Combine two or more BBoxes into a new BBox that contains both
      */
-    static combine(boxes: Iterable<BBox>, context: any = null) {
+    static combine(boxes: Iterable<BBox>, context?: any) {
         let min_x = Number.POSITIVE_INFINITY;
         let min_y = Number.POSITIVE_INFINITY;
         let max_x = Number.NEGATIVE_INFINITY;
@@ -178,7 +179,7 @@ export class BBox {
             this.y - s,
             this.w + s * 2,
             this.h + s * 2,
-            this.context
+            this.context,
         );
     }
 

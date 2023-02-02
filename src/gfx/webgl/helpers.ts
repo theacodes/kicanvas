@@ -36,7 +36,7 @@ class Uniform {
         public gl: WebGL2RenderingContext,
         public name: string,
         public location: WebGLUniformLocation,
-        public type: GLenum
+        public type: GLenum,
     ) {
         for (const [dst, src] of Object.entries(Uniform._function_map)) {
             this[dst] = (...args) => {
@@ -77,7 +77,7 @@ export class ShaderProgram {
         public gl: WebGL2RenderingContext,
         public name: string,
         public vertex: WebGLShader,
-        public fragment: WebGLShader
+        public fragment: WebGLShader,
     ) {
         if (typeof vertex === "string") {
             vertex = ShaderProgram.compile(gl, gl.VERTEX_SHADER, vertex);
@@ -107,12 +107,13 @@ export class ShaderProgram {
         gl: WebGL2RenderingContext,
         name: string,
         vert_src: URL | string,
-        frag_src: URL | string
+        frag_src: URL | string,
     ): Promise<ShaderProgram> {
-        if (!ShaderProgram.#shader_cache.has(gl)) {
-            ShaderProgram.#shader_cache.set(gl, new Map());
+        let cache = ShaderProgram.#shader_cache.get(gl);
+        if (!cache) {
+            cache = new Map();
+            ShaderProgram.#shader_cache.set(gl, cache);
         }
-        const cache = ShaderProgram.#shader_cache.get(gl);
 
         if (!cache.has(name)) {
             if (vert_src instanceof URL) {
@@ -127,7 +128,7 @@ export class ShaderProgram {
             cache.set(name, prog);
         }
 
-        return cache.get(name);
+        return cache.get(name) as ShaderProgram;
     }
 
     /**
@@ -167,7 +168,7 @@ export class ShaderProgram {
     static link(
         gl: WebGL2RenderingContext,
         vertex: WebGLShader,
-        fragment: WebGLShader
+        fragment: WebGLShader,
     ) {
         const program = gl.createProgram();
 
@@ -201,20 +202,26 @@ export class ShaderProgram {
 
             if (info == null) {
                 throw new Error(
-                    `Could not get uniform info for uniform number ${u_n} for program ${this.program}`
+                    `Could not get uniform info for uniform number ${u_n} for program ${this.program}`,
                 );
             }
 
             const location = this.gl.getUniformLocation(
                 this.program,
-                info.name
+                info.name,
             );
+
+            if (location == null) {
+                throw new Error(
+                    `Could not get uniform location for uniform number ${u_n} for program ${this.program}`,
+                );
+            }
 
             this[info.name] = this.uniforms[info.name] = new Uniform(
                 this.gl,
                 info.name,
                 location,
-                info.type
+                info.type,
             );
         }
     }
@@ -226,7 +233,7 @@ export class ShaderProgram {
             a_n <
             this.gl.getProgramParameter(
                 this.program,
-                this.gl.ACTIVE_ATTRIBUTES
+                this.gl.ACTIVE_ATTRIBUTES,
             );
             a_n++
         ) {
@@ -234,14 +241,14 @@ export class ShaderProgram {
 
             if (info == null) {
                 throw new Error(
-                    `Could not get attribute info for attribute number ${a_n} for program ${this.program}`
+                    `Could not get attribute info for attribute number ${a_n} for program ${this.program}`,
                 );
             }
 
             this.attribs[info.name] = info;
             this[info.name] = this.gl.getAttribLocation(
                 this.program,
-                info.name
+                info.name,
             );
         }
     }
@@ -256,7 +263,7 @@ export class ShaderProgram {
  * Manages vertex array objects (VAOs) and associated buffers.
  */
 export class VertexArray {
-    vao: WebGLVertexArrayObject;
+    vao?: WebGLVertexArrayObject;
     buffers: Buffer[] = [];
 
     /**
@@ -265,7 +272,13 @@ export class VertexArray {
      */
     constructor(public gl: WebGL2RenderingContext) {
         this.gl = gl;
-        this.vao = this.gl.createVertexArray();
+
+        const vao = this.gl.createVertexArray();
+        if (!vao) {
+            throw new Error(`Could not create new VertexArray`);
+        }
+        this.vao = vao;
+
         this.bind();
     }
 
@@ -274,8 +287,8 @@ export class VertexArray {
      * @param include_buffers
      */
     dispose(include_buffers = true) {
-        this.gl.deleteVertexArray(this.vao);
-        this.vao = null;
+        this.gl.deleteVertexArray(this.vao ?? null);
+        this.vao = undefined;
 
         if (include_buffers) {
             for (const buf of this.buffers) {
@@ -285,7 +298,7 @@ export class VertexArray {
     }
 
     bind() {
-        this.gl.bindVertexArray(this.vao);
+        this.gl.bindVertexArray(this.vao!);
     }
 
     /**
@@ -302,11 +315,11 @@ export class VertexArray {
     buffer(
         attrib: GLint,
         size: GLint,
-        type: GLenum = null,
+        type?: GLenum,
         normalized: GLboolean = false,
         stride: GLsizei = 0,
         offset: GLintptr = 0,
-        target: GLenum = null
+        target?: GLenum,
     ): Buffer {
         type ??= this.gl.FLOAT;
 
@@ -319,7 +332,7 @@ export class VertexArray {
             type,
             normalized,
             stride,
-            offset
+            offset,
         );
         this.gl.enableVertexAttribArray(attrib);
 
@@ -350,32 +363,36 @@ export type TypedArrayLike =
  * Manages a buffer of GPU data like vertices or colors
  */
 export class Buffer {
-    #buf: WebGLBuffer;
+    #buf?: WebGLBuffer;
+    target: GLenum;
 
     /**
      * Create a new buffer
      * @param target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
      */
-    constructor(
-        public gl: WebGL2RenderingContext,
-        public target: GLenum = null
-    ) {
+    constructor(public gl: WebGL2RenderingContext, target?: GLenum) {
         this.gl = gl;
         this.target = target ?? gl.ARRAY_BUFFER;
-        this.#buf = gl.createBuffer();
+
+        const buf = gl.createBuffer();
+        if (!buf) {
+            throw new Error("Unable to create new Buffer");
+        }
+
+        this.#buf = buf;
     }
 
     dispose() {
-        this.gl.deleteBuffer(this.#buf);
-        this.#buf = null;
+        this.gl.deleteBuffer(this.#buf ?? null);
+        this.#buf = undefined;
     }
 
     /**
      * Binds the buffer to the current context
      */
     bind() {
-        this.gl.bindBuffer(this.target, this.#buf);
+        this.gl.bindBuffer(this.target, this.#buf!);
     }
 
     /**
@@ -384,7 +401,7 @@ export class Buffer {
      * @param usage - intended usage pattern, typically gl.STATIC_DRAW
      *      (the default if unspecified) or gl.DYNAMIC_DRAW
      */
-    set(data: TypedArrayLike, usage: GLenum = null) {
+    set(data: TypedArrayLike, usage?: GLenum) {
         this.bind();
         usage ??= this.gl.STATIC_DRAW;
         this.gl.bufferData(this.target, data, usage);
@@ -397,7 +414,7 @@ export class Buffer {
         this.bind();
         return this.gl.getBufferParameter(
             this.target,
-            this.gl.BUFFER_SIZE
+            this.gl.BUFFER_SIZE,
         ) as number;
     }
 }

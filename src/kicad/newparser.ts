@@ -52,14 +52,14 @@ export const T = {
                 return e ? true : false;
         }
     },
-    string(obj: Obj, name: string, e: ListOrAtom): string {
+    string(obj: Obj, name: string, e: ListOrAtom): string | undefined {
         if (typeof e == "string") {
             return e;
         } else {
             return undefined;
         }
     },
-    number(obj: Obj, name: string, e: ListOrAtom): number {
+    number(obj: Obj, name: string, e: ListOrAtom): number | undefined {
         if (typeof e == "number") {
             return e;
         } else {
@@ -184,7 +184,7 @@ export const P = {
      * options, for example atom("align", ["left", "right"]) would process
      * (left) as {align: "left"} and (right) as {align: "right"}.
      */
-    atom(name: string, values: string[] = null): PropertyDefinition {
+    atom(name: string, values?: string[]): PropertyDefinition {
         let typefn;
 
         if (values) {
@@ -201,7 +201,7 @@ export const P = {
             fn(obj: Obj, name: string, e: ListOrAtom) {
                 // Handle "(atom)" as "atom".
                 if (Array.isArray(e) && e.length == 1) {
-                    e = e[0];
+                    e = e[0]!;
                 }
                 return typefn(obj, name, e);
             },
@@ -267,7 +267,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
             defs_map.set(n, def);
             n++;
         } else {
-            for (const a of def.accepts) {
+            for (const a of def.accepts!) {
                 defs_map.set(a, def);
             }
         }

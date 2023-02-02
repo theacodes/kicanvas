@@ -21,6 +21,9 @@ export class DropTarget {
         elm.addEventListener(
             "dragover",
             (e) => {
+                if (!e.dataTransfer) {
+                    return;
+                }
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "move";
             },
@@ -32,7 +35,12 @@ export class DropTarget {
             async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
+
                 const dt = e.dataTransfer;
+                if (!dt) {
+                    return;
+                }
+
                 const files = Array.from(dt.files).filter((file) => {
                     for (const ext of exts) {
                         if (file.name.endsWith(`.${ext}`)) {

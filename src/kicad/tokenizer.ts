@@ -45,17 +45,25 @@ function error_context(input: string, index: number) {
     return input.slice(start, index + end);
 }
 
+enum State {
+    none,
+    string,
+    number,
+    atom,
+    hex,
+}
+
 export function* tokenize(input: string) {
     const open_token = new Token(Token.OPEN);
     const close_token = new Token(Token.CLOSE);
-    let state = null;
-    let start_idx = null;
+    let state: State = State.none;
+    let start_idx = 0;
     let escaping = false;
 
     for (let i = 0; i < input.length + 1; i++) {
-        const c = i < input.length ? input[i] : EOF;
+        const c: string = i < input.length ? input[i]! : EOF;
 
-        if (state === null) {
+        if (state == State.none) {
             if (c === "(") {
                 yield open_token;
                 continue;
@@ -63,15 +71,15 @@ export function* tokenize(input: string) {
                 yield close_token;
                 continue;
             } else if (c === '"') {
-                state = "string";
+                state = State.string;
                 start_idx = i;
                 continue;
             } else if (c === "-" || c == "+" || is_digit(c)) {
-                state = "number";
+                state = State.number;
                 start_idx = i;
                 continue;
             } else if (is_alpha(c) || ["*", "&", "$", "/", "%"].includes(c)) {
-                state = "atom";
+                state = State.atom;
                 start_idx = i;
                 continue;
             } else if (is_whitespace(c)) {
@@ -82,7 +90,7 @@ export function* tokenize(input: string) {
                     i,
                 )}`;
             }
-        } else if (state === "atom") {
+        } else if (state == State.atom) {
             if (
                 is_alpha(c) ||
                 is_digit(c) ||
@@ -104,7 +112,7 @@ export function* tokenize(input: string) {
                 continue;
             } else if (c === ")" || is_whitespace(c)) {
                 yield new Token(Token.ATOM, input.substring(start_idx, i));
-                state = null;
+                state = State.none;
                 if (c === ")") {
                     yield close_token;
                 }
@@ -116,29 +124,29 @@ export function* tokenize(input: string) {
                     )}`,
                 );
             }
-        } else if (state === "number") {
+        } else if (state == State.number) {
             if (c === "." || is_digit(c)) {
                 continue;
             } else if (c.toLowerCase() === "x") {
                 /* Hex number */
-                state = "hex";
+                state = State.hex;
                 continue;
             } else if (
                 ["-", "a", "b", "c", "d", "e", "f"].includes(c.toLowerCase())
             ) {
                 /* Special case of UUID value */
-                state = "atom";
+                state = State.atom;
                 continue;
             } else if (is_alpha(c)) {
                 /* It's actually an atom, e.g. +3V3 */
-                state = "atom";
+                state = State.atom;
                 continue;
             } else if (c === ")" || is_whitespace(c)) {
                 yield new Token(
                     Token.NUMBER,
                     parseFloat(input.substring(start_idx, i)),
                 );
-                state = null;
+                state = State.none;
                 if (c === ")") {
                     yield close_token;
                 }
@@ -151,7 +159,7 @@ export function* tokenize(input: string) {
                     )}`,
                 );
             }
-        } else if (state === "hex") {
+        } else if (state == State.hex) {
             if (
                 is_digit(c) ||
                 ["a", "b", "c", "d", "e", "f", "_"].includes(c.toLowerCase())
@@ -160,7 +168,7 @@ export function* tokenize(input: string) {
             } else if (c === ")" || is_whitespace(c)) {
                 const hexstr = input.substring(start_idx, i).replace("_", "");
                 yield new Token(Token.NUMBER, Number.parseInt(hexstr, 16));
-                state = null;
+                state = State.none;
                 if (c === ")") {
                     yield close_token;
                 }
@@ -168,7 +176,7 @@ export function* tokenize(input: string) {
             } else {
                 throw `Unexpected character at index ${i}: ${c}, expected hexadecimal.`;
             }
-        } else if (state === "string") {
+        } else if (state == State.string) {
             if (!escaping && c === '"') {
                 yield new Token(
                     Token.STRING,
@@ -176,7 +184,7 @@ export function* tokenize(input: string) {
                         .substring((start_idx ?? 0) + 1, i)
                         .replaceAll("\\n", "\n"),
                 );
-                state = null;
+                state = State.none;
                 escaping = false;
                 continue;
             } else if (c === "\\") {

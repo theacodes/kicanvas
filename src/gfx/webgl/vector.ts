@@ -78,7 +78,7 @@ class Tesselator {
         }
         const color_data = color.to_array();
         for (let i = 0; i < length; i++) {
-            dest[offset + i] = color_data[i % color_data.length];
+            dest[offset + i] = color_data[i % color_data.length]!;
         }
     }
 
@@ -120,8 +120,8 @@ class Tesselator {
         let vertex_index = 0;
 
         for (let segment_num = 1; segment_num < points.length; segment_num++) {
-            const p1 = points[segment_num - 1];
-            const p2 = points[segment_num];
+            const p1 = points[segment_num - 1]!;
+            const p2 = points[segment_num]!;
 
             const length = p2.sub(p1).magnitude;
 
@@ -182,7 +182,7 @@ class Tesselator {
         let vertex_index = 0;
 
         for (let i = 0; i < circles.length; i++) {
-            const c = circles[i];
+            const c = circles[i]!;
             const cap_region = 1.0;
             const quad = this.tesselate_circle(c);
 
@@ -223,8 +223,9 @@ class Tesselator {
 
         const points_flattened = new Array(points.length * 2);
         for (let i = 0; i < points.length; i++) {
-            points_flattened[i * 2] = points[i].x;
-            points_flattened[i * 2 + 1] = points[i].y;
+            const pt = points[i]!;
+            points_flattened[i * 2] = pt.x;
+            points_flattened[i * 2 + 1] = pt.y;
         }
 
         // shortcut if the polygon is a single triangle.
@@ -255,7 +256,8 @@ class Tesselator {
  * A set of filled circles.
  */
 export class CircleSet {
-    static shader;
+    static shader: ShaderProgram;
+    shader: ShaderProgram;
     vao: VertexArray;
     position_buf: Buffer;
     cap_region_buf: Buffer;
@@ -280,11 +282,8 @@ export class CircleSet {
      * Create a new circle set.
      * @param shader - optional override for the shader program used when drawing.
      */
-    constructor(
-        public gl: WebGL2RenderingContext,
-        public shader: ShaderProgram = null,
-    ) {
-        this.shader ??= CircleSet.shader;
+    constructor(public gl: WebGL2RenderingContext, shader?: ShaderProgram) {
+        this.shader = shader ?? CircleSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
         this.cap_region_buf = this.vao.buffer(this.shader["a_cap_region"], 1);
@@ -327,7 +326,8 @@ export class CircleSet {
  * A set of stroked polylines
  */
 export class PolylineSet {
-    static shader;
+    static shader: ShaderProgram;
+    shader: ShaderProgram;
     vao: VertexArray;
     position_buf: Buffer;
     cap_region_buf: Buffer;
@@ -351,11 +351,8 @@ export class PolylineSet {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(
-        public gl: WebGL2RenderingContext,
-        public shader: ShaderProgram = null,
-    ) {
-        this.shader ??= PolylineSet.shader;
+    constructor(public gl: WebGL2RenderingContext, shader?: ShaderProgram) {
+        this.shader = shader ?? PolylineSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
         this.cap_region_buf = this.vao.buffer(this.shader["a_cap_region"], 1);
@@ -427,7 +424,8 @@ export class PolylineSet {
  * A set of filled polygons
  */
 export class PolygonSet {
-    static shader;
+    static shader: ShaderProgram;
+    shader: ShaderProgram;
     vao: VertexArray;
     position_buf: Buffer;
     color_buf: Buffer;
@@ -450,11 +448,8 @@ export class PolygonSet {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(
-        public gl: WebGL2RenderingContext,
-        public shader: ShaderProgram = null,
-    ) {
-        this.shader ??= PolygonSet.shader;
+    constructor(public gl: WebGL2RenderingContext, shader?: ShaderProgram) {
+        this.shader = shader ?? PolygonSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
         this.color_buf = this.vao.buffer(this.shader["a_color"], 4);
@@ -482,7 +477,7 @@ export class PolygonSet {
         width: number,
         color: Color,
     ): Polyline[] {
-        const lines = [];
+        const lines: Polyline[] = [];
         for (let i = 0; i < triangles.length; i += 6) {
             const a = new Vec2(triangles[i], triangles[i + 1]);
             const b = new Vec2(triangles[i + 2], triangles[i + 3]);

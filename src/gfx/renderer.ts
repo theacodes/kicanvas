@@ -30,7 +30,7 @@ import { Arc as MathArc } from "../math/arc";
  *
  */
 export abstract class Renderer {
-    #current_bbox: BBox = null;
+    #current_bbox: BBox | null;
 
     canvas: HTMLCanvasElement;
     state: RenderStateStack = new RenderStateStack();
@@ -252,7 +252,7 @@ export class RenderStateStack {
     }
 
     get top() {
-        return this.#stack.at(-1);
+        return this.#stack.at(-1)!;
     }
 
     /**

@@ -30,6 +30,9 @@ export class Matrix3 {
      * @param elements the 9 matrix elements
      */
     constructor(elements: ElementArray | Float32Array) {
+        if (elements.length != 9) {
+            throw new Error(`Matrix3 requires 9 elements, got ${elements}`);
+        }
         this.elements = new Float32Array(elements);
     }
 
@@ -52,9 +55,9 @@ export class Matrix3 {
         const e = this.elements;
         // prettier-ignore
         return new DOMMatrix([
-            e[0], e[3],
-            e[1], e[4],
-            e[6], e[7],
+            e[0]!, e[3]!,
+            e[1]!, e[4]!,
+            e[6]!, e[7]!,
         ]);
     }
 
@@ -65,10 +68,10 @@ export class Matrix3 {
         const e = this.elements;
         // prettier-ignore
         return new DOMMatrix([
-            e[0], e[1], 0, e[2],
-            e[3], e[4], 0, e[5],
+            e[0]!, e[1]!, 0, e[2]!,
+            e[3]!, e[4]!, 0, e[5]!,
             0, 0, 1, 0,
-            e[6], e[7], 0, 1
+            e[6]!, e[7]!, 0, 1
         ]);
     }
 
@@ -106,7 +109,10 @@ export class Matrix3 {
     /**
      * Update this matrix's elements
      */
-    set(elements: ElementArray) {
+    set(elements: Float32Array | ElementArray) {
+        if (elements.length != 9) {
+            throw new Error(`Matrix3 requires 9 elements, got ${elements}`);
+        }
         this.elements.set(elements);
     }
 
@@ -115,12 +121,12 @@ export class Matrix3 {
      * @returns A new Vec2
      */
     transform(vec: Vec2): Vec2 {
-        const a00 = this.elements[0 * 3 + 0];
-        const a01 = this.elements[0 * 3 + 1];
-        const a10 = this.elements[1 * 3 + 0];
-        const a11 = this.elements[1 * 3 + 1];
-        const a20 = this.elements[2 * 3 + 0];
-        const a21 = this.elements[2 * 3 + 1];
+        const a00 = this.elements[0 * 3 + 0]!;
+        const a01 = this.elements[0 * 3 + 1]!;
+        const a10 = this.elements[1 * 3 + 0]!;
+        const a11 = this.elements[1 * 3 + 1]!;
+        const a20 = this.elements[2 * 3 + 0]!;
+        const a21 = this.elements[2 * 3 + 1]!;
         const b00 = vec.x;
         const b01 = vec.y;
         const b02 = 1;
@@ -157,24 +163,24 @@ export class Matrix3 {
      * @returns this matrix
      */
     multiply_self(b: Matrix3) {
-        const a00 = this.elements[0 * 3 + 0];
-        const a01 = this.elements[0 * 3 + 1];
-        const a02 = this.elements[0 * 3 + 2];
-        const a10 = this.elements[1 * 3 + 0];
-        const a11 = this.elements[1 * 3 + 1];
-        const a12 = this.elements[1 * 3 + 2];
-        const a20 = this.elements[2 * 3 + 0];
-        const a21 = this.elements[2 * 3 + 1];
-        const a22 = this.elements[2 * 3 + 2];
-        const b00 = b.elements[0 * 3 + 0];
-        const b01 = b.elements[0 * 3 + 1];
-        const b02 = b.elements[0 * 3 + 2];
-        const b10 = b.elements[1 * 3 + 0];
-        const b11 = b.elements[1 * 3 + 1];
-        const b12 = b.elements[1 * 3 + 2];
-        const b20 = b.elements[2 * 3 + 0];
-        const b21 = b.elements[2 * 3 + 1];
-        const b22 = b.elements[2 * 3 + 2];
+        const a00 = this.elements[0 * 3 + 0]!;
+        const a01 = this.elements[0 * 3 + 1]!;
+        const a02 = this.elements[0 * 3 + 2]!;
+        const a10 = this.elements[1 * 3 + 0]!;
+        const a11 = this.elements[1 * 3 + 1]!;
+        const a12 = this.elements[1 * 3 + 2]!;
+        const a20 = this.elements[2 * 3 + 0]!;
+        const a21 = this.elements[2 * 3 + 1]!;
+        const a22 = this.elements[2 * 3 + 2]!;
+        const b00 = b.elements[0 * 3 + 0]!;
+        const b01 = b.elements[0 * 3 + 1]!;
+        const b02 = b.elements[0 * 3 + 2]!;
+        const b10 = b.elements[1 * 3 + 0]!;
+        const b11 = b.elements[1 * 3 + 1]!;
+        const b12 = b.elements[1 * 3 + 2]!;
+        const b20 = b.elements[2 * 3 + 0]!;
+        const b21 = b.elements[2 * 3 + 1]!;
+        const b22 = b.elements[2 * 3 + 2]!;
 
         this.elements[0] = b00 * a00 + b01 * a10 + b02 * a20;
         this.elements[1] = b00 * a01 + b01 * a11 + b02 * a21;
@@ -201,15 +207,15 @@ export class Matrix3 {
      * @returns A new matrix that is the inverse of this matrix
      */
     inverse(): Matrix3 {
-        const a00 = this.elements[0 * 3 + 0];
-        const a01 = this.elements[0 * 3 + 1];
-        const a02 = this.elements[0 * 3 + 2];
-        const a10 = this.elements[1 * 3 + 0];
-        const a11 = this.elements[1 * 3 + 1];
-        const a12 = this.elements[1 * 3 + 2];
-        const a20 = this.elements[2 * 3 + 0];
-        const a21 = this.elements[2 * 3 + 1];
-        const a22 = this.elements[2 * 3 + 2];
+        const a00 = this.elements[0 * 3 + 0]!;
+        const a01 = this.elements[0 * 3 + 1]!;
+        const a02 = this.elements[0 * 3 + 2]!;
+        const a10 = this.elements[1 * 3 + 0]!;
+        const a11 = this.elements[1 * 3 + 1]!;
+        const a12 = this.elements[1 * 3 + 2]!;
+        const a20 = this.elements[2 * 3 + 0]!;
+        const a21 = this.elements[2 * 3 + 1]!;
+        const a22 = this.elements[2 * 3 + 2]!;
 
         const b01 = a22 * a11 - a12 * a21;
         const b11 = -a22 * a10 + a12 * a20;

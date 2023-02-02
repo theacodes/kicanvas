@@ -17,13 +17,13 @@ export class WebGL2Renderer extends Renderer {
     #layers: WebGL2RenderLayer[] = [];
 
     /** The layer currently being drawn to. */
-    #active_layer: WebGL2RenderLayer = null;
+    #active_layer: WebGL2RenderLayer | null;
 
     /** Projection matrix for clip -> screen */
     projection_matrix: Matrix3;
 
     /** WebGL backend */
-    gl: WebGL2RenderingContext;
+    gl?: WebGL2RenderingContext;
 
     /**
      * Create a new WebGL2Renderer
@@ -71,7 +71,7 @@ export class WebGL2Renderer extends Renderer {
             layer.dispose();
         }
         if (this.gl) {
-            this.gl = null;
+            this.gl = undefined;
         }
     }
 
@@ -117,7 +117,7 @@ export class WebGL2Renderer extends Renderer {
         this.#layers.push(this.#active_layer);
         this.#active_layer = null;
 
-        return this.#layers.at(-1);
+        return this.#layers.at(-1)!;
     }
 
     override circle(circle: Circle) {
@@ -127,7 +127,7 @@ export class WebGL2Renderer extends Renderer {
             return;
         }
 
-        this.#active_layer.geometry.add_circle(circle);
+        this.#active_layer!.geometry.add_circle(circle);
     }
 
     override line(line: Polyline) {
@@ -137,7 +137,7 @@ export class WebGL2Renderer extends Renderer {
             return;
         }
 
-        this.#active_layer.geometry.add_line(line);
+        this.#active_layer!.geometry.add_line(line);
     }
 
     override polygon(polygon: Polygon) {
@@ -147,7 +147,7 @@ export class WebGL2Renderer extends Renderer {
             return;
         }
 
-        this.#active_layer.geometry.add_polygon(polygon);
+        this.#active_layer!.geometry.add_polygon(polygon);
     }
 
     get layers(): Iterable<RenderLayer> {

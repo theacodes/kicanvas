@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+type ElementOrFragment = HTMLElement | DocumentFragment;
+
 /**
  * A basic html tagged template literal.
  * It allows html elements (and arrays thereof) to be used in template literals
@@ -12,8 +14,8 @@
 export function html(
     strings: TemplateStringsArray,
     ...values: any[]
-): Element | DocumentFragment {
-    const replacements = [];
+): ElementOrFragment {
+    const replacements: ElementOrFragment[] = [];
     let out = "";
 
     for (let i = 0; i < values.length; i++) {
@@ -43,13 +45,13 @@ export function html(
 
     const slots = content.querySelectorAll("slot[replace]");
     for (let i = 0; i < slots.length; i++) {
-        const slot = slots[i];
-        const replacement = replacements[i];
+        const slot = slots[i]!;
+        const replacement = replacements[i]!;
         slot.replaceWith(replacement);
     }
 
     if (content.childElementCount == 1) {
-        return content.firstElementChild;
+        return content.firstElementChild as HTMLElement;
     } else {
         return content;
     }
@@ -71,12 +73,12 @@ export class CustomElement extends HTMLElement {
     }
 
     async update() {
-        for (const child of this.shadowRoot.children) {
+        for (const child of this.shadowRoot!.children) {
             if (child.tagName != "STYLE") {
                 child.remove();
             }
         }
-        this.shadowRoot.appendChild(await this.render(this.shadowRoot));
+        this.shadowRoot!.appendChild(await this.render(this.shadowRoot!));
     }
 
     async #renderInitialContent() {

@@ -9,7 +9,7 @@ export class Color {
         public r: number,
         public g: number,
         public b: number,
-        public a: number = 1
+        public a: number = 1,
     ) {}
 
     copy() {
@@ -58,11 +58,16 @@ export class Color {
             str = str.trim().slice(5, -1);
 
             const parts = str.split(",");
+
+            if (parts.length != 4) {
+                throw new Error(`Invalid color ${str}`);
+            }
+
             [r, g, b, a] = [
-                parseFloat(parts[0]) / 255,
-                parseFloat(parts[1]) / 255,
-                parseFloat(parts[2]) / 255,
-                parseFloat(parts[3]),
+                parseFloat(parts[0]!) / 255,
+                parseFloat(parts[1]!) / 255,
+                parseFloat(parts[2]!) / 255,
+                parseFloat(parts[3]!),
             ];
         } else {
             throw new Error(`Unable to parse CSS color string ${str}`);

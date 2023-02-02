@@ -25,12 +25,12 @@ export class Canvas2DRenderer extends Renderer {
     #layers: Canvas2dRenderLayer[] = [];
 
     /** The layer currently being drawn to. */
-    #active_layer: Canvas2dRenderLayer = null;
+    #active_layer: Canvas2dRenderLayer | null;
 
     /** State */
     override state: RenderStateStack = new RenderStateStack();
 
-    ctx2d: CanvasRenderingContext2D;
+    ctx2d?: CanvasRenderingContext2D;
 
     /**
      * Create a new Canvas2DRenderer
@@ -64,7 +64,7 @@ export class Canvas2DRenderer extends Renderer {
     }
 
     dispose() {
-        this.ctx2d = null;
+        this.ctx2d = undefined;
     }
 
     update_viewport() {
@@ -72,16 +72,16 @@ export class Canvas2DRenderer extends Renderer {
         const rect = this.canvas.getBoundingClientRect();
         this.canvas.width = Math.round(rect.width * dpr);
         this.canvas.height = Math.round(rect.height * dpr);
-        this.ctx2d.setTransform();
+        this.ctx2d!.setTransform();
     }
 
     clear_canvas() {
-        this.ctx2d.setTransform();
-        this.ctx2d.scale(window.devicePixelRatio, window.devicePixelRatio);
-        this.ctx2d.fillStyle = this.background_color.to_css();
-        this.ctx2d.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx2d.lineCap = "round";
-        this.ctx2d.lineJoin = "round";
+        this.ctx2d!.setTransform();
+        this.ctx2d!.scale(window.devicePixelRatio, window.devicePixelRatio);
+        this.ctx2d!.fillStyle = this.background_color.to_css();
+        this.ctx2d!.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx2d!.lineCap = "round";
+        this.ctx2d!.lineJoin = "round";
     }
 
     start_layer(name: string, depth = 0) {
@@ -89,12 +89,14 @@ export class Canvas2DRenderer extends Renderer {
     }
 
     end_layer(): RenderLayer {
-        if (this.#active_layer == null) throw new Error("No active layer");
+        if (!this.#active_layer) {
+            throw new Error("No active layer");
+        }
 
         this.#layers.push(this.#active_layer);
         this.#active_layer = null;
 
-        return this.#layers.at(-1);
+        return this.#layers.at(-1)!;
     }
 
     override circle(circle: Circle) {
@@ -115,7 +117,9 @@ export class Canvas2DRenderer extends Renderer {
             Math.PI * 2,
         );
 
-        this.#active_layer.commands.push(new DrawCommand(path, color, null, 0));
+        this.#active_layer!.commands.push(
+            new DrawCommand(path, color, null, 0),
+        );
     }
 
     override line(line: Polyline) {
@@ -139,7 +143,7 @@ export class Canvas2DRenderer extends Renderer {
             }
         }
 
-        this.#active_layer.commands.push(
+        this.#active_layer!.commands.push(
             new DrawCommand(path, null, color, line.width),
         );
     }
@@ -166,7 +170,9 @@ export class Canvas2DRenderer extends Renderer {
         }
         path.closePath();
 
-        this.#active_layer.commands.push(new DrawCommand(path, color, null, 0));
+        this.#active_layer!.commands.push(
+            new DrawCommand(path, color, null, 0),
+        );
     }
 
     get layers() {
@@ -192,8 +198,8 @@ class DrawCommand {
     ) {}
 
     render(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = this.fill;
-        ctx.strokeStyle = this.stroke;
+        ctx.fillStyle = this.fill ?? "black";
+        ctx.strokeStyle = this.stroke ?? "black";
         ctx.lineWidth = this.stroke_width;
         if (this.fill) {
             ctx.fill(this.path);
@@ -231,10 +237,11 @@ class Canvas2dRenderLayer extends RenderLayer {
         const last_command = this.commands.at(-1);
 
         if (
-            (last_command?.path_count < 20,
-            last_command?.fill == fill &&
-                last_command?.stroke == stroke &&
-                last_command?.stroke_width == stroke_width)
+            last_command &&
+            (last_command.path_count < 20,
+            last_command.fill == fill &&
+                last_command.stroke == stroke &&
+                last_command.stroke_width == stroke_width)
         ) {
             last_command.path.addPath(path);
             last_command.path_count++;
@@ -247,6 +254,11 @@ class Canvas2dRenderLayer extends RenderLayer {
 
     render(transform: Matrix3) {
         const ctx = (this.renderer as Canvas2DRenderer).ctx2d;
+
+        if (!ctx) {
+            throw new Error("No CanvasRenderingContext2D!");
+        }
+
         ctx.save();
 
         const accumulated_transform = Matrix3.from_DOMMatrix(
