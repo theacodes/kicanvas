@@ -24,7 +24,7 @@ class GlyphData {
     constructor(
         public strokes: number[][][],
         public width: number,
-        public bbox: { start: number[]; end: number[] }
+        public bbox: { start: number[]; end: number[] },
     ) {}
 }
 
@@ -55,10 +55,8 @@ export class Font {
      * Get the glyph data for a given glyph.
      */
     glyph(chr: string, subsitute = "?"): GlyphData {
-        return (
-            this.glyphs.at(chr.charCodeAt(0) - 32) ??
-            this.glyphs.at(subsitute.charCodeAt(0) - 32)
-        );
+        return (this.glyphs.at(chr.charCodeAt(0) - 32) ??
+            this.glyphs.at(subsitute.charCodeAt(0) - 32))!;
     }
 
     /**
@@ -72,8 +70,8 @@ export class Font {
      * Get overbar line data for the given glyph
      */
     overbar_for(glyph: GlyphData, italic: boolean): GlyphData {
-        const start = [0, -this.overbar_position_factor];
-        const end = [glyph.bbox.end[0], start[1]];
+        const start: [number, number] = [0, -this.overbar_position_factor];
+        const end: [number, number] = [glyph.bbox.end[0]!, start[1]];
 
         if (italic) {
             start[0] -= start[1] * this.italic_tilt;
@@ -97,7 +95,7 @@ export class ShapedGlyph {
         public readonly glyph: GlyphData,
         public readonly position: Vec2,
         public readonly size: Vec2,
-        public readonly tilt: number = 0
+        public readonly tilt: number = 0,
     ) {
         this.glyph = glyph;
         this.position = position;
@@ -105,7 +103,7 @@ export class ShapedGlyph {
         this.tilt = tilt;
         this.transform = Matrix3.translation(
             this.position.x,
-            this.position.y
+            this.position.y,
         ).scale_self(size.x, size.y);
     }
 
@@ -145,7 +143,7 @@ export class ShapedLine {
      */
     constructor(
         public readonly options: TextOptions,
-        public readonly shaped_glyphs: ShapedGlyph[]
+        public readonly shaped_glyphs: ShapedGlyph[],
     ) {}
 
     /**
@@ -165,12 +163,13 @@ export class ShapedLine {
             return new BBox(0, 0, 0, 0);
         }
 
-        const bbox_points = [];
-        const first = this.shaped_glyphs[0];
+        const bbox_points: Vec2[] = [];
+
+        const first = this.shaped_glyphs[0]!;
         for (const stroke of first.strokes()) {
             bbox_points.push(...stroke);
         }
-        const last = this.shaped_glyphs.at(-1);
+        const last = this.shaped_glyphs.at(-1)!;
         for (const stroke of last.strokes()) {
             bbox_points.push(...stroke);
         }
@@ -189,11 +188,11 @@ export class ShapedLine {
             return bb;
         }
 
-        const last = this.shaped_glyphs[this.shaped_glyphs.length - 1];
+        const last = this.shaped_glyphs[this.shaped_glyphs.length - 1]!;
 
         bb.x =
             last.position.x +
-            last.glyph.bbox.end[0] * last.size.x +
+            last.glyph.bbox.end[0]! * last.size.x +
             this.options.get_effective_thickness();
 
         bb.y = this.options.font.interline(this.options.size);
@@ -213,11 +212,11 @@ export class ShapedLine {
 export class ShapedParagraph {
     constructor(
         public readonly options: TextOptions,
-        public readonly lines: ShapedLine[]
+        public readonly lines: ShapedLine[],
     ) {}
 
     get bbox(): BBox {
-        const line_bboxes = [];
+        const line_bboxes: BBox[] = [];
         for (const line of this.lines) {
             line_bboxes.push(line.bbox());
         }
@@ -236,7 +235,7 @@ export class ShapedParagraph {
             yield new Polyline(
                 Array.from(stroke),
                 this.options.thickness,
-                color
+                color,
             );
         }
     }
@@ -255,7 +254,7 @@ export class TextOptions {
         public v_align: "top" | "center" | "bottom" = "top",
         public h_align: "left" | "center" | "right" = "left",
         public mirror_x: boolean = false,
-        public mirror_y: boolean = false
+        public mirror_y: boolean = false,
     ) {}
 
     copy() {
@@ -268,7 +267,7 @@ export class TextOptions {
             this.v_align,
             this.h_align,
             this.mirror_x,
-            this.mirror_y
+            this.mirror_y,
         );
         return t;
     }
@@ -335,7 +334,7 @@ export class TextShaper {
         let last_had_overbar = false;
 
         for (let i = 0; i < text.length; i++) {
-            let chr = text[i];
+            let chr = text[i]!;
 
             if (chr == "\t") {
                 chr_count = (Math.floor(chr_count / 4) + 1) * 4 - 1;
@@ -400,7 +399,7 @@ export class TextShaper {
 
             const glyph_postion = new Vec2(
                 char_offset.x + line_offset.x,
-                char_offset.y + line_offset.y
+                char_offset.y + line_offset.y,
             );
 
             out.push(
@@ -408,8 +407,8 @@ export class TextShaper {
                     glyph,
                     glyph_postion,
                     current_size.copy(),
-                    options.italic ? font.italic_tilt : 0
-                )
+                    options.italic ? font.italic_tilt : 0,
+                ),
             );
 
             if (overbar_depth > -1) {
@@ -417,18 +416,18 @@ export class TextShaper {
                     new ShapedGlyph(
                         this.default_font.overbar_for(
                             glyph,
-                            options.italic && !last_had_overbar
+                            options.italic && !last_had_overbar,
                         ),
                         new Vec2(glyph_postion.x, 0),
-                        base_size
-                    )
+                        base_size,
+                    ),
                 );
                 last_had_overbar = true;
             } else {
                 last_had_overbar = false;
             }
 
-            char_offset.x += current_size.x * glyph.bbox.end[0];
+            char_offset.x += current_size.x * glyph.bbox.end[0]!;
             chr_count++;
         }
 
@@ -442,10 +441,10 @@ export class TextShaper {
         text: string,
         position: Vec2,
         rotation: Angle,
-        options: TextOptions
+        options: TextOptions,
     ): ShapedParagraph {
         const text_lines = text.split("\n");
-        const shaped_lines = [];
+        const shaped_lines: ShapedLine[] = [];
 
         // Shape all the lines. Do this before drawing anything so that
         // alignment can be done properly.
@@ -456,7 +455,7 @@ export class TextShaper {
         const line_spacing = options.font.interline(options.size);
         const total_height = (shaped_lines.length - 1) * line_spacing;
         const matrix = Matrix3.translation(position.x, position.y).rotate_self(
-            rotation
+            rotation,
         );
 
         switch (options.v_align) {

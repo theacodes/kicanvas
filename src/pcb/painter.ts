@@ -71,7 +71,7 @@ class PolyPainter extends ItemPainter {
         const color = layer.color;
 
         if (p.width) {
-            this.gfx.line(new Polyline([...p.pts, p.pts[0]], p.width, color));
+            this.gfx.line(new Polyline([...p.pts, p.pts[0]!], p.width, color));
         }
 
         if (p.fill) {
@@ -351,7 +351,7 @@ class PadPainter extends ItemPainter {
                         this.gfx.polygon(new Polygon(rect_points, color));
                         this.gfx.line(
                             new Polyline(
-                                [...rect_points, rect_points[0]],
+                                [...rect_points, rect_points[0]!],
                                 rounding * 2,
                                 color,
                             ),

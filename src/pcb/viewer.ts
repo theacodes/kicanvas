@@ -74,7 +74,7 @@ export class BoardViewer extends Viewer {
     }
 
     #look_at_board() {
-        const edge_cuts = this.layers.by_name(LayerName.edge_cuts);
+        const edge_cuts = this.layers.by_name(LayerName.edge_cuts)!;
         const board_bbox = edge_cuts.bbox;
         this.viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
     }

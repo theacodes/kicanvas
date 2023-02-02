@@ -51,11 +51,11 @@ export class LayerSet extends BaseLayerSet {
             this.add(new ViewLayer(this, name));
         }
 
-        this.by_name(LayerName.interactive).visible = false;
+        this.by_name(LayerName.interactive)!.visible = false;
     }
 
     override *interactive_layers(): Generator<ViewLayer, void, unknown> {
         // Only the top interactive layer is clickable for schematics
-        yield this.by_name(LayerName.interactive);
+        yield this.by_name(LayerName.interactive)!;
     }
 }

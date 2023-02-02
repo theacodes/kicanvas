@@ -203,17 +203,17 @@ export class LayerSet extends BaseLayerSet {
 
             // Pad layers require that the front or back layer is visible.
             if (layer_name == ":Pads:Front") {
-                visible = () => this.by_name(LayerName.f_cu).visible;
+                visible = () => this.by_name(LayerName.f_cu)!.visible;
             }
             if (layer_name == ":Pads:Back") {
-                visible = () => this.by_name(LayerName.b_cu).visible;
+                visible = () => this.by_name(LayerName.b_cu)!.visible;
             }
 
             // Zone virtual layers for copper layers require that the referenced
             // copper layer is visible.
             if (layer_name.startsWith(":Zones:")) {
                 const copper_layer_name = layer_name.slice(7);
-                visible = () => this.by_name(copper_layer_name).visible;
+                visible = () => this.by_name(copper_layer_name)!.visible;
             }
 
             this.add(
@@ -233,13 +233,13 @@ export class LayerSet extends BaseLayerSet {
     color_for(layer_name: string): Color {
         switch (layer_name) {
             case ":Via:Holes":
-                return this.theme["via_hole"];
+                return this.theme["via_hole"] ?? Color.white;
             case ":Via:Through":
-                return this.theme["via_through"];
+                return this.theme["via_through"] ?? Color.white;
             case ":Pad:Holes":
-                return this.theme["background"];
+                return this.theme["background"] ?? Color.white;
             case ":Pad:HoleWalls":
-                return this.theme["pad_through_hole"];
+                return this.theme["pad_through_hole"] ?? Color.white;
         }
 
         let name = layer_name;
@@ -248,7 +248,7 @@ export class LayerSet extends BaseLayerSet {
 
         if (name.endsWith("_cu")) {
             name = name.replace("_cu", "");
-            return this.theme["copper"][name];
+            return this.theme["copper"]?.[name] ?? Color.white;
         }
 
         return this.theme[name] ?? Color.white;
@@ -291,7 +291,7 @@ export class LayerSet extends BaseLayerSet {
         ];
 
         for (const name of order) {
-            const layer: ViewLayer = this.by_name(name as string);
+            const layer: ViewLayer = this.by_name(name as string)!;
 
             if (layer) {
                 yield layer;
