@@ -15,6 +15,7 @@ import traces_pcb_src from "./files/traces.kicad_pcb";
 import dimensions_pcb_src from "./files/dimensions.kicad_pcb";
 import zones_pcb_src from "./files/zones.kicad_pcb";
 import vias_pcb_src from "./files/vias.kicad_pcb";
+import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
 
 suite("board parser", function () {
     test("empty pcb file", function () {
@@ -187,7 +188,7 @@ suite("board parser", function () {
 
         assert.deepInclude(pcb.drawings[0], {
             text: "Text 9",
-            at: { position: { x: 0, y: 9 }, rotation: 0 },
+            at: { position: { x: 0, y: 9 }, rotation: 0, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
                 hide: undefined,
@@ -208,7 +209,7 @@ suite("board parser", function () {
 
         assert.deepInclude(pcb.drawings[1], {
             text: "Text 5",
-            at: { position: { x: 0, y: 4 }, rotation: 0 },
+            at: { position: { x: 0, y: 4 }, rotation: 0, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
                 hide: undefined,
@@ -229,7 +230,7 @@ suite("board parser", function () {
 
         assert.deepInclude(pcb.drawings[2], {
             text: "Text 7",
-            at: { position: { x: 0, y: 6 }, rotation: 180 },
+            at: { position: { x: 0, y: 6 }, rotation: 180, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
                 hide: undefined,
@@ -250,7 +251,7 @@ suite("board parser", function () {
 
         assert.deepInclude(pcb.drawings[3], {
             text: "Text 2",
-            at: { position: { x: 0, y: 1 }, rotation: 0 },
+            at: { position: { x: 0, y: 1 }, rotation: 0, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
                 hide: undefined,
@@ -373,7 +374,7 @@ suite("board parser", function () {
 
         assert.deepInclude((pcb.drawings[0] as board.Dimension).gr_text, {
             text: "preval (mm)post",
-            at: { position: { x: 5, y: 4 }, rotation: 0 },
+            at: { position: { x: 5, y: 4 }, rotation: 0, unlocked: false },
             layer: { name: "F.Cu" },
             effects: {
                 font: {
@@ -494,7 +495,7 @@ suite("board parser", function () {
         assert.deepInclude(pcb.vias[0], {
             type: "through-hole",
             locked: true,
-            at: { position: { x: 2, y: 0 }, rotation: 0 },
+            at: { position: { x: 2, y: 0 }, rotation: 0, unlocked: false },
             size: 2,
             drill: 1,
             layers: ["F.Cu", "B.Cu"],
@@ -504,7 +505,7 @@ suite("board parser", function () {
         assert.deepInclude(pcb.vias[1], {
             type: "micro",
             locked: false,
-            at: { position: { x: 4, y: 0 }, rotation: 0 },
+            at: { position: { x: 4, y: 0 }, rotation: 0, unlocked: false },
             size: 2,
             drill: 1,
             layers: ["F.Cu", "In1.Cu"],
@@ -514,7 +515,7 @@ suite("board parser", function () {
         assert.deepInclude(pcb.vias[2], {
             type: "through-hole",
             locked: false,
-            at: { position: { x: 0, y: 0 }, rotation: 0 },
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
             size: 0.8,
             drill: 0.4,
             layers: ["F.Cu", "B.Cu"],
@@ -524,7 +525,7 @@ suite("board parser", function () {
         assert.deepInclude(pcb.vias[4], {
             type: "blind",
             locked: false,
-            at: { position: { x: 6, y: 0 }, rotation: 0 },
+            at: { position: { x: 6, y: 0 }, rotation: 0, unlocked: false },
             size: 2,
             drill: 1,
             layers: ["In2.Cu", "B.Cu"],
@@ -533,5 +534,204 @@ suite("board parser", function () {
             free: true,
             net: 0,
         } as Partial<board.Via>);
+    });
+
+    test("footprint with graphics", function () {
+        const pcb = new board.KicadPCB(footprint_graphics_pcb_src);
+        const fp = pcb.footprints[0];
+
+        assert.equal(fp.library_link, "Fiducial:Fiducial_1mm_Mask2mm");
+        assert.equal(fp.layer, "F.Cu");
+        assert.deepInclude(fp.at, {
+            position: { x: 0, y: 0 },
+            rotation: 0,
+        } as Partial<board.At>);
+
+        const [
+            text_ref,
+            text_value,
+            text_2,
+            text_3,
+            text_1,
+            text_ref_fab,
+            line,
+            rect,
+            arc,
+            circle,
+            poly,
+        ] = fp.drawings as [
+            board.FpText,
+            board.FpText,
+            board.FpText,
+            board.FpText,
+            board.FpText,
+            board.FpText,
+            board.FpLine,
+            board.FpRect,
+            board.FpArc,
+            board.FpCircle,
+            board.FpPoly,
+        ];
+
+        assert.deepInclude(text_ref, {
+            parent: fp,
+            type: "reference",
+            text: "REF**",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            layer: { name: "F.SilkS" },
+        } as Partial<board.FpText>);
+
+        assert.deepInclude(text_value, {
+            parent: fp,
+            type: "value",
+            text: "Test",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            layer: { name: "F.Fab" },
+        } as Partial<board.FpText>);
+
+        assert.deepInclude(text_ref_fab, {
+            parent: fp,
+            type: "user",
+            text: "${REFERENCE}",
+            at: { position: { x: 0, y: 0 }, rotation: 0, unlocked: false },
+            layer: { name: "F.Fab" },
+        } as Partial<board.FpText>);
+
+        assert.deepInclude(text_1, {
+            parent: fp,
+            type: "user",
+            text: "Text1",
+            at: { position: { x: 0, y: 4 }, rotation: 0, unlocked: true },
+            layer: { name: "F.SilkS" },
+            effects: {
+                font: {
+                    face: undefined,
+                    size: { x: 1, y: 1 },
+                    thickness: 0.15,
+                    italic: false,
+                    bold: false,
+                },
+                hide: undefined,
+                justify: {
+                    horizontal: "center",
+                    vertical: "center",
+                    mirror: false,
+                },
+            },
+        } as Partial<board.FpText>);
+
+        assert.deepInclude(text_2, {
+            parent: fp,
+            type: "user",
+            text: "Text2",
+            at: { position: { x: 0, y: 5 }, rotation: 90, unlocked: true },
+            layer: { name: "F.SilkS" },
+            effects: {
+                font: {
+                    face: undefined,
+                    size: { x: 1.5, y: 1.5 },
+                    thickness: 0.2,
+                    italic: true,
+                    bold: false,
+                },
+                hide: undefined,
+                justify: {
+                    horizontal: "right",
+                    vertical: "center",
+                    mirror: false,
+                },
+            },
+        } as Partial<board.FpText>);
+
+        assert.deepInclude(text_3, {
+            parent: fp,
+            type: "user",
+            text: "Text3",
+            at: { position: { x: 0, y: 17 }, rotation: 270, unlocked: false },
+            layer: { name: "F.SilkS" },
+            effects: {
+                font: {
+                    face: undefined,
+                    size: { x: 1.5, y: 1.5 },
+                    thickness: 0.2,
+                    italic: false,
+                    bold: false,
+                },
+                hide: undefined,
+                justify: {
+                    horizontal: "right",
+                    vertical: "center",
+                    mirror: true,
+                },
+            },
+        } as Partial<board.FpText>);
+
+        assert(arc instanceof board.FpArc);
+        assert.deepInclude(arc, {
+            start: { x: 0, y: -2 },
+            mid: { x: 2, y: 0 },
+            end: { x: 0, y: 2 },
+            layer: "F.SilkS",
+            width: 0.12,
+        } as Partial<board.FpArc>);
+
+        assert(rect instanceof board.FpRect);
+        assert.deepInclude(rect, {
+            start: { x: -2, y: -2 },
+            end: { x: 2, y: 2 },
+            layer: "F.SilkS",
+            width: 0.12,
+            fill: "none",
+        } as Partial<board.FpRect>);
+
+        assert(circle instanceof board.FpCircle);
+        assert.deepInclude(circle, {
+            center: { x: 0, y: 0 },
+            end: { x: 3, y: 0 },
+            layer: "F.SilkS",
+            width: 0.12,
+            fill: "none",
+        } as Partial<board.FpCircle>);
+
+        assert(line instanceof board.FpLine);
+        assert.deepInclude(line, {
+            start: { x: 0, y: 0 },
+            end: { x: 2, y: 0 },
+            layer: "F.SilkS",
+            width: 0.12,
+        } as Partial<board.FpLine>);
+
+        assert(poly instanceof board.FpPoly);
+        assert.deepInclude(poly, {
+            pts: [
+                { x: 3, y: 0 },
+                { x: 6, y: -3 },
+                { x: 9, y: 0 },
+                { x: 6, y: 3 },
+            ],
+            layer: "F.SilkS",
+            width: 0.12,
+            fill: "solid",
+        } as Partial<board.FpPoly>);
+
+        const zone = fp.zones[0];
+        assert.deepInclude(zone, {
+            parent: fp,
+            locked: true,
+            net: 0,
+            net_name: "",
+            layer: "F.Cu",
+            hatch: { style: "full", pitch: 0.508 },
+            connect_pads: { clearance: 0 },
+            min_thickness: 0.254,
+            keepout: {
+                tracks: "not_allowed",
+                vias: "not_allowed",
+                pads: "not_allowed",
+                copperpour: "allowed",
+                footprints: "allowed",
+            },
+        } as Partial<board.Zone>);
+        assert.isFalse(zone.fill.fill);
     });
 });

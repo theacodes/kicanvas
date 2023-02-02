@@ -183,7 +183,7 @@ export class Zone {
     hatch: { style: "none" | "edge" | "full"; pitch: number };
     priority: number;
     connect_pads: {
-        type: "yes" | "thru_hole_only" | "full" | "no";
+        type?: "yes" | "thru_hole_only" | "full" | "no";
         clearance: number;
     };
     min_thickness: number;
@@ -194,7 +194,7 @@ export class Zone {
     filled_polygons: FilledPolygon[];
     tstamp: string;
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent?: KicadPCB | Footprint) {
         Object.assign(
             this,
             parse_expr(
@@ -651,10 +651,20 @@ export class Net {
 export class At {
     position = new Vec2(0, 0);
     rotation = 0;
+    unlocked = false;
 
     constructor(expr: Parseable) {
-        [this.position.x = 0, this.position.y = 0, this.rotation = 0] =
-            expr.slice(1) as number[];
+        const parsed = parse_expr(
+            expr,
+            P.start("at"),
+            P.positional("x", T.number),
+            P.positional("y", T.number),
+            P.positional("rotation", T.number),
+            P.atom("unlocked"),
+        ) as { x: number; y: number; rotation?: number; unlocked?: boolean };
+        this.position.set(parsed.x, parsed.y);
+        this.rotation = parsed.rotation ?? 0;
+        this.unlocked = parsed.unlocked ?? false;
     }
 }
 
@@ -773,6 +783,8 @@ export class DimensionStyle {
     }
 }
 
+type FootprintDrawings = FpLine | FpCircle | FpArc | FpPoly | FpRect;
+
 export class Footprint {
     at: At;
     library_link: string;
@@ -797,8 +809,9 @@ export class Footprint {
     thermal_gap: number;
     attr: string[];
     properties: Record<string, string>;
-    graphics: FpLine | FpCircle | FpArc | FpPoly | FpRect;
+    drawings: FootprintDrawings[];
     pads: Pad[];
+    zones: Zone[];
     models: Model[];
 
     constructor(expr: Parseable) {
@@ -830,12 +843,13 @@ export class Footprint {
                 P.pair("thermal_gap", T.number),
                 P.list("attr", T.string),
                 P.dict("properties", "property", T.string),
-                P.collection("graphics", "fp_line", T.item(FpLine, this)),
-                P.collection("graphics", "fp_circle", T.item(FpCircle, this)),
-                P.collection("graphics", "fp_arc", T.item(FpArc, this)),
-                P.collection("graphics", "fp_poly", T.item(FpPoly, this)),
-                P.collection("graphics", "fp_rect", T.item(FpRect, this)),
-                P.collection("graphics", "fp_text", T.item(FpText, this)),
+                P.collection("drawings", "fp_line", T.item(FpLine, this)),
+                P.collection("drawings", "fp_circle", T.item(FpCircle, this)),
+                P.collection("drawings", "fp_arc", T.item(FpArc, this)),
+                P.collection("drawings", "fp_poly", T.item(FpPoly, this)),
+                P.collection("drawings", "fp_rect", T.item(FpRect, this)),
+                P.collection("drawings", "fp_text", T.item(FpText, this)),
+                P.collection("zones", "zone", T.item(Zone, this)),
                 P.collection("pads", "pad", T.item(Pad, this)),
                 P.collection("models", "model", T.item(Model)),
             ),
