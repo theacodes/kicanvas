@@ -14,15 +14,15 @@ export class KicadPCB {
     general?: { thickness: number };
     paper?: Paper;
     title_block?: TitleBlock;
-    layers: Layer[];
-    setup: Setup;
-    nets: Net[];
-    footprints: Footprint[];
-    zones: Zone[];
-    segments: (LineSegment | ArcSegment)[];
-    vias: Via[];
-    dimensions: Dimension[];
-    drawings: any[];
+    setup?: Setup;
+    layers: Layer[] = [];
+    nets: Net[] = [];
+    footprints: Footprint[] = [];
+    zones: Zone[] = [];
+    segments: (LineSegment | ArcSegment)[] = [];
+    vias: Via[] = [];
+    dimensions: Dimension[] = [];
+    drawings: (GrLine | GrCircle | GrArc | GrPoly | GrRect | GrText)[] = [];
 
     constructor(expr: Parseable) {
         Object.assign(
