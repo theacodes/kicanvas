@@ -186,37 +186,3 @@ export class Effects {
         return e;
     }
 }
-
-export function expand_text_vars(
-    text: string,
-    vars?: Map<string, string | undefined>,
-): string {
-    if (!vars) {
-        return text;
-    }
-
-    for (const [k, v] of vars.entries()) {
-        text = text.replaceAll("${" + k + "}", v ?? "");
-        text = text.replaceAll("${" + k.toUpperCase() + "}", v ?? "");
-    }
-
-    // console.log(text);
-
-    const escape_vars = {
-        slash: "/",
-        backslash: "\\",
-        lt: "<",
-        gt: ">",
-        colon: ":",
-        dblquote: '"',
-        bar: "|",
-        tab: "\t",
-        return: "\n",
-    };
-
-    for (const [k, v] of Object.entries(escape_vars)) {
-        text = text.replaceAll("{" + k + "}", v);
-    }
-
-    return text;
-}
