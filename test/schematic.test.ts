@@ -11,6 +11,7 @@ import { assert_deep_partial } from "./utilities";
 import empty_sch_src from "./files/empty.kicad_sch";
 import paper_sch_src from "./files/paper.kicad_sch";
 import wires_sch_src from "./files/wires.kicad_sch";
+import label_sch_src from "./files/labels.kicad_sch";
 
 suite("schematic parser", function () {
     test("empty sch file", function () {
@@ -152,6 +153,90 @@ suite("schematic parser", function () {
             at: { position: { x: 18, y: 2 }, rotation: 0 },
             diameter: 0,
             color: { r: 0, g: 0, b: 0, a: 0 },
+        });
+    });
+
+    test("sch with labels", function () {
+        const sch = new schematic.KicadSch(label_sch_src);
+
+        assert.equal(sch.net_labels.length, 6);
+        assert_deep_partial(sch.net_labels[0], {
+            text: "net label bold and italic",
+            at: { position: { x: 10, y: 14 }, rotation: 0 },
+            effects: {
+                font: {
+                    size: { x: 1.27, y: 1.27 },
+                    thickness: 0.254,
+                    bold: true,
+                    italic: true,
+                },
+                justify: {
+                    horizontal: "left",
+                    vertical: "bottom",
+                },
+            },
+        });
+        assert_deep_partial(sch.net_labels[3], {
+            text: "net label top",
+            at: { position: { x: 10, y: 10 }, rotation: 270 },
+            effects: {
+                font: {
+                    size: { x: 1.27, y: 1.27 },
+                    thickness: undefined,
+                },
+            },
+        });
+        assert_deep_partial(sch.net_labels[5], {
+            text: "net label 2.54",
+            at: { position: { x: 10, y: 12 }, rotation: 0 },
+            effects: {
+                font: {
+                    size: { x: 2.54, y: 2.54 },
+                    thickness: undefined,
+                },
+            },
+        });
+
+        assert.equal(sch.global_labels.length, 5);
+        assert_deep_partial(sch.global_labels[0], {
+            text: "global label tri state",
+            shape: "tri_state",
+            at: { position: { x: 10, y: 25 }, rotation: 0 },
+            fields_autoplaced: true,
+            effects: {
+                font: {
+                    size: { x: 1.27, y: 1.27 },
+                },
+                justify: {
+                    horizontal: "left",
+                    vertical: "center",
+                },
+            },
+            properties: [
+                {
+                    name: "Intersheet References",
+                    text: "${INTERSHEET_REFS}",
+                    id: 0,
+                },
+            ],
+        });
+
+        assert.equal(sch.hierarchical_labels.length, 5);
+        assert_deep_partial(sch.hierarchical_labels[1], {
+            text: "h label bidi",
+            shape: "bidirectional",
+            at: { position: { x: 14, y: 30 }, rotation: 270 },
+            effects: {
+                font: {
+                    size: { x: 1.27, y: 1.27 },
+                    thickness: 0.254,
+                    bold: true,
+                },
+                justify: {
+                    horizontal: "right",
+                    vertical: "center",
+                },
+            },
         });
     });
 });

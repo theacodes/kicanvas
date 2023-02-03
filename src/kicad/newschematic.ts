@@ -21,7 +21,9 @@ export class KicadSch {
     bus_entries: BusEntry[] = [];
     bus_aliases: BusAlias[] = [];
     junctions: Junction[] = [];
-    labels: Label[] = [];
+    net_labels: NetLabel[] = [];
+    global_labels: GlobalLabel[] = [];
+    hierarchical_labels: HierarchicalLabel[] = [];
     symbols: SchematicSymbol[] = [];
     no_connects: NoConnect[] = [];
     drawings: unknown[] = [];
@@ -46,9 +48,19 @@ export class KicadSch {
                 P.collection("bus_aliases", "bus_alias", T.item(BusAlias)),
                 P.collection("junctions", "junction", T.item(Junction)),
                 P.collection("no_connects", "no_connect", T.item(NoConnect)),
+                P.collection("net_labels", "label", T.item(NetLabel)),
+                P.collection(
+                    "global_labels",
+                    "global_label",
+                    T.item(GlobalLabel),
+                ),
+                P.collection(
+                    "hierarchical_labels",
+                    "hierarchical_label",
+                    T.item(HierarchicalLabel),
+                ),
                 // images
                 // sheets
-                // labels
                 P.collection("symbols", "symbol", T.item(SchematicSymbol)),
                 // drawings
                 P.item("sheet_instances", SheetInstances),
@@ -236,8 +248,6 @@ export class NoConnect {
     }
 }
 
-export class Label {}
-
 type Drawing = Arc | Bezier | Circle | Polyline | Rectangle | Text | TextBox;
 
 export class Arc extends GraphicItem {
@@ -417,6 +427,92 @@ export class TextBox extends GraphicItem {
                 P.vec2("size"),
                 P.item("effects", Effects),
                 ...GraphicItem.common_expr_defs,
+            ),
+        );
+    }
+}
+
+export class Label {
+    private = false;
+    text: string;
+    at: At;
+    effects = new Effects();
+    fields_autoplaced = false;
+    uuid?: string;
+
+    static common_expr_defs = [
+        P.positional("text"),
+        P.item("at", At),
+        P.item("effects", Effects),
+        P.atom("fields_autoplaced"),
+        P.pair("uuid", T.string),
+    ];
+}
+
+export class NetLabel extends Label {
+    constructor(expr: Parseable) {
+        /* (label "net label 2.54" (at 10 12 0)
+            (effects (font (size 2.54 2.54)) (justify left bottom))
+            (uuid 7c29627e-5d2a-4966-8e8b-eadd9d1e6530)) */
+        super();
+        Object.assign(
+            this,
+            parse_expr(expr, P.start("label"), ...Label.common_expr_defs),
+        );
+    }
+}
+
+type LabelShapes =
+    | "input"
+    | "output"
+    | "bidirectional"
+    | "tri_state"
+    | "passive"
+    | "dot"
+    | "round"
+    | "diamond"
+    | "rectangle";
+
+export class GlobalLabel extends Label {
+    shape: LabelShapes = "input";
+    properties: Property[] = [];
+
+    constructor(expr: Parseable) {
+        /* (global_label "global label tri state" (shape tri_state)
+            (at 10 25 0) (fields_autoplaced)
+            (effects (font (size 1.27 1.27)) (justify left))
+            (uuid 1e3e64a3-cedc-4434-ab25-d00014c1e69d)
+            (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 32.7936 24.9206 0)
+            (effects (font (size 1.27 1.27)) (justify left) hide))) */
+        super();
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("global_label"),
+                ...Label.common_expr_defs,
+                P.pair("shape", T.string),
+                P.collection("properties", "property", T.item(Property)),
+            ),
+        );
+    }
+}
+
+export class HierarchicalLabel extends Label {
+    shape: LabelShapes = "input";
+
+    constructor(expr: Parseable) {
+        /* (hierarchical_label "h label passive" (shape passive) (at 18 30 270)
+            (effects (font (size 1.27 1.27) (thickness 0.254) bold) (justify right))
+            (uuid 484b38aa-713f-4f24-9fa1-63547d78e1da)) */
+        super();
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("hierarchical_label"),
+                ...Label.common_expr_defs,
+                P.pair("shape", T.string),
             ),
         );
     }
