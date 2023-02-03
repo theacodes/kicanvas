@@ -130,7 +130,7 @@ export class Effects {
         const font_size = font.expect_expr("size");
         this.size = new Vec2(
             font_size.expect_number(),
-            font_size.expect_number()
+            font_size.expect_number(),
         );
         this.thickness = font.maybe_pair_number("thickness");
         this.bold = font.maybe_atom("bold") ? true : false;
@@ -185,4 +185,38 @@ export class Effects {
         e.hide = this.hide;
         return e;
     }
+}
+
+export function expand_text_vars(
+    text: string,
+    vars?: Map<string, string | undefined>,
+): string {
+    if (!vars) {
+        return text;
+    }
+
+    for (const [k, v] of vars.entries()) {
+        text = text.replaceAll("${" + k + "}", v ?? "");
+        text = text.replaceAll("${" + k.toUpperCase() + "}", v ?? "");
+    }
+
+    // console.log(text);
+
+    const escape_vars = {
+        slash: "/",
+        backslash: "\\",
+        lt: "<",
+        gt: ">",
+        colon: ":",
+        dblquote: '"',
+        bar: "|",
+        tab: "\t",
+        return: "\n",
+    };
+
+    for (const [k, v] of Object.entries(escape_vars)) {
+        text = text.replaceAll("{" + k + "}", v);
+    }
+
+    return text;
 }

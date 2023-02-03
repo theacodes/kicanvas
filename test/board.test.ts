@@ -99,6 +99,29 @@ suite("board parser", function () {
             name: "var2",
             value: "var 2 value",
         });
+
+        const text_vars = pcb.text_vars;
+        assert.equal(text_vars.get("var1"), "var 1 value");
+        assert.equal(text_vars.get("var2"), "var 2 value");
+        assert.equal(text_vars.get("TITLE"), "A board");
+        assert.equal(text_vars.get("ISSUE_DATE"), "2023-02-01");
+        assert.equal(text_vars.get("REVISION"), "v1");
+        assert.equal(text_vars.get("COMPANY"), "Winterbloom");
+        assert.equal(text_vars.get("COMMENT1"), "Comment 1");
+        assert.equal(text_vars.get("COMMENT3"), "Comment 3");
+        assert.equal(text_vars.get("COMMENT5"), "Comment 5");
+        assert.equal(text_vars.get("COMMENT7"), "Comment 7");
+        assert.equal(text_vars.get("COMMENT9"), "Comment 9");
+
+        const text = pcb.drawings[0] as board.GrText;
+        assert.equal(text.shown_text, "hello var 1 value");
+
+        const fp = pcb.footprints[0];
+        assert.equal(
+            (fp.drawings[2] as board.FpText).shown_text,
+            "F.Cu An extra property",
+        );
+        assert.equal((fp.drawings[3] as board.FpText).shown_text, "FID1");
     });
 
     test("pcb with paper settings & title block", function () {

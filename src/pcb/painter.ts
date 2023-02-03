@@ -438,7 +438,7 @@ class TextPainter extends ItemPainter {
         }
 
         const shaped = this.gfx.text_shaper.paragraph(
-            t.text,
+            t.shown_text,
             t.at.position,
             Angle.from_degrees(rotation),
             new TextOptions(

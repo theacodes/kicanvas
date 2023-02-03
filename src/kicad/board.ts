@@ -7,6 +7,7 @@
 import { parse_expr, P, T, type Parseable } from "./newparser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import type { List } from "./tokenizer.ts";
+import { expand_text_vars } from "./common.ts";
 
 export type Drawing =
     | GrLine
@@ -48,18 +49,22 @@ export class KicadPCB {
                 P.item("setup", Setup),
                 P.collection("properties", "property", T.item(Property)),
                 P.collection("nets", "net", T.item(Net)),
-                P.collection("footprints", "footprint", T.item(Footprint)),
+                P.collection(
+                    "footprints",
+                    "footprint",
+                    T.item(Footprint, this),
+                ),
                 P.collection("zones", "zone", T.item(Zone)),
                 P.collection("segments", "segment", T.item(LineSegment)),
                 P.collection("segments", "arc", T.item(ArcSegment)),
                 P.collection("vias", "via", T.item(Via)),
-                P.collection("drawings", "dimension", T.item(Dimension)),
+                P.collection("drawings", "dimension", T.item(Dimension, this)),
                 P.collection("drawings", "gr_line", T.item(GrLine)),
                 P.collection("drawings", "gr_circle", T.item(GrCircle)),
                 P.collection("drawings", "gr_arc", T.item(GrArc)),
                 P.collection("drawings", "gr_poly", T.item(GrPoly)),
                 P.collection("drawings", "gr_rect", T.item(GrRect)),
-                P.collection("drawings", "gr_text", T.item(GrText)),
+                P.collection("drawings", "gr_text", T.item(GrText, this)),
             ),
         );
     }
@@ -72,9 +77,13 @@ export class KicadPCB {
         yield* this.footprints;
     }
 
-    // get text_vars() {
-    //     const vars = new Map(this.title_block.text_vars);
-    // }
+    get text_vars(): Map<string, string | undefined> {
+        const vars = new Map(this.title_block?.text_vars);
+        for (const p of this.properties) {
+            vars.set(p.name, p.value);
+        }
+        return vars;
+    }
 }
 
 export class Property {
@@ -480,6 +489,24 @@ export class TitleBlock {
             ),
         );
     }
+
+    get text_vars(): Map<string, string | undefined> {
+        return new Map([
+            ["ISSUE_DATE", this.date],
+            ["REVISION", this.rev],
+            ["TITLE", this.title],
+            ["COMPANY", this.company],
+            ["COMMENT1", this.comment[1]],
+            ["COMMENT2", this.comment[2]],
+            ["COMMENT3", this.comment[3]],
+            ["COMMENT4", this.comment[4]],
+            ["COMMENT5", this.comment[5]],
+            ["COMMENT6", this.comment[6]],
+            ["COMMENT7", this.comment[7]],
+            ["COMMENT8", this.comment[8]],
+            ["COMMENT9", this.comment[9]],
+        ]);
+    }
 }
 
 export class Layer {
@@ -712,7 +739,7 @@ export class Dimension {
     format: DimensionFormat;
     style: DimensionStyle;
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent: KicadPCB) {
         Object.assign(
             this,
             parse_expr(
@@ -731,6 +758,10 @@ export class Dimension {
                 P.item("style", DimensionStyle),
             ),
         );
+    }
+
+    get text_vars(): Map<string, string | undefined> {
+        return new Map(this.parent.text_vars);
     }
 }
 
@@ -814,10 +845,12 @@ export class DimensionStyle {
     }
 }
 
-type FootprintDrawings = FpLine | FpCircle | FpArc | FpPoly | FpRect;
+type FootprintDrawings = FpLine | FpCircle | FpArc | FpPoly | FpRect | FpText;
 
 export class Footprint {
     at: At;
+    reference: string;
+    value: string;
     library_link: string;
     version: number;
     generator: string;
@@ -838,14 +871,14 @@ export class Footprint {
     zone_connect: number;
     thermal_width: number;
     thermal_gap: number;
-    attr: string[];
-    properties: Record<string, string>;
-    drawings: FootprintDrawings[];
-    pads: Pad[];
-    zones: Zone[];
-    models: Model[];
+    attr: string[] = [];
+    properties: Record<string, string> = {};
+    drawings: FootprintDrawings[] = [];
+    pads: Pad[] = [];
+    zones: Zone[] = [];
+    models: Model[] = [];
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent: KicadPCB) {
         Object.assign(
             this,
             parse_expr(
@@ -885,12 +918,47 @@ export class Footprint {
                 P.collection("models", "model", T.item(Model)),
             ),
         );
+
+        for (const d of this.drawings) {
+            if (!(d instanceof FpText)) {
+                continue;
+            }
+
+            if (d.type == "reference") {
+                this.reference = d.text;
+            }
+            if (d.type == "value") {
+                this.value = d.text;
+            }
+        }
     }
 
     *items(): Generator<FootprintDrawings | Pad | Zone, void, undefined> {
         yield* this.drawings ?? [];
         yield* this.zones ?? [];
         yield* this.pads ?? [];
+    }
+
+    get text_vars(): Map<string, string | undefined> {
+        const vars = new Map<string, string | undefined>([
+            ["REFERENCE", this.reference],
+            ["VALUE", this.value],
+            ["LAYER", this.layer],
+            ["FOOTPRINT_LIBRARY", this.library_link.split(":")[0]],
+            ["FOOTPRINT_NAME", this.library_link.split(":").at(-1)],
+        ]);
+
+        for (const [k, v] of Object.entries(this.properties)) {
+            vars.set(k, v);
+        }
+
+        for (const pad of this.pads) {
+            vars.set(`NET_NAME(${pad.number})`, `${pad.net?.number ?? ""}`);
+            vars.set(`NET_CLASS(${pad.number})`, pad.net?.name ?? "");
+            vars.set(`PIN_NAME(${pad.number})`, pad.pinfunction ?? "");
+        }
+
+        return new Map([...this.parent.text_vars, ...vars]);
     }
 }
 
@@ -1086,15 +1154,15 @@ export class FpRect extends Rect {
 }
 
 export class Text {
-    parent?: Footprint | Dimension;
+    parent?: Footprint | Dimension | KicadPCB;
     text: string;
-    original_text: string;
     at: At;
     layer: { name: string; knockout: boolean };
     unlocked = false;
     hide = false;
     effects = new Effects();
     tstamp: string;
+    #expanded_text: string;
 
     static common_expr_defs = [
         P.item("at", At),
@@ -1104,10 +1172,20 @@ export class Text {
         P.pair("tstamp", T.string),
         P.item("effects", Effects),
     ];
+
+    get shown_text() {
+        if (!this.#expanded_text) {
+            this.#expanded_text = expand_text_vars(
+                this.text,
+                this.parent?.text_vars,
+            );
+        }
+        return this.#expanded_text;
+    }
 }
 
 export class FpText extends Text {
-    type: string;
+    type: "reference" | "value" | "user";
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -1122,15 +1200,13 @@ export class FpText extends Text {
                 ...Text.common_expr_defs,
             ),
         );
-
-        this.original_text = this.text;
     }
 }
 
 export class GrText extends Text {
     constructor(
         expr: Parseable,
-        public override parent?: Footprint | Dimension,
+        public override parent: Footprint | Dimension | KicadPCB,
     ) {
         super();
 
@@ -1143,8 +1219,6 @@ export class GrText extends Text {
                 ...Text.common_expr_defs,
             ),
         );
-
-        this.original_text = this.text;
     }
 }
 
