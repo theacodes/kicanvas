@@ -6,6 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 import * as board from "../src/kicad/board";
+import * as common from "../src/kicad/newcommon";
 
 import empty_pcb_src from "./files/empty.kicad_pcb";
 import properties_pcb_src from "./files/properties.kicad_pcb";
@@ -584,7 +585,7 @@ suite("board parser", function () {
         assert.deepInclude(fp.at, {
             position: { x: 0, y: 0 },
             rotation: 0,
-        } as Partial<board.At>);
+        } as Partial<common.At>);
 
         const [
             text_ref,
