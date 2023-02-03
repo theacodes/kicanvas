@@ -1,5 +1,6 @@
 import { listify, type List } from "./tokenizer.ts";
 import { Vec2 } from "../math/vec2.ts";
+import { Color } from "../gfx/color.ts";
 
 enum Kind {
     // the first token in the expr (kind ...)
@@ -73,11 +74,18 @@ export const T = {
     },
     object(...defs: PropertyDefinition[]): TypeProcessor {
         return (obj: Obj, name: string, e: ListOrAtom) => {
-            return parse_expr(e as List, P.start(name), ...defs);
+            const existing = obj[name] ?? {};
+            return {
+                ...existing,
+                ...parse_expr(e as List, P.start(name), ...defs),
+            };
         };
     },
     vec2(obj: Obj, name: string, e: ListOrAtom): Vec2 {
         return new Vec2(e[1], e[2]);
+    },
+    color(obj: Obj, name: string, e: ListOrAtom): Color {
+        return new Color(e[1] / 255, e[2] / 255, e[3] / 255, e[4]);
     },
 };
 
@@ -242,6 +250,9 @@ export const P = {
      */
     vec2(name) {
         return P.expr(name, T.vec2);
+    },
+    color(name = "color") {
+        return P.expr(name, T.color);
     },
 };
 
