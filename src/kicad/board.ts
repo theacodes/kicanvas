@@ -7,7 +7,13 @@
 import { parse_expr, P, T, type Parseable } from "./newparser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import type { List } from "./tokenizer.ts";
-import { Effects, Paper, TitleBlock, expand_text_vars } from "./newcommon.ts";
+import {
+    At,
+    Effects,
+    Paper,
+    TitleBlock,
+    expand_text_vars,
+} from "./newcommon.ts";
 
 export type Drawing =
     | GrLine
@@ -542,26 +548,6 @@ export class Net {
                 P.positional("name", T.string),
             ),
         );
-    }
-}
-
-export class At {
-    position = new Vec2(0, 0);
-    rotation = 0;
-    unlocked = false;
-
-    constructor(expr: Parseable) {
-        const parsed = parse_expr(
-            expr,
-            P.start("at"),
-            P.positional("x", T.number),
-            P.positional("y", T.number),
-            P.positional("rotation", T.number),
-            P.atom("unlocked"),
-        ) as { x: number; y: number; rotation?: number; unlocked?: boolean };
-        this.position.set(parsed.x, parsed.y);
-        this.rotation = parsed.rotation ?? 0;
-        this.unlocked = parsed.unlocked ?? false;
     }
 }
 

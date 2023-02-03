@@ -41,8 +41,45 @@ export function expand_text_vars(
     return text;
 }
 
+export class At {
+    position = new Vec2(0, 0);
+    rotation = 0;
+    unlocked = false;
+
+    constructor(expr: Parseable) {
+        const parsed = parse_expr(
+            expr,
+            P.start("at"),
+            P.positional("x", T.number),
+            P.positional("y", T.number),
+            P.positional("rotation", T.number),
+            P.atom("unlocked"),
+        ) as { x: number; y: number; rotation?: number; unlocked?: boolean };
+        this.position.set(parsed.x, parsed.y);
+        this.rotation = parsed.rotation ?? 0;
+        this.unlocked = parsed.unlocked ?? false;
+    }
+}
+
+export type PaperSize =
+    | "User"
+    | "A0"
+    | "A1"
+    | "A2"
+    | "A3"
+    | "A4"
+    | "A5"
+    | "A"
+    | "B"
+    | "C"
+    | "D"
+    | "E"
+    | "USLetter"
+    | "USLegal"
+    | "USLedger";
+
 export class Paper {
-    size;
+    size: string;
     width?: number;
     height?: number;
     portrait = false;
