@@ -11,8 +11,8 @@
 */
 
 import { Vec2 } from "../math/vec2";
-import { SExprParser } from "./parser";
-import { At, Effects, Paper, TitleBlock } from "./common";
+import { SExprParser } from "./parser-old";
+import { At, Effects, Paper, TitleBlock } from "./common-old";
 import { Color } from "../gfx/color";
 
 export class Property {
@@ -26,7 +26,7 @@ export class Property {
     constructor(
         public parent: SymbolInstance | LibrarySymbol,
         number: number,
-        e: SExprParser
+        e: SExprParser,
     ) {
         this.number = number;
         this.key = e.expect_string();
@@ -170,7 +170,7 @@ export class LibrarySymbol {
                 const p = new Property(
                     this,
                     Object.values(this.properties).length,
-                    se
+                    se,
                 );
                 this.properties[p.key] = p;
                 continue;
@@ -288,7 +288,7 @@ export class SymbolInstance {
                 const p = new Property(
                     this,
                     Object.values(this.properties).length,
-                    se
+                    se,
                 );
                 this.properties[p.key] = p;
                 continue;

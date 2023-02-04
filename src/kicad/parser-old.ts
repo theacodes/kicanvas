@@ -144,7 +144,7 @@ export class SExprParser {
                 return value.value;
             } else {
                 throw new Error(
-                    `Can not unbox token type ${String(value.type)}`
+                    `Can not unbox token type ${String(value.type)}`,
                 );
             }
         } else if (value instanceof SExprParser) {
@@ -219,7 +219,9 @@ export class SExprParser {
 
         if (val === null) {
             throw new Error(
-                `Expected ${String(type)} found ${JSON.stringify(this.element)}`
+                `Expected ${String(type)} found ${JSON.stringify(
+                    this.element,
+                )}`,
             );
         }
 
@@ -265,8 +267,8 @@ export class SExprParser {
         if (e === null) {
             throw new Error(
                 `Expected expression ${name}, have ${JSON.stringify(
-                    this.element
-                )}`
+                    this.element,
+                )}`,
             );
         }
         return e;
@@ -340,7 +342,7 @@ export class SExprParser {
         const v = this.maybe_pair(name, type);
         if (v === null) {
             throw new Error(
-                `Expected pair ${name}, found ${JSON.stringify(this.element)}`
+                `Expected pair ${name}, found ${JSON.stringify(this.element)}`,
             );
         }
         return v;
@@ -398,7 +400,7 @@ export class SExprParser {
             e.expect_number(),
             e.expect_number(),
             e.expect_number(),
-            e.expect_number()
+            e.expect_number(),
         );
     }
 
@@ -408,7 +410,7 @@ export class SExprParser {
             e.expect_number(),
             e.expect_number(),
             e.expect_number(),
-            e.expect_number()
+            e.expect_number(),
         );
     }
 }

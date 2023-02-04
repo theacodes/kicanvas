@@ -11,7 +11,7 @@
 */
 
 import { Vec2 } from "../math/vec2";
-import { SExprParser } from "./parser";
+import { SExprParser } from "./parser-old";
 
 export class At {
     position: Vec2;

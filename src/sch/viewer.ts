@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse } from "../kicad/parser";
-import * as sch_items from "../kicad/schematic";
+import { parse } from "../kicad/parser-old";
+import * as sch_items from "../kicad/schematic-old";
 import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
 import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";

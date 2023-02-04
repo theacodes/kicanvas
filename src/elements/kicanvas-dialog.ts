@@ -1,4 +1,4 @@
-import { Property } from "../kicad/schematic";
+import { Property } from "../kicad/schematic-old";
 import { $make, $on, $q } from "../utils";
 
 export class KiCanvasDialogElement extends HTMLElement {
