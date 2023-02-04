@@ -560,7 +560,7 @@ export class LibSymbols {
 }
 
 export class LibSymbol {
-    id: string;
+    name: string;
     power = false;
     pin_numbers: {
         hide: boolean;
@@ -574,7 +574,7 @@ export class LibSymbol {
     properties: Property[] = [];
     children: LibSymbol[] = [];
     drawings: Drawing[] = [];
-    //pins
+    pins: PinDefinition[] = [];
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -582,16 +582,19 @@ export class LibSymbol {
             parse_expr(
                 expr,
                 P.start("symbol"),
+                P.positional("name"),
                 P.atom("power"),
-                P.object("pin_numbers", P.atom("hide")),
+                P.object("pin_numbers", this.pin_numbers, P.atom("hide")),
                 P.object(
                     "pin_names",
+                    this.pin_names,
                     P.pair("offset", T.number),
                     P.atom("hide"),
                 ),
                 P.pair("in_bom", T.boolean),
                 P.pair("on_board", T.boolean),
                 P.collection("properties", "property", T.item(Property, this)),
+                P.collection("pins", "pin", T.item(PinDefinition, this)),
                 P.collection("children", "symbol", T.item(LibSymbol, this)),
                 P.collection("drawings", "arc", T.item(Arc, this)),
                 P.collection("drawings", "bezier", T.item(Bezier, this)),
@@ -688,17 +691,19 @@ export class PinDefinition {
                 expr,
                 P.start("pin"),
                 P.positional("type", T.string),
-                P.positional("shaped", T.string),
+                P.positional("shape", T.string),
                 P.atom("hide"),
                 P.item("at", At),
                 P.pair("length", T.number),
                 P.object(
                     "name",
+                    this.name,
                     P.positional("text", T.string),
                     P.item("effects", Effects),
                 ),
                 P.object(
                     "number",
+                    this.number,
                     P.positional("text", T.string),
                     P.item("effects", Effects),
                 ),
@@ -875,7 +880,7 @@ export class SymbolInstance {
                 P.pair("reference", T.string),
                 P.pair("unit", T.number),
                 P.pair("value", T.string),
-                P.pair("footpint", T.string),
+                P.pair("footprint", T.string),
             ),
         );
     }

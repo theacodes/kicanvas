@@ -231,7 +231,7 @@ suite("board parser", function () {
             at: { position: { x: 0, y: 9 }, rotation: 0, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
-                hide: undefined,
+                hide: false,
                 font: {
                     face: undefined,
                     size: { x: 1, y: 1 },
@@ -252,7 +252,7 @@ suite("board parser", function () {
             at: { position: { x: 0, y: 4 }, rotation: 0, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
-                hide: undefined,
+                hide: false,
                 font: {
                     face: undefined,
                     size: { x: 1, y: 1 },
@@ -273,7 +273,7 @@ suite("board parser", function () {
             at: { position: { x: 0, y: 6 }, rotation: 180, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
-                hide: undefined,
+                hide: false,
                 font: {
                     face: undefined,
                     size: { x: 1, y: 1 },
@@ -294,7 +294,7 @@ suite("board parser", function () {
             at: { position: { x: 0, y: 1 }, rotation: 0, unlocked: false },
             layer: { name: "Dwgs.User" },
             effects: {
-                hide: undefined,
+                hide: false,
                 font: {
                     face: undefined,
                     size: { x: 1, y: 1 },
@@ -429,7 +429,7 @@ suite("board parser", function () {
                     vertical: "center",
                     mirror: true,
                 },
-                hide: undefined,
+                hide: false,
             },
         } as any);
 
@@ -651,7 +651,7 @@ suite("board parser", function () {
                     italic: false,
                     bold: false,
                 },
-                hide: undefined,
+                hide: false,
                 justify: {
                     horizontal: "center",
                     vertical: "center",
@@ -674,7 +674,7 @@ suite("board parser", function () {
                     italic: true,
                     bold: false,
                 },
-                hide: undefined,
+                hide: false,
                 justify: {
                     horizontal: "right",
                     vertical: "center",
@@ -697,7 +697,7 @@ suite("board parser", function () {
                     italic: false,
                     bold: false,
                 },
-                hide: undefined,
+                hide: false,
                 justify: {
                     horizontal: "right",
                     vertical: "center",

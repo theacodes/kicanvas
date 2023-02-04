@@ -48,7 +48,7 @@ export class KicadPCB {
                 P.start("kicad_pcb"),
                 P.pair("version", T.number),
                 P.pair("generator", T.string),
-                P.object("general", P.pair("thickness", T.number)),
+                P.object("general", {}, P.pair("thickness", T.number)),
                 P.item("paper", Paper),
                 P.item("title_block", TitleBlock),
                 P.list("layers", T.item(Layer)),
@@ -255,12 +255,14 @@ export class Zone {
                 P.list("layers", T.string),
                 P.object(
                     "hatch",
+                    {},
                     P.positional("style", T.string),
                     P.positional("pitch", T.number),
                 ),
                 P.pair("priority", T.number),
                 P.object(
                     "connect_pads",
+                    {},
                     P.positional("type", T.string),
                     P.pair("clearance", T.number),
                 ),
@@ -335,6 +337,7 @@ export class ZoneFill {
                 P.expr(
                     "smoothing",
                     T.object(
+                        {},
                         P.positional("style", T.string),
                         P.pair("radius", T.number),
                     ),
@@ -993,7 +996,12 @@ export class Text {
         P.item("at", At),
         P.atom("hide"),
         P.atom("unlocked"),
-        P.object("layer", P.positional("name", T.string), P.atom("knockout")),
+        P.object(
+            "layer",
+            {},
+            P.positional("name", T.string),
+            P.atom("knockout"),
+        ),
         P.pair("tstamp", T.string),
         P.item("effects", Effects),
     ];
@@ -1095,6 +1103,7 @@ export class Pad {
             P.expr(
                 "chamfer",
                 T.object(
+                    {},
                     P.atom("top_right"),
                     P.atom("top_left"),
                     P.atom("bottom_right"),
@@ -1183,9 +1192,9 @@ export class Model {
                 expr,
                 P.start("model"),
                 P.positional("filename", T.string),
-                P.object("offset", P.list("xyz", T.number)),
-                P.object("scale", P.list("xyz", T.number)),
-                P.object("rotate", P.list("xyz", T.number)),
+                P.object("offset", {}, P.list("xyz", T.number)),
+                P.object("scale", {}, P.list("xyz", T.number)),
+                P.object("rotate", {}, P.list("xyz", T.number)),
             ),
         );
     }

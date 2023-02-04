@@ -11,7 +11,7 @@ enum Kind {
     pair,
     // ((name value value value ...)) -> {name: [value, value, value]}
     list,
-    // (locked [hide]) or mutually exclusively flags like (a | b | c)
+    // (locked [he]) or mutually exclusively flags like (a | b | c)
     atom,
     // (name (kind 1) (kind 2) ...) -> {name: [item1, item2]}
     item_list,
@@ -72,9 +72,9 @@ export const T = {
             return new type(e as Parseable, ...args);
         };
     },
-    object(...defs: PropertyDefinition[]): TypeProcessor {
+    object(start: any, ...defs: PropertyDefinition[]): TypeProcessor {
         return (obj: Obj, name: string, e: ListOrAtom) => {
-            const existing = obj[name] ?? {};
+            const existing = obj[name] ?? start;
             return {
                 ...existing,
                 ...parse_expr(e as List, P.start(name), ...defs),
@@ -233,8 +233,12 @@ export const P = {
      * object("thing", P.pair("a"), P.pair("b")) would end up with
      * {thing: {a: 1, b: 2}}.
      */
-    object(name: string, ...defs: PropertyDefinition[]): PropertyDefinition {
-        return P.expr(name, T.object(...defs));
+    object(
+        name: string,
+        start: any,
+        ...defs: PropertyDefinition[]
+    ): PropertyDefinition {
+        return P.expr(name, T.object(start, ...defs));
     },
     /**
      * Accepts an expression that describes an object that can be used to

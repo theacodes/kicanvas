@@ -172,13 +172,14 @@ suite("Parser", function () {
             listify("(thing (a 1) (b 2) yes)"),
             P.object(
                 "thing",
+                { c: 3 },
                 P.pair("a"),
                 P.pair("b"),
                 P.atom("enabled", ["yes", "no"]),
             ),
         );
         assert.deepEqual(res, {
-            thing: { a: 1, b: 2, enabled: "yes" },
+            thing: { a: 1, b: 2, c: 3, enabled: "yes" },
         });
     });
 

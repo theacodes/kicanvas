@@ -174,7 +174,7 @@ export class TitleBlock {
 export class Effects {
     font = new Font();
     justify = new Justify();
-    hide: false;
+    hide = false;
 
     constructor(expr?: Parseable) {
         if (expr) {
