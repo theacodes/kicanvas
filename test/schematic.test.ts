@@ -11,7 +11,8 @@ import { assert_deep_partial } from "./utilities";
 import empty_sch_src from "./files/empty.kicad_sch";
 import paper_sch_src from "./files/paper.kicad_sch";
 import wires_sch_src from "./files/wires.kicad_sch";
-import label_sch_src from "./files/labels.kicad_sch";
+import labels_sch_src from "./files/labels.kicad_sch";
+import drawings_sch_src from "./files/drawings.kicad_sch";
 
 suite("schematic parser", function () {
     test("empty sch file", function () {
@@ -157,7 +158,7 @@ suite("schematic parser", function () {
     });
 
     test("sch with labels", function () {
-        const sch = new schematic.KicadSch(label_sch_src);
+        const sch = new schematic.KicadSch(labels_sch_src);
 
         assert.equal(sch.net_labels.length, 6);
         assert_deep_partial(sch.net_labels[0], {
@@ -238,5 +239,72 @@ suite("schematic parser", function () {
                 },
             },
         });
+    });
+
+    test("sch with drawings", function () {
+        const sch = new schematic.KicadSch(drawings_sch_src);
+
+        assert.equal(sch.drawings.length, 13);
+
+        const polyline1 = sch.drawings[0] as schematic.Polyline;
+        assert_deep_partial(polyline1, {
+            pts: [
+                { x: 1, y: 0 },
+                { x: 2, y: 0 },
+            ],
+            stroke: {
+                width: 0.1,
+                type: "solid",
+                color: { r: 1, g: 20 / 255, b: 31 / 255, a: 1 },
+            },
+        });
+
+        const polyline3 = sch.drawings[2] as schematic.Polyline;
+        assert_deep_partial(polyline3, {
+            pts: [
+                { x: 1, y: 0 },
+                { x: 1, y: 1 },
+            ],
+            stroke: {
+                width: 0,
+                type: "default",
+                color: { r: 0, g: 0, b: 0, a: 0 },
+            },
+        });
+
+        const text1 = sch.drawings[8] as schematic.Text;
+        assert_deep_partial(text1, {
+            text: "left bold italic",
+            at: { position: { x: 0, y: 0 }, rotation: 0 },
+            effects: {
+                font: {
+                    size: { x: 2.54, y: 2.54 },
+                    thickness: 0.508,
+                    bold: true,
+                    italic: true,
+                },
+                justify: {
+                    horizontal: "left",
+                    vertical: "bottom",
+                },
+            },
+        });
+
+        const text2 = sch.drawings[9] as schematic.Text;
+        assert_deep_partial(text2, {
+            text: "top normal",
+            at: { position: { x: 0, y: 0 }, rotation: 270 },
+            effects: {
+                font: {
+                    size: { x: 1.27, y: 1.27 },
+                },
+                justify: {
+                    horizontal: "right",
+                    vertical: "bottom",
+                },
+            },
+        });
+
+        assert.equal(sch.images.length, 1);
     });
 });

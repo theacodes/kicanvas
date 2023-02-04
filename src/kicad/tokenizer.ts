@@ -132,12 +132,14 @@ export function* tokenize(input: string) {
                 state = State.hex;
                 continue;
             } else if (
-                ["-", "a", "b", "c", "d", "e", "f"].includes(c.toLowerCase())
+                ["+", "-", "a", "b", "c", "d", "e", "f"].includes(
+                    c.toLowerCase(),
+                )
             ) {
                 /* Special case of UUID value */
                 state = State.atom;
                 continue;
-            } else if (is_alpha(c)) {
+            } else if (is_alpha(c) || ["/"].includes(c)) {
                 /* It's actually an atom, e.g. +3V3 */
                 state = State.atom;
                 continue;

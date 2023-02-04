@@ -26,7 +26,8 @@ export class KicadSch {
     hierarchical_labels: HierarchicalLabel[] = [];
     symbols: SchematicSymbol[] = [];
     no_connects: NoConnect[] = [];
-    drawings: unknown[] = [];
+    drawings: (Polyline | Text)[] = [];
+    images: Image[] = [];
     sheet_instances?: SheetInstances;
     symbol_instances?: SymbolInstances;
 
@@ -62,7 +63,9 @@ export class KicadSch {
                 // images
                 // sheets
                 P.collection("symbols", "symbol", T.item(SchematicSymbol)),
-                // drawings
+                P.collection("drawings", "polyline", T.item(Polyline, this)),
+                P.collection("drawings", "text", T.item(Text, this)),
+                P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
                 P.item("symbol_instances", SymbolInstances),
             ),
@@ -336,6 +339,7 @@ export class Circle extends GraphicItem {
 
 export class Polyline extends GraphicItem {
     pts: Vec2[];
+    uuid?: string;
 
     constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
         /*
@@ -354,6 +358,7 @@ export class Polyline extends GraphicItem {
                 P.start("polyline"),
                 P.list("pts", T.vec2),
                 ...GraphicItem.common_expr_defs,
+                P.pair("uuid", T.string),
             ),
         );
     }
@@ -383,12 +388,32 @@ export class Rectangle extends GraphicItem {
     }
 }
 
+export class Image {
+    uuid?: string;
+    at: At;
+    data: string;
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("image"),
+                P.item("at", At),
+                P.pair("data", T.string),
+                P.pair("uuid", T.string),
+            ),
+        );
+    }
+}
+
 export class Text {
     parent?: LibSymbol | SchematicSymbol;
     private = false;
     text: string;
     at: At;
     effects = new Effects();
+    uuid?: string;
 
     constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
         /*
@@ -403,6 +428,7 @@ export class Text {
                 P.positional("text"),
                 P.item("at", At),
                 P.item("effects", Effects),
+                P.pair("uuid", T.string),
             ),
         );
     }
