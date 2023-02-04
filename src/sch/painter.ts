@@ -8,8 +8,8 @@ import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
 import { ShapedParagraph, TextOptions } from "../gfx/text";
-import { Effects } from "../kicad/common-old";
-import * as sch_items from "../kicad/schematic-old";
+import { Effects } from "../kicad/common";
+import * as schematic from "../kicad/schematic";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
@@ -33,13 +33,13 @@ function color_maybe(
 }
 
 class RectanglePainter extends ItemPainter {
-    classes = [sch_items.Rectangle];
+    classes = [schematic.Rectangle];
 
-    layers_for(item: sch_items.Rectangle) {
+    layers_for(item: schematic.Rectangle) {
         return [LayerName.notes];
     }
 
-    paint(layer: ViewLayer, r: sch_items.Rectangle) {
+    paint(layer: ViewLayer, r: schematic.Rectangle) {
         const color = color_maybe(
             r.stroke.color,
             this.gfx.state.stroke,
@@ -54,7 +54,7 @@ class RectanglePainter extends ItemPainter {
             r.start,
         ];
 
-        if (r.fill !== "none") {
+        if (r.fill.type !== "none") {
             this.gfx.polygon(new Polygon(pts, this.gfx.state.fill));
         }
 
@@ -69,13 +69,13 @@ class RectanglePainter extends ItemPainter {
 }
 
 class PolylinePainter extends ItemPainter {
-    classes = [sch_items.Polyline];
+    classes = [schematic.Polyline];
 
-    layers_for(item: sch_items.Polyline) {
+    layers_for(item: schematic.Polyline) {
         return [LayerName.notes];
     }
 
-    paint(layer: ViewLayer, pl: sch_items.Polyline) {
+    paint(layer: ViewLayer, pl: schematic.Polyline) {
         const color = color_maybe(
             pl.stroke.color,
             this.gfx.state.stroke,
@@ -90,20 +90,20 @@ class PolylinePainter extends ItemPainter {
             ),
         );
 
-        if (pl.fill !== "none") {
+        if (pl.fill?.type !== "none") {
             this.gfx.polygon(new Polygon(pl.pts, color));
         }
     }
 }
 
 class WirePainter extends ItemPainter {
-    classes = [sch_items.Wire];
+    classes = [schematic.Wire];
 
-    layers_for(item: sch_items.Wire) {
+    layers_for(item: schematic.Wire) {
         return [LayerName.wire];
     }
 
-    paint(layer: ViewLayer, w: sch_items.Wire) {
+    paint(layer: ViewLayer, w: schematic.Wire) {
         this.gfx.line(
             new Polyline(
                 w.pts,
@@ -115,13 +115,13 @@ class WirePainter extends ItemPainter {
 }
 
 class CirclePainter extends ItemPainter {
-    classes = [sch_items.Circle];
+    classes = [schematic.Circle];
 
-    layers_for(item: sch_items.Circle) {
+    layers_for(item: schematic.Circle) {
         return [LayerName.notes];
     }
 
-    paint(layer: ViewLayer, c: sch_items.Circle) {
+    paint(layer: ViewLayer, c: schematic.Circle) {
         const color =
             this.gfx.state.stroke ?? (this.gfx.theme["note"] as Color);
 
@@ -136,20 +136,20 @@ class CirclePainter extends ItemPainter {
             ),
         );
 
-        if (c.fill != "none") {
+        if (c.fill.type != "none") {
             this.gfx.circle(new Circle(c.center, c.radius, color));
         }
     }
 }
 
 class ArcPainter extends ItemPainter {
-    classes = [sch_items.Arc];
+    classes = [schematic.Arc];
 
-    layers_for(item: sch_items.Arc) {
+    layers_for(item: schematic.Arc) {
         return [LayerName.notes];
     }
 
-    paint(layer: ViewLayer, a: sch_items.Arc) {
+    paint(layer: ViewLayer, a: schematic.Arc) {
         const color =
             this.gfx.state.stroke ?? (this.gfx.theme["note"] as Color);
 
@@ -174,13 +174,13 @@ class ArcPainter extends ItemPainter {
 }
 
 class JunctionPainter extends ItemPainter {
-    classes = [sch_items.Junction];
+    classes = [schematic.Junction];
 
-    layers_for(item: sch_items.Junction) {
+    layers_for(item: schematic.Junction) {
         return [LayerName.junction];
     }
 
-    paint(layer: ViewLayer, j: sch_items.Junction) {
+    paint(layer: ViewLayer, j: schematic.Junction) {
         const color = this.gfx.theme["junction"] as Color;
         this.gfx.circle(
             new Circle(j.at.position, (j.diameter || 1) / 2, color),
@@ -189,13 +189,13 @@ class JunctionPainter extends ItemPainter {
 }
 
 class NoConnectPainter extends ItemPainter {
-    classes = [sch_items.NoConnect];
+    classes = [schematic.NoConnect];
 
-    layers_for(item: sch_items.NoConnect) {
+    layers_for(item: schematic.NoConnect) {
         return [LayerName.junction];
     }
 
-    paint(layer: ViewLayer, nc: sch_items.NoConnect): void {
+    paint(layer: ViewLayer, nc: schematic.NoConnect): void {
         const color = this.gfx.theme["no_connect"] as Color;
         const width = 0.1524;
         const size = 1.2192 / 2;
@@ -227,9 +227,9 @@ class NoConnectPainter extends ItemPainter {
 }
 
 class TextPainter extends ItemPainter {
-    classes = [sch_items.Text];
+    classes = [schematic.Text];
 
-    layers_for(item: sch_items.Text) {
+    layers_for(item: schematic.Text) {
         if (item.parent) {
             return [LayerName.symbol_foreground];
         } else {
@@ -237,7 +237,7 @@ class TextPainter extends ItemPainter {
         }
     }
 
-    paint(layer: ViewLayer, t: sch_items.Text) {
+    paint(layer: ViewLayer, t: schematic.Text) {
         if (t.effects.hide) {
             return;
         }
@@ -254,17 +254,18 @@ class TextPainter extends ItemPainter {
 
         const options = new TextOptions(
             this.gfx.text_shaper.default_font,
-            t.effects.size,
-            t.effects.thickness,
-            t.effects.bold,
-            t.effects.italic,
-            t.effects.v_align,
-            t.effects.h_align,
-            t.effects.mirror,
+            t.effects.font.size,
+            t.effects.font.thickness,
+            t.effects.font.bold,
+            t.effects.font.italic,
+            t.effects.justify.vertical,
+            t.effects.justify.horizontal,
+            t.effects.justify.mirror,
         );
 
         pos.y -=
-            t.effects.size.y * 0.15 + options.get_effective_thickness(0.1524);
+            t.effects.font.size.y * 0.15 +
+            options.get_effective_thickness(0.1524);
 
         const shaped = this.gfx.text_shaper.paragraph(
             t.text,
@@ -279,18 +280,18 @@ class TextPainter extends ItemPainter {
     }
 }
 
-class LabelPainter extends ItemPainter {
+class NetLabelPainter extends ItemPainter {
     static readonly default_thickness = 0.1524;
     static readonly text_offset_ratio = 0.15;
     static readonly label_size_ratio = 0.375;
 
-    classes = [sch_items.Label];
+    classes: any[] = [schematic.NetLabel];
 
     layers_for(
         item:
-            | sch_items.Label
-            | sch_items.HierarchicalLabel
-            | sch_items.GlobalLabel,
+            | schematic.NetLabel
+            | schematic.HierarchicalLabel
+            | schematic.GlobalLabel,
     ) {
         return [LayerName.label];
     }
@@ -301,22 +302,22 @@ class LabelPainter extends ItemPainter {
 
     get_text_baseline_offset_dist(
         l:
-            | sch_items.Label
-            | sch_items.HierarchicalLabel
-            | sch_items.GlobalLabel,
+            | schematic.NetLabel
+            | schematic.HierarchicalLabel
+            | schematic.GlobalLabel,
         options: TextOptions,
     ) {
         return (
-            l.effects.size.y * LabelPainter.text_offset_ratio +
-            options.get_effective_thickness(LabelPainter.default_thickness)
+            l.effects.font.size.y * NetLabelPainter.text_offset_ratio +
+            options.get_effective_thickness(NetLabelPainter.default_thickness)
         );
     }
 
     get_text_offset(
         l:
-            | sch_items.Label
-            | sch_items.HierarchicalLabel
-            | sch_items.GlobalLabel,
+            | schematic.NetLabel
+            | schematic.HierarchicalLabel
+            | schematic.GlobalLabel,
         options: TextOptions,
     ) {
         const offset = new Vec2(0, 0);
@@ -331,7 +332,10 @@ class LabelPainter extends ItemPainter {
         return offset;
     }
 
-    paint(layer: ViewLayer, l: sch_items.Label | sch_items.HierarchicalLabel) {
+    paint(
+        layer: ViewLayer,
+        l: schematic.NetLabel | schematic.HierarchicalLabel,
+    ) {
         if (l.effects.hide) {
             return;
         }
@@ -347,20 +351,20 @@ class LabelPainter extends ItemPainter {
 
         const options = new TextOptions(
             this.gfx.text_shaper.default_font,
-            l.effects.size,
-            l.effects.thickness,
-            l.effects.bold,
-            l.effects.italic,
-            l.effects.v_align,
-            l.effects.h_align,
-            l.effects.mirror,
+            l.effects.font.size,
+            l.effects.font.thickness,
+            l.effects.font.bold,
+            l.effects.font.italic,
+            l.effects.justify.vertical,
+            l.effects.justify.horizontal,
+            l.effects.justify.mirror,
         );
 
         const pos_offset = this.get_text_offset(l, options);
         const pos = l.at.position.add(pos_offset);
 
         const shaped = this.gfx.text_shaper.paragraph(
-            l.name,
+            l.text,
             pos,
             rotation,
             options,
@@ -376,17 +380,17 @@ class LabelPainter extends ItemPainter {
 
     paint_shape(
         l:
-            | sch_items.Label
-            | sch_items.GlobalLabel
-            | sch_items.HierarchicalLabel,
+            | schematic.NetLabel
+            | schematic.GlobalLabel
+            | schematic.HierarchicalLabel,
         shaped: ShapedParagraph,
     ) {}
 
     paint_debug(
         l:
-            | sch_items.Label
-            | sch_items.GlobalLabel
-            | sch_items.HierarchicalLabel,
+            | schematic.NetLabel
+            | schematic.GlobalLabel
+            | schematic.HierarchicalLabel,
         shaped: ShapedParagraph,
     ) {
         this.gfx.circle(
@@ -409,20 +413,20 @@ class LabelPainter extends ItemPainter {
     }
 }
 
-class GlobalLabelPainter extends LabelPainter {
+class GlobalLabelPainter extends NetLabelPainter {
     // magic number from KiCAD's SCH_GLOBALLABEL::GetSchematicTextOffset
     // that centers the text so there's room for the overbar.
     static baseline_offset_ratio = 0.0715;
     static triangle_offset_ratio = 0.75;
 
-    override classes = [sch_items.GlobalLabel];
+    override classes = [schematic.GlobalLabel];
 
     override get color() {
         return this.gfx.theme["label_global"] as Color;
     }
 
-    override get_text_offset(l: sch_items.GlobalLabel, options: TextOptions) {
-        let horz = LabelPainter.label_size_ratio * options.size.y;
+    override get_text_offset(l: schematic.GlobalLabel, options: TextOptions) {
+        let horz = NetLabelPainter.label_size_ratio * options.size.y;
         const vert = options.size.y * GlobalLabelPainter.baseline_offset_ratio;
 
         if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
@@ -437,7 +441,7 @@ class GlobalLabelPainter extends LabelPainter {
         return offset;
     }
 
-    override paint_shape(l: sch_items.GlobalLabel, shaped: ShapedParagraph) {
+    override paint_shape(l: schematic.GlobalLabel, shaped: ShapedParagraph) {
         const color = this.color;
         const margin =
             shaped.options.size.y * GlobalLabelPainter.label_size_ratio;
@@ -508,27 +512,27 @@ class GlobalLabelPainter extends LabelPainter {
     }
 }
 
-class HierarchicalLabelPainter extends LabelPainter {
-    override classes = [sch_items.HierarchicalLabel];
+class HierarchicalLabelPainter extends NetLabelPainter {
+    override classes = [schematic.HierarchicalLabel];
 
     override get color() {
         return this.gfx.theme["label_hier"] as Color;
     }
 
     override get_text_offset(
-        l: sch_items.HierarchicalLabel,
+        l: schematic.HierarchicalLabel,
         options: TextOptions,
     ): Vec2 {
         const offset_dist = this.get_text_baseline_offset_dist(l, options);
-        const offset = new Vec2(offset_dist + l.effects.size.x, 0);
+        const offset = new Vec2(offset_dist + l.effects.font.size.x, 0);
         return offset.rotate(Angle.from_degrees(l.at.rotation));
     }
 
     override paint_shape(
-        l: sch_items.HierarchicalLabel,
+        l: schematic.HierarchicalLabel,
         shaped: ShapedParagraph,
     ): void {
-        const s = l.effects.size.y;
+        const s = l.effects.font.size.y;
         const color = this.color;
         const thickness = shaped.options.get_effective_thickness(
             HierarchicalLabelPainter.default_thickness,
@@ -564,7 +568,7 @@ class HierarchicalLabelPainter extends LabelPainter {
                 break;
 
             case "bidirectional":
-            case "tri-state":
+            case "tri_state":
                 points = [
                     new Vec2(s / 2, s / 2),
                     new Vec2(s, 0),
@@ -593,9 +597,9 @@ class HierarchicalLabelPainter extends LabelPainter {
 }
 
 class PinPainter extends ItemPainter {
-    classes = [sch_items.PinInstance];
+    classes = [schematic.PinInstance];
 
-    layers_for(item: sch_items.PinInstance) {
+    layers_for(item: schematic.PinInstance) {
         return [
             LayerName.symbol_pin,
             LayerName.symbol_foreground,
@@ -603,7 +607,7 @@ class PinPainter extends ItemPainter {
         ];
     }
 
-    paint(layer: ViewLayer, p: sch_items.PinInstance) {
+    paint(layer: ViewLayer, p: schematic.PinInstance) {
         const parent = p.parent;
         const def = p.definition;
 
@@ -698,8 +702,8 @@ class PinPainter extends ItemPainter {
 
     paint_name_and_number(
         local_matrix: Matrix3,
-        parent: sch_items.SymbolInstance,
-        p: sch_items.PinDefinition,
+        parent: schematic.SchematicSymbol,
+        p: schematic.PinDefinition,
     ) {
         if (p.hide) {
             return;
@@ -711,18 +715,19 @@ class PinPainter extends ItemPainter {
             .normalize();
 
         const line_thickness = 0.1524;
-        const num_thickness = p.number_effects.thickness || line_thickness;
-        const name_thickness = p.number_effects.thickness || line_thickness;
-        const label_offset = parent.lib_symbol.pin_name_offset;
-        const hide_pin_names = parent.lib_symbol.hide_pin_names;
-        const hide_pin_numbers = parent.lib_symbol.hide_pin_numbers;
+        const num_thickness = p.number.effects.font.thickness || line_thickness;
+        const name_thickness =
+            p.number.effects.font.thickness || line_thickness;
+        const label_offset = parent.lib_symbol.pin_names.offset;
+        const hide_pin_names = parent.lib_symbol.pin_names.hide;
+        const hide_pin_numbers = parent.lib_symbol.pin_numbers.hide;
         const text_margin = 0.6096 * 0.15; // 24 mils * ratio
         const pin_length = p.length;
 
-        const num_effects = p.number_effects.copy();
-        num_effects.thickness = num_thickness;
-        const name_effects = p.name_effects.copy();
-        name_effects.thickness = name_thickness;
+        const num_effects = p.number.effects.copy();
+        num_effects.font.thickness = num_thickness;
+        const name_effects = p.name.effects.copy();
+        name_effects.font.thickness = name_thickness;
 
         let name_placement;
         let num_placement;
@@ -768,7 +773,7 @@ class PinPainter extends ItemPainter {
 
         if (!hide_pin_numbers) {
             this.paint_label(
-                p.number,
+                p.number.text,
                 num_effects,
                 num_pos,
                 num_placement.h_align,
@@ -778,9 +783,9 @@ class PinPainter extends ItemPainter {
             );
         }
 
-        if (!hide_pin_names && p.name != "~") {
+        if (!hide_pin_names && p.name.text != "~") {
             this.paint_label(
-                p.name,
+                p.name.text,
                 name_effects,
                 name_pos,
                 name_placement.h_align,
@@ -804,8 +809,8 @@ class PinPainter extends ItemPainter {
     ) {
         const options = new TextOptions(
             this.gfx.text_shaper.default_font,
-            effects.size,
-            effects.thickness,
+            effects.font.size,
+            effects.font.thickness,
             false,
             false,
             v_align,
@@ -832,7 +837,7 @@ class PinPainter extends ItemPainter {
         this.gfx.circle(new Circle(pos, 0.1, new Color(1, 1, 0, 1)));
     }
 
-    paint_line(p: sch_items.PinDefinition) {
+    paint_line(p: schematic.PinDefinition) {
         const target_pin_radius = 0.381; // 15 mils
 
         // Little connection circle
@@ -858,10 +863,10 @@ class PinPainter extends ItemPainter {
     }
 }
 
-class LibrarySymbolPainter extends ItemPainter {
-    classes = [sch_items.LibrarySymbol];
+class LibSymbolPainter extends ItemPainter {
+    classes = [schematic.LibSymbol];
 
-    layers_for(item: sch_items.LibrarySymbol) {
+    layers_for(item: schematic.LibSymbol) {
         return [
             LayerName.symbol_foreground,
             LayerName.symbol_foreground,
@@ -869,7 +874,7 @@ class LibrarySymbolPainter extends ItemPainter {
         ];
     }
 
-    paint(layer: ViewLayer, s: sch_items.LibrarySymbol) {
+    paint(layer: ViewLayer, s: schematic.LibSymbol) {
         for (const c of s.children) {
             this.paint(layer, c);
         }
@@ -884,19 +889,21 @@ class LibrarySymbolPainter extends ItemPainter {
                 LayerName.interactive,
             ].includes(layer.name as LayerName)
         ) {
-            for (const g of s.graphics) {
-                if (
-                    layer.name == LayerName.symbol_background &&
-                    g.fill == "background"
-                ) {
-                    this.gfx.state.fill = fill_color as Color;
-                } else if (
-                    layer.name == LayerName.symbol_foreground &&
-                    g.fill == "outline"
-                ) {
-                    this.gfx.state.fill = outline_color as Color;
-                } else {
-                    this.gfx.state.fill = Color.transparent;
+            for (const g of s.drawings) {
+                if (g instanceof schematic.GraphicItem) {
+                    if (
+                        layer.name == LayerName.symbol_background &&
+                        g.fill.type == "background"
+                    ) {
+                        this.gfx.state.fill = fill_color as Color;
+                    } else if (
+                        layer.name == LayerName.symbol_foreground &&
+                        g.fill.type == "outline"
+                    ) {
+                        this.gfx.state.fill = outline_color as Color;
+                    } else {
+                        this.gfx.state.fill = Color.transparent;
+                    }
                 }
 
                 this.gfx.state.stroke = outline_color as Color;
@@ -908,20 +915,20 @@ class LibrarySymbolPainter extends ItemPainter {
 }
 
 class PropertyPainter extends ItemPainter {
-    classes = [sch_items.Property];
+    classes = [schematic.Property];
 
-    layers_for(item: sch_items.Property) {
+    layers_for(item: schematic.Property) {
         return [LayerName.symbol_field, LayerName.interactive];
     }
 
-    paint(layer: ViewLayer, p: sch_items.Property) {
-        if (p.effects.hide || !p.value) {
+    paint(layer: ViewLayer, p: schematic.Property) {
+        if (p.effects.hide || !p.text) {
             return;
         }
 
         let color = this.gfx.theme["fields"] as Color;
 
-        switch (p.key) {
+        switch (p.name) {
             case "Reference":
                 color = this.gfx.theme["reference"] as Color;
                 break;
@@ -943,18 +950,18 @@ class PropertyPainter extends ItemPainter {
 
         const text_options = new TextOptions(
             this.gfx.text_shaper.default_font,
-            p.effects.size,
-            p.effects.thickness || 0.127,
-            p.effects.bold,
-            p.effects.italic,
-            p.effects.v_align,
-            p.effects.h_align,
-            p.effects.mirror,
+            p.effects.font.size,
+            p.effects.font.thickness || 0.127,
+            p.effects.font.bold,
+            p.effects.font.italic,
+            p.effects.justify.vertical,
+            p.effects.justify.horizontal,
+            p.effects.justify.mirror,
         );
 
         // Prepare a transformation based on the parent's location,
         // rotation, and mirror settings.
-        const parent = p.parent as sch_items.SymbolInstance;
+        const parent = p.parent as schematic.SchematicSymbol;
         const parent_matrix = Matrix3.identity();
         parent_matrix.translate_self(p.at.position.x, p.at.position.y);
         parent_matrix.scale_self(
@@ -971,7 +978,7 @@ class PropertyPainter extends ItemPainter {
         // Get the BBox of the text if it was draw as-is without adjusting
         // the alignment.
         let bbox: BBox = this.gfx.text_shaper.paragraph(
-            p.value,
+            p.text,
             new Vec2(0, 0),
             orient,
             text_options,
@@ -997,7 +1004,7 @@ class PropertyPainter extends ItemPainter {
         text_options.h_align = "center";
 
         const shaped = this.gfx.text_shaper.paragraph(
-            p.value,
+            p.text,
             bbox_center,
             orient,
             text_options,
@@ -1014,10 +1021,10 @@ class PropertyPainter extends ItemPainter {
     }
 }
 
-class SymbolInstancePainter extends ItemPainter {
-    classes = [sch_items.SymbolInstance];
+class SchematicSymbolPainter extends ItemPainter {
+    classes = [schematic.SchematicSymbol];
 
-    layers_for(item: sch_items.SymbolInstance) {
+    layers_for(item: schematic.SchematicSymbol) {
         return [
             LayerName.interactive,
             LayerName.symbol_foreground,
@@ -1027,7 +1034,7 @@ class SymbolInstancePainter extends ItemPainter {
         ];
     }
 
-    paint(layer: ViewLayer, si: sch_items.SymbolInstance) {
+    paint(layer: ViewLayer, si: schematic.SchematicSymbol) {
         if (layer.name == LayerName.interactive && si.lib_symbol.power) {
             // Don't draw power symbols on the interactive layer.
             return;
@@ -1080,10 +1087,10 @@ export class SchematicPainter extends DocumentPainter {
             new NoConnectPainter(this, gfx),
             new TextPainter(this, gfx),
             new PinPainter(this, gfx),
-            new LibrarySymbolPainter(this, gfx),
+            new LibSymbolPainter(this, gfx),
             new PropertyPainter(this, gfx),
-            new SymbolInstancePainter(this, gfx),
-            new LabelPainter(this, gfx),
+            new SchematicSymbolPainter(this, gfx),
+            new NetLabelPainter(this, gfx),
             new GlobalLabelPainter(this, gfx),
             new HierarchicalLabelPainter(this, gfx),
         ];

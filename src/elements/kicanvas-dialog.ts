@@ -1,4 +1,4 @@
-import { Property } from "../kicad/schematic-old";
+import { Property } from "../kicad/schematic";
 import { $make, $on, $q } from "../utils";
 
 export class KiCanvasDialogElement extends HTMLElement {
@@ -90,8 +90,8 @@ export class KiCanvasDialogElement extends HTMLElement {
             const template = $make("template", {
                 innerHTML: `
                     <div class="property">
-                        <label for="${prop.key}">${prop.key}</label>
-                        <input type="text" readonly id="${prop.key}" name="${prop.key}" value="${prop.value}" />
+                        <label for="${prop.name}">${prop.text}</label>
+                        <input type="text" readonly id="${prop.name}" name="${prop.name}" value="${prop.text}" />
                     </div>`,
             });
             parent.append(template.content.cloneNode(true));

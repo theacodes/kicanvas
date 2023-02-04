@@ -4,8 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse } from "../kicad/parser-old";
-import * as sch_items from "../kicad/schematic-old";
+import * as sch_items from "../kicad/schematic";
 import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
 import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";
@@ -59,7 +58,7 @@ export class SchematicViewer extends Viewer {
             sch_text = await (await window.fetch(src)).text();
         }
 
-        this.schematic = new sch_items.KicadSch(parse(sch_text));
+        this.schematic = new sch_items.KicadSch(sch_text);
 
         if (this.layers) {
             this.layers.dispose();
