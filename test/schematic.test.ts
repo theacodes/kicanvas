@@ -461,5 +461,76 @@ suite("schematic parser", function () {
                 },
             ],
         });
+
+        // The last one is a power symbol
+        const lib_gnd = sch.lib_symbols.symbols[3];
+        assert_deep_partial(lib_gnd, {
+            name: "power:GND",
+            power: true,
+            pin_names: { offset: 0 },
+            in_bom: true,
+            on_board: true,
+            properties: [
+                { name: "Reference", text: "#PWR", effects: { hide: true } },
+                { name: "Value", text: "GND" },
+            ],
+        });
+    });
+
+    test("sch with symbols", function () {
+        const sch = new schematic.KicadSch(symbols_sch_src);
+
+        assert.equal(sch.symbols.length, 5);
+
+        assert_deep_partial(sch.symbols[0], {
+            lib_id: "Device:C",
+            at: { position: { x: 5, y: 0 }, rotation: 90 },
+            unit: 1,
+            in_bom: true,
+            on_board: true,
+            fields_autoplaced: true,
+            properties: [
+                {
+                    name: "Reference",
+                    text: "C?",
+                    id: 0,
+                    at: { position: { x: 5, y: -6.35 }, rotation: 90 },
+                },
+                { name: "Value", text: "10u", id: 1 },
+                {
+                    name: "Footprint",
+                    text: "Capacitor_SMD:C_0603_1608Metric",
+                    id: 2,
+                    effects: {
+                        font: { size: { x: 1.27, y: 1.27 } },
+                        hide: true,
+                    },
+                },
+                {
+                    name: "Datasheet",
+                    text: "~",
+                    id: 3,
+                    effects: { hide: true },
+                },
+            ],
+            pins: [{ number: "1" }, { number: "2" }],
+        });
+
+        assert_deep_partial(sch.symbols[1], {
+            lib_id: "Device:C",
+            at: { position: { x: 5, y: 0 }, rotation: 0 },
+        });
+
+        assert_deep_partial(sch.symbols[2], {
+            lib_id: "power:GND",
+        });
+
+        assert_deep_partial(sch.symbols[3], {
+            lib_id: "Regulator_Linear:AP1117-15",
+        });
+
+        assert_deep_partial(sch.symbols[4], {
+            lib_id: "Device:C_Polarized_US",
+        });
     });
 });
