@@ -5,7 +5,7 @@
 */
 
 import { assert } from "@esm-bundle/chai";
-import * as schematic from "../src/kicad/newschematic";
+import * as schematic from "../src/kicad/schematic";
 import { assert_deep_partial } from "./utilities";
 
 import empty_sch_src from "./files/empty.kicad_sch";

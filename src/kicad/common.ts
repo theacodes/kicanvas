@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./newparser.ts";
+import { parse_expr, P, T, type Parseable } from "./parser.ts";
 import { Vec2 } from "../math/vec2.ts";
 
 export function expand_text_vars(

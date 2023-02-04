@@ -4,16 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./newparser.ts";
+import { parse_expr, P, T, type Parseable } from "./parser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import type { List } from "./tokenizer.ts";
-import {
-    At,
-    Effects,
-    Paper,
-    TitleBlock,
-    expand_text_vars,
-} from "./newcommon.ts";
+import { At, Effects, Paper, TitleBlock, expand_text_vars } from "./common.ts";
 
 export type Drawing =
     | GrLine
