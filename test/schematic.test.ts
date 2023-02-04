@@ -13,6 +13,7 @@ import paper_sch_src from "./files/paper.kicad_sch";
 import wires_sch_src from "./files/wires.kicad_sch";
 import labels_sch_src from "./files/labels.kicad_sch";
 import drawings_sch_src from "./files/drawings.kicad_sch";
+import symbols_sch_src from "./files/symbols.kicad_sch";
 
 suite("schematic parser", function () {
     test("empty sch file", function () {
@@ -306,5 +307,159 @@ suite("schematic parser", function () {
         });
 
         assert.equal(sch.images.length, 1);
+    });
+
+    test("sch with library symbols", function () {
+        const sch = new schematic.KicadSch(symbols_sch_src);
+
+        assert.equal(sch.lib_symbols.symbols.length, 4);
+
+        const lib_c = sch.lib_symbols.symbols[0];
+        assert_deep_partial(lib_c, {
+            name: "Device:C",
+            pin_numbers: { hide: true },
+            pin_names: { offset: 0.254, hide: false },
+            in_bom: true,
+            on_board: true,
+            properties: [
+                {
+                    name: "Reference",
+                    text: "C",
+                    id: 0,
+                    at: { position: { x: 0.635, y: 2.54 }, rotation: 0 },
+                },
+                {
+                    name: "Value",
+                    text: "C",
+                    id: 1,
+                },
+                {
+                    name: "Footprint",
+                    text: "",
+                    id: 2,
+                },
+                {
+                    name: "Datasheet",
+                    text: "~",
+                    id: 3,
+                    effects: {
+                        hide: true,
+                    },
+                },
+            ],
+            children: [
+                {
+                    name: "C_0_1",
+                    drawings: [
+                        {
+                            pts: [
+                                { x: -2.032, y: -0.762 },
+                                { x: 2.032, y: -0.762 },
+                            ],
+                            stroke: { type: "default" },
+                            fill: { type: "none" },
+                        },
+                    ],
+                },
+                {
+                    name: "C_1_1",
+                    pins: [
+                        {
+                            type: "passive",
+                            shape: "line",
+                            at: { position: { x: 0, y: 3.81 }, rotation: 270 },
+                            length: 2.794,
+                            name: {
+                                text: "~",
+                                effects: {
+                                    font: { size: { x: 1.27, y: 1.27 } },
+                                },
+                            },
+                            number: {
+                                text: "1",
+                                effects: {
+                                    font: { size: { x: 1.27, y: 1.27 } },
+                                },
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
+
+        // For this one, just checking that it parsed the Arc drawing
+        // correctly, since that's the only big difference between it and the
+        // first symbol.
+        const lib_c_pol = sch.lib_symbols.symbols[1];
+        assert_deep_partial(lib_c_pol, {
+            name: "Device:C_Polarized_US",
+            children: [
+                {
+                    name: "C_Polarized_US_0_1",
+                    drawings: [
+                        {},
+                        {},
+                        {},
+                        {
+                            start: { x: 2.032, y: -1.27 },
+                            mid: { x: 0, y: -0.5572 },
+                            end: { x: -2.032, y: -1.27 },
+                            stroke: { type: "default" },
+                            fill: { type: "none" },
+                        },
+                    ],
+                },
+            ],
+        });
+
+        // For this one, we're checking the rectangle drawing
+        // and the different pin shapes.
+        const lib_ap1117 = sch.lib_symbols.symbols[2];
+        assert_deep_partial(lib_ap1117, {
+            name: "Regulator_Linear:AP1117-15",
+            pin_names: {
+                hide: false,
+                offset: 0.254,
+            },
+            pin_numbers: {
+                hide: false,
+            },
+            children: [
+                {
+                    name: "AP1117-15_0_1",
+                    drawings: [
+                        {
+                            start: { x: -5.08, y: -5.08 },
+                            end: { x: 5.08, y: 1.905 },
+                        },
+                    ],
+                },
+                {
+                    name: "AP1117-15_1_1",
+                    pins: [
+                        {
+                            type: "power_in",
+                            shape: "line",
+                            at: { position: { x: 0, y: -7.62 }, rotation: 90 },
+                            length: 2.54,
+                            name: {
+                                text: "GND",
+                                effects: {
+                                    font: { size: { x: 1.27, y: 1.27 } },
+                                },
+                            },
+                            number: {
+                                text: "1",
+                                effects: {
+                                    font: { size: { x: 1.27, y: 1.27 } },
+                                },
+                            },
+                        },
+                        { type: "power_out", name: { text: "VO" } },
+                        { type: "power_in", name: { text: "VI" } },
+                    ],
+                },
+            ],
+        });
     });
 });
