@@ -184,7 +184,7 @@ suite("schematic parser", function () {
             effects: {
                 font: {
                     size: { x: 1.27, y: 1.27 },
-                    thickness: undefined,
+                    thickness: 0,
                 },
             },
         });
@@ -194,7 +194,7 @@ suite("schematic parser", function () {
             effects: {
                 font: {
                     size: { x: 2.54, y: 2.54 },
-                    thickness: undefined,
+                    thickness: 0,
                 },
             },
         });
@@ -541,6 +541,7 @@ suite("schematic parser", function () {
 
         assert_deep_partial(sch.symbols[4], {
             lib_id: "Device:C_Polarized_US",
+            mirror: "x",
         });
     });
 });

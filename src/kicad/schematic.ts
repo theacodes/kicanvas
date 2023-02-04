@@ -62,7 +62,11 @@ export class KicadSch {
                 ),
                 // images
                 // sheets
-                P.collection("symbols", "symbol", T.item(SchematicSymbol)),
+                P.collection(
+                    "symbols",
+                    "symbol",
+                    T.item(SchematicSymbol, this),
+                ),
                 P.collection("drawings", "polyline", T.item(Polyline, this)),
                 P.collection("drawings", "text", T.item(Text, this)),
                 P.collection("images", "image", T.item(Image)),
@@ -70,6 +74,20 @@ export class KicadSch {
                 P.item("symbol_instances", SymbolInstances),
             ),
         );
+    }
+
+    *items() {
+        yield* this.wires;
+        yield* this.buses;
+        yield* this.bus_entries;
+        yield* this.junctions;
+        yield* this.net_labels;
+        yield* this.global_labels;
+        yield* this.hierarchical_labels;
+        yield* this.no_connects;
+        yield* this.symbols;
+        yield* this.drawings;
+        yield* this.images;
     }
 }
 
@@ -115,8 +133,8 @@ export class Fill {
 export class GraphicItem {
     parent?: LibSymbol | SchematicSymbol;
     private = false;
-    stroke: Stroke;
-    fill: Fill;
+    stroke?: Stroke;
+    fill?: Fill;
 
     constructor(parent?: LibSymbol | SchematicSymbol) {
         this.parent = parent;
@@ -555,6 +573,7 @@ export class HierarchicalLabel extends Label {
 
 export class LibSymbols {
     symbols: LibSymbol[] = [];
+    #symbols_by_name: Map<string, LibSymbol> = new Map();
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -565,6 +584,14 @@ export class LibSymbols {
                 P.collection("symbols", "symbol", T.item(LibSymbol)),
             ),
         );
+
+        for (const symbol of this.symbols) {
+            this.#symbols_by_name.set(symbol.name, symbol);
+        }
+    }
+
+    by_name(name: string) {
+        return this.#symbols_by_name.get(name);
     }
 }
 
@@ -584,6 +611,9 @@ export class LibSymbol {
     children: LibSymbol[] = [];
     drawings: Drawing[] = [];
     pins: PinDefinition[] = [];
+
+    #pins_by_number: Map<string, PinDefinition> = new Map();
+    #properties_by_id: Map<number, Property> = new Map();
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -614,34 +644,94 @@ export class LibSymbol {
                 P.collection("drawings", "textbox", T.item(TextBox, this)),
             ),
         );
+
+        for (const pin of this.pins) {
+            this.#pins_by_number.set(pin.number.text, pin);
+        }
+
+        for (const property of this.properties) {
+            this.#properties_by_id.set(property.id, property);
+        }
+    }
+
+    has_pin(number: string) {
+        return this.#pins_by_number.has(number);
+    }
+
+    pin_by_number(number: string): PinDefinition {
+        if (this.has_pin(number)) {
+            return this.#pins_by_number.get(number);
+        }
+        for (const child of this.children) {
+            if (child.has_pin(number)) {
+                return child.pin_by_number(number);
+            }
+        }
+        throw new Error(
+            `No pin numbered ${number} on library symbol ${this.name}`,
+        );
+    }
+
+    has_property(id: number) {
+        return this.#properties_by_id.has(id);
+    }
+
+    property_by_id(id: number): Property {
+        if (this.#properties_by_id.has(id)) {
+            return this.#properties_by_id.get(id);
+        }
+        for (const child of this.children) {
+            if (child.has_property(id)) {
+                return child.property_by_id(id);
+            }
+        }
+        throw new Error(
+            `No property with id ${id} on library symbol ${this.name}`,
+        );
     }
 }
 
 export class Property {
-    number: number;
     name: string;
     text: string;
     id: number;
     at: At;
     show_name = false;
     do_not_autoplace = false;
-    effects: Effects;
+    #effects?: Effects;
 
     constructor(expr: Parseable, public parent: LibSymbol | SchematicSymbol) {
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("property"),
-                P.positional("name", T.string),
-                P.positional("text", T.string),
-                P.pair("id", T.number),
-                P.item("at", At),
-                P.item("effects", Effects),
-                P.atom("show_name"),
-                P.atom("do_not_autoplace"),
-            ),
+        const parsed = parse_expr(
+            expr,
+            P.start("property"),
+            P.positional("name", T.string),
+            P.positional("text", T.string),
+            P.pair("id", T.number),
+            P.item("at", At),
+            P.item("effects", Effects),
+            P.atom("show_name"),
+            P.atom("do_not_autoplace"),
         );
+
+        this.#effects = parsed["effects"];
+        delete parsed["effects"];
+
+        Object.assign(this, parsed);
+    }
+
+    get effects(): Effects {
+        if (this.#effects) {
+            return this.#effects;
+        } else if (this.parent instanceof SchematicSymbol) {
+            return this.parent.lib_symbol
+                .property_by_id(this.id)
+                .effects.copy();
+        }
+        return new Effects();
+    }
+
+    set effects(e: Effects) {
+        this.#effects = e;
     }
 }
 
@@ -747,7 +837,7 @@ export class SchematicSymbol {
     lib_name?: string;
     lib_id: string;
     at: At;
-    mirror = false;
+    mirror?: "x" | "y";
     unit?: number;
     convert? = false;
     in_bom = false;
@@ -757,7 +847,7 @@ export class SchematicSymbol {
     properties: Property[] = [];
     pins: PinInstance[] = [];
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent: KicadSch) {
         /*
         (symbol (lib_id "Device:C_Small") (at 134.62 185.42 0) (unit 1)
           (in_bom yes) (on_board yes) (fields_autoplaced)
@@ -779,7 +869,7 @@ export class SchematicSymbol {
                 P.pair("lib_name", T.string),
                 P.pair("lib_id", T.string),
                 P.item("at", At),
-                P.atom("mirror"),
+                P.pair("mirror", T.string),
                 P.pair("unit", T.number),
                 P.atom("convert"),
                 P.pair("in_bom", T.boolean),
@@ -788,11 +878,15 @@ export class SchematicSymbol {
                 P.atom("fields_autoplaced"),
                 P.pair("uuid", T.string),
                 P.collection("properties", "property", T.item(Property, this)),
-                P.collection("pins", "pin", T.item(PinInstance)),
+                P.collection("pins", "pin", T.item(PinInstance, this)),
                 // TODO: instances introduced in KiCAD 7
                 // TODO: default instance introduced in KiCAD 7
             ),
         );
+    }
+
+    get lib_symbol(): LibSymbol {
+        return this.parent.lib_symbols.by_name(this.lib_name ?? this.lib_id);
     }
 }
 
@@ -801,7 +895,7 @@ export class PinInstance {
     uuid: string;
     alternate: string;
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent: SchematicSymbol) {
         /* (pin "1" (uuid ab9b91d4-020f-476d-acd8-920c7892e89a) (alternate abc)) */
         Object.assign(
             this,
@@ -813,6 +907,10 @@ export class PinInstance {
                 P.pair("alternate", T.string),
             ),
         );
+    }
+
+    get definition() {
+        return this.parent.lib_symbol.pin_by_number(this.number);
     }
 }
 
