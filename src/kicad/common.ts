@@ -190,12 +190,20 @@ export class Effects {
             );
         }
     }
+
+    copy() {
+        const e = new Effects();
+        e.font = this.font.copy();
+        e.justify = this.justify.copy();
+        e.hide = this.hide;
+        return e;
+    }
 }
 
 export class Font {
-    face: string;
+    face?: string;
     size: Vec2 = new Vec2(1.27, 1.27);
-    thickness: number;
+    thickness = 0;
     bold = false;
     italic = false;
 
@@ -215,6 +223,16 @@ export class Font {
                 ),
             );
         }
+    }
+
+    copy() {
+        const f = new Font();
+        f.face = this.face;
+        f.size = this.size.copy();
+        f.thickness = this.thickness;
+        f.bold = this.bold;
+        f.italic = this.italic;
+        return f;
     }
 }
 
@@ -236,5 +254,13 @@ export class Justify {
                 ),
             );
         }
+    }
+
+    copy() {
+        const j = new Justify();
+        j.horizontal = this.horizontal;
+        j.vertical = this.vertical;
+        j.mirror = this.mirror;
+        return j;
     }
 }
