@@ -660,7 +660,7 @@ export class LibSymbol {
 
     pin_by_number(number: string): PinDefinition {
         if (this.has_pin(number)) {
-            return this.#pins_by_number.get(number);
+            return this.#pins_by_number.get(number)!;
         }
         for (const child of this.children) {
             if (child.has_pin(number)) {
@@ -678,7 +678,7 @@ export class LibSymbol {
 
     property_by_id(id: number): Property {
         if (this.#properties_by_id.has(id)) {
-            return this.#properties_by_id.get(id);
+            return this.#properties_by_id.get(id)!;
         }
         for (const child of this.children) {
             if (child.has_property(id)) {
@@ -886,7 +886,10 @@ export class SchematicSymbol {
     }
 
     get lib_symbol(): LibSymbol {
-        return this.parent.lib_symbols.by_name(this.lib_name ?? this.lib_id);
+        // note: skipping a lot of null checks here because unless something
+        // horrible has happened, the schematic should absolutely have the
+        // library symbol for this symbol instance.
+        return this.parent.lib_symbols!.by_name(this.lib_name ?? this.lib_id)!;
     }
 }
 

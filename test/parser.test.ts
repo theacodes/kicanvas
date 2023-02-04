@@ -12,13 +12,12 @@ import { Vec2 } from "../src/math/vec2";
 
 suite("Parser", function () {
     test("start", function () {
-        let res;
-
-        res = parse_expr(listify("thing 1 2"), P.start("thing"));
+        const res = parse_expr(listify("thing 1 2"), P.start("thing"));
         assert.deepEqual(res, {});
 
-        res = parse_expr(listify("notthing 1 2"), P.start("thing"));
-        assert.deepEqual(res, null);
+        assert.throws(() => {
+            parse_expr(listify("notthing 1 2"), P.start("thing"));
+        });
     });
 
     test("positional", function () {

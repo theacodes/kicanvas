@@ -312,9 +312,9 @@ suite("schematic parser", function () {
     test("sch with library symbols", function () {
         const sch = new schematic.KicadSch(symbols_sch_src);
 
-        assert.equal(sch.lib_symbols.symbols.length, 4);
+        assert.equal(sch.lib_symbols!.symbols.length, 4);
 
-        const lib_c = sch.lib_symbols.symbols[0];
+        const lib_c = sch.lib_symbols!.symbols[0];
         assert_deep_partial(lib_c, {
             name: "Device:C",
             pin_numbers: { hide: true },
@@ -390,7 +390,7 @@ suite("schematic parser", function () {
         // For this one, just checking that it parsed the Arc drawing
         // correctly, since that's the only big difference between it and the
         // first symbol.
-        const lib_c_pol = sch.lib_symbols.symbols[1];
+        const lib_c_pol = sch.lib_symbols!.symbols[1];
         assert_deep_partial(lib_c_pol, {
             name: "Device:C_Polarized_US",
             children: [
@@ -414,7 +414,7 @@ suite("schematic parser", function () {
 
         // For this one, we're checking the rectangle drawing
         // and the different pin shapes.
-        const lib_ap1117 = sch.lib_symbols.symbols[2];
+        const lib_ap1117 = sch.lib_symbols!.symbols[2];
         assert_deep_partial(lib_ap1117, {
             name: "Regulator_Linear:AP1117-15",
             pin_names: {
@@ -473,7 +473,7 @@ suite("schematic parser", function () {
         });
 
         // The last one is a power symbol
-        const lib_gnd = sch.lib_symbols.symbols[3];
+        const lib_gnd = sch.lib_symbols!.symbols[3];
         assert_deep_partial(lib_gnd, {
             name: "power:GND",
             power: true,

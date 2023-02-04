@@ -19,12 +19,12 @@ import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
 
 function color_maybe(
-    color: Color,
-    fallback_color: Color,
+    color?: Color,
+    fallback_color?: Color,
     fail_color: Color = new Color(1, 0, 0, 1),
 ) {
-    if (!color.is_transparent) {
-        return color;
+    if (!color?.is_transparent) {
+        return color!;
     }
     if (fallback_color) {
         return fallback_color;
@@ -41,7 +41,7 @@ class RectanglePainter extends ItemPainter {
 
     paint(layer: ViewLayer, r: schematic.Rectangle) {
         const color = color_maybe(
-            r.stroke.color,
+            r.stroke?.color,
             this.gfx.state.stroke,
             this.gfx.theme["note"] as Color,
         );
@@ -54,14 +54,14 @@ class RectanglePainter extends ItemPainter {
             r.start,
         ];
 
-        if (r.fill.type !== "none") {
+        if (r.fill?.type !== "none") {
             this.gfx.polygon(new Polygon(pts, this.gfx.state.fill));
         }
 
         this.gfx.line(
             new Polyline(
                 pts,
-                r.stroke.width || this.gfx.state.stroke_width,
+                r.stroke?.width || this.gfx.state.stroke_width,
                 color,
             ),
         );
@@ -77,7 +77,7 @@ class PolylinePainter extends ItemPainter {
 
     paint(layer: ViewLayer, pl: schematic.Polyline) {
         const color = color_maybe(
-            pl.stroke.color,
+            pl.stroke?.color,
             this.gfx.state.stroke,
             this.gfx.theme["note"] as Color,
         );
@@ -85,7 +85,7 @@ class PolylinePainter extends ItemPainter {
         this.gfx.line(
             new Polyline(
                 pl.pts,
-                pl.stroke.width || this.gfx.state.stroke_width,
+                pl.stroke?.width || this.gfx.state.stroke_width,
                 color,
             ),
         );
@@ -131,12 +131,12 @@ class CirclePainter extends ItemPainter {
                 c.radius,
                 new Angle(0),
                 new Angle(Math.PI * 2),
-                c.stroke.width || this.gfx.state.stroke_width,
+                c.stroke?.width || this.gfx.state.stroke_width,
                 color,
             ),
         );
 
-        if (c.fill.type != "none") {
+        if (c.fill?.type != "none") {
             this.gfx.circle(new Circle(c.center, c.radius, color));
         }
     }
@@ -157,7 +157,7 @@ class ArcPainter extends ItemPainter {
             a.start,
             a.mid,
             a.end,
-            a.stroke.width,
+            a.stroke?.width,
         );
 
         this.gfx.arc(
@@ -166,7 +166,7 @@ class ArcPainter extends ItemPainter {
                 arc.radius,
                 arc.start_angle,
                 arc.end_angle,
-                a.stroke.width || this.gfx.state.stroke_width,
+                a.stroke?.width || this.gfx.state.stroke_width,
                 color,
             ),
         );
@@ -893,12 +893,12 @@ class LibSymbolPainter extends ItemPainter {
                 if (g instanceof schematic.GraphicItem) {
                     if (
                         layer.name == LayerName.symbol_background &&
-                        g.fill.type == "background"
+                        g.fill?.type == "background"
                     ) {
                         this.gfx.state.fill = fill_color as Color;
                     } else if (
                         layer.name == LayerName.symbol_foreground &&
-                        g.fill.type == "outline"
+                        g.fill?.type == "outline"
                     ) {
                         this.gfx.state.fill = outline_color as Color;
                     } else {

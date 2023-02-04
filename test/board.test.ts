@@ -117,7 +117,7 @@ suite("board parser", function () {
         const text = pcb.drawings[0] as board.GrText;
         assert.equal(text.shown_text, "hello var 1 value");
 
-        const fp = pcb.footprints[0];
+        const fp = pcb.footprints[0]!;
         assert.equal(
             (fp.drawings[2] as board.FpText).shown_text,
             "F.Cu An extra property",
@@ -578,7 +578,7 @@ suite("board parser", function () {
 
     test("footprint with graphics", function () {
         const pcb = new board.KicadPCB(footprint_graphics_pcb_src);
-        const fp = pcb.footprints[0];
+        const fp = pcb.footprints[0]!;
 
         assert.equal(fp.library_link, "Fiducial:Fiducial_1mm_Mask2mm");
         assert.equal(fp.layer, "F.Cu");
@@ -754,7 +754,7 @@ suite("board parser", function () {
             fill: "solid",
         } as Partial<board.FpPoly>);
 
-        const zone = fp.zones[0];
+        const zone = fp.zones[0]!;
         assert.deepInclude(zone, {
             parent: fp,
             locked: true,
@@ -779,7 +779,7 @@ suite("board parser", function () {
         const pcb = new board.KicadPCB(footprint_pads_pcb_src);
         assert.equal(pcb.footprints.length, 13);
 
-        const pad1 = pcb.footprints[0].pads[0];
+        const pad1 = pcb.footprints[0]!.pads[0]!;
         assert.deepInclude(pad1, {
             number: "1",
             type: "smd",
@@ -789,7 +789,7 @@ suite("board parser", function () {
             layers: ["F.Cu", "F.Mask"],
         } as Partial<board.Pad>);
 
-        const pad2 = pcb.footprints[1].pads[0];
+        const pad2 = pcb.footprints[1]!.pads[0]!;
         assert.deepInclude(pad2, {
             number: "1",
             type: "smd",
@@ -805,7 +805,7 @@ suite("board parser", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad3 = pcb.footprints[2].pads[0];
+        const pad3 = pcb.footprints[2]!.pads[0]!;
         assert.deepInclude(pad3, {
             number: "1",
             type: "smd",
@@ -816,7 +816,7 @@ suite("board parser", function () {
             roundrect_rratio: 0.4,
         } as Partial<board.Pad>);
 
-        const pad4 = pcb.footprints[3].pads[0];
+        const pad4 = pcb.footprints[3]!.pads[0]!;
         assert.deepInclude(pad4, {
             number: "1",
             type: "smd",
@@ -840,7 +840,7 @@ suite("board parser", function () {
             ],
         } as Partial<board.GrPoly>);
 
-        const pad5 = pcb.footprints[4].pads[0];
+        const pad5 = pcb.footprints[4]!.pads[0]!;
         assert.deepInclude(pad5, {
             number: "1",
             type: "thru_hole",
@@ -856,7 +856,7 @@ suite("board parser", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad6 = pcb.footprints[5].pads[0];
+        const pad6 = pcb.footprints[5]!.pads[0]!;
         assert.deepInclude(pad6, {
             number: "1",
             type: "thru_hole",
@@ -872,7 +872,7 @@ suite("board parser", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad7 = pcb.footprints[6].pads[0];
+        const pad7 = pcb.footprints[6]!.pads[0]!;
         assert.deepInclude(pad7, {
             number: "1",
             type: "thru_hole",
@@ -888,7 +888,7 @@ suite("board parser", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad8 = pcb.footprints[7].pads[0];
+        const pad8 = pcb.footprints[7]!.pads[0]!;
         assert.deepInclude(pad8, {
             number: "1",
             type: "smd",
@@ -898,7 +898,7 @@ suite("board parser", function () {
             layers: ["F.Cu", "F.Mask"],
         } as Partial<board.Pad>);
 
-        const pad9 = pcb.footprints[8].pads[0];
+        const pad9 = pcb.footprints[8]!.pads[0]!;
         assert.deepInclude(pad9, {
             number: "1",
             type: "smd",
@@ -914,7 +914,7 @@ suite("board parser", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad10 = pcb.footprints[9].pads[0];
+        const pad10 = pcb.footprints[9]!.pads[0]!;
         assert.deepInclude(pad10, {
             number: "1",
             type: "smd",
@@ -925,7 +925,7 @@ suite("board parser", function () {
             rect_delta: { x: 0.5, y: 0 },
         } as Partial<board.Pad>);
 
-        const pad11 = pcb.footprints[10].pads[0];
+        const pad11 = pcb.footprints[10]!.pads[0]!;
         assert.deepInclude(pad11, {
             number: "1",
             type: "smd",
@@ -955,7 +955,7 @@ suite("board parser", function () {
             fill: "none",
         } as Partial<board.GrCircle>);
 
-        const pad12 = pcb.footprints[11].pads[0];
+        const pad12 = pcb.footprints[11]!.pads[0]!;
         assert.deepInclude(pad12, {
             number: "1",
             type: "thru_hole",
@@ -971,7 +971,7 @@ suite("board parser", function () {
             layers: ["*.Cu", "*.Mask"],
         } as Partial<board.Pad>);
 
-        const pad13 = pcb.footprints[12].pads[0];
+        const pad13 = pcb.footprints[12]!.pads[0]!;
         assert.deepInclude(pad13, {
             number: "",
             type: "smd",
