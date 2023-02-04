@@ -426,6 +426,16 @@ suite("schematic parser", function () {
             },
             children: [
                 {
+                    name: "AP1117-15_0_0",
+                    drawings: [
+                        {
+                            // This is a text object, and specifically we need to check that
+                            // the rotation ended up getting processed correctly.
+                            at: { position: { x: 0, y: 0 }, rotation: 90 },
+                        },
+                    ],
+                },
+                {
                     name: "AP1117-15_0_1",
                     drawings: [
                         {

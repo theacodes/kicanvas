@@ -408,14 +408,16 @@ export class Image {
 }
 
 export class Text {
-    parent?: LibSymbol | SchematicSymbol;
     private = false;
     text: string;
     at: At;
     effects = new Effects();
     uuid?: string;
 
-    constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
+    constructor(
+        expr: Parseable,
+        public parent?: LibSymbol | SchematicSymbol | KicadSch,
+    ) {
         /*
         (text "SWD" (at -5.08 0 900)
           (effects (font (size 2.54 2.54))))
@@ -431,6 +433,13 @@ export class Text {
                 P.pair("uuid", T.string),
             ),
         );
+
+        if (parent instanceof LibSymbol || parent instanceof SchematicSymbol) {
+            // From sch_sexpr_parser.cpp:LIB_TEXT* SCH_SEXPR_PARSER::parseText()
+            // "Yes, LIB_TEXT is really decidegrees even though all the others are degrees. :("
+            // motherfuck.
+            this.at.rotation /= 10;
+        }
     }
 }
 
