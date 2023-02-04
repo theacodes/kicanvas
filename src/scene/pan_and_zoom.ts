@@ -33,7 +33,7 @@ export class PanAndZoom {
         public camera: Camera2,
         public callback: PanAndZoomCallback,
         public min_zoom = 0.5,
-        public max_zoom = 10
+        public max_zoom = 10,
     ) {
         this.target.addEventListener("mousedown", (e) => {
             e.preventDefault();
@@ -57,18 +57,18 @@ export class PanAndZoom {
                 this.#rect = this.target.getBoundingClientRect();
                 this.#handle_zoom(e.deltaY, this.#relative_mouse_pos(e));
             },
-            { passive: false }
+            { passive: false },
         );
     }
 
-    #relative_mouse_pos(e) {
+    #relative_mouse_pos(e: MouseEvent) {
         return new Vec2(
             e.clientX - this.#rect.left,
-            e.clientY - this.#rect.top
+            e.clientY - this.#rect.top,
         );
     }
 
-    #start_pan(mouse) {
+    #start_pan(mouse: Vec2) {
         const mouse_world = this.camera.screen_to_world(mouse);
         this.#pan_mouse.set(mouse_world);
         this.#pan_center.set(this.camera.center);
@@ -76,7 +76,7 @@ export class PanAndZoom {
         this.#panning = true;
     }
 
-    #continue_pan(mouse) {
+    #continue_pan(mouse: Vec2) {
         const mouse_world = this.#pan_inv_matrix.transform(mouse);
         const delta = mouse_world.sub(this.#pan_mouse);
 
@@ -87,13 +87,13 @@ export class PanAndZoom {
         }
     }
 
-    #handle_zoom(delta, mouse) {
+    #handle_zoom(delta: number, mouse: Vec2) {
         const mouse_world = this.camera.screen_to_world(mouse);
 
         this.camera.zoom *= Math.exp(delta * -0.001);
         this.camera.zoom = Math.min(
             this.max_zoom,
-            Math.max(this.camera.zoom, this.min_zoom)
+            Math.max(this.camera.zoom, this.min_zoom),
         );
 
         const new_world = this.camera.screen_to_world(mouse);

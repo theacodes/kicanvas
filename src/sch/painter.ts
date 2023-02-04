@@ -636,7 +636,11 @@ class PinPainter extends ItemPainter {
         }
     }
 
-    orient_label(offset: Vec2, rotation: Angle, h_align: string) {
+    orient_label(
+        offset: Vec2,
+        rotation: Angle,
+        h_align: "center" | "left" | "right",
+    ): { offset: Vec2; h_align: "center" | "left" | "right" } {
         switch (rotation.degrees) {
             case 0:
                 break;
@@ -664,7 +668,11 @@ class PinPainter extends ItemPainter {
         thickness: number,
         pin_length: number,
         rotation: Angle,
-    ) {
+    ): {
+        offset: Vec2;
+        h_align: "center" | "left" | "right";
+        v_align: "center" | "top" | "bottom";
+    } {
         const offset = new Vec2(label_offset - thickness / 2 + pin_length, 0);
         const placement = this.orient_label(offset, rotation, "left");
         return { v_align: "center", ...placement };
@@ -676,7 +684,11 @@ class PinPainter extends ItemPainter {
         text_thickness: number,
         pin_length: number,
         rotation: Angle,
-    ) {
+    ): {
+        offset: Vec2;
+        h_align: "center" | "left" | "right";
+        v_align: "center" | "top" | "bottom";
+    } {
         const offset = new Vec2(
             pin_length / 2,
             -(text_margin + pin_thickness / 2 + text_thickness / 2),
@@ -691,7 +703,11 @@ class PinPainter extends ItemPainter {
         text_thickness: number,
         pin_length: number,
         rotation: Angle,
-    ) {
+    ): {
+        offset: Vec2;
+        h_align: "center" | "left" | "right";
+        v_align: "center" | "top" | "bottom";
+    } {
         const offset = new Vec2(
             pin_length / 2,
             text_margin + pin_thickness / 2 + text_thickness / 2,
@@ -802,8 +818,8 @@ class PinPainter extends ItemPainter {
         text: string,
         effects: Effects,
         pos: Vec2,
-        h_align,
-        v_align,
+        h_align: "center" | "left" | "right",
+        v_align: "center" | "top" | "bottom",
         rotation: Angle,
         color: Color,
     ) {

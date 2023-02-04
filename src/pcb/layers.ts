@@ -170,12 +170,13 @@ const copper_layers = [
  * Board view layer set
  */
 export class LayerSet extends BaseLayerSet {
-    theme: Record<string, Color>;
-
     /**
      * Create a new LayerSet
      */
-    constructor(board: KicadPCB, theme) {
+    constructor(
+        board: KicadPCB,
+        public theme: Record<string, Color | Record<string, Color>>,
+    ) {
         super();
 
         this.theme = theme;
@@ -238,13 +239,13 @@ export class LayerSet extends BaseLayerSet {
     color_for(layer_name: string): Color {
         switch (layer_name) {
             case ":Via:Holes":
-                return this.theme["via_hole"] ?? Color.white;
+                return (this.theme["via_hole"] as Color) ?? Color.white;
             case ":Via:Through":
-                return this.theme["via_through"] ?? Color.white;
+                return (this.theme["via_through"] as Color) ?? Color.white;
             case ":Pad:Holes":
-                return this.theme["background"] ?? Color.white;
+                return (this.theme["background"] as Color) ?? Color.white;
             case ":Pad:HoleWalls":
-                return this.theme["pad_through_hole"] ?? Color.white;
+                return (this.theme["pad_through_hole"] as Color) ?? Color.white;
         }
 
         let name = layer_name;
@@ -253,10 +254,13 @@ export class LayerSet extends BaseLayerSet {
 
         if (name.endsWith("_cu")) {
             name = name.replace("_cu", "");
-            return this.theme["copper"]?.[name] ?? Color.white;
+            return (
+                (this.theme["copper"] as Record<string, Color>)?.[name] ??
+                Color.white
+            );
         }
 
-        return this.theme[name] ?? Color.white;
+        return (this.theme[name] as Color) ?? Color.white;
     }
 
     /**

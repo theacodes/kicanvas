@@ -40,7 +40,7 @@ export class Vec2 {
      * Update this vector's values
      */
     set(x: Vec2Like, y?: number) {
-        let x_prime;
+        let x_prime: number | null = null;
 
         if (typeof x == "number" && typeof y == "number") {
             x_prime = x;
@@ -53,14 +53,14 @@ export class Vec2 {
         } else if (x instanceof Object && Object.hasOwn(x, "x")) {
             this.x = x.x;
             this.y = x.y;
-        } else if (x_prime == undefined || y == undefined) {
+        }
+
+        if (x_prime == null || y == undefined) {
             throw new Error(`Invalid parameters x: ${x}, y: ${y}.`);
         }
 
         this.x = x_prime;
-        // y should always be a number at this point, but for some reason TS
-        // doesn't catch the narrowing above.
-        this.y = y!;
+        this.y = y;
     }
 
     /** Iterate through [x, y] */

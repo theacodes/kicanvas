@@ -82,10 +82,12 @@ export const T = {
         };
     },
     vec2(obj: Obj, name: string, e: ListOrAtom): Vec2 {
-        return new Vec2(e[1], e[2]);
+        const el = e as number[];
+        return new Vec2(el[1], el[2]);
     },
     color(obj: Obj, name: string, e: ListOrAtom): Color {
-        return new Color(e[1] / 255, e[2] / 255, e[3] / 255, e[4]);
+        const el = e as [string, number, number, number, number?];
+        return new Color(el[1] / 255, el[2] / 255, el[3] / 255, el[4]);
     },
 };
 
@@ -129,7 +131,7 @@ export const P = {
             name: name,
             accepts: [name],
             fn: (obj: Obj, name: string, e: ListOrAtom) => {
-                return typefn(obj, name, e[1]);
+                return typefn(obj, name, (e as any[])[1]);
             },
         };
     },
@@ -180,8 +182,9 @@ export const P = {
             name: name,
             accepts: [accept],
             fn: (obj: Obj, name: string, e: ListOrAtom) => {
+                const el = e as [string, string, any];
                 const rec = obj[name] ?? {};
-                rec[e[1]] = typefn(obj, name, e[2]);
+                rec[el[1]] = typefn(obj, name, el[2]);
                 return rec;
             },
         };
@@ -193,7 +196,7 @@ export const P = {
      * (left) as {align: "left"} and (right) as {align: "right"}.
      */
     atom(name: string, values?: string[]): PropertyDefinition {
-        let typefn;
+        let typefn: TypeProcessor;
 
         if (values) {
             typefn = T.string;
@@ -252,7 +255,7 @@ export const P = {
      * Accepts an expression that describes a 2d vector. For example,
      * ((xy 1 2)) with vec2("xy") would end up with {xy: Vec2(1, 2)}.
      */
-    vec2(name) {
+    vec2(name: string) {
         return P.expr(name, T.vec2);
     },
     color(name = "color") {
@@ -289,11 +292,14 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
     }
 
     if (start_def) {
+        let acceptable_start_strings: string[];
         if (typeof start_def.name == "string") {
-            start_def.name = [start_def.name];
+            acceptable_start_strings = [start_def.name];
+        } else {
+            acceptable_start_strings = start_def.name;
         }
 
-        const first = expr.at(0);
+        const first = expr.at(0) as string;
 
         if (!start_def.name.includes(first)) {
             throw new Error(
@@ -304,11 +310,11 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
         expr = expr.slice(1);
     }
 
-    const out = {};
+    const out: Record<string, any> = {};
 
     n = 0;
     for (const element of expr) {
-        let def;
+        let def: PropertyDefinition | null = null;
 
         // bare string value can be an atom
         if (typeof element == "string") {

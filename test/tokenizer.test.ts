@@ -14,10 +14,13 @@ const CLOSE = Token.CLOSE;
 const ATOM = Token.ATOM;
 const NUMBER = Token.NUMBER;
 const STRING = Token.STRING;
-const OPEN_TOKEN = [OPEN, undefined];
-const CLOSE_TOKEN = [CLOSE, undefined];
+const OPEN_TOKEN: [symbol, any] = [OPEN, undefined];
+const CLOSE_TOKEN: [symbol, any] = [CLOSE, undefined];
 
-function assert_tokens(parsed_tokens, expected_tokens) {
+function assert_tokens(
+    parsed_tokens: Generator<tokenizer.Token>,
+    expected_tokens: [symbol, any][],
+) {
     for (const expected of expected_tokens) {
         const parsed = parsed_tokens.next()?.value;
         assert.equal(

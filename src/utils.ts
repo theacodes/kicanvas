@@ -14,60 +14,79 @@ export async function $onload() {
 }
 
 /* Returns a HTMLElement give the ID or the element itself. */
-export function $e(x) {
+export function $e(x: string | HTMLElement): HTMLElement | null {
     if (typeof x === "string") {
         return document.getElementById(x);
     }
     return x;
 }
 
-export function $s(el_or_selector, selector = undefined) {
-    if (typeof el_or_selector === "string") {
-        return document.querySelectorAll(el_or_selector);
+export function $s(
+    el_or_selector: HTMLElement | DocumentFragment | ShadowRoot | string,
+    selector?: string,
+) {
+    if (!selector) {
+        return document.querySelectorAll(el_or_selector as string);
     } else {
-        return el_or_selector.querySelectorAll(selector);
+        return (el_or_selector as HTMLElement).querySelectorAll(selector);
     }
 }
 
-export function $q(el_or_selector, selector?: string) {
-    if (typeof el_or_selector === "string") {
-        return document.querySelector(el_or_selector);
+export function $q(
+    el_or_selector: HTMLElement | DocumentFragment | ShadowRoot | string,
+    selector?: string,
+) {
+    if (!selector) {
+        return document.querySelector(el_or_selector as string);
     } else {
-        return el_or_selector.querySelector(selector);
+        return (el_or_selector as HTMLElement).querySelector(selector);
     }
 }
 
-export function $make(tag_name, properties = {}) {
+export function $make(
+    tag_name: string,
+    properties: Record<string, string | HTMLElement[]> = {},
+) {
     const elem = document.createElement(tag_name);
     for (const [name, value] of Object.entries(properties)) {
         if (name === "children") {
-            for (const child of value as IterableIterator<HTMLElement>) {
+            for (const child of value as HTMLElement[]) {
                 elem.appendChild(child);
             }
         } else if (name === "innerText") {
-            elem.innerText = value;
+            elem.innerText = value as string;
         } else if (name === "innerHTML") {
-            elem.innerHTML = value;
+            elem.innerHTML = value as string;
         } else {
-            elem.setAttribute(name, value);
+            elem.setAttribute(name, value as string);
         }
     }
     return elem;
 }
 
-export function $draw(c) {
+export function $draw(c: () => void) {
     window.requestAnimationFrame(c);
 }
 
 /* Adds an event listener. */
-export function $on(elem, event, callback, strict = true) {
+export function $on(
+    elem: EventTarget,
+    event: string,
+    callback: ((event: Event) => any) | ((event: CustomEvent) => any),
+    strict = true,
+) {
     if (!strict && (elem === null || elem === undefined)) {
         return;
     }
-    elem.addEventListener(event, callback);
+    elem.addEventListener(event, callback as (event: Event) => any);
 }
 
-export function $event(e, name, detail, bubble = true) {
+export function $event(
+    e: EventTarget,
+    name: string,
+    detail: any,
+    bubble = true,
+) {
     e.dispatchEvent(
         new CustomEvent(name, {
             detail: detail,
@@ -76,9 +95,10 @@ export function $event(e, name, detail, bubble = true) {
     );
 }
 
-export function $template(content) {
+export function $template(content: string) {
     const template = $make("template", {
         innerHTML: content,
-    });
-    return template.content.cloneNode(true).firstElementChild;
+    }) as HTMLTemplateElement;
+    return (template.content.cloneNode(true) as DocumentFragment)
+        .firstElementChild;
 }

@@ -38,7 +38,10 @@ export class KiCanvasInfoBarElement extends CustomElement {
         this.target.addEventListener(
             "kicad-board:item-selected",
             (e: Event) => {
-                this.#onItemSelected(e.target, (e as CustomEvent).detail);
+                this.#onItemSelected(
+                    e.target as HTMLElement,
+                    (e as CustomEvent).detail,
+                );
             },
         );
     }
@@ -47,9 +50,9 @@ export class KiCanvasInfoBarElement extends CustomElement {
         this.target = undefined!;
     }
 
-    #onItemSelected(element, detail) {
+    #onItemSelected(element: HTMLElement, detail: Footprint) {
         console.log("Selected", detail);
-        this.#footprint = detail as Footprint;
+        this.#footprint = detail;
         this.update();
     }
 

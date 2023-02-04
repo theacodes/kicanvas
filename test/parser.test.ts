@@ -266,7 +266,7 @@ suite("Parser", function () {
 
 class TestItem {
     args: any[];
-    constructor(public expr, ...args) {
+    constructor(public expr: any, ...args: any[]) {
         this.args = args;
     }
 }

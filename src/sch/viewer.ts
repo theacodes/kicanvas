@@ -17,7 +17,7 @@ export class SchematicViewer extends Viewer {
     schematic: sch_items.KicadSch;
     #painter: SchematicPainter;
 
-    constructor(canvas) {
+    constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
         this.addEventListener("kicanvas:viewer:select", (e: Event) => {

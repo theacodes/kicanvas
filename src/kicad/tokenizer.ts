@@ -202,7 +202,9 @@ export function* tokenize(input: string) {
     }
 }
 
-function* listify_tokens(tokens: Generator<Token>) {
+export type List = (string | number | List)[];
+
+function* listify_tokens(tokens: Generator<Token>): Generator<List> {
     let token;
     let it;
 
@@ -217,7 +219,7 @@ function* listify_tokens(tokens: Generator<Token>) {
                 yield token.value;
                 break;
             case Token.OPEN:
-                yield Array.from(listify_tokens(tokens));
+                yield Array.from(listify_tokens(tokens)) as any;
                 break;
             case Token.CLOSE:
             case undefined:
@@ -225,8 +227,6 @@ function* listify_tokens(tokens: Generator<Token>) {
         }
     }
 }
-
-export type List = (string | number | List)[];
 
 export function listify(src: string): List {
     const tokens = tokenize(src);

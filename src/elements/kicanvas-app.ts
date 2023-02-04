@@ -24,7 +24,7 @@ class KiCanvasAppElement extends CustomElement {
         super.connectedCallback();
 
         new DropTarget(this, ["kicad_sch", "kicad_pcb"], (files) => {
-            this.load(files[0]);
+            this.load(files[0]!);
         });
     }
 

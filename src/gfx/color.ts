@@ -112,7 +112,7 @@ export class Color {
         return this.a == 0;
     }
 
-    with_alpha(a) {
+    with_alpha(a: number) {
         const c = this.copy();
         c.a = a;
         return c;

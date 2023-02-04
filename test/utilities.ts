@@ -20,25 +20,32 @@ export function assert_deep_partial<T>(
 ) {
     for (const [key, value] of Object.entries(expected)) {
         const local_path = `${path}.${key}`;
-        const actual_value = actual[key];
+        const actual_value: any = (actual as any)[key];
 
-        if (actual_value == undefined && value != undefined) {
+        if (actual_value == null && value != null) {
             assertfn(
                 actual_value,
                 value,
-                `Expected ${local_path} to be ${value} found undefined`,
+                `Expected ${local_path} to be ${value} found ${actual_value}`,
             );
         }
 
         switch (typeof value) {
             case "object":
-                assert_deep_partial(actual[key], value, assertfn, local_path);
+                assert_deep_partial(
+                    (actual as any)[key],
+                    value!,
+                    assertfn,
+                    local_path,
+                );
                 break;
             default:
                 assertfn(
-                    actual[key],
+                    (actual as any)[key],
                     value,
-                    `Expected ${local_path} to be ${value} found ${actual[key]}`,
+                    `Expected ${local_path} to be ${value} found ${
+                        (actual as any)[key]
+                    }`,
                 );
         }
     }

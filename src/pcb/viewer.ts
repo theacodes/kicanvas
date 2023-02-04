@@ -17,7 +17,7 @@ export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;
     #painter: BoardPainter;
 
-    constructor(canvas) {
+    constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
         this.addEventListener("kicanvas:viewer:select", (e: Event) => {

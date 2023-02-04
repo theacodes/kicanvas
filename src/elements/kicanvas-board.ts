@@ -30,8 +30,9 @@ export class KiCanvasBoardElement extends HTMLElement {
     async connectedCallback() {
         this.#renderShadowDOM();
 
-        if (this.getAttribute("src")) {
-            this.load(this.getAttribute("src"));
+        const src = this.getAttribute("src");
+        if (src) {
+            this.load(src);
         }
     }
 
@@ -42,7 +43,7 @@ export class KiCanvasBoardElement extends HTMLElement {
         this.selected = [];
     }
 
-    async load(src) {
+    async load(src: File | string) {
         this.viewer = new BoardViewer(this.#canvas);
 
         await this.viewer.setup();

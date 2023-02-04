@@ -1127,7 +1127,7 @@ export class Pad {
                     P.collection("items", "gr_rect", T.item(GrRect, this)),
                     P.collection("items", "gr_poly", T.item(GrPoly, this)),
                 );
-                return parsed?.["items"];
+                return (parsed as { items: any[] })?.["items"];
             }),
         );
 

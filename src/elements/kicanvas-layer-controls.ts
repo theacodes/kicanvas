@@ -70,18 +70,18 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         return content;
     }
 
-    #onClick(e) {
-        const button = e.target.closest("button");
-        if (!button) {
+    #onClick(e: Event) {
+        const button = (e.target as HTMLElement)?.closest("button");
+        const name = button?.getAttribute("name");
+
+        if (!name) {
             return;
         }
 
-        const layer = this.target.viewer.layers.by_name(
-            button.getAttribute("name"),
-        )!;
+        const layer = this.target.viewer.layers.by_name(name)!;
 
         layer.visible = !layer.visible;
-        button.setAttribute("visible", layer.visible ? "yes" : "no");
+        button!.setAttribute("visible", layer.visible ? "yes" : "no");
         this.target.viewer.draw_soon();
     }
 }

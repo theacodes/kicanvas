@@ -8,6 +8,10 @@
  * Basic helpers for interacting with WebGL2
  */
 
+type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
+    ? R
+    : never;
+
 /**
  * Encapsulates a shader uniform, making it easier to set values.
  *
@@ -17,32 +21,50 @@
  *
  */
 class Uniform {
-    static _function_map = {
-        f1: "uniform1f",
-        f1v: "uniform1fv",
-        f2: "uniform2f",
-        f2v: "uniform2fv",
-        f3: "uniform3f",
-        f3v: "uniform3fv",
-        f4: "uniform4f",
-        f4v: "uniform4fv",
-        mat3f: "uniformMatrix3fv",
-        mat3fv: "uniformMatrix3fv",
-        // TODO: This is incomplete
-        // TODO: I can also figure this out from the type
-    };
-
     constructor(
         public gl: WebGL2RenderingContext,
         public name: string,
         public location: WebGLUniformLocation,
         public type: GLenum,
+    ) {}
+
+    f1(x: number) {
+        this.gl.uniform1f(this.location, x);
+    }
+    f1v(data: Float32List, srcOffset?: GLuint, srcLength?: GLuint) {
+        this.gl.uniform1fv(this.location, data, srcOffset, srcLength);
+    }
+    f2(...args: ParametersExceptFirst<WebGLRenderingContextBase["uniform2f"]>) {
+        this.gl.uniform2f(this.location, ...args);
+    }
+    f2v(...args: ParametersExceptFirst<WebGL2RenderingContext["uniform2fv"]>) {
+        this.gl.uniform2fv(this.location, ...args);
+    }
+    f3(...args: ParametersExceptFirst<WebGL2RenderingContext["uniform3f"]>) {
+        this.gl.uniform3f(this.location, ...args);
+    }
+    f3v(...args: ParametersExceptFirst<WebGL2RenderingContext["uniform3fv"]>) {
+        this.gl.uniform3fv(this.location, ...args);
+    }
+    f4(...args: ParametersExceptFirst<WebGL2RenderingContext["uniform4f"]>) {
+        this.gl.uniform4f(this.location, ...args);
+    }
+    f4v(...args: ParametersExceptFirst<WebGL2RenderingContext["uniform4fv"]>) {
+        this.gl.uniform4fv(this.location, ...args);
+    }
+    mat3f(
+        ...args: ParametersExceptFirst<
+            WebGL2RenderingContext["uniformMatrix3fv"]
+        >
     ) {
-        for (const [dst, src] of Object.entries(Uniform._function_map)) {
-            this[dst] = (...args) => {
-                this.gl[src](this.location, ...args);
-            };
-        }
+        this.gl.uniformMatrix3fv(this.location, ...args);
+    }
+    mat3fv(
+        ...args: ParametersExceptFirst<
+            WebGL2RenderingContext["uniformMatrix3fv"]
+        >
+    ) {
+        this.gl.uniformMatrix3fv(this.location, ...args);
     }
 }
 
@@ -57,15 +79,11 @@ export class ShaderProgram {
 
     program: WebGLProgram;
 
-    /** Shader uniforms
-     * @type {Object.<string, Uniform>}
-     */
-    uniforms = {};
+    /** Shader uniforms */
+    uniforms: Record<string, Uniform> = {};
 
-    /** Shader attributes
-     * @type {Object.<string, WebGLActiveInfo>}
-     */
-    attribs = {};
+    /** Shader attributes */
+    attribs: Record<string, WebGLActiveInfo> = {};
 
     /**
      * Create and compile a shader program

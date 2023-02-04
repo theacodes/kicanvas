@@ -144,8 +144,9 @@ export class TitleBlock {
                 P.pair("rev", T.string),
                 P.pair("company", T.string),
                 P.expr("comment", (obj, name, e) => {
-                    const record = obj[name] ?? {};
-                    record[e[1]] = e[2];
+                    const ep = e as [string, string, string];
+                    const record: Record<string, any> = obj[name] ?? {};
+                    record[ep[1]] = ep[2];
                     return record;
                 }),
             ),

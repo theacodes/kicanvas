@@ -6,20 +6,20 @@ export class KiCanvasDialogElement extends HTMLElement {
         super();
     }
 
-    get dialog() {
-        return $q(this.shadowRoot, "dialog");
+    get dialog(): HTMLDialogElement {
+        return $q(this.shadowRoot!, "dialog") as HTMLDialogElement;
     }
 
     async connectedCallback() {
         this.#render();
-        $on(window, "kicad-schematic:item-selected", (e) => {
-            this.#onItemSelected(e.target, e.detail);
+        $on(window, "kicad-schematic:item-selected", (e: CustomEvent) => {
+            this.#onItemSelected(e.target as HTMLElement, e.detail);
         });
     }
 
-    #onItemSelected(element, detail) {
+    #onItemSelected(element: HTMLElement, detail: { properties: Property[] }) {
         this.#renderSelectedProperties(detail.properties);
-        this.dialog.showModal();
+        this.dialog!.showModal();
     }
 
     #render() {
@@ -76,24 +76,24 @@ export class KiCanvasDialogElement extends HTMLElement {
                         <button>Close</button>
                     </form>
                 </dialog>`,
-        });
+        }) as HTMLTemplateElement;
 
         const root = this.attachShadow({ mode: "open" });
         root.appendChild(template.content.cloneNode(true));
     }
 
-    #renderSelectedProperties(properties: Record<string, Property>) {
-        const parent = $q(this.shadowRoot, ".properties");
+    #renderSelectedProperties(properties: Property[]) {
+        const parent = $q(this.shadowRoot!, ".properties")!;
         parent.innerHTML = "";
 
-        for (const [_, prop] of Object.entries(properties)) {
+        for (const prop of properties) {
             const template = $make("template", {
                 innerHTML: `
                     <div class="property">
                         <label for="${prop.name}">${prop.text}</label>
                         <input type="text" readonly id="${prop.name}" name="${prop.name}" value="${prop.text}" />
                     </div>`,
-            });
+            }) as HTMLTemplateElement;
             parent.append(template.content.cloneNode(true));
         }
     }

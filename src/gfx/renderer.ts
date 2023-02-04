@@ -47,7 +47,7 @@ export abstract class Renderer {
         }
     }
 
-    abstract dispose();
+    abstract dispose(): void;
 
     get background_color(): Color {
         return (this.theme?.["background"] as Color) ?? new Color(0, 0, 0, 1);

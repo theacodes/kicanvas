@@ -8,7 +8,7 @@ export class DropTarget {
     constructor(
         elm: HTMLElement,
         exts: string[],
-        callback: (FileList) => void,
+        callback: (files: File[]) => void,
     ) {
         elm.addEventListener(
             "dragenter",
