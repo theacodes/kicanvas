@@ -90,7 +90,7 @@ export class KiCanvasDialogElement extends HTMLElement {
             const template = $make("template", {
                 innerHTML: `
                     <div class="property">
-                        <label for="${prop.name}">${prop.text}</label>
+                        <label for="${prop.name}">${prop.name}</label>
                         <input type="text" readonly id="${prop.name}" name="${prop.name}" value="${prop.text}" />
                     </div>`,
             }) as HTMLTemplateElement;
