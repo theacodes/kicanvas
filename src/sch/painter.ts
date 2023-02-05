@@ -1082,8 +1082,6 @@ class LibTextPainter extends ItemPainter {
 
         const color = this.gfx.theme["foreground"] as Color;
 
-        console.log(p, (this.view_painter as SchematicPainter).current_symbol);
-
         const shaped = layout_text(
             this.gfx.text_shaper,
             p.text,
@@ -1095,8 +1093,6 @@ class LibTextPainter extends ItemPainter {
 
         this.gfx.state.push();
         this.gfx.state.matrix = Matrix3.identity();
-
-        console.log(shaped.options.get_effective_thickness());
 
         for (const stroke of shaped.strokes()) {
             this.gfx.line(
