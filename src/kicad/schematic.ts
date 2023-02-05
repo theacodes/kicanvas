@@ -432,10 +432,7 @@ export class Text {
     effects = new Effects();
     uuid?: string;
 
-    constructor(
-        expr: Parseable,
-        public parent?: LibSymbol | SchematicSymbol | KicadSch,
-    ) {
+    constructor(expr: Parseable) {
         /*
         (text "SWD" (at -5.08 0 900)
           (effects (font (size 2.54 2.54))))
@@ -451,6 +448,12 @@ export class Text {
                 P.pair("uuid", T.string),
             ),
         );
+    }
+}
+
+export class LibText extends Text {
+    constructor(expr: Parseable, public parent?: LibSymbol | SchematicSymbol) {
+        super(expr);
 
         if (parent instanceof LibSymbol || parent instanceof SchematicSymbol) {
             // From sch_sexpr_parser.cpp:LIB_TEXT* SCH_SEXPR_PARSER::parseText()
@@ -640,7 +643,7 @@ export class LibSymbol {
                 P.collection("drawings", "circle", T.item(Circle, this)),
                 P.collection("drawings", "polyline", T.item(Polyline, this)),
                 P.collection("drawings", "rectangle", T.item(Rectangle, this)),
-                P.collection("drawings", "text", T.item(Text, this)),
+                P.collection("drawings", "text", T.item(LibText, this)),
                 P.collection("drawings", "textbox", T.item(TextBox, this)),
             ),
         );
@@ -861,28 +864,27 @@ export class SchematicSymbol {
           (pin "1" (uuid ab9b91d4-020f-476d-acd8-920c7892e89a))
           (pin "2" (uuid ec1eed11-c9f6-4ab0-ad9c-a96c0cb10d03)))
         */
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("symbol"),
-                P.pair("lib_name", T.string),
-                P.pair("lib_id", T.string),
-                P.item("at", At),
-                P.pair("mirror", T.string),
-                P.pair("unit", T.number),
-                P.atom("convert"),
-                P.pair("in_bom", T.boolean),
-                P.pair("on_board", T.boolean),
-                P.pair("dnp", T.boolean),
-                P.atom("fields_autoplaced"),
-                P.pair("uuid", T.string),
-                P.collection("properties", "property", T.item(Property, this)),
-                P.collection("pins", "pin", T.item(PinInstance, this)),
-                // TODO: instances introduced in KiCAD 7
-                // TODO: default instance introduced in KiCAD 7
-            ),
+        const parsed = parse_expr(
+            expr,
+            P.start("symbol"),
+            P.pair("lib_name", T.string),
+            P.pair("lib_id", T.string),
+            P.item("at", At),
+            P.pair("mirror", T.string),
+            P.pair("unit", T.number),
+            P.atom("convert"),
+            P.pair("in_bom", T.boolean),
+            P.pair("on_board", T.boolean),
+            P.pair("dnp", T.boolean),
+            P.atom("fields_autoplaced"),
+            P.pair("uuid", T.string),
+            P.collection("properties", "property", T.item(Property, this)),
+            P.collection("pins", "pin", T.item(PinInstance, this)),
+            // TODO: instances introduced in KiCAD 7
+            // TODO: default instance introduced in KiCAD 7
         );
+
+        Object.assign(this, parsed);
     }
 
     get lib_symbol(): LibSymbol {
