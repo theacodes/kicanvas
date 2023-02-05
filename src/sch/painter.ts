@@ -7,8 +7,8 @@
 import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
-import { ShapedParagraph, TextOptions } from "../gfx/text";
-import { Effects } from "../kicad/common";
+import { ShapedParagraph, TextOptions, TextShaper } from "../gfx/text";
+import { At, Effects } from "../kicad/common";
 import * as schematic from "../kicad/schematic";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
@@ -230,11 +230,7 @@ class TextPainter extends ItemPainter {
     classes = [schematic.Text];
 
     layers_for(item: schematic.Text) {
-        if (item.parent) {
-            return [LayerName.symbol_foreground];
-        } else {
-            return [LayerName.notes];
-        }
+        return [LayerName.notes];
     }
 
     paint(layer: ViewLayer, t: schematic.Text) {
@@ -930,6 +926,93 @@ class LibSymbolPainter extends ItemPainter {
     }
 }
 
+function layout_text(
+    shaper: TextShaper,
+    text: string,
+    at: At,
+    effects: Effects,
+    parent?: schematic.KicadSch | schematic.SchematicSymbol,
+    relative = false,
+): ShapedParagraph {
+    /*
+        Drawing text is hard.
+        Properties and symbol text are drawn based on the location and
+        orientation (rotation and mirroring) of their parent symbol, which
+        makes interpreting the text alignment... difficult. So KiCAD's approach
+        (and ours) is to first calculate the bbox of the text drawn the "normal"
+        way, then checking the bbox to see if the text needs to be moved
+        around. Once the real final coordinates are figured out, it
+        draws the text centered on the bbox.
+    */
+
+    const text_options = new TextOptions(
+        shaper.default_font,
+        effects.font.size,
+        effects.font.thickness,
+        effects.font.bold,
+        effects.font.italic,
+        effects.justify.vertical,
+        effects.justify.horizontal,
+        effects.justify.mirror,
+    );
+
+    // Prepare a transformation based on the parent's location,
+    // rotation, and mirror settings.
+    const local_matrix = Matrix3.identity();
+
+    if (parent instanceof schematic.SchematicSymbol && relative) {
+        local_matrix.translate_self(parent.at.position.x, parent.at.position.y);
+        local_matrix.scale_self(
+            parent.mirror == "y" ? -1 : 1,
+            parent.mirror == "x" ? -1 : 1,
+        );
+    }
+
+    local_matrix.translate_self(at.position.x, at.position.y);
+
+    // Figure out the total rotation of this text including the
+    // parent's rotation.
+    let orient = Angle.from_degrees(at.rotation);
+
+    if (parent instanceof schematic.SchematicSymbol) {
+        orient.degrees += parent.at.rotation;
+    }
+
+    orient = orient.normalize();
+
+    // Get the BBox of the text if it was draw as-is without adjusting
+    // the alignment.
+    let bbox: BBox = shaper.paragraph(
+        text,
+        new Vec2(0, 0),
+        orient,
+        text_options,
+    ).bbox;
+
+    bbox = bbox.transform(local_matrix).grow(0.512);
+    const bbox_center = bbox.center;
+
+    // Text is either oriented horizontally (0 deg) or vertically (90 deg),
+    // never anything in between.
+    if (orient.degrees == 180) {
+        orient.degrees = 0;
+    }
+    if (orient.degrees == 270) {
+        orient.degrees = 90;
+    }
+
+    // Now draw the text using the BBox's center as the origin and
+    // alignment set to center, center, which side-steps any weirdness
+    // with text alignment.
+
+    text_options.v_align = "center";
+    text_options.h_align = "center";
+
+    const shaped = shaper.paragraph(text, bbox_center, orient, text_options);
+
+    return shaped;
+}
+
 class PropertyPainter extends ItemPainter {
     classes = [schematic.Property];
 
@@ -953,77 +1036,13 @@ class PropertyPainter extends ItemPainter {
                 break;
         }
 
-        /*
-            Drawing text is hard.
-            Properties are drawn based on the location and orientation (rotation
-            and mirroring) of their parent symbol, which makes interpreting
-            the text alignment... difficult. So KiCAD's approach (and ours)
-            is to first calculate the bbox of the text drawn the "normal"
-            way, then checking the bbox to see if the text needs to be moved
-            around. Once the real final coordinates are figured out, it
-            draws the text centered on the bbox.
-        */
-
-        const text_options = new TextOptions(
-            this.gfx.text_shaper.default_font,
-            p.effects.font.size,
-            p.effects.font.thickness || 0.127,
-            p.effects.font.bold,
-            p.effects.font.italic,
-            p.effects.justify.vertical,
-            p.effects.justify.horizontal,
-            p.effects.justify.mirror,
-        );
-
-        // Prepare a transformation based on the parent's location,
-        // rotation, and mirror settings.
-        const parent = p.parent as schematic.SchematicSymbol;
-        const parent_matrix = Matrix3.identity();
-        parent_matrix.translate_self(p.at.position.x, p.at.position.y);
-        parent_matrix.scale_self(
-            parent.mirror == "y" ? -1 : 1,
-            parent.mirror == "x" ? -1 : 1,
-        );
-
-        // Figure out the total rotation of this text including the
-        // parent's rotation.
-        let orient = new Angle(0);
-        orient.degrees = parent.at.rotation + p.at.rotation;
-        orient = orient.normalize();
-
-        // Get the BBox of the text if it was draw as-is without adjusting
-        // the alignment.
-        let bbox: BBox = this.gfx.text_shaper.paragraph(
+        const shaped = layout_text(
+            this.gfx.text_shaper,
             p.text,
-            new Vec2(0, 0),
-            orient,
-            text_options,
-        ).bbox;
-
-        bbox = bbox.transform(parent_matrix).grow(0.512);
-        const bbox_center = bbox.center;
-
-        // Text is either oriented horizontally (0 deg)or vertically (90 deg),
-        // never anything in between.
-        if (orient.degrees == 180) {
-            orient.degrees = 0;
-        }
-        if (orient.degrees == 270) {
-            orient.degrees = 90;
-        }
-
-        // Now draw the text using the BBox's center as the origin and
-        // alignment set to center, center, which side-steps any weirdness
-        // with text alignment.
-
-        text_options.v_align = "center";
-        text_options.h_align = "center";
-
-        const shaped = this.gfx.text_shaper.paragraph(
-            p.text,
-            bbox_center,
-            orient,
-            text_options,
+            p.at,
+            p.effects,
+            p.parent as schematic.SchematicSymbol | schematic.KicadSch,
+            false,
         );
 
         if (layer.name == LayerName.interactive) {
@@ -1034,6 +1053,54 @@ class PropertyPainter extends ItemPainter {
                 this.gfx.line(new Polyline(Array.from(stroke), 0.127, color));
             }
         }
+    }
+}
+
+class LibTextPainter extends ItemPainter {
+    classes = [schematic.LibText];
+
+    layers_for(item: schematic.LibText) {
+        return [LayerName.symbol_foreground];
+    }
+
+    paint(layer: ViewLayer, p: schematic.LibText) {
+        if (
+            layer.name != LayerName.symbol_foreground ||
+            p.effects.hide ||
+            !p.text
+        ) {
+            return;
+        }
+
+        const color = this.gfx.theme["foreground"] as Color;
+
+        console.log(p, (this.view_painter as SchematicPainter).current_symbol);
+
+        const shaped = layout_text(
+            this.gfx.text_shaper,
+            p.text,
+            p.at,
+            p.effects,
+            (this.view_painter as SchematicPainter).current_symbol,
+            true,
+        );
+
+        this.gfx.state.push();
+        this.gfx.state.matrix = Matrix3.identity();
+
+        console.log(shaped.options.get_effective_thickness());
+
+        for (const stroke of shaped.strokes()) {
+            this.gfx.line(
+                new Polyline(
+                    Array.from(stroke),
+                    shaped.options.get_effective_thickness(),
+                    color,
+                ),
+            );
+        }
+
+        this.gfx.state.pop();
     }
 }
 
@@ -1056,6 +1123,8 @@ class SchematicSymbolPainter extends ItemPainter {
             return;
         }
 
+        (this.view_painter as SchematicPainter).current_symbol = si;
+
         const matrix = Matrix3.identity();
         matrix.translate_self(si.at.position.x, si.at.position.y);
         matrix.scale_self(si.mirror == "y" ? -1 : 1, si.mirror == "x" ? 1 : -1);
@@ -1073,7 +1142,7 @@ class SchematicSymbolPainter extends ItemPainter {
                 LayerName.interactive,
             ].includes(layer.name as LayerName)
         ) {
-            for (const pin of Object.values(si.pins)) {
+            for (const pin of si.pins) {
                 this.view_painter.paint_item(layer, pin);
             }
         }
@@ -1083,10 +1152,12 @@ class SchematicSymbolPainter extends ItemPainter {
             layer.name == LayerName.symbol_field ||
             layer.name == LayerName.interactive
         ) {
-            for (const p of Object.values(si.properties)) {
+            for (const p of si.properties) {
                 this.view_painter.paint_item(layer, p);
             }
         }
+
+        (this.view_painter as SchematicPainter).current_symbol = undefined;
     }
 }
 
@@ -1102,6 +1173,7 @@ export class SchematicPainter extends DocumentPainter {
             new JunctionPainter(this, gfx),
             new NoConnectPainter(this, gfx),
             new TextPainter(this, gfx),
+            new LibTextPainter(this, gfx),
             new PinPainter(this, gfx),
             new LibSymbolPainter(this, gfx),
             new PropertyPainter(this, gfx),
@@ -1111,4 +1183,6 @@ export class SchematicPainter extends DocumentPainter {
             new HierarchicalLabelPainter(this, gfx),
         ];
     }
+
+    current_symbol?: schematic.SchematicSymbol;
 }
