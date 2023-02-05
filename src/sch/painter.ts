@@ -931,7 +931,7 @@ function layout_text(
     text: string,
     at: At,
     effects: Effects,
-    parent?: schematic.KicadSch | schematic.SchematicSymbol,
+    parent?: schematic.SchematicSymbol,
     relative = false,
 ): ShapedParagraph {
     /*
@@ -960,7 +960,7 @@ function layout_text(
     // rotation, and mirror settings.
     const local_matrix = Matrix3.identity();
 
-    if (parent instanceof schematic.SchematicSymbol && relative) {
+    if (parent && relative) {
         local_matrix.translate_self(parent.at.position.x, parent.at.position.y);
         local_matrix.scale_self(
             parent.mirror == "y" ? -1 : 1,
@@ -969,6 +969,14 @@ function layout_text(
     }
 
     local_matrix.translate_self(at.position.x, at.position.y);
+
+    // For non-relative text, mirroring is applied *after* translation.
+    if (parent && !relative) {
+        local_matrix.scale_self(
+            parent.mirror == "y" ? -1 : 1,
+            parent.mirror == "x" ? -1 : 1,
+        );
+    }
 
     // Figure out the total rotation of this text including the
     // parent's rotation.
@@ -1041,7 +1049,7 @@ class PropertyPainter extends ItemPainter {
             p.text,
             p.at,
             p.effects,
-            p.parent as schematic.SchematicSymbol | schematic.KicadSch,
+            p.parent as schematic.SchematicSymbol,
             false,
         );
 

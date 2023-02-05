@@ -679,7 +679,7 @@ export class LibSymbol {
         return this.#properties_by_id.has(id);
     }
 
-    property_by_id(id: number): Property {
+    property_by_id(id: number): Property | null {
         if (this.#properties_by_id.has(id)) {
             return this.#properties_by_id.get(id)!;
         }
@@ -688,9 +688,7 @@ export class LibSymbol {
                 return child.property_by_id(id);
             }
         }
-        throw new Error(
-            `No property with id ${id} on library symbol ${this.name}`,
-        );
+        return null;
     }
 }
 
@@ -726,9 +724,10 @@ export class Property {
         if (this.#effects) {
             return this.#effects;
         } else if (this.parent instanceof SchematicSymbol) {
-            return this.parent.lib_symbol
-                .property_by_id(this.id)
-                .effects.copy();
+            this.#effects =
+                this.parent.lib_symbol
+                    .property_by_id(this.id)
+                    ?.effects?.copy() ?? new Effects();
         }
         return new Effects();
     }
