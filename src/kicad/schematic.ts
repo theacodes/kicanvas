@@ -9,6 +9,40 @@ import { Vec2 } from "../math/vec2.ts";
 import { At, Effects, Paper, TitleBlock } from "./common.ts";
 import { Color } from "../gfx/color.ts";
 
+/* Default values for various things found in schematics
+ * From EESchema's default_values.h, converted from mils to mm. */
+export const DefaultValues = {
+    /* The size of the rectangle indicating an unconnected wire or label */
+    dangling_symbol_size: 0.3048, // 12 mils
+
+    /* The size of the rectangle indicating a connected, unselected wire end */
+    unselected_end_size: 0.1016, // 4 mils
+
+    pin_length: 2.54, // 100 mils
+    pinnum_size: 1.27, // 50 mils
+    pinname_size: 1.27, // 50 mils
+    selection_thickness: 0.0762, // 3 mils
+    line_width: 0.1524, // 6 mils
+    wire_width: 0.1524, // 6 mils
+    bus_width: 0.3048, // 12 mils
+    noconnect_size: 1.2192, // 48 mils
+    junction_diameter: 0.9144, // 36 mils
+
+    /* The default bus and wire entry size. */
+    sch_entry_size: 2.54, // 100 mils
+
+    text_size: 1.27, // 50 mils
+
+    /* Ratio of the font height to the baseline of the text above the wire. */
+    text_offset_ratio: 0.15, // unitless ratio
+
+    /* Ratio of the font height to space around global labels */
+    label_size_ratio: 0.375, // unitless ratio
+
+    /* The offset of the pin name string from the end of the pin in mils. */
+    pin_name_offset: 0.508, // 20 mils
+};
+
 export class KicadSch {
     version: number;
     generator?: string;
@@ -607,7 +641,10 @@ export class LibSymbol {
     pin_names: {
         offset: number;
         hide: boolean;
-    } = { offset: 0, hide: false };
+    } = {
+        offset: DefaultValues.pin_name_offset,
+        hide: false,
+    };
     in_bom = false;
     on_board = false;
     properties: Property[] = [];
