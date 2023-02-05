@@ -12,6 +12,15 @@ export class KiCanvasDialogElement extends HTMLElement {
 
     async connectedCallback() {
         this.#render();
+
+        $on(this.shadowRoot!, "focusin", (e: Event) => {
+            if ((e.target as HTMLElement).tagName != "INPUT") {
+                return;
+            }
+
+            (e.target as HTMLInputElement).select();
+        });
+
         $on(window, "kicad-schematic:item-selected", (e: CustomEvent) => {
             this.#onItemSelected(e.target as HTMLElement, e.detail);
         });
