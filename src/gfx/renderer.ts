@@ -207,6 +207,8 @@ export abstract class Renderer {
 }
 
 export abstract class RenderLayer {
+    composite_operation: GlobalCompositeOperation = "source-over";
+
     constructor(
         public readonly renderer: Renderer,
         public readonly name: string,

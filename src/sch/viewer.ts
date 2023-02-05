@@ -79,6 +79,6 @@ export class SchematicViewer extends Viewer {
     }
 
     override get selection_color(): Color {
-        return theme.schematic.shadow;
+        return Color.white;
     }
 }

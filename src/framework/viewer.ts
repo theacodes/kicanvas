@@ -115,14 +115,14 @@ export abstract class Viewer extends EventTarget {
             this.renderer.start_layer(layer.name, 1);
 
             this.renderer.line(
-                Polyline.from_BBox(bb, 0.127, this.selection_color),
+                Polyline.from_BBox(bb, 0.254, this.selection_color),
             );
 
-            this.renderer.polygon(
-                Polygon.from_BBox(bb, this.selection_color.with_alpha(0.4)),
-            );
+            this.renderer.polygon(Polygon.from_BBox(bb, this.selection_color));
 
             layer.graphics = this.renderer.end_layer();
+
+            layer.graphics.composite_operation = "overlay";
         }
 
         this.draw_soon();
