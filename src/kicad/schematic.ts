@@ -126,7 +126,7 @@ export class KicadSch {
 }
 
 export class Stroke {
-    width: number;
+    width: number = DefaultValues.line_width;
     type: "dash" | "dot" | "dash_dot" | "dash_dot_dot" | "solid" | "default" =
         "default";
     color: Color;

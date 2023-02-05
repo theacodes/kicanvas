@@ -197,8 +197,8 @@ class NoConnectPainter extends ItemPainter {
 
     paint(layer: ViewLayer, nc: schematic.NoConnect): void {
         const color = this.gfx.theme["no_connect"] as Color;
-        const width = 0.1524;
-        const size = 1.2192 / 2;
+        const width = schematic.DefaultValues.line_width;
+        const size = schematic.DefaultValues.noconnect_size / 2;
 
         this.gfx.state.push();
         this.gfx.state.matrix.translate_self(
@@ -277,10 +277,6 @@ class TextPainter extends ItemPainter {
 }
 
 class NetLabelPainter extends ItemPainter {
-    static readonly default_thickness = 0.1524;
-    static readonly text_offset_ratio = 0.15;
-    static readonly label_size_ratio = 0.375;
-
     classes: any[] = [schematic.NetLabel];
 
     layers_for(
@@ -304,8 +300,8 @@ class NetLabelPainter extends ItemPainter {
         options: TextOptions,
     ) {
         return (
-            l.effects.font.size.y * NetLabelPainter.text_offset_ratio +
-            options.get_effective_thickness(NetLabelPainter.default_thickness)
+            l.effects.font.size.y * schematic.DefaultValues.text_offset_ratio +
+            options.get_effective_thickness(schematic.DefaultValues.line_width)
         );
     }
 
@@ -371,7 +367,7 @@ class NetLabelPainter extends ItemPainter {
         }
 
         this.paint_shape(l, shaped);
-        this.paint_debug(l, shaped);
+        // this.paint_debug(l, shaped);
     }
 
     paint_shape(
@@ -422,7 +418,7 @@ class GlobalLabelPainter extends NetLabelPainter {
     }
 
     override get_text_offset(l: schematic.GlobalLabel, options: TextOptions) {
-        let horz = NetLabelPainter.label_size_ratio * options.size.y;
+        let horz = schematic.DefaultValues.label_size_ratio * options.size.y;
         const vert = options.size.y * GlobalLabelPainter.baseline_offset_ratio;
 
         if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
@@ -440,10 +436,10 @@ class GlobalLabelPainter extends NetLabelPainter {
     override paint_shape(l: schematic.GlobalLabel, shaped: ShapedParagraph) {
         const color = this.color;
         const margin =
-            shaped.options.size.y * GlobalLabelPainter.label_size_ratio;
+            shaped.options.size.y * schematic.DefaultValues.label_size_ratio;
         const half_size = shaped.options.size.y / 2 + margin;
         const thickness = shaped.options.get_effective_thickness(
-            GlobalLabelPainter.default_thickness,
+            schematic.DefaultValues.line_width,
         );
 
         let length =
@@ -531,7 +527,7 @@ class HierarchicalLabelPainter extends NetLabelPainter {
         const s = l.effects.font.size.y;
         const color = this.color;
         const thickness = shaped.options.get_effective_thickness(
-            HierarchicalLabelPainter.default_thickness,
+            schematic.DefaultValues.line_width,
         );
 
         this.gfx.state.push();
@@ -726,14 +722,14 @@ class PinPainter extends ItemPainter {
             .negative()
             .normalize();
 
-        const line_thickness = 0.1524;
+        const line_thickness = schematic.DefaultValues.line_width;
         const num_thickness = p.number.effects.font.thickness || line_thickness;
         const name_thickness =
             p.number.effects.font.thickness || line_thickness;
         const label_offset = parent.lib_symbol.pin_names.offset;
         const hide_pin_names = parent.lib_symbol.pin_names.hide;
         const hide_pin_numbers = parent.lib_symbol.pin_numbers.hide;
-        const text_margin = 0.6096 * 0.15; // 24 mils * ratio
+        const text_margin = 0.6096 * schematic.DefaultValues.text_offset_ratio; // 24 mils * ratio
         const pin_length = p.length;
 
         const num_effects = p.number.effects.copy();
@@ -845,21 +841,16 @@ class PinPainter extends ItemPainter {
         for (const line of shaped.to_polylines(color)) {
             this.gfx.line(line);
         }
-
-        this.gfx.circle(new Circle(pos, 0.1, new Color(1, 1, 0, 1)));
     }
 
     paint_line(p: schematic.PinDefinition) {
-        const target_pin_radius = 0.381; // 15 mils
+        const target_pin_radius = schematic.DefaultValues.wire_width * 1.5;
 
         // Little connection circle
-        this.gfx.arc(
-            new Arc(
+        this.gfx.circle(
+            new Circle(
                 new Vec2(0, 0),
                 target_pin_radius,
-                new Angle(0),
-                new Angle(Math.PI * 2),
-                this.gfx.state.stroke_width / 2,
                 this.gfx.theme["pin"] as Color,
             ),
         );
@@ -1053,12 +1044,19 @@ class PropertyPainter extends ItemPainter {
             false,
         );
 
+        const thickness =
+            p.effects.font.thickness || schematic.DefaultValues.line_width;
+
         if (layer.name == LayerName.interactive) {
             // drawing text is expensive, just draw the bbox for the interactive layer.
-            this.gfx.line(Polyline.from_BBox(shaped.bbox, 0.127, Color.white));
+            this.gfx.line(
+                Polyline.from_BBox(shaped.bbox, thickness, Color.white),
+            );
         } else {
             for (const stroke of shaped.strokes()) {
-                this.gfx.line(new Polyline(Array.from(stroke), 0.127, color));
+                this.gfx.line(
+                    new Polyline(Array.from(stroke), thickness, color),
+                );
             }
         }
     }
