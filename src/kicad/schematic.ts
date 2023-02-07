@@ -482,6 +482,11 @@ export class Text {
                 P.pair("uuid", T.string),
             ),
         );
+
+        // Remove trailing \n on text
+        if (this.text.endsWith("\n")) {
+            this.text = this.text.slice(0, this.text.length - 1);
+        }
     }
 }
 
@@ -761,12 +766,11 @@ export class Property {
         if (this.#effects) {
             return this.#effects;
         } else if (this.parent instanceof SchematicSymbol) {
-            this.#effects =
-                this.parent.lib_symbol
-                    .property_by_id(this.id)
-                    ?.effects?.copy() ?? new Effects();
+            this.#effects = new Effects();
+        } else {
+            console.log("hrm", this);
         }
-        return new Effects();
+        return this.#effects!;
     }
 
     set effects(e: Effects) {
