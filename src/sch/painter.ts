@@ -418,8 +418,8 @@ class GlobalLabelPainter extends NetLabelPainter {
     }
 
     override get_text_offset(l: schematic.GlobalLabel, options: TextOptions) {
+        const vert = 0;
         let horz = schematic.DefaultValues.label_size_ratio * options.size.y;
-        const vert = options.size.y * GlobalLabelPainter.baseline_offset_ratio;
 
         if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
             // accommodate triangular shaped tail
@@ -515,8 +515,11 @@ class HierarchicalLabelPainter extends NetLabelPainter {
         l: schematic.HierarchicalLabel,
         options: TextOptions,
     ): Vec2 {
-        const offset_dist = this.get_text_baseline_offset_dist(l, options);
-        const offset = new Vec2(offset_dist + l.effects.font.size.x, 0);
+        const horiz =
+            this.get_text_baseline_offset_dist(l, options) +
+            l.effects.font.size.x;
+        const vert = 0;
+        const offset = new Vec2(horiz, vert);
         return offset.rotate(Angle.from_degrees(l.at.rotation));
     }
 
