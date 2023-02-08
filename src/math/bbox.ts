@@ -115,8 +115,18 @@ export class BBox {
         return new Vec2(this.x, this.y);
     }
 
+    set start(v: Vec2) {
+        this.x = v.x;
+        this.y = v.y;
+    }
+
     get end() {
         return new Vec2(this.x + this.w, this.y + this.h);
+    }
+
+    set end(v: Vec2) {
+        this.x2 = v.x;
+        this.y2 = v.y;
     }
 
     get top_left() {
