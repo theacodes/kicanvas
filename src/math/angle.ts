@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Vec2 } from "./vec2";
+
 export type AngleLike = Angle | number;
 
 /**
@@ -102,5 +104,37 @@ export class Angle {
      */
     negative(): Angle {
         return new Angle(-this.radians);
+    }
+
+    rotate_point(point: Vec2, origin: Vec2 = new Vec2(0, 0)): Vec2 {
+        let x = point.x - origin.x;
+        let y = point.y - origin.y;
+
+        const angle = this.normalize();
+
+        // shortcuts for 0, 90, 180, and 270
+        if (angle.degrees == 0) {
+            // do nothing
+        } else if (angle.degrees == 90) {
+            [x, y] = [y, -x];
+        } else if (angle.degrees == 180) {
+            [x, y] = [-x, -y];
+        } else if (angle.degrees == 270) {
+            [x, y] = [-y, x];
+        }
+        // no shortcut, do the actual math.
+        else {
+            const sina = Math.sin(angle.radians);
+            const cosa = Math.cos(angle.radians);
+            const [x0, y0] = [x, y];
+
+            x = y0 * sina + x0 * cosa;
+            y = y0 * cosa - x0 - sina;
+        }
+
+        x += origin.x;
+        y += origin.y;
+
+        return new Vec2(x, y);
     }
 }
