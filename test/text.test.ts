@@ -117,8 +117,7 @@ suite("stroke font", function () {
     });
 
     test("get text as glyphs", function () {
-        // Expected values pulled from KiCAD via debugging to StrokeFont::GetTextAsGlyphs, with the
-        // note that we use mm instead of eeschema's scaled integers.
+        // Expected values pulled from KiCAD via debugging to StrokeFont::GetTextAsGlyphs
 
         const text = "text";
         const size = new Vec2(12700, 12700);
@@ -160,11 +159,6 @@ suite("stroke font", function () {
                 [3] = (x = 309638.09523809527, y = 302036.23809523811)
                 [4] = (x = 310847.61904761905, y = 302036.23809523811)
             }
-            m_boundingBox = {
-                m_Pos = (x = 304800, y = 302639.95238095237)
-                m_Size = (x = 7257.1428571428569, y = 1.0476190476190474)
-                m_init = true
-            }
         }
         */
         const t_glyph = glyphs[0] as StrokeGlyph;
@@ -185,6 +179,68 @@ suite("stroke font", function () {
         assert.closeTo(t_glyph.strokes[1]![3]!.y, 302036.2, 0.5);
         assert.closeTo(t_glyph.strokes[1]![4]!.x, 310847.6, 0.5);
         assert.closeTo(t_glyph.strokes[1]![4]!.y, 302036.2, 0.5);
+    });
+
+    test("get text as glyphs (rotated, italic)", function () {
+        // Expected values pulled from KiCAD via debugging to StrokeFont::GetTextAsGlyphs
+
+        const text = "hello";
+        const size = new Vec2(12700, 12700);
+        const pos = new Vec2(863600, 1044067);
+        const angle = Angle.from_degrees(90);
+        const mirror = false;
+        const origin = new Vec2(863600, 1066800);
+        const style = new TextStyle();
+        style.italic = true;
+
+        const { bbox, glyphs, cursor } = font.get_text_as_glyphs(
+            text,
+            size,
+            pos,
+            angle,
+            mirror,
+            origin,
+            style,
+        );
+
+        assert.closeTo(cursor.x, 910770, 0.5);
+        assert.closeTo(cursor.y, 1044067, 0.5);
+
+        /*
+        {
+            m_Pos = (x = 863600, y = 1044067)
+            m_Size = (x = 44630, y = 12700)
+            m_init = true
+        }
+        */
+        assert.closeTo(bbox.x, 863600, 0.5);
+        assert.closeTo(bbox.y, 1044067, 0.5);
+        assert.closeTo(bbox.w, 44630, 0.5);
+        assert.closeTo(bbox.h, 12700, 0.5);
+
+        assert.equal(glyphs.length, 5);
+
+        /*
+        {
+            [0] = size=4 {
+                [0] = (x = 840262.23809523811, y = 1039510.3095238095)
+                [1] = (x = 839657.47619047621, y = 1040644.2380952381)
+                [2] = (x = 838447.95238095243, y = 1041097.8095238095)
+                [3] = (x = 827562.23809523811, y = 1039737.0952380953)
+            }
+        }
+        */
+        const l_glyph = glyphs[2] as StrokeGlyph;
+        assert.equal(l_glyph.strokes.length, 1);
+        assert.equal(l_glyph.strokes[0]!.length, 4);
+        assert.closeTo(l_glyph.strokes[0]![0]!.x, 840262.2, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![0]!.y, 1039510.3, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![1]!.x, 839657.5, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![1]!.y, 1040644.2, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![2]!.x, 838447.9, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![2]!.y, 1041097.8, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![3]!.x, 827562.2, 0.5);
+        assert.closeTo(l_glyph.strokes[0]![3]!.y, 1039737.1, 0.5);
     });
 
     test("string boundary limits", function () {
@@ -253,7 +309,6 @@ suite("stroke font", function () {
             false,
         );
 
-        console.log(limits);
         assert.closeTo(limits.x, 136230, 0.5);
         assert.closeTo(limits.y, 16670, 0.5);
     });
