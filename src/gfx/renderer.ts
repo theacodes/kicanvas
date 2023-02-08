@@ -204,6 +204,11 @@ export abstract class Renderer {
 
         this.add_bbox(BBox.from_points(polygon.points));
     }
+
+    /** Draw a list of glyphs */
+    glyphs(glyphs: any[]) {
+        // TODO
+    }
 }
 
 export abstract class RenderLayer {
