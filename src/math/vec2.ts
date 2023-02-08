@@ -118,7 +118,11 @@ export class Vec2 {
         return m.transform(this);
     }
 
-    multiply(s: number) {
-        return new Vec2(this.x * s, this.y * s);
+    multiply(s: Vec2 | number) {
+        if (typeof s == "number") {
+            return new Vec2(this.x * s, this.y * s);
+        } else {
+            return new Vec2(this.x * s.x, this.y * s.y);
+        }
     }
 }
