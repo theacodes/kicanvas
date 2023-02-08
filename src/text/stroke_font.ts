@@ -23,11 +23,21 @@ export class StrokeFont extends Font {
     static readonly font_scale = 1 / 21;
     static readonly font_offset = -10;
 
+    private static instance?: StrokeFont;
+
+    static default(): StrokeFont {
+        if (!this.instance) {
+            this.instance = new StrokeFont();
+        }
+        return this.instance;
+    }
+
     /** Glyph data loaded from newstroke */
     #glyphs: StrokeGlyph[] = [];
 
     constructor() {
         super("stroke");
+        this.#load();
     }
 
     /**
@@ -44,7 +54,7 @@ export class StrokeFont extends Font {
      *  - FONT_OFFSET is used to allow descenders that go below the baseline
      *
      */
-    load() {
+    #load() {
         for (const glyph_data of newstroke_font) {
             let start_x = 0;
             let end_x = 0;
@@ -118,7 +128,7 @@ export class StrokeFont extends Font {
         return glyph_height * StrokeFont.overbar_position_factor;
     }
 
-    override get_interline(glyph_height: number, line_spacing: number): number {
+    override get_interline(glyph_height: number, line_spacing = 1): number {
         // KiCAD doesn't include glyph thickness for interline spacing in
         // order to keep the spacing between bold and normal text the same.
         return glyph_height * line_spacing * StrokeFont.interline_pitch_ratio;

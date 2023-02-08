@@ -12,8 +12,7 @@ import { Angle } from "../src/math/angle";
 import { TextStyle } from "../src/text/font";
 import { StrokeGlyph } from "../src/text/glyph";
 
-const font = new StrokeFont();
-font.load();
+const font = StrokeFont.default();
 
 suite("base font", function () {
     test("break words", function () {

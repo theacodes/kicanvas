@@ -620,10 +620,13 @@ export class TextStyle {
     }
 }
 
+export type HAlign = "left" | "center" | "right";
+export type VAlign = "top" | "center" | "bottom";
+
 export class TextAttributes {
     font: Font | null = null;
-    h_align: "left" | "center" | "right" = "center";
-    v_align: "top" | "center" | "bottom" = "center";
+    h_align: HAlign = "center";
+    v_align: VAlign = "center";
     angle: Angle = new Angle(0);
     line_spacing = 1;
     stroke_width = 0;
