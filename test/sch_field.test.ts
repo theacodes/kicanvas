@@ -152,7 +152,6 @@ suite("SchField", function () {
         assert.equal(field.effective_vert_justify, "top");
 
         field.parent.transform = one_eighty_deg_matrix;
-        console.log("matrix", one_eighty_deg_matrix);
         assert.equal(field.effective_horiz_justify, "right");
         assert.equal(field.effective_vert_justify, "bottom");
 

@@ -79,8 +79,6 @@ export class SchField extends EDAText {
     get bounding_box(): BBox {
         const bbox = this.get_text_box();
 
-        console.log("initial bb", bbox);
-
         // adjust bounding box according to parent location
         const origin = this.parent?.position ?? new Vec2(0, 0);
         const pos = this.text_pos.sub(origin);
@@ -149,7 +147,6 @@ export class SchField extends EDAText {
         const center = this.bounding_box.center;
         const pos = this.position;
         const rot = this.draw_rotation.degrees;
-        console.log("draw rot", rot, "center", center);
         const is_vertical = rot == 90 || rot == 270;
 
         switch (this.v_align) {
