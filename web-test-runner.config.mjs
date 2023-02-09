@@ -1,9 +1,18 @@
 import { defaultReporter, summaryReporter } from "@web/test-runner";
+import { chromeLauncher } from "@web/test-runner-chrome";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
 
 // https://modern-web.dev/docs/test-runner/cli-and-configuration/
 
 export default {
+    // browsers: [
+    //     chromeLauncher({
+    //         concurrency: 1,
+    //         launchOptions: {
+    //             devtools: true,
+    //         },
+    //     }),
+    // ],
     plugins: [
         esbuildPlugin({
             ts: true,
