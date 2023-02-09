@@ -197,8 +197,6 @@ export abstract class EDAText {
         );
         let overbar_offset = 0;
 
-        console.log("initial extents", extents);
-
         // Create a bbox for horizontal text that's top and left aligned. It'll
         // be adjusted later to account for different orientations and alignments.
         const text_size = extents.copy();
@@ -215,7 +213,6 @@ export abstract class EDAText {
             pos.y = -pos.y;
         }
 
-        console.log("initial bbox pos", pos);
         bbox.start = pos;
 
         // Merge all bboxes for multiline text where a specific line wasn't
@@ -230,8 +227,6 @@ export abstract class EDAText {
                     italic,
                 );
                 text_size.x = Math.max(text_size.x, extents.x);
-
-                console.log("line", line, extents, text_size);
             }
 
             text_size.y += Math.round(
@@ -241,8 +236,6 @@ export abstract class EDAText {
 
         bbox.w = text_size.x;
         bbox.h = text_size.y;
-
-        console.log("pre-adjusted bbox", bbox);
 
         // Adjust the bbox for justification, mirroring, etc.
         const italic_offset = this.italic
