@@ -1,0 +1,5 @@
+#auto_saved_files#
+_autosave*
+*-backups/
+*.kicad_prl
+*.kicad_pro
