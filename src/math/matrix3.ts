@@ -121,18 +121,17 @@ export class Matrix3 {
      * @returns A new Vec2
      */
     transform(vec: Vec2): Vec2 {
-        const a00 = this.elements[0 * 3 + 0]!;
-        const a01 = this.elements[0 * 3 + 1]!;
-        const a10 = this.elements[1 * 3 + 0]!;
-        const a11 = this.elements[1 * 3 + 1]!;
-        const a20 = this.elements[2 * 3 + 0]!;
-        const a21 = this.elements[2 * 3 + 1]!;
-        const b00 = vec.x;
-        const b01 = vec.y;
-        const b02 = 1;
+        const x1 = this.elements[0 * 3 + 0]!;
+        const x2 = this.elements[0 * 3 + 1]!;
+        const y1 = this.elements[1 * 3 + 0]!;
+        const y2 = this.elements[1 * 3 + 1]!;
+        const z1 = this.elements[2 * 3 + 0]!;
+        const z2 = this.elements[2 * 3 + 1]!;
+        const px = vec.x;
+        const py = vec.y;
 
-        const x = b00 * a00 + b01 * a10 + b02 * a20;
-        const y = b00 * a01 + b01 * a11 + b02 * a21;
+        const x = px * x1 + py * y1 + z1;
+        const y = px * x2 + py * y2 + z2;
 
         return new Vec2(x, y);
     }
