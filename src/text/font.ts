@@ -6,10 +6,12 @@
 
 import { Color } from "../gfx/color";
 import { Renderer } from "../gfx/renderer";
+import { Polyline } from "../gfx/shapes";
 import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
+import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
-import { Glyph } from "./glyph";
+import { Glyph, StrokeGlyph } from "./glyph";
 import { Markup, MarkupNode } from "./markup";
 
 /** Font base class
@@ -65,12 +67,8 @@ export abstract class Font {
                 gfx,
                 line.text,
                 line.position,
-                attributes.size,
-                attributes.angle,
-                attributes.mirrored,
                 position,
-                attributes.italic,
-                attributes.underlined,
+                attributes,
             );
         }
     }
@@ -234,32 +232,41 @@ export abstract class Font {
         gfx: Renderer | null,
         text: string,
         position: Vec2,
-        size: Vec2,
-        angle: Angle,
-        mirror: boolean,
         origin: Vec2,
-        italic: boolean,
-        underline: boolean,
+        attributes: TextAttributes,
     ): BBox {
         if (!gfx) {
             return new BBox(0, 0, 0, 0);
         }
 
         const style = new TextStyle();
-        style.italic = italic;
-        style.underline = underline;
+        style.italic = attributes.italic;
+        style.underline = attributes.underlined;
 
         const { glyphs, bbox } = this.draw_markup_text(
             text,
             position,
-            size,
-            angle,
-            mirror,
+            attributes.size,
+            attributes.angle,
+            attributes.mirrored,
             origin,
             style,
         );
 
-        gfx.glyphs(glyphs);
+        const transform = Matrix3.scaling(0.0001, 0.0001);
+
+        for (const glyph of glyphs as StrokeGlyph[]) {
+            for (const stroke of glyph.strokes) {
+                const stroke_pts = Array.from(transform.transform_all(stroke));
+                gfx.line(
+                    new Polyline(
+                        stroke_pts,
+                        attributes.stroke_width / 10000,
+                        attributes.color,
+                    ),
+                );
+            }
+        }
 
         return bbox;
     }
@@ -367,7 +374,7 @@ export abstract class Font {
                     break;
             }
 
-            positions.push(position);
+            positions.push(position.add(line_offset));
         }
 
         const out = [];
@@ -642,4 +649,23 @@ export class TextAttributes {
     /** Used to keep the text from being rotated upside-down
      * or backwards and becoming difficult to read. */
     keep_upright = false;
+
+    copy() {
+        const a = new TextAttributes();
+        a.font = this.font;
+        a.h_align = this.h_align;
+        a.v_align = this.v_align;
+        a.angle = this.angle.copy();
+        a.line_spacing = this.line_spacing;
+        a.stroke_width = this.stroke_width;
+        a.italic = this.italic;
+        a.bold = this.bold;
+        a.underlined = this.underlined;
+        a.color = this.color.copy();
+        a.visible = this.visible;
+        a.mirrored = this.mirrored;
+        a.multiline = this.multiline;
+        a.size = this.size.copy();
+        return a;
+    }
 }
