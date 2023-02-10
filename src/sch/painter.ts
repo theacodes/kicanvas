@@ -17,6 +17,8 @@ import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
+import { SchField } from "../text/sch_field";
+import { StrokeFont } from "../text/stroke_font";
 
 function color_maybe(
     color?: Color,
@@ -1038,29 +1040,108 @@ class PropertyPainter extends ItemPainter {
                 break;
         }
 
-        const shaped = layout_text(
-            this.gfx.text_shaper,
-            p.text,
-            p.at,
-            p.effects,
-            p.parent as schematic.SchematicSymbol,
-            false,
-        );
+        const parent = p.parent as schematic.SchematicSymbol;
 
-        const thickness =
-            p.effects.font.thickness || schematic.DefaultValues.line_width;
+        // [x1, x2, 0, y1, y2, ...]
+        const zero_deg_matrix = new Matrix3([1, 0, 0, 0, -1, 0, 0, 0, 1]); // [1, 0, 0, -1]
+        const ninety_deg_matrix = new Matrix3([0, -1, 0, -1, 0, 0, 0, 0, 1]); // [0, -1, -1, 0]
+        const one_eighty_deg_matrix = new Matrix3([-1, 0, 0, 0, 1, 0, 0, 0, 1]); // [-1, 0, 0, 1]
+        const two_seventy_deg_matrix = new Matrix3([0, 1, 0, 1, 0, 0, 0, 0, 1]); // [0, 1, 1, 0]
+
+        let transform = zero_deg_matrix;
+        if (parent.at.rotation == 0) {
+            // leave matrix as is
+        } else if (parent.at.rotation == 90) {
+            transform = ninety_deg_matrix;
+        } else if (parent.at.rotation == 180) {
+            transform = one_eighty_deg_matrix;
+        } else if (parent.at.rotation == 270) {
+            transform = two_seventy_deg_matrix;
+        } else {
+            throw new Error(`unexpected rotation ${parent.at.rotation}`);
+        }
+
+        if (parent.mirror == "y") {
+            // * [-1, 0, 0, 1]
+            const x1 = transform.elements[0]! * -1;
+            const y1 = transform.elements[3]! * -1;
+            const x2 = transform.elements[1]!;
+            const y2 = transform.elements[4]!;
+            transform.elements[0] = x1;
+            transform.elements[1] = x2;
+            transform.elements[3] = y1;
+            transform.elements[4] = y2;
+        } else if (parent.mirror == "x") {
+            // * [1, 0, 0, -1]
+            const x1 = transform.elements[0]!;
+            const y1 = transform.elements[3]!;
+            const x2 = transform.elements[1]! * -1;
+            const y2 = transform.elements[4]! * -1;
+            transform.elements[0] = x1;
+            transform.elements[1] = x2;
+            transform.elements[3] = y1;
+            transform.elements[4] = y2;
+        }
+
+        const schfield = new SchField(p.text, {
+            position: parent.at.position.multiply(10000),
+            transform: transform,
+        });
+
+        schfield.attributes.h_align = p.effects.justify.horizontal;
+        schfield.attributes.v_align = p.effects.justify.vertical;
+        schfield.attributes.stroke_width = p.effects.font.thickness * 10000;
+        schfield.attributes.italic = p.effects.font.italic;
+        schfield.attributes.bold = p.effects.font.bold;
+        schfield.attributes.size.set(p.effects.font.size.multiply(10000));
+        schfield.attributes.angle = Angle.from_degrees(p.at.rotation);
+
+        // Position is tricky. KiCAD's parser calls into SCH_FIELD::SetPosition
+        // when parsing which sets the position relative to the parent transform
+        // but KiCanvas doesn't do any of that. So we have to do that transform
+        // here.
+        let rel_position = p.at.position
+            .multiply(10000)
+            .sub(schfield.parent!.position);
+        rel_position = transform.inverse().transform(rel_position);
+        rel_position = rel_position.add(schfield.parent!.position);
+
+        schfield.text_pos = rel_position;
+
+        const orient = schfield.draw_rotation;
+        const bbox = schfield.bounding_box;
+        const pos = bbox.center;
+
+        schfield.attributes.angle = orient;
+        schfield.attributes.h_align = "center";
+        schfield.attributes.v_align = "center";
+        schfield.attributes.stroke_width =
+            schfield.get_effective_text_thickness(
+                schematic.DefaultValues.line_width * 10000,
+            );
+        schfield.attributes.color = color;
+
+        const bbox_pts = Matrix3.scaling(0.0001, 0.0001).transform_all([
+            bbox.top_left,
+            bbox.top_right,
+            bbox.bottom_right,
+            bbox.bottom_left,
+            bbox.top_left,
+        ]);
 
         if (layer.name == LayerName.interactive) {
             // drawing text is expensive, just draw the bbox for the interactive layer.
-            this.gfx.line(
-                Polyline.from_BBox(shaped.bbox, thickness, Color.white),
-            );
+            this.gfx.line(new Polyline(Array.from(bbox_pts), 0.1, Color.white));
         } else {
-            for (const stroke of shaped.strokes()) {
-                this.gfx.line(
-                    new Polyline(Array.from(stroke), thickness, color),
-                );
-            }
+            this.gfx.state.push();
+            StrokeFont.default().draw(
+                this.gfx,
+                schfield.shown_text,
+                pos,
+                new Vec2(0, 0),
+                schfield.attributes,
+            );
+            this.gfx.state.pop();
         }
     }
 }
