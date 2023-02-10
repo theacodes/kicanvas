@@ -49,6 +49,10 @@ export class Angle {
         this.radians = radians;
     }
 
+    copy() {
+        return new Angle(this.radians);
+    }
+
     get radians() {
         return this.#theta_rad;
     }
