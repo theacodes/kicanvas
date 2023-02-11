@@ -19,6 +19,7 @@ import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { SchField } from "../text/sch_field";
 import { StrokeFont } from "../text/stroke_font";
+import { SchText } from "../text/sch_text";
 
 function color_maybe(
     color?: Color,
@@ -236,45 +237,35 @@ class TextPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, t: schematic.Text) {
-        if (t.effects.hide) {
+        if (t.effects.hide || !t.text) {
             return;
         }
 
-        const rotation = Angle.from_degrees(t.at.rotation).normalize();
+        const schtext = new SchText(t.text);
 
-        if (rotation.degrees == 180) {
-            rotation.degrees = 0;
-        } else if (rotation.degrees == 270) {
-            rotation.degrees = 90;
-        }
+        schtext.attributes.h_align = t.effects.justify.horizontal;
+        schtext.attributes.v_align = t.effects.justify.vertical;
+        schtext.attributes.stroke_width = t.effects.font.thickness * 10000;
+        schtext.attributes.italic = t.effects.font.italic;
+        schtext.attributes.bold = t.effects.font.bold;
+        schtext.attributes.size.set(t.effects.font.size.multiply(10000));
+        schtext.attributes.angle = Angle.from_degrees(t.at.rotation);
+        schtext.text_pos = t.at.position.multiply(10000);
 
-        const pos = t.at.position.copy();
-
-        const options = new TextOptions(
-            this.gfx.text_shaper.default_font,
-            t.effects.font.size,
-            t.effects.font.thickness,
-            t.effects.font.bold,
-            t.effects.font.italic,
-            t.effects.justify.vertical,
-            t.effects.justify.horizontal,
-            t.effects.justify.mirror,
+        schtext.attributes.stroke_width = schtext.get_effective_text_thickness(
+            schematic.DefaultValues.line_width * 10000,
         );
+        schtext.attributes.color = this.gfx.theme["notes"] as Color;
 
-        pos.y -=
-            t.effects.font.size.y * 0.15 +
-            options.get_effective_thickness(0.1524);
-
-        const shaped = this.gfx.text_shaper.paragraph(
-            t.text,
-            pos,
-            rotation,
-            options,
+        this.gfx.state.push();
+        StrokeFont.default().draw(
+            this.gfx,
+            schtext.shown_text,
+            schtext.text_pos,
+            new Vec2(0, 0),
+            schtext.attributes,
         );
-
-        for (const line of shaped.to_polylines(this.gfx.state.stroke)) {
-            this.gfx.line(line);
-        }
+        this.gfx.state.pop();
     }
 }
 
