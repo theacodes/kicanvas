@@ -301,7 +301,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
 
         const first = expr.at(0) as string;
 
-        if (!start_def.name.includes(first)) {
+        if (!acceptable_start_strings.includes(first)) {
             throw new Error(
                 `Expression must start with ${start_def.name} found ${first} in ${expr}`,
             );
