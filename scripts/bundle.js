@@ -5,7 +5,6 @@
 */
 
 import esbuild from "esbuild";
-import { copy } from "esbuild-plugin-copy";
 import { resolve } from "path";
 
 export const ENTRY = resolve("src/index.ts");
@@ -22,16 +21,6 @@ export async function bundle(options = {}) {
             ".glsl": "text",
             ".css": "text",
         },
-        plugins: [
-            copy({
-                assets: [
-                    {
-                        from: [resolve("src/resources/*")],
-                        to: ["resources"],
-                    },
-                ],
-            }),
-        ],
         ...options,
     };
     return { options: options, context: await esbuild.context(options) };

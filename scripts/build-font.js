@@ -23,86 +23,61 @@
 import * as fs from "fs/promises";
 
 const INFILE = "./third_party/newstroke/newstroke_font.cpp";
-const OUTFILE = "./src/resources/glyphs.json";
-const STROKE_FONT_SCALE = 1.0 / 21.0;
-const FONT_OFFSET = -10;
+const OUTFILE = "./src/text/newstroke_glyphs.ts";
 
-function ord(c) {
-    return c.charCodeAt(0);
-}
-
-function decode_val(c) {
-    return ord(c) - ord("R");
-}
-
-function decode_coord(c) {
-    return [decode_val(c[0]), decode_val(c[1])];
-}
-
-console.log(`Reading glyph data from ${INFILE}`);
-
-let src_text = await fs.readFile(INFILE, {
+let src = await fs.readFile(INFILE, {
     encoding: "utf-8",
 });
 
-// Cheating by evaling the big ass C++ file with an array as javascript.
-// I'd use JSON but it has comments in it.
-src_text = "[" + src_text.slice(src_text.indexOf("{") + 1);
-src_text = src_text.slice(0, src_text.indexOf("}")) + "]";
+const first_bracket = src.indexOf("{");
 
-const glyphs_data = eval(src_text);
+const preamble = `/* Generated from third-pary ${INFILE} for KiCanvas. See below for original license. */`;
+const license_str = src.slice(0, src.lastIndexOf("*/", first_bracket) + 2);
+const glyph_array_str = src.slice(first_bracket + 1, src.lastIndexOf("}") - 1);
 
-const glyphs = [];
+const glyphs = eval(`[${glyph_array_str}]`);
+const glyph_set = new Set(glyphs);
+const glyph_map = new Map();
 
-for (const glyph_data of glyphs_data) {
-    const glyph = {
-        strokes: [],
-        width: 0,
-    };
-
-    let start_x = 0;
-    let end_x = 0;
-    let min_y = 0;
-    let max_y = 0;
-    let point_list = null;
-
-    for (let i = 0; i < glyph_data.length; i += 2) {
-        const coord_raw = [glyph_data[i], glyph_data[i + 1]];
-        const coord = decode_coord(coord_raw);
-
-        if (i < 2) {
-            // The first coord contains the horizontal bounding box
-            start_x = coord[0] * STROKE_FONT_SCALE;
-            end_x = coord[1] * STROKE_FONT_SCALE;
-        } else if (coord_raw[0] == " " && coord_raw[1] == "R") {
-            // End of stroke
-            point_list = null;
-        } else {
-            const point = [
-                coord[0] * STROKE_FONT_SCALE - start_x,
-                (coord[1] + FONT_OFFSET) * STROKE_FONT_SCALE,
-            ];
-
-            // Start of new stroke, create a new list of points and add it to the glyph.
-            if (point_list == null) {
-                point_list = [];
-                glyph.strokes.push(point_list);
-            }
-
-            point_list.push(point);
-
-            min_y = Math.min(min_y, point[1]);
-            max_y = Math.max(max_y, point[1]);
-        }
-    }
-
-    glyph.width = end_x - start_x;
-    glyph.bbox = { start: [0, min_y], end: [glyph.width, max_y - min_y] };
-
-    glyphs.push(glyph);
+for (const glyph of glyphs) {
+    const count = glyph_map.get(glyph) ?? 0;
+    glyph_map.set(glyph, count + 1);
 }
 
-const output = JSON.stringify(glyphs, null, 2);
+const repeated_glyphs = new Map();
+const repeated_glyph_defs = [];
+
+let unique_index = 0;
+for (const [glyph, count] of glyph_map) {
+    if (count > 10) {
+        repeated_glyphs.set(glyph, unique_index);
+        repeated_glyph_defs.push(`${JSON.stringify(glyph)}`);
+    }
+}
+
+const repeated_glyphs_def_str = repeated_glyph_defs.join(", ");
+
+const out_glyphs = glyphs.map((glyph) => {
+    if (repeated_glyphs.has(glyph)) {
+        return repeated_glyphs.get(glyph);
+    } else {
+        return JSON.stringify(glyph);
+    }
+});
+
+const out_glyph_array_str = out_glyphs.join(",\n");
+
+console.log(`${glyphs.length} total glyphs, ${glyph_set.size} unique`);
+
+const code = `export const shared_glyphs = [${repeated_glyphs_def_str}];\n\nexport const glyph_data: (string|number|undefined)[]  = [${out_glyph_array_str}\n];\n`;
+const header = `${preamble}\n\n${license_str}`;
+const output = `${header}\n\n${code}\n`;
+
+console.log(
+    `Output file size: ${Math.round(
+        output.length / 1024,
+    )} kilobytes with ${Math.round(header.length / 1024)} kilobytes overhead`,
+);
 
 await fs.writeFile(OUTFILE, output, "utf8");
 

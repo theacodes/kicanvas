@@ -9,7 +9,7 @@ import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
 import { Font, TextStyle } from "./font";
 import { Glyph, StrokeGlyph } from "./glyph";
-import newstroke_font from "./newstroke_font";
+import * as newstroke from "./newstroke_glyphs";
 
 /** Stroke font
  *
@@ -33,7 +33,8 @@ export class StrokeFont extends Font {
     }
 
     /** Glyph data loaded from newstroke */
-    #glyphs: StrokeGlyph[] = [];
+    #glyphs: Map<number, StrokeGlyph> = new Map();
+    #shared_glyphs: StrokeGlyph[] = [];
 
     constructor() {
         super("stroke");
@@ -42,78 +43,52 @@ export class StrokeFont extends Font {
 
     /**
      * Parses and prepares Newstroke for rendering.
-     *
-     * Newstroke is distributed as a .cpp file and a old-format KiCAD library,
-     * this script reads a JS-ified version.
-     *
-     * The code here is based on KiCAD's STROKE_FONT::LoadNewStrokeFont
-     *
-     *  Notes:
-     *  - Coordinate values are coded as ASCII characters relative to "R".
-     *  - Coordinate values are -1 to +1.
-     *  - FONT_OFFSET is used to allow descenders that go below the baseline
-     *
      */
     #load() {
-        for (const glyph_data of newstroke_font) {
-            let start_x = 0;
-            let end_x = 0;
-            let width = 0;
-            let min_y = 0;
-            let max_y = 0;
-            const strokes: Vec2[][] = [];
-            let points: Vec2[] | null = null;
+        console.profile();
+        const shared_glyphs = [];
 
-            for (let i = 0; i < glyph_data.length; i += 2) {
-                const coord_raw: [string, string] = [
-                    glyph_data[i]!,
-                    glyph_data[i + 1]!,
-                ];
-                const coord = decode_coord(coord_raw);
-
-                if (i < 2) {
-                    // The first coord contains the horizontal bounding box
-                    start_x = coord[0] * StrokeFont.font_scale;
-                    end_x = coord[1] * StrokeFont.font_scale;
-                    width = end_x - start_x;
-                } else if (coord_raw[0] == " " && coord_raw[1] == "R") {
-                    // End of stroke
-                    points = null;
-                } else {
-                    const point = new Vec2(
-                        coord[0] * StrokeFont.font_scale - start_x,
-                        (coord[1] + StrokeFont.font_offset) *
-                            StrokeFont.font_scale,
-                    );
-
-                    // Start of new stroke, create a new list of points and add it to the glyph.
-                    if (points == null) {
-                        points = [];
-                        strokes.push(points);
-                    }
-
-                    min_y = Math.min(min_y, point.y);
-                    max_y = Math.max(max_y, point.y);
-
-                    points.push(point);
-                }
-            }
-
-            const bb = new BBox(0, min_y, width, max_y - min_y);
-            const glyph = new StrokeGlyph(strokes, bb);
-
-            this.#glyphs.push(glyph);
+        for (const glyph_data of newstroke.shared_glyphs) {
+            shared_glyphs.push(decode_glyph(glyph_data));
         }
+
+        // by default, KiCanvas only loads the first 127 glyphs of newstroke
+        // to reduce memory and CPU usage. Additional glyphs are lazy loaded
+        // as needed
+        for (let i = 0; i < 127; i++) {
+            this.#load_glyph(i);
+        }
+        console.profileEnd();
+    }
+
+    #load_glyph(idx: number) {
+        const data: number | string | undefined = newstroke.glyph_data[idx];
+        if (typeof data == "string") {
+            this.#glyphs.set(idx, decode_glyph(data));
+        } else if (typeof data == "number") {
+            this.#glyphs.set(idx, this.#shared_glyphs[data]!);
+        } else {
+            throw new Error(`Invalid glyph data for glyph ${idx}: ${data}`);
+        }
+
+        // remove the glyph data from the array, since it won't be needed again.
+        newstroke.glyph_data[idx] = undefined;
     }
 
     /** Get a glyph for a specific character. */
     get_glyph(c: string): StrokeGlyph {
         const glyph_index = ord(c) - ord(" ");
-        if (glyph_index < 0 || glyph_index > this.#glyphs.length) {
+
+        if (glyph_index < 0 || glyph_index > newstroke.glyph_data.length) {
             return this.get_glyph("?");
         }
 
-        return this.#glyphs[glyph_index]!;
+        if (!this.#glyphs.has(glyph_index)) {
+            this.#load_glyph(glyph_index);
+            console.log("Lazy loaded", c);
+        }
+
+        return this.#glyphs.get(glyph_index)!;
     }
 
     override get is_stroke() {
@@ -294,4 +269,67 @@ function decode_coord_val(c: string): number {
 
 function decode_coord(c: [string, string]): [number, number] {
     return [decode_coord_val(c[0]!), decode_coord_val(c[1]!)];
+}
+
+/**
+ * Parses a newstroke glyph
+ *
+ * Newstroke is distributed as a .cpp file and a old-format KiCAD library,
+ * this script reads a JS-ified version.
+ *
+ * The code here is based on KiCAD's STROKE_FONT::LoadNewStrokeFont
+ *
+ *  Notes:
+ *  - Coordinate values are coded as ASCII characters relative to "R".
+ *  - Coordinate values are -1 to +1.
+ *  - FONT_OFFSET is used to allow descenders that go below the baseline
+ *
+ */
+function decode_glyph(glyph_data: string) {
+    let start_x = 0;
+    let end_x = 0;
+    let width = 0;
+    let min_y = 0;
+    let max_y = 0;
+    const strokes: Vec2[][] = [];
+    let points: Vec2[] | null = null;
+
+    for (let i = 0; i < glyph_data.length; i += 2) {
+        const coord_raw: [string, string] = [
+            glyph_data[i]!,
+            glyph_data[i + 1]!,
+        ];
+        const coord = decode_coord(coord_raw);
+
+        if (i < 2) {
+            // The first coord contains the horizontal bounding box
+            start_x = coord[0] * StrokeFont.font_scale;
+            end_x = coord[1] * StrokeFont.font_scale;
+            width = end_x - start_x;
+        } else if (coord_raw[0] == " " && coord_raw[1] == "R") {
+            // End of stroke
+            points = null;
+        } else {
+            const point = new Vec2(
+                coord[0] * StrokeFont.font_scale - start_x,
+                (coord[1] + StrokeFont.font_offset) * StrokeFont.font_scale,
+            );
+
+            // Start of new stroke, create a new list of points and add it to the glyph.
+            if (points == null) {
+                points = [];
+                strokes.push(points);
+            }
+
+            min_y = Math.min(min_y, point.y);
+            max_y = Math.max(max_y, point.y);
+
+            points.push(point);
+        }
+    }
+
+    const bb = new BBox(0, min_y, width, max_y - min_y);
+    const glyph = new StrokeGlyph(strokes, bb);
+
+    return glyph;
 }
