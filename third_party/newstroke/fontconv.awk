@@ -3,33 +3,7 @@
 # awk script to convert KiCAD font.
 
 BEGIN {
-	print "/*"
-	print " * newstroke_font.cpp - definitions for automatically converted font"
-	print " *"
-	print " * This program source code file is part of KICAD, a free EDA CAD application."
-	print " *"
-	print " * Copyright (C) 2010 vladimir uryvaev <vovanius@bk.ru>"
-	print " * Copyright (C) 1992-2010 Kicad Developers, see change_log.txt for contributors."
-	print " *"
-	print " * This program is free software; you can redistribute it and/or"
-	print " * modify it under the terms of the GNU General Public License"
-	print " * as published by the Free Software Foundation; either version 2"
-	print " * of the License, or (at your option) any later version."
-	print " *"
-	print " * This program is distributed in the hope that it will be useful,"
-	print " * but WITHOUT ANY WARRANTY; without even the implied warranty of"
-	print " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
-	print " * GNU General Public License for more details."
-	print " *"
-	print " * You should have received a copy of the GNU General Public License"
-	print " * along with this program; if not, you may find one here:"
-	print " * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
-	print " * or you may search the http://www.gnu.org website for the version 2 license,"
-	print " * or you may write to the Free Software Foundation, Inc.,"
-	print " * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA"
-	print " */"
-	print ""
-	print "#include \"newstroke_font.h\""
+	print "/* Automatically converted font */"
 	missed = 0
 	printstats = 1
 
@@ -295,9 +269,9 @@ $1 == "ENDDEF" {
 # parsing font index
 $1 == "font" {
 	print fontend
-	print "const char* const "$2"[] ="
+	print "const static char* "$2"[] ="
 	print "{"
-	fontend = "};\n\nconst int "$2"_bufsize = sizeof(newstroke_font)/sizeof(newstroke_font[0]);\n"
+	fontend = "};"
 }
 $1 == "startchar" {
 	codeno = $2
