@@ -16,17 +16,8 @@ import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
 import { Polyline } from "./shapes";
 import { Color } from "./color";
-
-class GlyphData {
-    /**
-     * Create Glyph data
-     */
-    constructor(
-        public strokes: number[][][],
-        public width: number,
-        public bbox: { start: number[]; end: number[] },
-    ) {}
-}
+import { StrokeFont } from "../text/stroke_font";
+import { StrokeGlyph } from "../text/glyph";
 
 /**
  * A Hershey font
@@ -38,25 +29,24 @@ export class Font {
     bold_factor = 1.3;
     stroke_font_scale = 1.0 / 21.0;
     italic_tilt = 1.0 / 8;
-    glyphs: GlyphData[];
 
-    constructor() {
-        this.glyphs = [];
-    }
+    // stubbed out for now while I build the new text engine.
+    #stroke_font: StrokeFont;
+
+    constructor() {}
 
     /**
      * Load glyph data from the given URL
      */
     async load(src: URL) {
-        this.glyphs = await (await fetch(src)).json();
+        this.#stroke_font = StrokeFont.default();
     }
 
     /**
      * Get the glyph data for a given glyph.
      */
-    glyph(chr: string, subsitute = "?"): GlyphData {
-        return (this.glyphs.at(chr.charCodeAt(0) - 32) ??
-            this.glyphs.at(subsitute.charCodeAt(0) - 32))!;
+    glyph(chr: string, subsitute = "?"): StrokeGlyph {
+        return this.#stroke_font.get_glyph(chr);
     }
 
     /**
@@ -64,20 +54,6 @@ export class Font {
      */
     interline(size: Vec2): number {
         return size.y * this.interline_pitch_ratio;
-    }
-
-    /**
-     * Get overbar line data for the given glyph
-     */
-    overbar_for(glyph: GlyphData, italic: boolean): GlyphData {
-        const start: [number, number] = [0, -this.overbar_position_factor];
-        const end: [number, number] = [glyph.bbox.end[0]!, start[1]];
-
-        if (italic) {
-            start[0] -= start[1] * this.italic_tilt;
-        }
-
-        return new GlyphData([[start, end]], glyph.width, glyph.bbox);
     }
 }
 
@@ -92,7 +68,7 @@ export class ShapedGlyph {
      * Create a ShapedGlyph
      */
     constructor(
-        public readonly glyph: GlyphData,
+        public readonly glyph: StrokeGlyph,
         public readonly position: Vec2,
         public readonly size: Vec2,
         public readonly tilt: number = 0,
@@ -111,9 +87,9 @@ export class ShapedGlyph {
      * Yields points from a given stroke transformed by the given matrix
      * and tilt.
      */
-    *#points(stroke: number[][]) {
+    *#points(stroke: Vec2[]) {
         for (const point of stroke) {
-            const pt = new Vec2(...point);
+            const pt = point.copy();
             if (this.tilt) {
                 pt.x -= pt.y * this.tilt;
             }
@@ -192,7 +168,7 @@ export class ShapedLine {
 
         bb.x =
             last.position.x +
-            last.glyph.bbox.end[0]! * last.size.x +
+            last.glyph.bbox.end.x! * last.size.x +
             this.options.get_effective_thickness();
 
         bb.y = this.options.font.interline(this.options.size);
@@ -331,7 +307,6 @@ export class TextShaper {
         let brace_depth = 0;
         let super_sup_depth = -1;
         let overbar_depth = -1;
-        let last_had_overbar = false;
 
         for (let i = 0; i < text.length; i++) {
             let chr = text[i]!;
@@ -411,23 +386,7 @@ export class TextShaper {
                 ),
             );
 
-            if (overbar_depth > -1) {
-                out.push(
-                    new ShapedGlyph(
-                        this.default_font.overbar_for(
-                            glyph,
-                            options.italic && !last_had_overbar,
-                        ),
-                        new Vec2(glyph_postion.x, 0),
-                        base_size,
-                    ),
-                );
-                last_had_overbar = true;
-            } else {
-                last_had_overbar = false;
-            }
-
-            char_offset.x += current_size.x * glyph.bbox.end[0]!;
+            char_offset.x += current_size.x * glyph.bbox.end.x!;
             chr_count++;
         }
 
