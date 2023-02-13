@@ -6,6 +6,7 @@
 
 import { parse_expr, P, T, type Parseable } from "./parser.ts";
 import { Vec2 } from "../math/vec2.ts";
+import { Color } from "../gfx/color.ts";
 
 export function expand_text_vars(
     text: string,
@@ -187,6 +188,7 @@ export class Effects {
                     P.item("font", Font),
                     P.item("justify", Justify),
                     P.atom("hide"),
+                    P.color(),
                 ),
             );
         }
@@ -207,6 +209,7 @@ export class Font {
     thickness = 0;
     bold = false;
     italic = false;
+    color: Color = Color.transparent;
 
     constructor(expr?: Parseable) {
         if (expr) {
