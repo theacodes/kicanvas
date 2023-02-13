@@ -110,6 +110,14 @@ export class Angle {
         return new Angle(-this.radians);
     }
 
+    get is_vertical() {
+        return this.degrees == 90 || this.degrees == 270;
+    }
+
+    get is_horizontal() {
+        return this.degrees == 0 || this.degrees == 180;
+    }
+
     rotate_point(point: Vec2, origin: Vec2 = new Vec2(0, 0)): Vec2 {
         let x = point.x - origin.x;
         let y = point.y - origin.y;
