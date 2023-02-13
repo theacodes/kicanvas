@@ -20,7 +20,16 @@ export class BBox {
         public w: number = 0,
         public h: number = 0,
         public context?: any,
-    ) {}
+    ) {
+        if (this.w < 0) {
+            this.w *= -1;
+            this.x -= this.w;
+        }
+        if (this.h < 0) {
+            this.h *= -1;
+            this.y -= this.h;
+        }
+    }
 
     copy() {
         return new BBox(this.x, this.y, this.w, this.h, this.context);
@@ -150,10 +159,11 @@ export class BBox {
     }
 
     set x2(v: number) {
-        if (v < this.x) {
-            [v, this.x] = [this.x, v];
-        }
         this.w = v - this.x;
+        if (this.w < 0) {
+            this.w *= -1;
+            this.x -= this.w;
+        }
     }
 
     get y2() {
@@ -161,10 +171,11 @@ export class BBox {
     }
 
     set y2(v: number) {
-        if (v < this.y) {
-            [v, this.y] = [this.y, v];
-        }
         this.h = v - this.y;
+        if (this.h < 0) {
+            this.h *= -1;
+            this.y -= this.h;
+        }
     }
 
     get center() {
@@ -191,6 +202,20 @@ export class BBox {
             this.h + s * 2,
             this.context,
         );
+    }
+
+    scale(s: number) {
+        return BBox.from_points(
+            [this.start.multiply(s), this.end.multiply(s)],
+            this.context,
+        );
+    }
+
+    /**
+     * @returns a BBox flipped around the X axis (mirrored Y)
+     */
+    mirror_vertical() {
+        return new BBox(this.x, -this.y, this.w, -this.h);
     }
 
     /**
