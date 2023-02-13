@@ -7,8 +7,8 @@
 import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
-import { ShapedParagraph, TextOptions, TextShaper } from "../gfx/text";
-import { At, Effects } from "../kicad/common";
+import { ShapedParagraph, TextOptions } from "../gfx/text";
+import { Effects } from "../kicad/common";
 import * as schematic from "../kicad/schematic";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
@@ -20,6 +20,7 @@ import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { SchField } from "../text/sch_field";
 import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
+import { LibText } from "../text/lib_text";
 
 function color_maybe(
     color?: Color,
@@ -913,99 +914,67 @@ class LibSymbolPainter extends ItemPainter {
     }
 }
 
-function layout_text(
-    shaper: TextShaper,
-    text: string,
-    at: At,
-    effects: Effects,
-    parent?: schematic.SchematicSymbol,
-    relative = false,
-): ShapedParagraph {
-    /*
-        Drawing text is hard.
-        Properties and symbol text are drawn based on the location and
-        orientation (rotation and mirroring) of their parent symbol, which
-        makes interpreting the text alignment... difficult. So KiCAD's approach
-        (and ours) is to first calculate the bbox of the text drawn the "normal"
-        way, then checking the bbox to see if the text needs to be moved
-        around. Once the real final coordinates are figured out, it
-        draws the text centered on the bbox.
-    */
+type SymbolTransform = {
+    matrix: Matrix3;
+    rotations: number;
+    mirror_x: boolean;
+    mirror_y: boolean;
+};
 
-    const text_options = new TextOptions(
-        shaper.default_font,
-        effects.font.size,
-        effects.font.thickness,
-        effects.font.bold,
-        effects.font.italic,
-        effects.justify.vertical,
-        effects.justify.horizontal,
-        effects.justify.mirror,
-    );
+function get_symbol_transform(
+    symbol: schematic.SchematicSymbol,
+): SymbolTransform {
+    // [x1, x2, 0, y1, y2, ...]
+    const zero_deg_matrix = new Matrix3([1, 0, 0, 0, -1, 0, 0, 0, 1]); // [1, 0, 0, -1]
+    const ninety_deg_matrix = new Matrix3([0, -1, 0, -1, 0, 0, 0, 0, 1]); // [0, -1, -1, 0]
+    const one_eighty_deg_matrix = new Matrix3([-1, 0, 0, 0, 1, 0, 0, 0, 1]); // [-1, 0, 0, 1]
+    const two_seventy_deg_matrix = new Matrix3([0, 1, 0, 1, 0, 0, 0, 0, 1]); // [0, 1, 1, 0]
+    let rotations = 0;
 
-    // Prepare a transformation based on the parent's location,
-    // rotation, and mirror settings.
-    const local_matrix = Matrix3.identity();
-
-    if (parent && relative) {
-        local_matrix.translate_self(parent.at.position.x, parent.at.position.y);
-        local_matrix.scale_self(
-            parent.mirror == "y" ? -1 : 1,
-            parent.mirror == "x" ? -1 : 1,
-        );
+    let matrix = zero_deg_matrix;
+    if (symbol.at.rotation == 0) {
+        // leave matrix as is
+    } else if (symbol.at.rotation == 90) {
+        rotations = 1;
+        matrix = ninety_deg_matrix;
+    } else if (symbol.at.rotation == 180) {
+        rotations = 2;
+        matrix = one_eighty_deg_matrix;
+    } else if (symbol.at.rotation == 270) {
+        rotations = 3;
+        matrix = two_seventy_deg_matrix;
+    } else {
+        throw new Error(`unexpected rotation ${symbol.at.rotation}`);
     }
 
-    local_matrix.translate_self(at.position.x, at.position.y);
-
-    // For non-relative text, mirroring is applied *after* translation.
-    if (parent && !relative) {
-        local_matrix.scale_self(
-            parent.mirror == "y" ? -1 : 1,
-            parent.mirror == "x" ? -1 : 1,
-        );
+    if (symbol.mirror == "y") {
+        // * [-1, 0, 0, 1]
+        const x1 = matrix.elements[0]! * -1;
+        const y1 = matrix.elements[3]! * -1;
+        const x2 = matrix.elements[1]!;
+        const y2 = matrix.elements[4]!;
+        matrix.elements[0] = x1;
+        matrix.elements[1] = x2;
+        matrix.elements[3] = y1;
+        matrix.elements[4] = y2;
+    } else if (symbol.mirror == "x") {
+        // * [1, 0, 0, -1]
+        const x1 = matrix.elements[0]!;
+        const y1 = matrix.elements[3]!;
+        const x2 = matrix.elements[1]! * -1;
+        const y2 = matrix.elements[4]! * -1;
+        matrix.elements[0] = x1;
+        matrix.elements[1] = x2;
+        matrix.elements[3] = y1;
+        matrix.elements[4] = y2;
     }
 
-    // Figure out the total rotation of this text including the
-    // parent's rotation.
-    let orient = Angle.from_degrees(at.rotation);
-
-    if (parent instanceof schematic.SchematicSymbol) {
-        orient.degrees += parent.at.rotation;
-    }
-
-    orient = orient.normalize();
-
-    // Get the BBox of the text if it was draw as-is without adjusting
-    // the alignment.
-    let bbox: BBox = shaper.paragraph(
-        text,
-        new Vec2(0, 0),
-        orient,
-        text_options,
-    ).bbox;
-
-    bbox = bbox.transform(local_matrix).grow(0.512);
-    const bbox_center = bbox.center;
-
-    // Text is either oriented horizontally (0 deg) or vertically (90 deg),
-    // never anything in between.
-    if (orient.degrees == 180) {
-        orient.degrees = 0;
-    }
-    if (orient.degrees == 270) {
-        orient.degrees = 90;
-    }
-
-    // Now draw the text using the BBox's center as the origin and
-    // alignment set to center, center, which side-steps any weirdness
-    // with text alignment.
-
-    text_options.v_align = "center";
-    text_options.h_align = "center";
-
-    const shaped = shaper.paragraph(text, bbox_center, orient, text_options);
-
-    return shaped;
+    return {
+        matrix: matrix,
+        rotations: rotations,
+        mirror_x: symbol.mirror == "x",
+        mirror_y: symbol.mirror == "y",
+    };
 }
 
 class PropertyPainter extends ItemPainter {
@@ -1032,51 +1001,11 @@ class PropertyPainter extends ItemPainter {
         }
 
         const parent = p.parent as schematic.SchematicSymbol;
-
-        // [x1, x2, 0, y1, y2, ...]
-        const zero_deg_matrix = new Matrix3([1, 0, 0, 0, -1, 0, 0, 0, 1]); // [1, 0, 0, -1]
-        const ninety_deg_matrix = new Matrix3([0, -1, 0, -1, 0, 0, 0, 0, 1]); // [0, -1, -1, 0]
-        const one_eighty_deg_matrix = new Matrix3([-1, 0, 0, 0, 1, 0, 0, 0, 1]); // [-1, 0, 0, 1]
-        const two_seventy_deg_matrix = new Matrix3([0, 1, 0, 1, 0, 0, 0, 0, 1]); // [0, 1, 1, 0]
-
-        let transform = zero_deg_matrix;
-        if (parent.at.rotation == 0) {
-            // leave matrix as is
-        } else if (parent.at.rotation == 90) {
-            transform = ninety_deg_matrix;
-        } else if (parent.at.rotation == 180) {
-            transform = one_eighty_deg_matrix;
-        } else if (parent.at.rotation == 270) {
-            transform = two_seventy_deg_matrix;
-        } else {
-            throw new Error(`unexpected rotation ${parent.at.rotation}`);
-        }
-
-        if (parent.mirror == "y") {
-            // * [-1, 0, 0, 1]
-            const x1 = transform.elements[0]! * -1;
-            const y1 = transform.elements[3]! * -1;
-            const x2 = transform.elements[1]!;
-            const y2 = transform.elements[4]!;
-            transform.elements[0] = x1;
-            transform.elements[1] = x2;
-            transform.elements[3] = y1;
-            transform.elements[4] = y2;
-        } else if (parent.mirror == "x") {
-            // * [1, 0, 0, -1]
-            const x1 = transform.elements[0]!;
-            const y1 = transform.elements[3]!;
-            const x2 = transform.elements[1]! * -1;
-            const y2 = transform.elements[4]! * -1;
-            transform.elements[0] = x1;
-            transform.elements[1] = x2;
-            transform.elements[3] = y1;
-            transform.elements[4] = y2;
-        }
+        const transform = get_symbol_transform(parent);
 
         const schfield = new SchField(p.text, {
             position: parent.at.position.multiply(10000),
-            transform: transform,
+            transform: transform.matrix,
         });
 
         schfield.attributes.h_align = p.effects.justify.horizontal;
@@ -1094,7 +1023,7 @@ class PropertyPainter extends ItemPainter {
         let rel_position = p.at.position
             .multiply(10000)
             .sub(schfield.parent!.position);
-        rel_position = transform.inverse().transform(rel_position);
+        rel_position = transform.matrix.inverse().transform(rel_position);
         rel_position = rel_position.add(schfield.parent!.position);
 
         schfield.text_pos = rel_position;
@@ -1145,39 +1074,109 @@ class LibTextPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, p: schematic.LibText) {
-        if (
-            layer.name != LayerName.symbol_foreground ||
-            p.effects.hide ||
-            !p.text
-        ) {
+        if (p.effects.hide || !p.text) {
             return;
         }
 
-        const color = this.gfx.theme["foreground"] as Color;
+        const current_symbol = (this.view_painter as SchematicPainter)
+            .current_symbol!;
+        const current_symbol_transform = (this.view_painter as SchematicPainter)
+            .current_symbol_transform!;
 
-        const shaped = layout_text(
-            this.gfx.text_shaper,
-            p.text,
-            p.at,
-            p.effects,
-            (this.view_painter as SchematicPainter).current_symbol,
-            true,
+        const libtext = new LibText(p.text);
+
+        libtext.attributes.h_align = p.effects.justify.horizontal;
+        libtext.attributes.v_align = p.effects.justify.vertical;
+        libtext.attributes.stroke_width = p.effects.font.thickness * 10000;
+        libtext.attributes.italic = p.effects.font.italic;
+        libtext.attributes.bold = p.effects.font.bold;
+        libtext.attributes.size.set(p.effects.font.size.multiply(10000));
+        libtext.attributes.angle = Angle.from_degrees(p.at.rotation);
+        libtext.text_pos = p.at.position.multiply(10000);
+        libtext.attributes.stroke_width = libtext.get_effective_text_thickness(
+            (p.effects.font.thickness ?? 0) * 10000,
         );
+        libtext.attributes.color = this.gfx.theme["foreground"] as Color;
+
+        for (let i = 0; i < current_symbol_transform.rotations; i++) {
+            libtext.rotate(new Vec2(0, 0), true);
+        }
+
+        if (current_symbol_transform.mirror_x) {
+            libtext.mirror_vertical(new Vec2(0, 0));
+        }
+
+        if (current_symbol_transform.mirror_y) {
+            libtext.mirror_horizontal(new Vec2(0, 0));
+        }
+
+        libtext.text_pos = libtext.text_pos.add(
+            current_symbol.at.position.multiply(new Vec2(10000, -10000)),
+        );
+
+        const bbox = libtext.bounding_box;
+        const pos = bbox.center;
+
+        if (libtext.attributes.angle.is_vertical) {
+            switch (libtext.attributes.h_align) {
+                case "left":
+                    pos.y = bbox.y2;
+                    break;
+                case "center":
+                    pos.y = (bbox.y + bbox.y2) / 2;
+                    break;
+                case "right":
+                    pos.y = bbox.y;
+                    break;
+            }
+        } else {
+            switch (libtext.attributes.h_align) {
+                case "left":
+                    pos.x = bbox.x;
+                    break;
+                case "center":
+                    pos.x = (bbox.x + bbox.x2) / 2;
+                    break;
+                case "right":
+                    pos.x = bbox.x2;
+                    break;
+            }
+        }
+
+        libtext.attributes.v_align = "center";
 
         this.gfx.state.push();
         this.gfx.state.matrix = Matrix3.identity();
 
-        for (const stroke of shaped.strokes()) {
-            this.gfx.line(
-                new Polyline(
-                    Array.from(stroke),
-                    shaped.options.get_effective_thickness(),
-                    color,
-                ),
-            );
-        }
+        StrokeFont.default().draw(
+            this.gfx,
+            libtext.shown_text,
+            pos,
+            new Vec2(0, 0),
+            libtext.attributes,
+        );
+
+        // this.paint_debug(bbox);
 
         this.gfx.state.pop();
+    }
+
+    paint_debug(bbox: BBox) {
+        this.gfx.line(
+            Polyline.from_BBox(
+                bbox.scale(1 / 10000),
+                0.127,
+                new Color(0, 0, 1, 1),
+            ),
+        );
+
+        this.gfx.circle(
+            new Circle(
+                bbox.center.multiply(1 / 10000),
+                0.2,
+                new Color(0, 1, 0, 1),
+            ),
+        );
     }
 }
 
@@ -1200,17 +1199,22 @@ class SchematicSymbolPainter extends ItemPainter {
             return;
         }
 
-        (this.view_painter as SchematicPainter).current_symbol = si;
+        const transform = get_symbol_transform(si);
 
-        const matrix = Matrix3.identity();
-        matrix.translate_self(si.at.position.x, si.at.position.y);
-        matrix.scale_self(si.mirror == "y" ? -1 : 1, si.mirror == "x" ? 1 : -1);
-        matrix.rotate_self(Angle.deg_to_rad(-si.at.rotation));
+        (this.view_painter as SchematicPainter).current_symbol = si;
+        (this.view_painter as SchematicPainter).current_symbol_transform =
+            transform;
 
         this.gfx.state.push();
-        this.gfx.state.multiply(matrix);
+        this.gfx.state.matrix = Matrix3.translation(
+            si.at.position.x,
+            si.at.position.y,
+        );
+        this.gfx.state.multiply(transform.matrix);
 
         this.view_painter.paint_item(layer, si.lib_symbol);
+
+        this.gfx.state.pop();
 
         if (
             [
@@ -1223,7 +1227,6 @@ class SchematicSymbolPainter extends ItemPainter {
                 this.view_painter.paint_item(layer, pin);
             }
         }
-        this.gfx.state.pop();
 
         if (
             layer.name == LayerName.symbol_field ||
@@ -1262,4 +1265,5 @@ export class SchematicPainter extends DocumentPainter {
     }
 
     current_symbol?: schematic.SchematicSymbol;
+    current_symbol_transform?: SymbolTransform;
 }
