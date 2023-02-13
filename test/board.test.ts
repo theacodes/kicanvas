@@ -238,6 +238,7 @@ suite("board parser", function () {
                     thickness: 0.25,
                     italic: false,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 justify: {
                     horizontal: "center",
@@ -259,6 +260,7 @@ suite("board parser", function () {
                     thickness: 0.25,
                     italic: true,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 justify: {
                     horizontal: "right",
@@ -280,6 +282,7 @@ suite("board parser", function () {
                     thickness: 0.25,
                     italic: true,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 justify: {
                     horizontal: "center",
@@ -301,6 +304,7 @@ suite("board parser", function () {
                     thickness: 0.25,
                     italic: false,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 justify: {
                     horizontal: "center",
@@ -423,6 +427,7 @@ suite("board parser", function () {
                     thickness: 0.5,
                     bold: false,
                     italic: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 justify: {
                     horizontal: "left",
@@ -650,6 +655,7 @@ suite("board parser", function () {
                     thickness: 0.15,
                     italic: false,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 hide: false,
                 justify: {
@@ -673,6 +679,7 @@ suite("board parser", function () {
                     thickness: 0.2,
                     italic: true,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 hide: false,
                 justify: {
@@ -696,6 +703,7 @@ suite("board parser", function () {
                     thickness: 0.2,
                     italic: false,
                     bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
                 },
                 hide: false,
                 justify: {
