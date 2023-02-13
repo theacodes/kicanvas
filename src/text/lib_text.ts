@@ -130,7 +130,7 @@ export class LibText extends EDAText {
      * Deals with re-assigning the horizontal justification, as mirroring
      * left aligned text is the same as changing it to right aligned.
      */
-    mirror_horizontal(center: Vec2) {
+    mirror_horizontally(center: Vec2) {
         this.normalize_justification(false);
         let x = this.text_pos.x;
 
@@ -154,7 +154,7 @@ export class LibText extends EDAText {
      * Deals with re-assigning the vertical justification, as mirroring
      * top aligned text is the same as changing it to bottom aligned.
      */
-    mirror_vertical(center: Vec2) {
+    mirror_vertically(center: Vec2) {
         this.normalize_justification(false);
         let y = this.text_pos.y;
 

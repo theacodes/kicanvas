@@ -1103,11 +1103,11 @@ class LibTextPainter extends ItemPainter {
         }
 
         if (current_symbol_transform.mirror_x) {
-            libtext.mirror_vertical(new Vec2(0, 0));
+            libtext.mirror_vertically(new Vec2(0, 0));
         }
 
         if (current_symbol_transform.mirror_y) {
-            libtext.mirror_horizontal(new Vec2(0, 0));
+            libtext.mirror_horizontally(new Vec2(0, 0));
         }
 
         libtext.text_pos = libtext.text_pos.add(
