@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Effects } from "../kicad/common";
+import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
 import { Font, TextAttributes } from "./font";
@@ -44,6 +46,19 @@ export abstract class EDAText {
 
     constructor(text: string) {
         this.text = text;
+    }
+
+    apply_effects(effects: Effects) {
+        this.attributes.h_align = effects.justify.horizontal;
+        this.attributes.v_align = effects.justify.vertical;
+        this.attributes.mirrored = effects.justify.mirror;
+        this.attributes.italic = effects.font.italic;
+        this.attributes.bold = effects.font.bold;
+        this.attributes.size.set(effects.font.size.multiply(10000));
+        this.attributes.stroke_width = this.get_effective_text_thickness(
+            (effects.font.thickness ?? 0) * 10000,
+        );
+        this.attributes.color = effects.font.color;
     }
 
     /** The unprocessed text value, as it would be seen in save files */
@@ -97,6 +112,10 @@ export abstract class EDAText {
 
     get text_angle() {
         return this.attributes.angle;
+    }
+
+    set text_angle(a: Angle) {
+        this.attributes.angle = a;
     }
 
     get italic() {
