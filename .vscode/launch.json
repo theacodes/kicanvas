@@ -8,9 +8,14 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8000/board.html",
+            "url": "http://localhost:8000/schematic.html",
             "webRoot": "${workspaceFolder}/www",
-            "preLaunchTask": "${defaultBuildTask}",
+            //"preLaunchTask": "${defaultBuildTask}",
+            "skipFiles": [
+                "<node_internals>/**",
+                "**/node_modules/**",
+                "third_party/**"
+            ]
         }
     ]
 }
