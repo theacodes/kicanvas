@@ -82,7 +82,6 @@ export class StrokeFont extends Font {
 
         if (!this.#glyphs.has(glyph_index)) {
             this.#load_glyph(glyph_index);
-            console.log("Lazy loaded", c);
         }
 
         return this.#glyphs.get(glyph_index)!;
