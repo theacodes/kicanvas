@@ -123,8 +123,16 @@ export abstract class EDAText {
         return this.attributes.h_align;
     }
 
+    set h_align(v) {
+        this.attributes.h_align = v;
+    }
+
     get v_align() {
         return this.attributes.v_align;
+    }
+
+    set v_align(v) {
+        this.attributes.v_align = v;
     }
 
     get line_spacing() {
@@ -175,7 +183,7 @@ export abstract class EDAText {
             strings = text.split("\n");
 
             if (strings.length) {
-                if (line && line < strings.length) {
+                if (line != undefined && line < strings.length) {
                     text = strings[line]!;
                 } else {
                     text = strings[0]!;
