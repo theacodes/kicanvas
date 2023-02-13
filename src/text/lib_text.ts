@@ -14,14 +14,8 @@ import { EDAText } from "./eda_text";
  * text and doesn't include fields, pin names, or pin numbers.
  *
  * Note: the methods normalize_text, rotate, mirror_horizontal, and
- * mirror_vertical are all implemented in order to match KiCAD's behavior.
- * The LibTextPainter uses these methods to properly orient and position symbol
- * text, since KiCAD does not directly use a symbol's transformation to orient
- * text. Instead, KiCAD deep copies the library symbol then calls rotate() on
- * text items multiple times based on the symbol instance's rotation. This
- * makes it non-trivial to directly set the text's location and orientation,
- * so we adopt their somewhat convoluted method. See KiCAD's
- * sch_painter.cpp::orientSymbol.
+ * mirror_vertical are all implemented in order to match KiCAD's behavior, see
+ * apply_symbol_transformations().
  *
  */
 export class LibText extends EDAText {
@@ -55,6 +49,80 @@ export class LibText extends EDAText {
         bbox = bbox.mirror_vertical();
 
         return bbox;
+    }
+
+    /**
+     * Returns the center of the text's BBox in world coordinates.
+     *
+     * This contains the positioning logic KiCAD performs in
+     * SCH_PAINTER::Draw(LIB_TEXT). It made more sense for it to be here for
+     * us.
+     */
+    get world_pos(): Vec2 {
+        const bbox = this.bounding_box;
+        const pos = bbox.center;
+
+        if (this.attributes.angle.is_vertical) {
+            switch (this.attributes.h_align) {
+                case "left":
+                    pos.y = bbox.y2;
+                    break;
+                case "center":
+                    pos.y = (bbox.y + bbox.y2) / 2;
+                    break;
+                case "right":
+                    pos.y = bbox.y;
+                    break;
+            }
+        } else {
+            switch (this.attributes.h_align) {
+                case "left":
+                    pos.x = bbox.x;
+                    break;
+                case "center":
+                    pos.x = (bbox.x + bbox.x2) / 2;
+                    break;
+                case "right":
+                    pos.x = bbox.x2;
+                    break;
+            }
+        }
+
+        return pos;
+    }
+
+    /**
+     * Applies symbol transformation (rotation, position, mirror).
+     *
+     * Uses the rotate() and mirror_*() methods to properly orient and position
+     * symbol text, since KiCAD does not directly use a symbol's transformation
+     * to orient text. Instead, KiCAD deep copies the library symbol then calls
+     * rotate() on text items multiple times based on the symbol instance's
+     * rotation. This makes it non-trivial to directly set the text's location
+     * and orientation, so we adopt their somewhat convoluted method. See
+     * KiCAD's sch_painter.cpp::orientSymbol.
+     */
+    apply_symbol_transformations(transforms: {
+        position: Vec2;
+        rotations: number;
+        mirror_x: boolean;
+        mirror_y: boolean;
+    }) {
+        for (let i = 0; i < transforms.rotations; i++) {
+            this.rotate(new Vec2(0, 0), true);
+        }
+
+        if (transforms.mirror_x) {
+            this.mirror_vertically(new Vec2(0, 0));
+        }
+
+        if (transforms.mirror_y) {
+            this.mirror_horizontally(new Vec2(0, 0));
+        }
+
+        this.text_pos = this.text_pos.add(
+            transforms.position.multiply(new Vec2(10000, -10000)),
+        );
     }
 
     /**

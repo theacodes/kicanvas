@@ -916,6 +916,7 @@ class LibSymbolPainter extends ItemPainter {
 
 type SymbolTransform = {
     matrix: Matrix3;
+    position: Vec2;
     rotations: number;
     mirror_x: boolean;
     mirror_y: boolean;
@@ -971,6 +972,7 @@ function get_symbol_transform(
 
     return {
         matrix: matrix,
+        position: symbol.at.position,
         rotations: rotations,
         mirror_x: symbol.mirror == "x",
         mirror_y: symbol.mirror == "y",
@@ -1008,12 +1010,7 @@ class PropertyPainter extends ItemPainter {
             transform: transform.matrix,
         });
 
-        schfield.attributes.h_align = p.effects.justify.horizontal;
-        schfield.attributes.v_align = p.effects.justify.vertical;
-        schfield.attributes.stroke_width = p.effects.font.thickness * 10000;
-        schfield.attributes.italic = p.effects.font.italic;
-        schfield.attributes.bold = p.effects.font.bold;
-        schfield.attributes.size.set(p.effects.font.size.multiply(10000));
+        schfield.apply_effects(p.effects);
         schfield.attributes.angle = Angle.from_degrees(p.at.rotation);
 
         // Position is tricky. KiCAD's parser calls into SCH_FIELD::SetPosition
@@ -1073,76 +1070,32 @@ class LibTextPainter extends ItemPainter {
         return [LayerName.symbol_foreground];
     }
 
-    paint(layer: ViewLayer, p: schematic.LibText) {
-        if (p.effects.hide || !p.text) {
+    paint(layer: ViewLayer, lt: schematic.LibText) {
+        if (lt.effects.hide || !lt.text) {
             return;
         }
 
-        const current_symbol = (this.view_painter as SchematicPainter)
-            .current_symbol!;
         const current_symbol_transform = (this.view_painter as SchematicPainter)
             .current_symbol_transform!;
 
-        const libtext = new LibText(p.text);
+        const libtext = new LibText(lt.text);
 
-        libtext.attributes.h_align = p.effects.justify.horizontal;
-        libtext.attributes.v_align = p.effects.justify.vertical;
-        libtext.attributes.stroke_width = p.effects.font.thickness * 10000;
-        libtext.attributes.italic = p.effects.font.italic;
-        libtext.attributes.bold = p.effects.font.bold;
-        libtext.attributes.size.set(p.effects.font.size.multiply(10000));
-        libtext.attributes.angle = Angle.from_degrees(p.at.rotation);
-        libtext.text_pos = p.at.position.multiply(10000);
-        libtext.attributes.stroke_width = libtext.get_effective_text_thickness(
-            (p.effects.font.thickness ?? 0) * 10000,
-        );
+        libtext.apply_effects(lt.effects);
+
+        libtext.text_pos = lt.at.position.multiply(10000);
+        libtext.text_angle = Angle.from_degrees(lt.at.rotation);
         libtext.attributes.color = this.gfx.theme["foreground"] as Color;
 
-        for (let i = 0; i < current_symbol_transform.rotations; i++) {
-            libtext.rotate(new Vec2(0, 0), true);
-        }
+        libtext.apply_symbol_transformations(current_symbol_transform);
 
-        if (current_symbol_transform.mirror_x) {
-            libtext.mirror_vertically(new Vec2(0, 0));
-        }
+        // This gets the absolute world coordinates where the text should
+        // be drawn.
+        const pos = libtext.world_pos;
 
-        if (current_symbol_transform.mirror_y) {
-            libtext.mirror_horizontally(new Vec2(0, 0));
-        }
-
-        libtext.text_pos = libtext.text_pos.add(
-            current_symbol.at.position.multiply(new Vec2(10000, -10000)),
-        );
-
-        const bbox = libtext.bounding_box;
-        const pos = bbox.center;
-
-        if (libtext.attributes.angle.is_vertical) {
-            switch (libtext.attributes.h_align) {
-                case "left":
-                    pos.y = bbox.y2;
-                    break;
-                case "center":
-                    pos.y = (bbox.y + bbox.y2) / 2;
-                    break;
-                case "right":
-                    pos.y = bbox.y;
-                    break;
-            }
-        } else {
-            switch (libtext.attributes.h_align) {
-                case "left":
-                    pos.x = bbox.x;
-                    break;
-                case "center":
-                    pos.x = (bbox.x + bbox.x2) / 2;
-                    break;
-                case "right":
-                    pos.x = bbox.x2;
-                    break;
-            }
-        }
-
+        // draw_pos already applies v_align, so set it to center to draw
+        // the text in the right spot.
+        // Note: I'm not sure why it doesn't clear h_align like SchField
+        // does.
         libtext.attributes.v_align = "center";
 
         this.gfx.state.push();
