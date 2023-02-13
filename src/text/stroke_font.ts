@@ -45,20 +45,16 @@ export class StrokeFont extends Font {
      * Parses and prepares Newstroke for rendering.
      */
     #load() {
-        console.profile();
-        const shared_glyphs = [];
-
         for (const glyph_data of newstroke.shared_glyphs) {
-            shared_glyphs.push(decode_glyph(glyph_data));
+            this.#shared_glyphs.push(decode_glyph(glyph_data));
         }
 
-        // by default, KiCanvas only loads the first 127 glyphs of newstroke
+        // by default, KiCanvas only loads the first 256 glyphs of newstroke
         // to reduce memory and CPU usage. Additional glyphs are lazy loaded
         // as needed
-        for (let i = 0; i < 127; i++) {
+        for (let i = 0; i < 256; i++) {
             this.#load_glyph(i);
         }
-        console.profileEnd();
     }
 
     #load_glyph(idx: number) {
@@ -66,7 +62,8 @@ export class StrokeFont extends Font {
         if (typeof data == "string") {
             this.#glyphs.set(idx, decode_glyph(data));
         } else if (typeof data == "number") {
-            this.#glyphs.set(idx, this.#shared_glyphs[data]!);
+            const glyph = this.#shared_glyphs[data]!;
+            this.#glyphs.set(idx, glyph);
         } else {
             throw new Error(`Invalid glyph data for glyph ${idx}: ${data}`);
         }

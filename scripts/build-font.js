@@ -5,18 +5,16 @@
 */
 
 /**
- * Parses and prepares Newstroke for rendering in JavaScript.
+ * Transforms KiCAD's newstroke font into a format KiCanvas can use.
  *
  * Newstroke is distributed as a .cpp file and a old-format KiCAD library,
- * this script transforms it into a simple JSON file for easy consumption by
- * KiCanvas.
+ * this script transforms it into a .ts file so it can be easily imported
+ * into KiCanvas
  *
- * The script here is based loosely on KiCAD's STROKE_FONT::LoadNewStrokeFont
- *
- *  Notes:
- *  - Coordinates values are coded as ASCII characters relative to "R".
- *  - FONT_OFFSET is used to allow descenders that go below the baseline
- *
+ * Note: Newstroke is *huge*, nearly 3MB! It's currently the single largest
+ * part of KiCanvas's bundle. This is largely due to the CJK character set,
+ * so it may make sense to split it into a separate file that's loaded
+ * on demand.
  *
  */
 
@@ -49,9 +47,10 @@ const repeated_glyph_defs = [];
 
 let unique_index = 0;
 for (const [glyph, count] of glyph_map) {
-    if (count > 10) {
+    if (count > 2) {
         repeated_glyphs.set(glyph, unique_index);
         repeated_glyph_defs.push(`${JSON.stringify(glyph)}`);
+        unique_index++;
     }
 }
 
