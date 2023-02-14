@@ -20,7 +20,7 @@ import { EDAText } from "../../text/eda_text";
 import { StrokeFont } from "../../text/stroke_font";
 
 /**
- * Implement's KiCAD rendering logic for symbol pins.
+ * Implements KiCAD rendering logic for symbol pins.
  *
  * This is similar in scope to the EDAText class and its children, it's
  * designed to recreate KiCAD's behavior as closely as possible.
