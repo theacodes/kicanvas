@@ -19,7 +19,7 @@ import { StrokeFont } from "./stroke_font";
  * Note: Just like the underlying Font class, this all expects
  * scalled internal units instead of mm!
  */
-export abstract class EDAText {
+export class EDAText {
     static get_bold_thickness(text_width: number): number {
         return Math.round(text_width / 5);
     }
@@ -65,7 +65,9 @@ export abstract class EDAText {
     text: string;
 
     /** The processed text that will be used for rendering */
-    abstract get shown_text(): string;
+    get shown_text(): string {
+        return this.text;
+    }
 
     /** Effective text width selected either the text thickness specified in
      * attributes if it's a valid value or the given default value. */
