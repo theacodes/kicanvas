@@ -8,7 +8,6 @@ import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
 import { ShapedParagraph, TextOptions } from "../gfx/text";
-import { Effects } from "../kicad/common";
 import * as schematic from "../kicad/schematic";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
@@ -21,6 +20,7 @@ import { SchField } from "../text/sch_field";
 import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
 import { LibText } from "../text/lib_text";
+import { LibPin } from "../text/lib_pin";
 
 function color_maybe(
     color?: Color,
@@ -597,269 +597,32 @@ class PinPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, p: schematic.PinInstance) {
-        const parent = p.parent;
-        const def = p.definition;
-
-        if (def.hide) {
+        if (p.definition.hide) {
             return;
         }
 
-        const local_matrix = this.gfx.state.matrix.copy();
-        local_matrix.translate_self(def.at.position.x, def.at.position.y);
-        local_matrix.rotate_self(Angle.deg_to_rad(-def.at.rotation));
+        const current_symbol_transform = (this.view_painter as SchematicPainter)
+            .current_symbol_transform!;
+
+        const libpin = new LibPin(p);
+
+        libpin.apply_symbol_transformations(current_symbol_transform);
 
         this.gfx.state.push();
-        this.gfx.state.matrix = local_matrix;
+        this.gfx.state.matrix = Matrix3.identity();
+        this.gfx.state.stroke = this.gfx.theme["pin"] as Color;
 
         if (
             layer.name == LayerName.symbol_pin ||
             layer.name == LayerName.interactive
         ) {
-            this.paint_line(def);
+            libpin.draw_pin_shape(this.gfx);
         }
-
-        this.gfx.state.pop();
-
         if (layer.name == LayerName.symbol_foreground) {
-            this.paint_name_and_number(local_matrix, parent, def);
-        }
-    }
-
-    orient_label(
-        offset: Vec2,
-        rotation: Angle,
-        h_align: "center" | "left" | "right",
-    ): { offset: Vec2; h_align: "center" | "left" | "right" } {
-        switch (rotation.degrees) {
-            case 0:
-                break;
-            case 180:
-                offset.x *= -1;
-                if (h_align == "left") {
-                    h_align = "right";
-                }
-                break;
-            case 90:
-                offset = new Vec2(offset.y, -offset.x);
-                break;
-            case 270:
-                offset = new Vec2(offset.y, offset.x);
-                if (h_align == "left") {
-                    h_align = "right";
-                }
-                break;
-        }
-        return { offset: offset, h_align: h_align };
-    }
-
-    place_inside(
-        label_offset: number,
-        thickness: number,
-        pin_length: number,
-        rotation: Angle,
-    ): {
-        offset: Vec2;
-        h_align: "center" | "left" | "right";
-        v_align: "center" | "top" | "bottom";
-    } {
-        const offset = new Vec2(label_offset - thickness / 2 + pin_length, 0);
-        const placement = this.orient_label(offset, rotation, "left");
-        return { v_align: "center", ...placement };
-    }
-
-    place_above(
-        text_margin: number,
-        pin_thickness: number,
-        text_thickness: number,
-        pin_length: number,
-        rotation: Angle,
-    ): {
-        offset: Vec2;
-        h_align: "center" | "left" | "right";
-        v_align: "center" | "top" | "bottom";
-    } {
-        const offset = new Vec2(
-            pin_length / 2,
-            -(text_margin + pin_thickness / 2 + text_thickness / 2),
-        );
-        const placement = this.orient_label(offset, rotation, "center");
-        return { v_align: "bottom", ...placement };
-    }
-
-    place_below(
-        text_margin: number,
-        pin_thickness: number,
-        text_thickness: number,
-        pin_length: number,
-        rotation: Angle,
-    ): {
-        offset: Vec2;
-        h_align: "center" | "left" | "right";
-        v_align: "center" | "top" | "bottom";
-    } {
-        const offset = new Vec2(
-            pin_length / 2,
-            text_margin + pin_thickness / 2 + text_thickness / 2,
-        );
-        const placement = this.orient_label(offset, rotation, "center");
-        return { v_align: "top", ...placement };
-    }
-
-    paint_name_and_number(
-        local_matrix: Matrix3,
-        parent: schematic.SchematicSymbol,
-        p: schematic.PinDefinition,
-    ) {
-        if (p.hide) {
-            return;
-        }
-
-        const abs_pos = local_matrix.absolute_translation;
-        const abs_rotation = local_matrix.absolute_rotation
-            .negative()
-            .normalize();
-
-        const line_thickness = schematic.DefaultValues.line_width;
-        const num_thickness = p.number.effects.font.thickness || line_thickness;
-        const name_thickness =
-            p.number.effects.font.thickness || line_thickness;
-        const label_offset = parent.lib_symbol.pin_names.offset;
-        const hide_pin_names = parent.lib_symbol.pin_names.hide;
-        const hide_pin_numbers = parent.lib_symbol.pin_numbers.hide;
-        const text_margin = 0.6096 * schematic.DefaultValues.text_offset_ratio; // 24 mils * ratio
-        const pin_length = p.length;
-
-        const num_effects = p.number.effects.copy();
-        num_effects.font.thickness = num_thickness;
-        const name_effects = p.name.effects.copy();
-        name_effects.font.thickness = name_thickness;
-
-        let name_placement;
-        let num_placement;
-
-        if (label_offset > 0) {
-            name_placement = this.place_inside(
-                label_offset,
-                name_thickness,
-                pin_length,
-                abs_rotation,
-            );
-
-            num_placement = this.place_above(
-                text_margin,
-                line_thickness,
-                num_thickness,
-                pin_length,
-                abs_rotation,
-            );
-        } else {
-            name_placement = this.place_above(
-                text_margin,
-                line_thickness,
-                name_thickness,
-                pin_length,
-                abs_rotation,
-            );
-
-            num_placement = this.place_below(
-                text_margin,
-                line_thickness,
-                num_thickness,
-                pin_length,
-                abs_rotation,
-            );
-        }
-
-        const num_pos = abs_pos.add(num_placement.offset);
-        const name_pos = abs_pos.add(name_placement.offset);
-
-        this.gfx.state.push();
-        this.gfx.state.matrix = Matrix3.identity();
-
-        if (!hide_pin_numbers) {
-            this.paint_label(
-                p.number.text,
-                num_effects,
-                num_pos,
-                num_placement.h_align,
-                num_placement.v_align,
-                abs_rotation,
-                this.gfx.theme["pin_number"] as Color,
-            );
-        }
-
-        if (!hide_pin_names && p.name.text != "~") {
-            this.paint_label(
-                p.name.text,
-                name_effects,
-                name_pos,
-                name_placement.h_align,
-                name_placement.v_align,
-                abs_rotation,
-                this.gfx.theme["pin_name"] as Color,
-            );
+            libpin.draw_name_and_number(this.gfx);
         }
 
         this.gfx.state.pop();
-    }
-
-    paint_label(
-        text: string,
-        effects: Effects,
-        pos: Vec2,
-        h_align: "center" | "left" | "right",
-        v_align: "center" | "top" | "bottom",
-        rotation: Angle,
-        color: Color,
-    ) {
-        const options = new TextOptions(
-            this.gfx.text_shaper.default_font,
-            effects.font.size,
-            effects.font.thickness,
-            false,
-            false,
-            v_align,
-            h_align,
-        );
-
-        if (rotation.degrees == 180) {
-            rotation.degrees = 0;
-        } else if (rotation.degrees == 270) {
-            rotation.degrees = 90;
-        }
-
-        const shaped = this.gfx.text_shaper.paragraph(
-            text,
-            pos,
-            rotation,
-            options,
-        );
-
-        for (const line of shaped.to_polylines(color)) {
-            this.gfx.line(line);
-        }
-    }
-
-    paint_line(p: schematic.PinDefinition) {
-        const target_pin_radius = schematic.DefaultValues.wire_width * 1.5;
-
-        // Little connection circle
-        this.gfx.circle(
-            new Circle(
-                new Vec2(0, 0),
-                target_pin_radius,
-                this.gfx.theme["pin"] as Color,
-            ),
-        );
-
-        // Connecting line
-        this.gfx.line(
-            new Polyline(
-                [new Vec2(0, 0), new Vec2(p.length, 0)],
-                this.gfx.state.stroke_width,
-                this.gfx.theme["pin"] as Color,
-            ),
-        );
     }
 }
 
