@@ -169,11 +169,13 @@ export class LibPin {
      * Draw the pin's name and number, if they're visible.
      */
     draw_name_and_number(gfx: Renderer) {
+        const name = this.def.name.text;
+        const number = this.def.number.text;
         const pin_length = this.def.length;
         const hide_pin_names =
-            this.libsym.pin_names.hide || !this.def.name.text;
+            this.libsym.pin_names.hide || !name || name == "~";
         const hide_pin_numbers =
-            this.libsym.pin_numbers.hide || !this.def.name.text;
+            this.libsym.pin_numbers.hide || !number || number == "~";
         const pin_thickness = DefaultValues.line_width;
         const pin_name_offset = this.libsym.pin_names.offset;
         //  24 mils * ratio
@@ -231,7 +233,7 @@ export class LibPin {
         if (name_placement) {
             PinLabelInternals.draw(
                 gfx,
-                this.def.name.text,
+                name,
                 this.position,
                 name_placement,
                 this.def.name.effects,
@@ -242,7 +244,7 @@ export class LibPin {
         if (num_placement) {
             PinLabelInternals.draw(
                 gfx,
-                this.def.number.text,
+                number,
                 this.position,
                 num_placement,
                 this.def.number.effects,
