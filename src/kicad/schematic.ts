@@ -19,6 +19,7 @@ export const DefaultValues = {
     unselected_end_size: 0.1016, // 4 mils
 
     pin_length: 2.54, // 100 mils
+    pinsymbol_size: 0.635, // 25 mils
     pinnum_size: 1.27, // 50 mils
     pinname_size: 1.27, // 50 mils
     selection_thickness: 0.0762, // 3 mils
@@ -27,6 +28,7 @@ export const DefaultValues = {
     bus_width: 0.3048, // 12 mils
     noconnect_size: 1.2192, // 48 mils
     junction_diameter: 0.9144, // 36 mils
+    target_pin_radius: 0.381, // 15 mils
 
     /* The default bus and wire entry size. */
     sch_entry_size: 2.54, // 100 mils
@@ -660,7 +662,7 @@ export class LibSymbol {
     #pins_by_number: Map<string, PinDefinition> = new Map();
     #properties_by_id: Map<number, Property> = new Map();
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent?: LibSymbol) {
         Object.assign(
             this,
             parse_expr(
@@ -697,6 +699,13 @@ export class LibSymbol {
         for (const property of this.properties) {
             this.#properties_by_id.set(property.id, property);
         }
+    }
+
+    get root(): LibSymbol {
+        if (this.parent) {
+            return this.parent.root;
+        }
+        return this;
     }
 
     has_pin(number: string) {
@@ -778,7 +787,7 @@ export class Property {
     }
 }
 
-type PinElectricalType =
+export type PinElectricalType =
     | "input"
     | "output"
     | "bidirectional"
@@ -793,7 +802,7 @@ type PinElectricalType =
     | "no_connect"
     | "free";
 
-type PinShape =
+export type PinShape =
     | "line"
     | "inverted"
     | "clock"
