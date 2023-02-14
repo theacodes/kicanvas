@@ -51,8 +51,11 @@ export class Vec2 {
             x_prime = x[0];
             y = x[1];
         } else if (x instanceof Object && Object.hasOwn(x, "x")) {
-            this.x = x.x;
-            this.y = x.y;
+            x_prime = x.x;
+            y = x.y;
+        } else if (x == 0 && y == undefined) {
+            x_prime = 0;
+            y = 0;
         }
 
         if (x_prime == null || y == undefined) {
