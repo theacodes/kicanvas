@@ -4,32 +4,32 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle } from "../math/angle";
-import { Vec2 } from "../math/vec2";
+import { Angle } from "../../math/angle";
+import { Vec2 } from "../../math/vec2";
 import {
     DefaultValues,
     PinInstance,
     type PinElectricalType,
     type PinShape,
-} from "../kicad/schematic";
-import { Renderer } from "../gfx/renderer";
-import type { HAlign, VAlign } from "./font";
-import { Effects } from "../kicad/common";
-import { Color } from "../gfx/color";
-import { EDAText } from "./eda_text";
-import { StrokeFont } from "./stroke_font";
+} from "../../kicad/schematic";
+import { Renderer } from "../../gfx/renderer";
+import type { HAlign, VAlign } from "../../text/font";
+import { Effects } from "../../kicad/common";
+import { Color } from "../../gfx/color";
+import { EDAText } from "../../text/eda_text";
+import { StrokeFont } from "../../text/stroke_font";
 
 /**
- * Represents symbol pins.
+ * Implement's KiCAD rendering logic for symbol pins.
  *
- * While not *exactly* an EDAText class, its behavior is just as tangled in
- * the text rendering due to the pin name and number placement logic.
+ * This is similar in scope to the EDAText class and its children, it's
+ * designed to recreate KiCAD's behavior as closely as possible.
  *
- * Most of the logic here is based on SCH_PAINTER::draw( const LIB_PIN, ...) -
- * which is a massive method at over 400 lines - and a few small bits of
- * LIB_PIN.
+ * Most of the logic here is based a few small bits of LIB_PIN and EDA_ITEM,
+ * with the vast majority adapted from SCH_PAINTER::draw( const LIB_PIN, ...) -
+ * which is a massive method at over 400 lines!
  */
-export class LibPin {
+export class SymbolPin {
     position: Vec2;
     orientation: PinOrientation = "up";
 

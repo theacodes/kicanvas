@@ -20,7 +20,7 @@ import { SchField } from "../text/sch_field";
 import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
 import { LibText } from "../text/lib_text";
-import { LibPin } from "../text/lib_pin";
+import { SymbolPin } from "./items/symbol_pin";
 
 function color_maybe(
     color?: Color,
@@ -604,7 +604,7 @@ class PinPainter extends ItemPainter {
         const current_symbol_transform = (this.view_painter as SchematicPainter)
             .current_symbol_transform!;
 
-        const libpin = new LibPin(p);
+        const libpin = new SymbolPin(p);
 
         libpin.apply_symbol_transformations(current_symbol_transform);
 
