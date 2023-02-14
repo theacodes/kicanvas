@@ -11,6 +11,7 @@ import { Color } from "./color";
 import { TextShaper } from "./text";
 import { Circle, Polyline, Polygon, Arc } from "./shapes";
 import { Arc as MathArc } from "../math/arc";
+import { Angle } from "../math/angle";
 
 /**
  * KiCanvas' abstraction over various graphics backends.
@@ -123,13 +124,32 @@ export abstract class Renderer {
     /**
      * Draw a filled circle
      */
-    circle(circle: Circle) {
-        if (circle.color == null || (circle.color as Color)?.is_transparent) {
-            circle.color = this.state.fill;
+    abstract circle(circle: Circle): void;
+    abstract circle(center: Vec2, radius: number, color?: Color): void;
+    abstract circle(
+        circle_or_center: Circle | Vec2,
+        radius?: number,
+        color?: Color,
+    ): void;
+
+    protected prep_circle(
+        circle_or_center: Circle | Vec2,
+        radius?: number,
+        color?: Color,
+    ): Circle {
+        let circle: Circle;
+        if (circle_or_center instanceof Circle) {
+            circle = circle_or_center;
+        } else {
+            circle = new Circle(
+                circle_or_center,
+                radius!,
+                color ?? this.state.fill,
+            );
         }
 
-        if (!circle.color) {
-            return;
+        if (!circle.color || circle.color.is_transparent) {
+            circle.color = this.state.fill ?? Color.transparent;
         }
 
         circle.center = this.state.matrix.transform(circle.center);
@@ -141,20 +161,58 @@ export abstract class Renderer {
                 circle.center.sub(radial),
             ]),
         );
+
+        return circle;
     }
 
     /**
      * Draw a stroked arc
      */
-    arc(arc: Arc) {
-        if (arc.color == null || (arc.color as Color)?.is_transparent) {
-            arc.color = this.state.stroke;
+    abstract arc(arc: Arc): void;
+    abstract arc(
+        center: Vec2,
+        radius: number,
+        start_angle: Angle,
+        end_angle: Angle,
+        width?: number,
+        color?: Color,
+    ): void;
+    abstract arc(
+        arc_or_center: Arc | Vec2,
+        radius?: number,
+        start_angle?: Angle,
+        end_angle?: Angle,
+        width?: number,
+        color?: Color,
+    ): void;
+
+    protected prep_arc(
+        arc_or_center: Arc | Vec2,
+        radius?: number,
+        start_angle?: Angle,
+        end_angle?: Angle,
+        width?: number,
+        color?: Color,
+    ): Arc {
+        let arc: Arc;
+        if (arc_or_center instanceof Arc) {
+            arc = arc_or_center;
+        } else {
+            arc = new Arc(
+                arc_or_center,
+                radius!,
+                start_angle ?? new Angle(0),
+                end_angle ?? new Angle(Math.PI * 2),
+                width ?? this.state.stroke_width,
+                color ?? this.state.stroke,
+            );
         }
 
-        if (!arc.color) {
-            return;
+        if (!arc.color || arc.color.is_transparent) {
+            arc.color = this.state.stroke ?? Color.transparent;
         }
 
+        // TODO: This should probably be its own method.
         const math_arc = new MathArc(
             arc.center,
             arc.radius,
@@ -165,18 +223,39 @@ export abstract class Renderer {
         const points = math_arc.to_polyline();
 
         this.line(new Polyline(points, arc.width, arc.color));
+
+        return arc;
     }
 
     /**
      * Draw a stroked polyline
      */
-    line(line: Polyline) {
-        if (line.color == null || (line.color as Color)?.is_transparent) {
-            line.color = this.state.stroke;
+    abstract line(line: Polyline): void;
+    abstract line(points: Vec2[], width?: number, color?: Color): void;
+    abstract line(
+        line_or_points: Polyline | Vec2[],
+        width?: number,
+        color?: Color,
+    ): void;
+
+    protected prep_line(
+        line_or_points: Polyline | Vec2[],
+        width?: number,
+        color?: Color,
+    ): Polyline {
+        let line: Polyline;
+        if (line_or_points instanceof Polyline) {
+            line = line_or_points;
+        } else {
+            line = new Polyline(
+                line_or_points,
+                width ?? this.state.stroke_width,
+                color ?? this.state.stroke,
+            );
         }
 
-        if (!line.color) {
-            return;
+        if (!line.color || line.color.is_transparent) {
+            line.color = this.state.stroke ?? Color.transparent;
         }
 
         line.points = Array.from(this.state.matrix.transform_all(line.points));
@@ -184,18 +263,30 @@ export abstract class Renderer {
         let bbox = BBox.from_points(line.points);
         bbox = bbox.grow(line.width);
         this.add_bbox(bbox);
+
+        return line;
     }
 
     /**
      * Draw a filled polygon
      */
-    polygon(polygon: Polygon) {
-        if (polygon.color == null || (polygon.color as Color)?.is_transparent) {
-            polygon.color = this.state.fill;
+    abstract polygon(polygon: Polygon): void;
+    abstract polygon(points: Vec2[], color?: Color): void;
+    abstract polygon(polygon_or_points: Polygon | Vec2[], color?: Color): void;
+
+    protected prep_polygon(
+        polygon_or_points: Polygon | Vec2[],
+        color?: Color,
+    ): Polygon {
+        let polygon: Polygon;
+        if (polygon_or_points instanceof Polygon) {
+            polygon = polygon_or_points;
+        } else {
+            polygon = new Polygon(polygon_or_points, color ?? this.state.fill);
         }
 
-        if (!polygon.color) {
-            return;
+        if (!polygon.color || polygon.color.is_transparent) {
+            polygon.color = this.state.fill ?? Color.transparent;
         }
 
         polygon.points = Array.from(
@@ -203,6 +294,8 @@ export abstract class Renderer {
         );
 
         this.add_bbox(BBox.from_points(polygon.points));
+
+        return polygon;
     }
 
     /** Draw a list of glyphs */

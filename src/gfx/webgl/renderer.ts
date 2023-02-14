@@ -7,7 +7,10 @@
 import { PrimitiveSet } from "./vector";
 import { RenderLayer, Renderer } from "../renderer";
 import { Matrix3 } from "../../math/matrix3";
-import { Circle, Polygon, Polyline } from "../shapes";
+import { Arc, Circle, Polygon, Polyline } from "../shapes";
+import { Vec2 } from "../../math/vec2";
+import { Angle } from "../../math/angle";
+import { Color } from "../color";
 
 /**
  * WebGL2-based renderer
@@ -120,8 +123,30 @@ export class WebGL2Renderer extends Renderer {
         return this.#layers.at(-1)!;
     }
 
-    override circle(circle: Circle) {
-        super.circle(circle);
+    override arc(
+        arc_or_center: Arc | Vec2,
+        radius?: number,
+        start_angle?: Angle,
+        end_angle?: Angle,
+        width?: number,
+        color?: Color,
+    ): void {
+        super.prep_arc(
+            arc_or_center,
+            radius,
+            start_angle,
+            end_angle,
+            width,
+            color,
+        );
+    }
+
+    override circle(
+        circle_or_center: Circle | Vec2,
+        radius?: number,
+        color?: Color,
+    ): void {
+        const circle = super.prep_circle(circle_or_center, radius, color);
 
         if (!circle.color) {
             return;
@@ -130,8 +155,12 @@ export class WebGL2Renderer extends Renderer {
         this.#active_layer!.geometry.add_circle(circle);
     }
 
-    override line(line: Polyline) {
-        super.line(line);
+    override line(
+        line_or_points: Polyline | Vec2[],
+        width?: number,
+        color?: Color,
+    ): void {
+        const line = super.prep_line(line_or_points, width, color);
 
         if (!line.color) {
             return;
@@ -140,8 +169,8 @@ export class WebGL2Renderer extends Renderer {
         this.#active_layer!.geometry.add_line(line);
     }
 
-    override polygon(polygon: Polygon) {
-        super.polygon(polygon);
+    override polygon(polygon_or_points: Polygon | Vec2[], color?: Color): void {
+        const polygon = super.prep_polygon(polygon_or_points, color);
 
         if (!polygon.color) {
             return;

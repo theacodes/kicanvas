@@ -6,8 +6,10 @@
 
 import { Renderer, RenderLayer, RenderStateStack } from "../renderer";
 import { Matrix3 } from "../../math/matrix3";
-import { Circle, Polygon, Polyline } from "../shapes";
+import { Arc, Circle, Polygon, Polyline } from "../shapes";
 import { Color } from "../color";
+import { Vec2 } from "../../math/vec2";
+import { Angle } from "../../math/angle";
 
 /**
  * Canvas2d-based renderer.
@@ -99,14 +101,36 @@ export class Canvas2DRenderer extends Renderer {
         return this.#layers.at(-1)!;
     }
 
-    override circle(circle: Circle) {
-        super.circle(circle);
+    override arc(
+        arc_or_center: Arc | Vec2,
+        radius?: number,
+        start_angle?: Angle,
+        end_angle?: Angle,
+        width?: number,
+        color?: Color,
+    ): void {
+        super.prep_arc(
+            arc_or_center,
+            radius,
+            start_angle,
+            end_angle,
+            width,
+            color,
+        );
+    }
 
-        if (!circle.color) {
+    override circle(
+        circle_or_center: Circle | Vec2,
+        radius?: number,
+        color?: Color,
+    ): void {
+        const circle = super.prep_circle(circle_or_center, radius, color);
+
+        if (!circle.color || circle.color.is_transparent) {
             return;
         }
 
-        const color = (circle.color as Color).to_css();
+        const css_color = (circle.color as Color).to_css();
 
         const path = new Path2D();
         path.arc(
@@ -118,18 +142,22 @@ export class Canvas2DRenderer extends Renderer {
         );
 
         this.#active_layer!.commands.push(
-            new DrawCommand(path, color, null, 0),
+            new DrawCommand(path, css_color, null, 0),
         );
     }
 
-    override line(line: Polyline) {
-        super.line(line);
+    override line(
+        line_or_points: Polyline | Vec2[],
+        width?: number,
+        color?: Color,
+    ): void {
+        const line = super.prep_line(line_or_points, width, color);
 
-        if (!line.color) {
+        if (!line.color || line.color.is_transparent) {
             return;
         }
 
-        const color = (line.color as Color).to_css();
+        const css_color = (line.color as Color).to_css();
 
         const path = new Path2D();
         let started = false;
@@ -144,18 +172,18 @@ export class Canvas2DRenderer extends Renderer {
         }
 
         this.#active_layer!.commands.push(
-            new DrawCommand(path, null, color, line.width),
+            new DrawCommand(path, null, css_color, line.width),
         );
     }
 
-    override polygon(polygon: Polygon) {
-        super.polygon(polygon);
+    override polygon(polygon_or_points: Polygon | Vec2[], color?: Color): void {
+        const polygon = super.prep_polygon(polygon_or_points, color);
 
-        if (!polygon.color) {
+        if (!polygon.color || polygon.color.is_transparent) {
             return;
         }
 
-        const color = (polygon.color as Color).to_css();
+        const css_color = (polygon.color as Color).to_css();
 
         const path = new Path2D();
         let started = false;
@@ -171,7 +199,7 @@ export class Canvas2DRenderer extends Renderer {
         path.closePath();
 
         this.#active_layer!.commands.push(
-            new DrawCommand(path, color, null, 0),
+            new DrawCommand(path, css_color, null, 0),
         );
     }
 
