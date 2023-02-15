@@ -7,7 +7,14 @@
 import { parse_expr, P, T, type Parseable } from "./parser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import type { List } from "./tokenizer.ts";
-import { At, Effects, Paper, TitleBlock, expand_text_vars } from "./common.ts";
+import {
+    At,
+    Effects,
+    Paper,
+    Stroke,
+    TitleBlock,
+    expand_text_vars,
+} from "./common.ts";
 
 export type Drawing =
     | GrLine
@@ -434,6 +441,9 @@ export class PCBPlotParams {
     drillshape: number;
     scaleselection: number;
     outputdirectory: string;
+    plot_on_all_layers_selection: number;
+    dashed_line_dash_ratio: number;
+    dashed_line_gap_ratio: number;
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -473,6 +483,9 @@ export class PCBPlotParams {
                 P.pair("drillshape", T.number),
                 P.pair("scaleselection", T.number),
                 P.pair("outputdirectory", T.string),
+                P.pair("plot_on_all_layers_selection", T.number),
+                P.pair("dashed_line_dash_ratio", T.number),
+                P.pair("dashed_line_gap_ratio", T.number),
             ),
         );
     }
@@ -945,6 +958,7 @@ export class Rect extends GraphicItem {
     end: Vec2;
     width: number;
     fill: string;
+    stroke: Stroke;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -962,8 +976,13 @@ export class Rect extends GraphicItem {
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
                 P.pair("tstamp", T.string),
+                P.item("stroke", Stroke),
             ),
         );
+
+        if (this.width == undefined) {
+            this.width = this.stroke?.width;
+        }
     }
 }
 
