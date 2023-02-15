@@ -56,6 +56,7 @@ abstract class LabelPainter extends ItemPainter {
 
         const pos = this.schtext.text_pos.add(this.schematic_text_offset);
 
+        this.gfx.state.push();
         this.gfx.state.stroke = this.color;
         this.gfx.state.fill = this.color;
 
@@ -74,6 +75,8 @@ abstract class LabelPainter extends ItemPainter {
                 this.schtext.attributes.stroke_width / 10000,
             );
         }
+
+        this.gfx.state.pop();
     }
 
     create_shape(): Vec2[] {
