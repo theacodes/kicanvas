@@ -4,12 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Renderer } from "../../gfx/renderer";
 import * as schematic from "../../kicad/schematic";
 import { Angle } from "../../math/angle";
 import { Vec2 } from "../../math/vec2";
 import { SchText } from "../../text/sch_text";
 import { StrokeFont } from "../../text/stroke_font";
+import { ItemPainter } from "../../framework/painter";
+import { LayerName, ViewLayer } from "../layers";
+import { Color } from "../../gfx/color";
 
 /**
  * Implements KiCAD rendering logic for net, global, and hierarchical labels.
@@ -25,19 +27,61 @@ import { StrokeFont } from "../../text/stroke_font";
  * - SCH_PAINTER::draw( const SCH_TEXT )
  *
  */
-export class Label {
+
+abstract class LabelPainter extends ItemPainter {
     schtext: SchText;
+    label: schematic.Label;
 
-    constructor(public label: schematic.Label) {
-        this.schtext = new SchText(label.text);
-        this.schtext.apply_at(label.at);
-        this.schtext.apply_effects(label.effects);
+    override classes: any[] = [];
 
-        if (label.at.rotation == 0 || label.at.rotation == 180) {
+    override layers_for(item: schematic.Label) {
+        return [LayerName.label];
+    }
+
+    override paint(layer: ViewLayer, l: schematic.Label) {
+        if (l.effects.hide) {
+            return;
+        }
+
+        this.label = l;
+        this.schtext = new SchText(l.text);
+        this.schtext.apply_at(l.at);
+        this.schtext.apply_effects(l.effects);
+
+        if (l.at.rotation == 0 || l.at.rotation == 180) {
             this.schtext.text_angle.degrees = 0;
-        } else if (label.at.rotation == 90 || label.at.rotation == 270) {
+        } else if (l.at.rotation == 90 || l.at.rotation == 270) {
             this.schtext.text_angle.degrees = 90;
         }
+
+        const pos = this.schtext.text_pos.add(this.schematic_text_offset);
+
+        this.gfx.state.stroke = this.color;
+        this.gfx.state.fill = this.color;
+
+        StrokeFont.default().draw(
+            this.gfx,
+            this.schtext.shown_text,
+            pos,
+            new Vec2(0, 0),
+            this.schtext.attributes,
+        );
+
+        const shape_pts = this.create_shape();
+        if (shape_pts) {
+            this.gfx.line(
+                shape_pts,
+                this.schtext.attributes.stroke_width / 10000,
+            );
+        }
+    }
+
+    create_shape(): Vec2[] {
+        return [];
+    }
+
+    get color() {
+        return new Color(1, 0, 1, 1);
     }
 
     get text_offset(): number {
@@ -61,37 +105,25 @@ export class Label {
             return new Vec2(0, -dist);
         }
     }
+}
 
-    draw(gfx: Renderer) {
-        const pos = this.schtext.text_pos.add(this.schematic_text_offset);
+export class NetLabelPainter extends LabelPainter {
+    override classes: any[] = [schematic.NetLabel];
 
-        StrokeFont.default().draw(
-            gfx,
-            this.schtext.shown_text,
-            pos,
-            new Vec2(0, 0),
-            this.schtext.attributes,
-        );
-
-        const shape_pts = this.create_shape();
-        if (shape_pts) {
-            gfx.line(shape_pts, this.schtext.attributes.stroke_width / 10000);
-        }
-    }
-
-    create_shape(): Vec2[] {
-        return [];
+    override get color() {
+        return this.gfx.theme["label_local"] as Color;
     }
 }
 
-export class NetLabel extends Label {}
+export class GlobalLabelPainter extends LabelPainter {
+    override classes: any[] = [schematic.GlobalLabel];
 
-export class GlobalLabel extends Label {
-    constructor(public override label: schematic.GlobalLabel) {
-        super(label);
+    override get color() {
+        return this.gfx.theme["label_global"] as Color;
     }
 
     override get schematic_text_offset(): Vec2 {
+        const label = this.label as schematic.GlobalLabel;
         const text_height = this.schtext.text_size.y;
         let horz = this.box_expansion;
 
@@ -99,9 +131,7 @@ export class GlobalLabel extends Label {
         // offsets the center of the text to accomodate overbars.
         const vert = text_height * 0.0715;
 
-        if (
-            ["input", "bidirectional", "tri_state"].includes(this.label.shape)
-        ) {
+        if (["input", "bidirectional", "tri_state"].includes(label.shape)) {
             // accommodate triangular shaped tail
             horz += text_height * 0.75;
         }
@@ -127,6 +157,7 @@ export class GlobalLabel extends Label {
      * Adapted from SCH_GLOBALLABEL::CreateGraphicShape
      */
     override create_shape(): Vec2[] {
+        const label = this.label as schematic.GlobalLabel;
         const pos = this.schtext.text_pos;
         const angle = Angle.from_degrees(this.label.at.rotation + 180);
         const text_height = this.schtext.text_size.y;
@@ -150,7 +181,7 @@ export class GlobalLabel extends Label {
 
         const offset = new Vec2();
 
-        switch (this.label.shape) {
+        switch (label.shape) {
             case "input":
                 offset.x = -half_size;
                 pts[0]!.x += half_size;
@@ -182,9 +213,11 @@ export class GlobalLabel extends Label {
     }
 }
 
-export class HierarchicalLabel extends Label {
-    constructor(public override label: schematic.HierarchicalLabel) {
-        super(label);
+export class HierarchicalLabelPainter extends LabelPainter {
+    override classes: any[] = [schematic.HierarchicalLabel];
+
+    override get color() {
+        return this.gfx.theme["label_hier"] as Color;
     }
 
     override get schematic_text_offset(): Vec2 {
@@ -211,13 +244,14 @@ export class HierarchicalLabel extends Label {
      * Adapted from SCH_HIERLABEL::CreateGraphicShape and TemplateShape.
      */
     override create_shape(): Vec2[] {
+        const label = this.label as schematic.HierarchicalLabel;
         const pos = this.schtext.text_pos;
         const angle = Angle.from_degrees(this.label.at.rotation);
         const s = this.schtext.text_width;
 
         let pts: Vec2[];
 
-        switch (this.label.shape) {
+        switch (label.shape) {
             case "output":
                 pts = [
                     new Vec2(0, s / 2),

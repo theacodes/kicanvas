@@ -19,8 +19,12 @@ import { SchField } from "../text/sch_field";
 import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
 import { LibText } from "../text/lib_text";
-import { SymbolPin } from "./items/symbol_pin";
-import { GlobalLabel, HierarchicalLabel, NetLabel } from "./items/label";
+import { SymbolPin } from "./painters/symbol_pin";
+import {
+    GlobalLabelPainter,
+    HierarchicalLabelPainter,
+    NetLabelPainter,
+} from "./painters/label";
 
 function color_maybe(
     color?: Color,
@@ -258,79 +262,6 @@ class TextPainter extends ItemPainter {
             schtext.attributes,
         );
         this.gfx.state.pop();
-    }
-}
-
-class NetLabelPainter extends ItemPainter {
-    classes: any[] = [schematic.NetLabel];
-
-    override layers_for(item: schematic.NetLabel) {
-        return [LayerName.label];
-    }
-
-    get color() {
-        return this.gfx.theme["label_local"] as Color;
-    }
-
-    override paint(layer: ViewLayer, l: schematic.NetLabel) {
-        if (l.effects.hide) {
-            return;
-        }
-
-        const nl = new NetLabel(l);
-
-        this.gfx.state.fill = this.color;
-        this.gfx.state.stroke = this.color;
-        nl.draw(this.gfx);
-    }
-}
-
-class GlobalLabelPainter extends ItemPainter {
-    override classes = [schematic.GlobalLabel];
-    layers_for(item: schematic.GlobalLabel) {
-        return [LayerName.label];
-    }
-
-    get color() {
-        return this.gfx.theme["label_global"] as Color;
-    }
-
-    override paint(layer: ViewLayer, l: schematic.GlobalLabel) {
-        if (l.effects.hide) {
-            return;
-        }
-
-        const gl = new GlobalLabel(l);
-
-        this.gfx.state.fill = this.color;
-        this.gfx.state.stroke = this.color;
-
-        gl.draw(this.gfx);
-    }
-}
-
-class HierarchicalLabelPainter extends ItemPainter {
-    override classes = [schematic.HierarchicalLabel];
-
-    override layers_for(item: schematic.NetLabel) {
-        return [LayerName.label];
-    }
-
-    get color() {
-        return this.gfx.theme["label_hier"] as Color;
-    }
-
-    override paint(layer: ViewLayer, l: schematic.GlobalLabel) {
-        if (l.effects.hide) {
-            return;
-        }
-
-        const hl = new HierarchicalLabel(l);
-
-        this.gfx.state.fill = this.color;
-        this.gfx.state.stroke = this.color;
-
-        hl.draw(this.gfx);
     }
 }
 
