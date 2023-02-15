@@ -324,10 +324,24 @@ type SymbolTransform = {
     mirror_y: boolean;
 };
 
+/**
+ * Determines the symbol position, orientation, and mirroring
+ *
+ * This is based on SCH_PAINTER::orientSymbol, where KiCAD does some fun logic
+ * to place a symbol instance. This tries to replicate that.
+ */
 function get_symbol_transform(
     symbol: schematic.SchematicSymbol,
 ): SymbolTransform {
-    // [x1, x2, 0, y1, y2, ...]
+    // Note: KiCAD uses a 2x2 transformation matrix for symbol orientation. It's
+    // literally the only place that uses this wacky matrix. We approximate it
+    // with carefully crafted Matrix3s. KiCAD's symbol matrix is defined as
+    //      [x1, x2]
+    //      [y1, y2]
+    // which cooresponds to a Matrix3 of
+    //      [x1, x2, 0]
+    //      [x1, y2, 0]
+    //      [0,   0, 1]
     const zero_deg_matrix = new Matrix3([1, 0, 0, 0, -1, 0, 0, 0, 1]); // [1, 0, 0, -1]
     const ninety_deg_matrix = new Matrix3([0, -1, 0, -1, 0, 0, 0, 0, 1]); // [0, -1, -1, 0]
     const one_eighty_deg_matrix = new Matrix3([-1, 0, 0, 0, 1, 0, 0, 0, 1]); // [-1, 0, 0, 1]
