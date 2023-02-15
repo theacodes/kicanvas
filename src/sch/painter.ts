@@ -21,6 +21,7 @@ import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
 import { LibText } from "../text/lib_text";
 import { SymbolPin } from "./items/symbol_pin";
+import { GlobalLabel, NetLabel } from "./items/label";
 
 function color_maybe(
     color?: Color,
@@ -244,18 +245,9 @@ class TextPainter extends ItemPainter {
 
         const schtext = new SchText(t.text);
 
-        schtext.attributes.h_align = t.effects.justify.horizontal;
-        schtext.attributes.v_align = t.effects.justify.vertical;
-        schtext.attributes.stroke_width = t.effects.font.thickness * 10000;
-        schtext.attributes.italic = t.effects.font.italic;
-        schtext.attributes.bold = t.effects.font.bold;
-        schtext.attributes.size.set(t.effects.font.size.multiply(10000));
-        schtext.attributes.angle = Angle.from_degrees(t.at.rotation);
-        schtext.text_pos = t.at.position.multiply(10000);
+        schtext.apply_effects(t.effects);
+        schtext.apply_at(t.at);
 
-        schtext.attributes.stroke_width = schtext.get_effective_text_thickness(
-            schematic.DefaultValues.line_width * 10000,
-        );
         schtext.attributes.color = this.gfx.theme["notes"] as Color;
 
         this.gfx.state.push();
@@ -270,7 +262,7 @@ class TextPainter extends ItemPainter {
     }
 }
 
-class NetLabelPainter extends ItemPainter {
+class OldBaseLabelPainter extends ItemPainter {
     classes: any[] = [schematic.NetLabel];
 
     layers_for(
@@ -326,42 +318,11 @@ class NetLabelPainter extends ItemPainter {
             return;
         }
 
-        const color = this.color;
-        const rotation = Angle.from_degrees(l.at.rotation).normalize();
+        const nl = new NetLabel(l);
 
-        if (rotation.degrees == 180) {
-            rotation.degrees = 0;
-        } else if (rotation.degrees == 270) {
-            rotation.degrees = 90;
-        }
-
-        const options = new TextOptions(
-            this.gfx.text_shaper.default_font,
-            l.effects.font.size,
-            l.effects.font.thickness,
-            l.effects.font.bold,
-            l.effects.font.italic,
-            l.effects.justify.vertical,
-            l.effects.justify.horizontal,
-            l.effects.justify.mirror,
-        );
-
-        const pos_offset = this.get_text_offset(l, options);
-        const pos = l.at.position.add(pos_offset);
-
-        const shaped = this.gfx.text_shaper.paragraph(
-            l.text,
-            pos,
-            rotation,
-            options,
-        );
-
-        for (const line of shaped.to_polylines(color)) {
-            this.gfx.line(line);
-        }
-
-        this.paint_shape(l, shaped);
-        // this.paint_debug(l, shaped);
+        this.gfx.state.fill = this.color;
+        this.gfx.state.stroke = this.color;
+        nl.draw(this.gfx);
     }
 
     paint_shape(
@@ -399,106 +360,55 @@ class NetLabelPainter extends ItemPainter {
     }
 }
 
-class GlobalLabelPainter extends NetLabelPainter {
-    // magic number from KiCAD's SCH_GLOBALLABEL::GetSchematicTextOffset
-    // that centers the text so there's room for the overbar.
-    static baseline_offset_ratio = 0.0715;
-    static triangle_offset_ratio = 0.75;
+class NetLabelPainter extends ItemPainter {
+    classes: any[] = [schematic.NetLabel];
 
-    override classes = [schematic.GlobalLabel];
-
-    override get color() {
-        return this.gfx.theme["label_global"] as Color;
+    override layers_for(item: schematic.NetLabel) {
+        return [LayerName.label];
     }
 
-    override get_text_offset(l: schematic.GlobalLabel, options: TextOptions) {
-        const vert = 0;
-        let horz = schematic.DefaultValues.label_size_ratio * options.size.y;
-
-        if (["input", "bidirectional", "tri_state"].includes(l.shape)) {
-            // accommodate triangular shaped tail
-            horz += options.size.y * GlobalLabelPainter.triangle_offset_ratio;
-        }
-
-        const offset = new Vec2(horz, vert).rotate(
-            Angle.from_degrees(l.at.rotation),
-        );
-
-        return offset;
+    get color() {
+        return this.gfx.theme["label_local"] as Color;
     }
 
-    override paint_shape(l: schematic.GlobalLabel, shaped: ShapedParagraph) {
-        const color = this.color;
-        const margin =
-            shaped.options.size.y * schematic.DefaultValues.label_size_ratio;
-        const half_size = shaped.options.size.y / 2 + margin;
-        const thickness = shaped.options.get_effective_thickness(
-            schematic.DefaultValues.line_width,
-        );
-
-        let length =
-            l.at.rotation == 90 || l.at.rotation == 270
-                ? shaped.bbox.h
-                : shaped.bbox.w;
-        length += 2 * margin;
-
-        // hack: I'm not yet sure how kicad adds this extra length to the bbox.
-        length += half_size * 0.5;
-
-        const x = length + thickness + 0.03;
-        const y = half_size + thickness + 0.03;
-
-        const line = new Polyline(
-            [
-                new Vec2(0, 0),
-                new Vec2(0, -y),
-                new Vec2(-x, -y),
-                new Vec2(-x, 0),
-                new Vec2(-x, y),
-                new Vec2(0, y),
-                new Vec2(0, 0),
-            ],
-            thickness,
-            color,
-        );
-
-        let x_offset = 0;
-
-        switch (l.shape) {
-            case "input":
-                x_offset = -half_size;
-                line.points[0]!.x += half_size;
-                line.points[6]!.x += half_size;
-                break;
-            case "output":
-                line.points[3]!.x -= half_size;
-                break;
-            case "bidirectional":
-            case "tri_state":
-                x_offset = -half_size;
-                line.points[0]!.x += half_size;
-                line.points[6]!.x += half_size;
-                line.points[3]!.x -= half_size;
-                break;
-            default:
-                break;
+    override paint(layer: ViewLayer, l: schematic.NetLabel) {
+        if (l.effects.hide) {
+            return;
         }
 
-        for (const pt of line.points) {
-            pt.x += x_offset;
-        }
+        const nl = new NetLabel(l);
 
-        const rotation = Angle.from_degrees(l.at.rotation + 180);
-
-        this.gfx.state.push();
-        this.gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
-        this.gfx.state.matrix.rotate_self(rotation);
-        this.gfx.line(line);
-        this.gfx.state.pop();
+        this.gfx.state.fill = this.color;
+        this.gfx.state.stroke = this.color;
+        nl.draw(this.gfx);
     }
 }
 
-class HierarchicalLabelPainter extends NetLabelPainter {
+class GlobalLabelPainter extends ItemPainter {
+    override classes = [schematic.GlobalLabel];
+    layers_for(item: schematic.GlobalLabel) {
+        return [LayerName.label];
+    }
+
+    get color() {
+        return this.gfx.theme["label_global"] as Color;
+    }
+
+    override paint(layer: ViewLayer, l: schematic.GlobalLabel) {
+        if (l.effects.hide) {
+            return;
+        }
+
+        const gl = new GlobalLabel(l);
+
+        this.gfx.state.fill = this.color;
+        this.gfx.state.stroke = this.color;
+
+        gl.draw(this.gfx);
+    }
+}
+
+class HierarchicalLabelPainter extends OldBaseLabelPainter {
     override classes = [schematic.HierarchicalLabel];
 
     override get color() {
@@ -844,12 +754,10 @@ class LibTextPainter extends ItemPainter {
         const libtext = new LibText(lt.text);
 
         libtext.apply_effects(lt.effects);
-
-        libtext.text_pos = lt.at.position.multiply(10000);
-        libtext.text_angle = Angle.from_degrees(lt.at.rotation);
-        libtext.attributes.color = this.gfx.theme["foreground"] as Color;
-
+        libtext.apply_at(lt.at);
         libtext.apply_symbol_transformations(current_symbol_transform);
+
+        libtext.attributes.color = this.gfx.theme["foreground"] as Color;
 
         // This gets the absolute world coordinates where the text should
         // be drawn.
