@@ -6,7 +6,7 @@
 
 import { parse_expr, P, T, type Parseable } from "./parser.ts";
 import { Vec2 } from "../math/vec2.ts";
-import { At, Effects, Paper, TitleBlock } from "./common.ts";
+import { At, Effects, Paper, TitleBlock, Stroke } from "./common.ts";
 import { Color } from "../gfx/color.ts";
 
 /* Default values for various things found in schematics
@@ -124,27 +124,6 @@ export class KicadSch {
         yield* this.symbols;
         yield* this.drawings;
         yield* this.images;
-    }
-}
-
-export class Stroke {
-    width: number = DefaultValues.line_width;
-    type: "dash" | "dot" | "dash_dot" | "dash_dot_dot" | "solid" | "default" =
-        "default";
-    color: Color;
-
-    constructor(expr: Parseable) {
-        /* (stroke (width 0.508) (type default) (color 0 0 0 0)) */
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("stroke"),
-                P.pair("width", T.number),
-                P.pair("type", T.string),
-                P.color(),
-            ),
-        );
     }
 }
 

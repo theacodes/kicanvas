@@ -268,3 +268,24 @@ export class Justify {
         return j;
     }
 }
+
+export class Stroke {
+    width: number;
+    type: "dash" | "dot" | "dash_dot" | "dash_dot_dot" | "solid" | "default" =
+        "default";
+    color: Color;
+
+    constructor(expr: Parseable) {
+        /* (stroke (width 0.508) (type default) (color 0 0 0 0)) */
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("stroke"),
+                P.pair("width", T.number),
+                P.pair("type", T.string),
+                P.color(),
+            ),
+        );
+    }
+}
