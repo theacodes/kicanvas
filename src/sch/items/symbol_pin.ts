@@ -25,9 +25,10 @@ import { StrokeFont } from "../../text/stroke_font";
  * This is similar in scope to the EDAText class and its children, it's
  * designed to recreate KiCAD's behavior as closely as possible.
  *
- * Most of the logic here is based a few small bits of LIB_PIN and EDA_ITEM,
- * with the vast majority adapted from SCH_PAINTER::draw( const LIB_PIN, ...) -
- * which is a massive method at over 400 lines!
+ * The logic here is based a few small bits of LIB_PIN and EDA_ITEM, with the
+ * ast majority adapted from SCH_PAINTER::draw( const LIB_PIN, ...) - which is
+ * a massive method at over 400 lines!
+ *
  */
 export class SymbolPin {
     position: Vec2;
