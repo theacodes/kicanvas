@@ -809,6 +809,7 @@ export class Line extends GraphicItem {
     start: Vec2;
     end: Vec2;
     width: number;
+    stroke: Stroke;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -825,8 +826,11 @@ export class Line extends GraphicItem {
                 P.vec2("end"),
                 P.pair("width", T.number),
                 P.pair("tstamp", T.string),
+                P.item("stroke", Stroke),
             ),
         );
+
+        this.width ??= this.stroke?.width || 0;
     }
 }
 
@@ -844,6 +848,7 @@ export class Circle extends GraphicItem {
     end: Vec2;
     width: number;
     fill: string;
+    stroke: Stroke;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -861,8 +866,11 @@ export class Circle extends GraphicItem {
                 P.pair("fill", T.string),
                 P.pair("layer", T.string),
                 P.pair("tstamp", T.string),
+                P.item("stroke", Stroke),
             ),
         );
+
+        this.width ??= this.stroke?.width || 0;
     }
 }
 
@@ -880,6 +888,7 @@ export class Arc extends GraphicItem {
     mid: Vec2;
     end: Vec2;
     width: number;
+    stroke: Stroke;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -897,8 +906,11 @@ export class Arc extends GraphicItem {
                 P.vec2("end"),
                 P.pair("width", T.number),
                 P.pair("tstamp", T.string),
+                P.item("stroke", Stroke),
             ),
         );
+
+        this.width ??= this.stroke?.width || 0;
     }
 }
 
@@ -917,6 +929,7 @@ export class Poly extends GraphicItem {
     width: number;
     fill: string;
     island: boolean;
+    stroke: Stroke;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
@@ -934,8 +947,11 @@ export class Poly extends GraphicItem {
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
                 P.pair("tstamp", T.string),
+                P.item("stroke", Stroke),
             ),
         );
+
+        this.width ??= this.stroke?.width || 0;
     }
 }
 
@@ -980,9 +996,7 @@ export class Rect extends GraphicItem {
             ),
         );
 
-        if (this.width == undefined) {
-            this.width = this.stroke?.width;
-        }
+        this.width ??= this.stroke?.width || 0;
     }
 }
 
