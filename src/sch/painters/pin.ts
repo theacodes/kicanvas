@@ -6,18 +6,17 @@
 
 import { Angle } from "../../math/angle";
 import { Vec2 } from "../../math/vec2";
-import {
-    DefaultValues,
-    PinInstance,
-    type PinElectricalType,
-    type PinShape,
-} from "../../kicad/schematic";
 import { Renderer } from "../../gfx/renderer";
 import type { HAlign, VAlign } from "../../text/font";
 import { Effects } from "../../kicad/common";
 import { Color } from "../../gfx/color";
 import { EDAText } from "../../text/eda_text";
 import { StrokeFont } from "../../text/stroke_font";
+import { ItemPainter } from "../../framework/painter";
+import * as schematic from "../../kicad/schematic";
+import { LayerName, ViewLayer } from "../layers";
+import { SchematicPainter } from "../painter";
+import { Matrix3 } from "../../math/matrix3";
 
 /**
  * Implements KiCAD rendering logic for symbol pins.
@@ -30,13 +29,50 @@ import { StrokeFont } from "../../text/stroke_font";
  * a massive method at over 400 lines!
  *
  */
-export class SymbolPin {
+export class PinPainter extends ItemPainter {
+    override classes = [schematic.PinInstance];
+
+    override layers_for(item: schematic.PinInstance) {
+        return [
+            LayerName.symbol_pin,
+            LayerName.symbol_foreground,
+            LayerName.interactive,
+        ];
+    }
+
+    pin: schematic.PinInstance;
     position: Vec2;
     orientation: PinOrientation = "up";
 
-    constructor(public pin: PinInstance) {
-        this.position = pin.definition.at.position.copy();
-        this.orientation = angle_to_orientation(pin.definition.at.rotation);
+    paint(layer: ViewLayer, p: schematic.PinInstance) {
+        if (p.definition.hide) {
+            return;
+        }
+
+        this.pin = p;
+        this.position = p.definition.at.position.copy();
+        this.orientation = angle_to_orientation(p.definition.at.rotation);
+
+        const current_symbol_transform = (this.view_painter as SchematicPainter)
+            .current_symbol_transform!;
+
+        this.apply_symbol_transformations(current_symbol_transform);
+
+        this.gfx.state.push();
+        this.gfx.state.matrix = Matrix3.identity();
+        this.gfx.state.stroke = this.gfx.theme["pin"] as Color;
+
+        if (
+            layer.name == LayerName.symbol_pin ||
+            layer.name == LayerName.interactive
+        ) {
+            this.draw_pin_shape(this.gfx);
+        }
+        if (layer.name == LayerName.symbol_foreground) {
+            this.draw_name_and_number(this.gfx);
+        }
+
+        this.gfx.state.pop();
     }
 
     /** The pin definition from the library symbol */
@@ -177,11 +213,11 @@ export class SymbolPin {
             this.libsym.pin_names.hide || !name || name == "~";
         const hide_pin_numbers =
             this.libsym.pin_numbers.hide || !number || number == "~";
-        const pin_thickness = DefaultValues.line_width;
+        const pin_thickness = schematic.DefaultValues.line_width;
         const pin_name_offset = this.libsym.pin_names.offset;
         //  24 mils * ratio
         // From void SCH_PAINTER::draw( const LIB_PIN *aPin, int aLayer, bool aDimmed )
-        const text_margin = 0.6096 * DefaultValues.text_offset_ratio;
+        const text_margin = 0.6096 * schematic.DefaultValues.text_offset_ratio;
         const num_thickness =
             this.def.number.effects.font.thickness || pin_thickness;
         const name_thickness =
@@ -313,15 +349,15 @@ export const PinShapeInternals = {
 
     draw(
         gfx: Pick<Renderer, "line" | "circle" | "arc">,
-        electrical_type: PinElectricalType,
-        shape: PinShape,
+        electrical_type: schematic.PinElectricalType,
+        shape: schematic.PinShape,
         position: Vec2,
         p0: Vec2,
         dir: Vec2,
     ) {
-        const radius = DefaultValues.pinsymbol_size;
+        const radius = schematic.DefaultValues.pinsymbol_size;
         const diam = radius * 2;
-        const nc_radius = DefaultValues.target_pin_radius;
+        const nc_radius = schematic.DefaultValues.target_pin_radius;
 
         if (electrical_type == "no_connect") {
             gfx.line([p0, position]);

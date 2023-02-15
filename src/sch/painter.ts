@@ -19,7 +19,7 @@ import { SchField } from "../text/sch_field";
 import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
 import { LibText } from "../text/lib_text";
-import { SymbolPin } from "./painters/symbol_pin";
+import { PinPainter } from "./painters/pin";
 import {
     GlobalLabelPainter,
     HierarchicalLabelPainter,
@@ -261,47 +261,6 @@ class TextPainter extends ItemPainter {
             new Vec2(0, 0),
             schtext.attributes,
         );
-        this.gfx.state.pop();
-    }
-}
-
-class PinPainter extends ItemPainter {
-    classes = [schematic.PinInstance];
-
-    layers_for(item: schematic.PinInstance) {
-        return [
-            LayerName.symbol_pin,
-            LayerName.symbol_foreground,
-            LayerName.interactive,
-        ];
-    }
-
-    paint(layer: ViewLayer, p: schematic.PinInstance) {
-        if (p.definition.hide) {
-            return;
-        }
-
-        const current_symbol_transform = (this.view_painter as SchematicPainter)
-            .current_symbol_transform!;
-
-        const libpin = new SymbolPin(p);
-
-        libpin.apply_symbol_transformations(current_symbol_transform);
-
-        this.gfx.state.push();
-        this.gfx.state.matrix = Matrix3.identity();
-        this.gfx.state.stroke = this.gfx.theme["pin"] as Color;
-
-        if (
-            layer.name == LayerName.symbol_pin ||
-            layer.name == LayerName.interactive
-        ) {
-            libpin.draw_pin_shape(this.gfx);
-        }
-        if (layer.name == LayerName.symbol_foreground) {
-            libpin.draw_name_and_number(this.gfx);
-        }
-
         this.gfx.state.pop();
     }
 }
