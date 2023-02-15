@@ -8,7 +8,6 @@ import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 import { Color } from "./color";
-import { TextShaper } from "./text";
 import { Circle, Polyline, Polygon, Arc } from "./shapes";
 import { Arc as MathArc } from "../math/arc";
 import { Angle } from "../math/angle";
@@ -35,18 +34,13 @@ export abstract class Renderer {
 
     canvas: HTMLCanvasElement;
     state: RenderStateStack = new RenderStateStack();
-    text_shaper: TextShaper;
     theme: Record<string, Color | Record<string, Color>>;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
     }
 
-    async setup() {
-        if (!this.text_shaper) {
-            this.text_shaper = await TextShaper.default();
-        }
-    }
+    abstract setup(): Promise<void>;
 
     abstract dispose(): void;
 

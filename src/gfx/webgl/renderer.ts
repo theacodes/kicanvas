@@ -39,8 +39,6 @@ export class WebGL2Renderer extends Renderer {
      * Create and configure the WebGL2 context.
      */
     override async setup() {
-        await super.setup();
-
         // just in case the browser still gives us a backbuffer with alpha,
         // set the background color of the canvas to black so that it behaves
         // correctly.
