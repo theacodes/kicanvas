@@ -54,7 +54,7 @@ class RectPainter extends ItemPainter {
 
         this.gfx.line(new Polyline(points, r.width, color));
 
-        if (r.fill) {
+        if (r.fill && r.fill != "none") {
             this.gfx.polygon(new Polygon(points, color));
         }
     }
@@ -74,7 +74,7 @@ class PolyPainter extends ItemPainter {
             this.gfx.line(new Polyline([...p.pts, p.pts[0]!], p.width, color));
         }
 
-        if (p.fill) {
+        if (p.fill && p.fill != "none") {
             this.gfx.polygon(new Polygon(p.pts, color));
         }
     }
@@ -113,7 +113,7 @@ class CirclePainter extends ItemPainter {
             c.width,
         );
 
-        if (c.fill) {
+        if (c.fill && c.fill != "none") {
             this.gfx.circle(
                 new Circle(arc.center, arc.radius + (c.width ?? 0), color),
             );
