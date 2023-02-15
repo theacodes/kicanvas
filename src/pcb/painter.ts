@@ -420,15 +420,15 @@ class GrTextPainter extends ItemPainter {
     classes = [pcb_items.GrText];
 
     layers_for(t: pcb_items.GrText) {
-        if (t instanceof pcb_items.FpText && t.hide) {
-            return [];
-        } else {
-            return [t.layer.name];
-        }
+        return [t.layer.name];
     }
 
     paint(layer: ViewLayer, t: pcb_items.GrText) {
-        const edatext = new EDAText(t.text);
+        if (t.hide || !t.shown_text) {
+            return;
+        }
+
+        const edatext = new EDAText(t.shown_text);
 
         edatext.apply_effects(t.effects);
         edatext.apply_at(t.at);
@@ -451,7 +451,7 @@ class FpTextPainter extends ItemPainter {
     classes = [pcb_items.FpText];
 
     layers_for(t: pcb_items.FpText) {
-        if (t instanceof pcb_items.FpText && t.hide) {
+        if (t.hide) {
             return [];
         } else {
             return [t.layer.name];
@@ -459,7 +459,11 @@ class FpTextPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, t: pcb_items.FpText) {
-        const edatext = new EDAText(t.text);
+        if (t.hide || !t.shown_text) {
+            return;
+        }
+
+        const edatext = new EDAText(t.shown_text);
 
         edatext.apply_effects(t.effects);
         edatext.apply_at(t.at);
