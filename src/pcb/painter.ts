@@ -18,9 +18,10 @@ import { Angle } from "../math/angle";
 import { Renderer } from "../gfx/renderer";
 import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
-import { TextOptions } from "../gfx/text";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
+import { EDAText } from "../text/eda_text";
+import { StrokeFont } from "../text/stroke_font";
 
 class LinePainter extends ItemPainter {
     classes = [pcb_items.GrLine, pcb_items.FpLine];
@@ -190,7 +191,7 @@ class ZonePainter extends ItemPainter {
                 layer.color.r,
                 layer.color.g,
                 layer.color.b,
-                layer.color.a * 0.5,
+                layer.color.a * 0.1,
             );
             this.gfx.polygon(new Polygon(p.pts, color));
         }
@@ -427,41 +428,24 @@ class TextPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, t: pcb_items.GrText | pcb_items.FpText) {
-        let rotation = t.at.rotation;
+        console.log(t);
 
-        if (rotation == 180 || rotation == -180) {
-            rotation = 0;
-        }
+        const schtext = new EDAText(t.text);
 
-        if (t instanceof pcb_items.FpText && t.parent) {
-            rotation -= t.parent.at.rotation ?? 0;
-        }
+        schtext.apply_effects(t.effects);
+        schtext.apply_at(t.at);
 
-        const shaped = this.gfx.text_shaper.paragraph(
-            t.shown_text,
-            t.at.position,
-            Angle.from_degrees(rotation),
-            new TextOptions(
-                this.gfx.text_shaper.default_font,
-                t.effects.font.size,
-                t.effects.font.thickness,
-                t.effects.font.bold,
-                t.effects.font.italic,
-                "center",
-                t.effects.justify.horizontal,
-                t.effects.justify.mirror,
-            ),
+        schtext.attributes.color = layer.color;
+
+        this.gfx.state.push();
+        StrokeFont.default().draw(
+            this.gfx,
+            schtext.shown_text,
+            schtext.text_pos,
+            new Vec2(0, 0),
+            schtext.attributes,
         );
-
-        for (const stroke of shaped.strokes()) {
-            this.gfx.line(
-                new Polyline(
-                    Array.from(stroke),
-                    t.effects.font.thickness ?? 0.127,
-                    layer.color,
-                ),
-            );
-        }
+        this.gfx.state.pop();
     }
 }
 
