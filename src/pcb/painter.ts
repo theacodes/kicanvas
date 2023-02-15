@@ -416,10 +416,10 @@ class PadPainter extends ItemPainter {
     }
 }
 
-class TextPainter extends ItemPainter {
-    classes = [pcb_items.GrText, pcb_items.FpText];
+class GrTextPainter extends ItemPainter {
+    classes = [pcb_items.GrText];
 
-    layers_for(t: pcb_items.GrText | pcb_items.FpText) {
+    layers_for(t: pcb_items.GrText) {
         if (t instanceof pcb_items.FpText && t.hide) {
             return [];
         } else {
@@ -427,23 +427,72 @@ class TextPainter extends ItemPainter {
         }
     }
 
-    paint(layer: ViewLayer, t: pcb_items.GrText | pcb_items.FpText) {
-        console.log(t);
+    paint(layer: ViewLayer, t: pcb_items.GrText) {
+        const edatext = new EDAText(t.text);
 
-        const schtext = new EDAText(t.text);
+        edatext.apply_effects(t.effects);
+        edatext.apply_at(t.at);
 
-        schtext.apply_effects(t.effects);
-        schtext.apply_at(t.at);
-
-        schtext.attributes.color = layer.color;
+        edatext.attributes.color = layer.color;
 
         this.gfx.state.push();
         StrokeFont.default().draw(
             this.gfx,
-            schtext.shown_text,
-            schtext.text_pos,
+            edatext.shown_text,
+            edatext.text_pos,
             new Vec2(0, 0),
-            schtext.attributes,
+            edatext.attributes,
+        );
+        this.gfx.state.pop();
+    }
+}
+
+class FpTextPainter extends ItemPainter {
+    classes = [pcb_items.FpText];
+
+    layers_for(t: pcb_items.FpText) {
+        if (t instanceof pcb_items.FpText && t.hide) {
+            return [];
+        } else {
+            return [t.layer.name];
+        }
+    }
+
+    paint(layer: ViewLayer, t: pcb_items.FpText) {
+        const edatext = new EDAText(t.text);
+
+        edatext.apply_effects(t.effects);
+        edatext.apply_at(t.at);
+
+        edatext.attributes.keep_upright = !t.at.unlocked;
+        edatext.attributes.color = layer.color;
+
+        if (t.parent) {
+            const rot = Angle.from_degrees(t.parent.at.rotation);
+            let pos = edatext.text_pos;
+            pos = rot.rotate_point(pos, new Vec2(0, 0));
+            pos = pos.add(t.parent.at.position.multiply(10000));
+            edatext.text_pos.set(pos);
+        }
+
+        if (edatext.attributes.keep_upright) {
+            while (edatext.text_angle.degrees > 90) {
+                edatext.text_angle.degrees -= 180;
+            }
+            while (edatext.text_angle.degrees <= -90) {
+                edatext.text_angle.degrees += 180;
+            }
+        }
+
+        this.gfx.state.push();
+        this.gfx.state.matrix = Matrix3.identity();
+
+        StrokeFont.default().draw(
+            this.gfx,
+            edatext.shown_text,
+            edatext.text_pos,
+            new Vec2(0, 0),
+            edatext.attributes,
         );
         this.gfx.state.pop();
     }
@@ -511,7 +560,8 @@ export class BoardPainter extends DocumentPainter {
             new ZonePainter(this, gfx),
             new PadPainter(this, gfx),
             new FootprintPainter(this, gfx),
-            new TextPainter(this, gfx),
+            new GrTextPainter(this, gfx),
+            new FpTextPainter(this, gfx),
             new DimensionPainter(this, gfx),
         ];
     }
