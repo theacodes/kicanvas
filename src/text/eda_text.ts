@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Effects } from "../kicad/common";
+import { At, Effects } from "../kicad/common";
 import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
@@ -20,34 +20,16 @@ import { StrokeFont } from "./stroke_font";
  * scalled internal units instead of mm!
  */
 export class EDAText {
-    static get_bold_thickness(text_width: number): number {
-        return Math.round(text_width / 5);
-    }
-
-    static get_normal_thickness(text_width: number): number {
-        return Math.round(text_width / 8);
-    }
-
-    /** Prevents text from being too thick and overlapping
-     *
-     * As per KiCAD's Clamp_Text_PenSize, this limits normal text to
-     * 18% and bold text to 25%.
-     */
-    static clamp_thickness(
-        thickness: number,
-        text_width: number,
-        allow_bold: boolean,
-    ) {
-        const max_thickness = Math.round(
-            text_width * (allow_bold ? 0.25 : 0.18),
-        );
-        return Math.min(thickness, max_thickness);
-    }
-
     constructor(text: string) {
         this.text = text;
     }
 
+    /**
+     * Apply "effects" parsed from schematic or board files.
+     *
+     * KiCAD uses Effects to encapsulate all of the various text
+     * options, this translates it into attributes.
+     */
     apply_effects(effects: Effects) {
         this.attributes.h_align = effects.justify.horizontal;
         this.attributes.v_align = effects.justify.vertical;
@@ -55,10 +37,20 @@ export class EDAText {
         this.attributes.italic = effects.font.italic;
         this.attributes.bold = effects.font.bold;
         this.attributes.size.set(effects.font.size.multiply(10000));
-        this.attributes.stroke_width = this.get_effective_text_thickness(
-            (effects.font.thickness ?? 0) * 10000,
-        );
+        this.attributes.stroke_width = (effects.font.thickness ?? 0) * 10000;
+        this.attributes.stroke_width = this.get_effective_text_thickness(1588);
         this.attributes.color = effects.font.color;
+    }
+
+    /**
+     * Apply "at" parsed from schematic or board files.
+     *
+     * KiCAD uses At to encapsulate both position and rotation. How this is
+     * actually applied various based on the actual text item.
+     */
+    apply_at(at: At) {
+        this.text_pos = at.position.multiply(10000);
+        this.text_angle = Angle.from_degrees(at.rotation);
     }
 
     /** The unprocessed text value, as it would be seen in save files */
@@ -72,24 +64,19 @@ export class EDAText {
     /** Effective text width selected either the text thickness specified in
      * attributes if it's a valid value or the given default value. */
     get_effective_text_thickness(default_thickness?: number): number {
-        const static_this = this.constructor as typeof EDAText;
         let thickness = this.text_thickness;
 
         if (thickness < 1) {
             thickness = default_thickness ?? 0;
 
             if (this.bold) {
-                thickness = static_this.get_bold_thickness(this.text_width);
+                thickness = get_bold_thickness(this.text_width);
             } else if (thickness <= 1) {
-                thickness = static_this.get_normal_thickness(this.text_width);
+                thickness = get_normal_thickness(this.text_width);
             }
         }
 
-        thickness = static_this.clamp_thickness(
-            thickness,
-            this.text_width,
-            true,
-        );
+        thickness = clamp_thickness(thickness, this.text_width, true);
 
         return thickness;
     }
@@ -299,45 +286,26 @@ export class EDAText {
 
         return bbox;
     }
-
-    /*
-    Additional methods not used (as far as I can tell):
-    - GetEffectiveTextShape
-    - TextHitText
-    - TransformBoundingBoxToPolygon (used by PCB_TEXT with knockout)
-    - GetLinePositions (used by plot/print, but not by painter)
-    */
 }
 
-/*
-SCH_PAINTER::strokeText(string text, vec2 position, text_attributes attrs) uses:
-- Font->Draw()
+function get_bold_thickness(text_width: number): number {
+    return Math.round(text_width / 5);
+}
 
-SCH_PAINTER::draw(LIB_TEXT) uses:
-- IsVisible()
-- GetBoundingBox()
-- GetEffectivePenWidth()
-- GetShownText()
-- GetAttributes() (angle, halign, valign)
-- SCH_PAINTER::strokeText()
+function get_normal_thickness(text_width: number): number {
+    return Math.round(text_width / 8);
+}
 
-
-SCH_PAINTER::draw(LIB_FIELD) uses:
-- ViewGetLayers()
-- IsForceVisible()
-- SCH_PAINTER::strokeText()
-
-SCH_PAINTER::draw(SCH_TEXT) uses:
-- Type() (sheet pin, hier label, global label, directive label, local label, regular text)
-- GetSchematicTextOffset()
-- GetDrawRotation()
-- GetDrawPos()
-- IsBold(), IsItalic()
-
-
-SCH_PAINTER::draw(SCH_FIELD) uses:
-- GetLayer()
-- GetTextAngle()
-- GetParent()
-
-*/
+/** Prevents text from being too thick and overlapping
+ *
+ * As per KiCAD's Clamp_Text_PenSize, this limits normal text to
+ * 18% and bold text to 25%.
+ */
+function clamp_thickness(
+    thickness: number,
+    text_width: number,
+    allow_bold: boolean,
+) {
+    const max_thickness = Math.round(text_width * (allow_bold ? 0.25 : 0.18));
+    return Math.min(thickness, max_thickness);
+}
