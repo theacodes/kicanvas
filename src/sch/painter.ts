@@ -7,7 +7,6 @@
 import { Color } from "../gfx/color";
 import { Polygon, Polyline, Arc, Circle } from "../gfx/shapes";
 import { Renderer } from "../gfx/renderer";
-import { ShapedParagraph, TextOptions } from "../gfx/text";
 import * as schematic from "../kicad/schematic";
 import { Angle } from "../math/angle";
 import { Arc as MathArc } from "../math/arc";
@@ -21,7 +20,7 @@ import { StrokeFont } from "../text/stroke_font";
 import { SchText } from "../text/sch_text";
 import { LibText } from "../text/lib_text";
 import { SymbolPin } from "./items/symbol_pin";
-import { GlobalLabel, NetLabel } from "./items/label";
+import { GlobalLabel, HierarchicalLabel, NetLabel } from "./items/label";
 
 function color_maybe(
     color?: Color,
@@ -262,104 +261,6 @@ class TextPainter extends ItemPainter {
     }
 }
 
-class OldBaseLabelPainter extends ItemPainter {
-    classes: any[] = [schematic.NetLabel];
-
-    layers_for(
-        item:
-            | schematic.NetLabel
-            | schematic.HierarchicalLabel
-            | schematic.GlobalLabel,
-    ) {
-        return [LayerName.label];
-    }
-
-    get color() {
-        return this.gfx.theme["label_local"] as Color;
-    }
-
-    get_text_baseline_offset_dist(
-        l:
-            | schematic.NetLabel
-            | schematic.HierarchicalLabel
-            | schematic.GlobalLabel,
-        options: TextOptions,
-    ) {
-        return (
-            l.effects.font.size.y * schematic.DefaultValues.text_offset_ratio +
-            options.get_effective_thickness(schematic.DefaultValues.line_width)
-        );
-    }
-
-    get_text_offset(
-        l:
-            | schematic.NetLabel
-            | schematic.HierarchicalLabel
-            | schematic.GlobalLabel,
-        options: TextOptions,
-    ) {
-        const offset = new Vec2(0, 0);
-        const offset_dist = this.get_text_baseline_offset_dist(l, options);
-
-        if (l.at.rotation == 0 || l.at.rotation == 180) {
-            offset.y = -offset_dist;
-        } else {
-            offset.x = -offset_dist;
-        }
-
-        return offset;
-    }
-
-    paint(
-        layer: ViewLayer,
-        l: schematic.NetLabel | schematic.HierarchicalLabel,
-    ) {
-        if (l.effects.hide) {
-            return;
-        }
-
-        const nl = new NetLabel(l);
-
-        this.gfx.state.fill = this.color;
-        this.gfx.state.stroke = this.color;
-        nl.draw(this.gfx);
-    }
-
-    paint_shape(
-        l:
-            | schematic.NetLabel
-            | schematic.GlobalLabel
-            | schematic.HierarchicalLabel,
-        shaped: ShapedParagraph,
-    ) {}
-
-    paint_debug(
-        l:
-            | schematic.NetLabel
-            | schematic.GlobalLabel
-            | schematic.HierarchicalLabel,
-        shaped: ShapedParagraph,
-    ) {
-        this.gfx.circle(
-            new Circle(l.at.position, 0.2, new Color(1, 0.2, 0.2, 1)),
-        );
-        const bb = shaped.bbox;
-        this.gfx.line(
-            new Polyline(
-                [
-                    bb.top_left,
-                    bb.top_right,
-                    bb.bottom_right,
-                    bb.bottom_left,
-                    bb.top_left,
-                ],
-                0.1,
-                new Color(1, 0.2, 0.2, 0.2),
-            ),
-        );
-    }
-}
-
 class NetLabelPainter extends ItemPainter {
     classes: any[] = [schematic.NetLabel];
 
@@ -408,90 +309,28 @@ class GlobalLabelPainter extends ItemPainter {
     }
 }
 
-class HierarchicalLabelPainter extends OldBaseLabelPainter {
+class HierarchicalLabelPainter extends ItemPainter {
     override classes = [schematic.HierarchicalLabel];
 
-    override get color() {
+    override layers_for(item: schematic.NetLabel) {
+        return [LayerName.label];
+    }
+
+    get color() {
         return this.gfx.theme["label_hier"] as Color;
     }
 
-    override get_text_offset(
-        l: schematic.HierarchicalLabel,
-        options: TextOptions,
-    ): Vec2 {
-        const horiz =
-            this.get_text_baseline_offset_dist(l, options) +
-            l.effects.font.size.x;
-        const vert = 0;
-        const offset = new Vec2(horiz, vert);
-        return offset.rotate(Angle.from_degrees(l.at.rotation));
-    }
-
-    override paint_shape(
-        l: schematic.HierarchicalLabel,
-        shaped: ShapedParagraph,
-    ): void {
-        const s = l.effects.font.size.y;
-        const color = this.color;
-        const thickness = shaped.options.get_effective_thickness(
-            schematic.DefaultValues.line_width,
-        );
-
-        this.gfx.state.push();
-        this.gfx.state.matrix.translate_self(l.at.position.x, l.at.position.y);
-        this.gfx.state.matrix.rotate_self(Angle.from_degrees(l.at.rotation));
-
-        let points: Vec2[];
-
-        switch (l.shape) {
-            case "output":
-                points = [
-                    new Vec2(0, s / 2),
-                    new Vec2(s / 2, s / 2),
-                    new Vec2(s, 0),
-                    new Vec2(s / 2, -s / 2),
-                    new Vec2(0, -s / 2),
-                    new Vec2(0, s / 2),
-                ];
-                break;
-
-            case "input":
-                points = [
-                    new Vec2(s, s / 2),
-                    new Vec2(s / 2, s / 2),
-                    new Vec2(0, 0),
-                    new Vec2(s / 2, -s / 2),
-                    new Vec2(s, -s / 2),
-                    new Vec2(s, s / 2),
-                ];
-                break;
-
-            case "bidirectional":
-            case "tri_state":
-                points = [
-                    new Vec2(s / 2, s / 2),
-                    new Vec2(s, 0),
-                    new Vec2(s / 2, -s / 2),
-                    new Vec2(0, 0),
-                    new Vec2(s / 2, s / 2),
-                ];
-                break;
-
-            case "passive":
-            default:
-                points = [
-                    new Vec2(0, s / 2),
-                    new Vec2(s, s / 2),
-                    new Vec2(s, -s / 2),
-                    new Vec2(0, -s / 2),
-                    new Vec2(0, s / 2),
-                ];
-                break;
+    override paint(layer: ViewLayer, l: schematic.GlobalLabel) {
+        if (l.effects.hide) {
+            return;
         }
 
-        this.gfx.line(new Polyline(points, thickness, color));
+        const hl = new HierarchicalLabel(l);
 
-        this.gfx.state.pop();
+        this.gfx.state.fill = this.color;
+        this.gfx.state.stroke = this.color;
+
+        hl.draw(this.gfx);
     }
 }
 

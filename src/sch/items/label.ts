@@ -72,12 +72,21 @@ export class Label {
             new Vec2(0, 0),
             this.schtext.attributes,
         );
+
+        const shape_pts = this.create_shape();
+        if (shape_pts) {
+            gfx.line(shape_pts, this.schtext.attributes.stroke_width / 10000);
+        }
+    }
+
+    create_shape(): Vec2[] {
+        return [];
     }
 }
 
 export class NetLabel extends Label {}
 
-export class GlobalLabel extends NetLabel {
+export class GlobalLabel extends Label {
     constructor(public override label: schematic.GlobalLabel) {
         super(label);
     }
@@ -113,20 +122,11 @@ export class GlobalLabel extends NetLabel {
         }
     }
 
-    override draw(gfx: Renderer) {
-        super.draw(gfx);
-
-        gfx.line(
-            this.create_shape(),
-            this.schtext.attributes.stroke_width / 10000,
-        );
-    }
-
     /**
-     *
+     * Creates the label's outline shape
      * Adapted from SCH_GLOBALLABEL::CreateGraphicShape
      */
-    create_shape() {
+    override create_shape(): Vec2[] {
         const pos = this.schtext.text_pos;
         const angle = Angle.from_degrees(this.label.at.rotation + 180);
         const text_height = this.schtext.text_size.y;
@@ -182,4 +182,94 @@ export class GlobalLabel extends NetLabel {
     }
 }
 
-export const LabelShapeInternals = {};
+export class HierarchicalLabel extends Label {
+    constructor(public override label: schematic.HierarchicalLabel) {
+        super(label);
+    }
+
+    override get schematic_text_offset(): Vec2 {
+        const dist = this.text_offset + this.schtext.text_width;
+
+        switch (this.label.at.rotation) {
+            case 0:
+                return new Vec2(dist, 0);
+            case 90:
+                return new Vec2(0, -dist);
+            case 180:
+                return new Vec2(-dist, 0);
+            case 270:
+                return new Vec2(0, dist);
+            default:
+                throw new Error(
+                    `Unexpected label rotation ${this.label.at.rotation}`,
+                );
+        }
+    }
+
+    /**
+     * Creates the label's outline shape
+     * Adapted from SCH_HIERLABEL::CreateGraphicShape and TemplateShape.
+     */
+    override create_shape(): Vec2[] {
+        const pos = this.schtext.text_pos;
+        const angle = Angle.from_degrees(this.label.at.rotation);
+        const s = this.schtext.text_width;
+
+        let pts: Vec2[];
+
+        switch (this.label.shape) {
+            case "output":
+                pts = [
+                    new Vec2(0, s / 2),
+                    new Vec2(s / 2, s / 2),
+                    new Vec2(s, 0),
+                    new Vec2(s / 2, -s / 2),
+                    new Vec2(0, -s / 2),
+                    new Vec2(0, s / 2),
+                ];
+                break;
+
+            case "input":
+                pts = [
+                    new Vec2(s, s / 2),
+                    new Vec2(s / 2, s / 2),
+                    new Vec2(0, 0),
+                    new Vec2(s / 2, -s / 2),
+                    new Vec2(s, -s / 2),
+                    new Vec2(s, s / 2),
+                ];
+                break;
+
+            case "bidirectional":
+            case "tri_state":
+                pts = [
+                    new Vec2(s / 2, s / 2),
+                    new Vec2(s, 0),
+                    new Vec2(s / 2, -s / 2),
+                    new Vec2(0, 0),
+                    new Vec2(s / 2, s / 2),
+                ];
+                break;
+
+            case "passive":
+            default:
+                pts = [
+                    new Vec2(0, s / 2),
+                    new Vec2(s, s / 2),
+                    new Vec2(s, -s / 2),
+                    new Vec2(0, -s / 2),
+                    new Vec2(0, s / 2),
+                ];
+                break;
+        }
+
+        pts = pts.map((pt) => {
+            return pt
+                .rotate(angle)
+                .add(pos)
+                .multiply(1 / 10000);
+        });
+
+        return pts;
+    }
+}
