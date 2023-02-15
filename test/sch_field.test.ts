@@ -14,8 +14,6 @@ import { Matrix3 } from "../src/math/matrix3";
 // Symbol coordinates are upside down (bottom to top).
 const zero_deg_matrix = Matrix3.identity().scale_self(1, -1);
 const ninety_deg_matrix = zero_deg_matrix.rotate(Angle.from_degrees(-90));
-const one_eighty_deg_matrix = zero_deg_matrix.rotate(Angle.from_degrees(180));
-const two_seventy_deg_matrix = zero_deg_matrix.rotate(Angle.from_degrees(90));
 
 suite("SchField", function () {
     test(".shown_text", function () {
@@ -116,47 +114,5 @@ suite("SchField", function () {
         assert.equal(bbox.y, 448865);
         assert.equal(bbox.w, 38320);
         assert.equal(bbox.h, 16670);
-    });
-
-    test(".effective_{horiz,vert}_justify", function () {
-        const field = new SchField("C51");
-        field.text_pos = new Vec2(558800, 514288);
-        field.attributes.size = new Vec2(12700, 12700);
-        field.attributes.h_align = "left";
-        field.attributes.v_align = "top";
-        field.attributes.multiline = true;
-        field.parent = {
-            position: new Vec2(533400, 495300),
-            transform: zero_deg_matrix,
-        };
-
-        field.attributes.angle.degrees = 0;
-        assert.equal(field.effective_horiz_justify, "left");
-        assert.equal(field.effective_vert_justify, "top");
-
-        field.attributes.angle.degrees = 90;
-        assert.equal(field.effective_horiz_justify, "left");
-        assert.equal(field.effective_vert_justify, "top");
-
-        field.attributes.angle.degrees = 180;
-        assert.equal(field.effective_horiz_justify, "right");
-        assert.equal(field.effective_vert_justify, "bottom");
-
-        field.attributes.angle.degrees = 270;
-        assert.equal(field.effective_horiz_justify, "right");
-        assert.equal(field.effective_vert_justify, "top");
-
-        field.attributes.angle.degrees = 0;
-        field.parent.transform = ninety_deg_matrix;
-        assert.equal(field.effective_horiz_justify, "left");
-        assert.equal(field.effective_vert_justify, "top");
-
-        field.parent.transform = one_eighty_deg_matrix;
-        assert.equal(field.effective_horiz_justify, "right");
-        assert.equal(field.effective_vert_justify, "bottom");
-
-        field.parent.transform = two_seventy_deg_matrix;
-        assert.equal(field.effective_horiz_justify, "right");
-        assert.equal(field.effective_vert_justify, "top");
     });
 });

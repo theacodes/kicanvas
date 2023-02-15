@@ -9,7 +9,6 @@ import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 import { EDAText } from "./eda_text";
-import type { HAlign, VAlign } from "./font";
 
 type Parent = {
     position: Vec2;
@@ -106,76 +105,6 @@ export class SchField extends EDAText {
         bbox.start = bbox.start.add(origin);
 
         return bbox;
-    }
-
-    get is_horiz_justify_flipped(): boolean {
-        const center = this.bounding_box.center;
-        const pos = this.position;
-        const rot = this.draw_rotation.degrees;
-        const is_vertical = rot == 90 || rot == 270;
-
-        switch (this.h_align) {
-            case "left":
-                if (is_vertical) {
-                    return center.y > pos.y;
-                } else {
-                    return center.x < pos.x;
-                }
-            case "right":
-                if (is_vertical) {
-                    return center.y < pos.y;
-                } else {
-                    return center.x > pos.x;
-                }
-            default:
-                return false;
-        }
-    }
-
-    get effective_horiz_justify(): HAlign {
-        switch (this.h_align) {
-            case "left":
-                return this.is_horiz_justify_flipped ? "right" : "left";
-            case "right":
-                return this.is_horiz_justify_flipped ? "left" : "right";
-            case "center":
-                return "center";
-        }
-    }
-
-    get is_vert_justify_flipped(): boolean {
-        const center = this.bounding_box.center;
-        const pos = this.position;
-        const rot = this.draw_rotation.degrees;
-        const is_vertical = rot == 90 || rot == 270;
-
-        switch (this.v_align) {
-            case "top":
-                if (is_vertical) {
-                    return center.x < pos.y;
-                } else {
-                    return center.y < pos.y;
-                }
-            case "bottom":
-                if (is_vertical) {
-                    return center.x > pos.x;
-                } else {
-                    return center.y > pos.y;
-                }
-            default:
-                return false;
-        }
-    }
-
-    get effective_vert_justify(): VAlign {
-        switch (this.v_align) {
-            case "top":
-                return this.is_vert_justify_flipped ? "bottom" : "top";
-            case "bottom":
-                return this.is_vert_justify_flipped ? "top" : "bottom";
-            case "center":
-                return "center";
-        }
     }
 }
 
