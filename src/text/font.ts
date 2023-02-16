@@ -37,10 +37,6 @@ export abstract class Font {
 
     constructor(public name: string) {}
 
-    get is_stroke() {
-        return true;
-    }
-
     draw(
         gfx: Renderer | null,
         text: string,
@@ -93,7 +89,7 @@ export abstract class Font {
         style.bold = bold;
         style.italic = italic;
 
-        let { bbox } = this.get_markup_as_glyphs(
+        const { bbox } = this.get_markup_as_glyphs(
             text,
             new Vec2(0, 0),
             size,
@@ -102,12 +98,6 @@ export abstract class Font {
             new Vec2(0, 0),
             style,
         );
-
-        if (this.is_stroke) {
-            // KiCAD grows the bounding box a little for stroke fonts to
-            // accommodate descenders and such.
-            bbox = bbox.grow(thickness * 1.25);
-        }
 
         return new Vec2(bbox.w, bbox.h);
     }

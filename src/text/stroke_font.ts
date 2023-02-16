@@ -87,8 +87,26 @@ export class StrokeFont extends Font {
         return this.#glyphs.get(glyph_index)!;
     }
 
-    override get is_stroke() {
-        return true;
+    override get_line_extents(
+        text: string,
+        size: Vec2,
+        thickness: number,
+        bold: boolean,
+        italic: boolean,
+    ): Vec2 {
+        const extents = super.get_line_extents(
+            text,
+            size,
+            thickness,
+            bold,
+            italic,
+        );
+        // KiCAD grows the bounding box a little for stroke fonts to
+        // accommodate descenders and such.
+        const padding = thickness * 1.25 * 2;
+        extents.x += padding;
+        extents.y += padding;
+        return extents;
     }
 
     override compute_underline_vertical_position(glyph_height: number): number {
