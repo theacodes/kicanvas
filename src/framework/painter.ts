@@ -33,7 +33,7 @@ interface PaintableDocument {
 /**
  * Base class for painting a complete document, for example, an entire schematic or board.
  */
-export abstract class DocumentPainter {
+export class DocumentPainter {
     #painters: Map<unknown, ItemPainter> = new Map();
 
     /**
