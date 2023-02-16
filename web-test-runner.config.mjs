@@ -5,6 +5,8 @@ import { esbuildPlugin } from "@web/dev-server-esbuild";
 // https://modern-web.dev/docs/test-runner/cli-and-configuration/
 
 export default {
+    files: "test/**/*.test.ts",
+    nodeResolve: true,
     // browsers: [
     //     chromeLauncher({
     //         concurrency: 1,

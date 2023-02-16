@@ -6,8 +6,8 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { LibText } from "../src/text/lib_text";
-import { Vec2 } from "../src/math/vec2";
+import { LibText } from "../../src/text/lib_text";
+import { Vec2 } from "../../src/math/vec2";
 
 function make_text() {
     const text = new LibText("center/bottom/0");

@@ -6,10 +6,10 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { SchField } from "../src/text/sch_field";
-import { Vec2 } from "../src/math/vec2";
-import { Angle } from "../src/math/angle";
-import { Matrix3 } from "../src/math/matrix3";
+import { SchField } from "../../src/text/sch_field";
+import { Vec2 } from "../../src/math/vec2";
+import { Angle } from "../../src/math/angle";
+import { Matrix3 } from "../../src/math/matrix3";
 
 // Symbol coordinates are upside down (bottom to top).
 const zero_deg_matrix = Matrix3.identity().scale_self(1, -1);

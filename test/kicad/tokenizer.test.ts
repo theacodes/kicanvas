@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import * as tokenizer from "../src/kicad/tokenizer";
+import * as tokenizer from "../../src/kicad/tokenizer";
 
 const Token = tokenizer.Token;
 const OPEN = Token.OPEN;
