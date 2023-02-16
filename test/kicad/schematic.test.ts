@@ -15,8 +15,8 @@ import labels_sch_src from "./files/labels.kicad_sch";
 import drawings_sch_src from "./files/drawings.kicad_sch";
 import symbols_sch_src from "./files/symbols.kicad_sch";
 
-suite("schematic parser", function () {
-    test("empty sch file", function () {
+suite("kicad.schematic.KicadSch(): schematic parsing", function () {
+    test("with empty schematic file", function () {
         const sch = new schematic.KicadSch(empty_sch_src);
 
         assert_deep_partial(sch, {
@@ -27,7 +27,7 @@ suite("schematic parser", function () {
         });
     });
 
-    test("sch with paper settings & title block", function () {
+    test("with paper settings & title block", function () {
         const sch = new schematic.KicadSch(paper_sch_src);
 
         assert_deep_partial(sch.paper, {
@@ -52,7 +52,7 @@ suite("schematic parser", function () {
         });
     });
 
-    test("sch with wires, buses, no connects, and junctions", function () {
+    test("with wires, buses, no connects, and junctions", function () {
         const sch = new schematic.KicadSch(wires_sch_src);
 
         assert.equal(sch.wires.length, 11);
@@ -158,7 +158,7 @@ suite("schematic parser", function () {
         });
     });
 
-    test("sch with labels", function () {
+    test("with labels", function () {
         const sch = new schematic.KicadSch(labels_sch_src);
 
         assert.equal(sch.net_labels.length, 6);
@@ -242,7 +242,7 @@ suite("schematic parser", function () {
         });
     });
 
-    test("sch with drawings", function () {
+    test("with drawings", function () {
         const sch = new schematic.KicadSch(drawings_sch_src);
 
         assert.equal(sch.drawings.length, 13);
@@ -309,7 +309,7 @@ suite("schematic parser", function () {
         assert.equal(sch.images.length, 1);
     });
 
-    test("sch with library symbols", function () {
+    test("with library symbols", function () {
         const sch = new schematic.KicadSch(symbols_sch_src);
 
         assert.equal(sch.lib_symbols!.symbols.length, 4);
@@ -487,7 +487,7 @@ suite("schematic parser", function () {
         });
     });
 
-    test("sch with symbols", function () {
+    test("with symbols", function () {
         const sch = new schematic.KicadSch(symbols_sch_src);
 
         assert.equal(sch.symbols.length, 5);

@@ -7,8 +7,8 @@
 import { AssertionError, assert } from "@esm-bundle/chai";
 import * as utilities from "./utilities";
 
-suite("utilities", function () {
-    test("assert_deep_partial", function () {
+suite("test.utilities", function () {
+    test(".assert_deep_partial()", function () {
         const actual = {
             string: "string",
             number: 1,

@@ -19,8 +19,8 @@ function make_text() {
     return text;
 }
 
-suite("LibText", function () {
-    test(".bounding_box()", function () {
+suite("text.lib_text.LibText()", function () {
+    test(".bounding_box", function () {
         const text = make_text();
         text.text_pos = new Vec2(0, 101600);
         text.attributes.size = new Vec2(12700, 12700);

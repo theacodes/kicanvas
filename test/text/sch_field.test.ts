@@ -15,7 +15,7 @@ import { Matrix3 } from "../../src/math/matrix3";
 const zero_deg_matrix = Matrix3.identity().scale_self(1, -1);
 const ninety_deg_matrix = zero_deg_matrix.rotate(Angle.from_degrees(-90));
 
-suite("SchField", function () {
+suite("text.sch_field.SchField()", function () {
     test(".shown_text", function () {
         const field = new SchField("abc");
 

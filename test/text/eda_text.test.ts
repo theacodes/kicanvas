@@ -19,8 +19,8 @@ class EDATextImpl extends EDAText {
     }
 }
 
-suite("EDAText", function () {
-    test("get text box (basic)", function () {
+suite("text.EDAText()", function () {
+    test(".get_text_box() simple case", function () {
         // Known reference values taken from KiCAD debugging.
         const text = new EDATextImpl("hello");
 
@@ -45,7 +45,7 @@ suite("EDAText", function () {
         assert.closeTo(bbox.h, 16670, 0.5);
     });
 
-    test("get text box (multiline)", function () {
+    test(".get_text_box() multiline case", function () {
         // Known reference values taken from KiCAD debugging.
 
         const text = new EDATextImpl("hello\nworld");

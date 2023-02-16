@@ -36,8 +36,8 @@ function assert_tokens(
     }
 }
 
-suite("Tokens", function () {
-    test("bare", function () {
+suite("kicad.tokenizer.tokenize(): s-expression tokenizer", function () {
+    test("with bare values", function () {
         const tokens = tokenizer.tokenize('1 a "c" 4');
         assert_tokens(tokens, [
             [NUMBER, 1],
@@ -47,7 +47,7 @@ suite("Tokens", function () {
         ]);
     });
 
-    test("atoms", function () {
+    test("with atoms", function () {
         let tokens = tokenizer.tokenize("(abc)");
         assert_tokens(tokens, [OPEN_TOKEN, [ATOM, "abc"], CLOSE_TOKEN]);
         tokens = tokenizer.tokenize("(abc def)");
@@ -78,7 +78,7 @@ suite("Tokens", function () {
         ]);
     });
 
-    test("numbers", function () {
+    test("with numbers", function () {
         let tokens = tokenizer.tokenize("(0)");
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, 0], CLOSE_TOKEN]);
         tokens = tokenizer.tokenize("(123)");
@@ -91,7 +91,7 @@ suite("Tokens", function () {
         assert_tokens(tokens, [OPEN_TOKEN, [NUMBER, 1234.5678], CLOSE_TOKEN]);
     });
 
-    test("strings", function () {
+    test("with strings", function () {
         let tokens = tokenizer.tokenize('("Hello, world!")');
         assert_tokens(tokens, [
             OPEN_TOKEN,
@@ -103,8 +103,8 @@ suite("Tokens", function () {
     });
 });
 
-suite("Listify", function () {
-    test("simple lists", function () {
+suite("kicad.tokenizer.listify()", function () {
+    test("with simple lists", function () {
         const cases: [string, any[]][] = [
             ["(1 2 3)", [[1, 2, 3]]],
             ["(a b c)", [["a", "b", "c"]]],
@@ -119,7 +119,7 @@ suite("Listify", function () {
             assert.deepEqual(l, expected);
         }
     });
-    test("nested lists", function () {
+    test("with nested lists", function () {
         const cases: [string, any[]][] = [
             ["(1 (2))", [[1, [2]]]],
             ["(1 (2 (a)) b (c))", [[1, [2, ["a"]], "b", ["c"]]]],

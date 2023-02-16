@@ -20,8 +20,8 @@ import vias_pcb_src from "./files/vias.kicad_pcb";
 import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
 import footprint_pads_pcb_src from "./files/footprint-pads.kicad_pcb";
 
-suite("board parser", function () {
-    test("empty pcb file", function () {
+suite("kicad.board.KicadPCB(): board parsing", function () {
+    test("with empty pcb file", function () {
         const pcb = new board.KicadPCB(empty_pcb_src);
 
         assert.equal(pcb.version, 20211014);
@@ -88,7 +88,7 @@ suite("board parser", function () {
         assert.deepInclude(pcb.nets[0], { number: 0, name: "" });
     });
 
-    test("pcb with properties", function () {
+    test("with title block and properties", function () {
         const pcb = new board.KicadPCB(properties_pcb_src);
 
         assert.equal(pcb.properties.length, 2);
@@ -125,7 +125,7 @@ suite("board parser", function () {
         assert.equal((fp.drawings[3] as board.FpText).shown_text, "FID1");
     });
 
-    test("pcb with paper settings & title block", function () {
+    test("with paper settings & title block", function () {
         const pcb = new board.KicadPCB(paper_pcb_src);
 
         assert.deepInclude(pcb.paper, {
@@ -150,7 +150,7 @@ suite("board parser", function () {
         });
     });
 
-    test("pcb with shapes", function () {
+    test("with graphics", function () {
         const pcb = new board.KicadPCB(shapes_pcb_src);
 
         assert.equal(pcb.drawings.length, 6);
@@ -221,7 +221,7 @@ suite("board parser", function () {
         } as Partial<board.GrPoly>);
     });
 
-    test("pcb with text", function () {
+    test("with text", function () {
         const pcb = new board.KicadPCB(text_pcb_src);
 
         assert.equal(pcb.drawings.length, 10);
@@ -315,7 +315,7 @@ suite("board parser", function () {
         } as any);
     });
 
-    test("pcb with traces", function () {
+    test("with traces", function () {
         const pcb = new board.KicadPCB(traces_pcb_src);
 
         assert.equal(pcb.nets.length, 3);
@@ -383,7 +383,7 @@ suite("board parser", function () {
         } as Partial<board.LineSegment>);
     });
 
-    test("pcb with dimensions", function () {
+    test("with dimensions", function () {
         const pcb = new board.KicadPCB(dimensions_pcb_src);
 
         assert.equal(pcb.drawings.length, 5);
@@ -460,7 +460,7 @@ suite("board parser", function () {
         } as Partial<board.Dimension>);
     });
 
-    test("pcb with zones", function () {
+    test("with zones", function () {
         const pcb = new board.KicadPCB(zones_pcb_src);
 
         assert.equal(pcb.zones.length, 3);
@@ -532,7 +532,7 @@ suite("board parser", function () {
         } as Partial<board.Zone>);
     });
 
-    test("pcb with vias", function () {
+    test("with vias", function () {
         const pcb = new board.KicadPCB(vias_pcb_src);
 
         assert.equal(pcb.vias.length, 5);
@@ -580,8 +580,10 @@ suite("board parser", function () {
             net: 0,
         } as Partial<board.Via>);
     });
+});
 
-    test("footprint with graphics", function () {
+suite("kicad.board.Footprint()", function () {
+    test("with graphics", function () {
         const pcb = new board.KicadPCB(footprint_graphics_pcb_src);
         const fp = pcb.footprints[0]!;
 
@@ -783,7 +785,7 @@ suite("board parser", function () {
         assert.isFalse(zone.fill.fill);
     });
 
-    test("footprint with pads", function () {
+    test("with pads", function () {
         const pcb = new board.KicadPCB(footprint_pads_pcb_src);
         assert.equal(pcb.footprints.length, 13);
 

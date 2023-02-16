@@ -10,8 +10,8 @@ import { type List, listify } from "../../src/kicad/tokenizer";
 import { T, P, parse_expr } from "../../src/kicad/parser";
 import { Vec2 } from "../../src/math/vec2";
 
-suite("Parser", function () {
-    test("start", function () {
+suite("kicad.parser.parse_expr(): s-expression parser", function () {
+    test(".start()", function () {
         const res = parse_expr(listify("thing 1 2"), P.start("thing"));
         assert.deepEqual(res, {});
 
@@ -20,7 +20,7 @@ suite("Parser", function () {
         });
     });
 
-    test("positional", function () {
+    test(".positional()", function () {
         let res;
 
         res = parse_expr(
@@ -45,7 +45,7 @@ suite("Parser", function () {
         assert.deepEqual(res, { first: undefined, second: 2 });
     });
 
-    test("pair", function () {
+    test(".pair()", function () {
         const res = parse_expr(
             listify("(a 1) (c 3) (b 2) d"),
             P.pair("a"),
@@ -56,7 +56,7 @@ suite("Parser", function () {
         assert.deepEqual(res, { a: 1, b: 2, c: 3, d: undefined });
     });
 
-    test("list", function () {
+    test(".list()", function () {
         const res = parse_expr(
             listify("(a 1) (b 1 2 3) (c c1 c2 3) (d)"),
             P.list("a"),
@@ -72,7 +72,7 @@ suite("Parser", function () {
         });
     });
 
-    test("collection", function () {
+    test(".collection()", function () {
         const res = parse_expr(
             listify("(foo a 1) (bar b 2) (baz c 3) (foo d 4)"),
             P.collection("foos_and_bars", "foo"),
@@ -89,7 +89,7 @@ suite("Parser", function () {
         });
     });
 
-    test("dict", function () {
+    test(".dict()", function () {
         const res = parse_expr(
             listify("(def a 1) (def b 2) (def c (3 4))"),
             P.dict("defs", "def"),
@@ -103,7 +103,7 @@ suite("Parser", function () {
         });
     });
 
-    test("atom", function () {
+    test(".atom()", function () {
         const defs = [
             P.atom("locked"),
             P.atom("enabled", ["yes", "no"]),
@@ -147,7 +147,7 @@ suite("Parser", function () {
         }
     });
 
-    test("expr", function () {
+    test(".expr()", function () {
         let res;
 
         res = parse_expr(listify("(expr 1 2 3)"), P.expr("expr"));
@@ -166,7 +166,7 @@ suite("Parser", function () {
         });
     });
 
-    test("object", function () {
+    test(".object()", function () {
         const res = parse_expr(
             listify("(thing (a 1) (b 2) yes)"),
             P.object(
@@ -182,7 +182,7 @@ suite("Parser", function () {
         });
     });
 
-    test("item", function () {
+    test(".item()", function () {
         const res = parse_expr(
             listify("(item (a 1) (b 2) yes)"),
             P.item("item", TestItem, "arg1", "arg2"),
@@ -197,7 +197,7 @@ suite("Parser", function () {
         });
     });
 
-    test("vec2", function () {
+    test(".vec2()", function () {
         const res = parse_expr(
             listify("(at 1 2) (xy 3 4)"),
             P.vec2("at"),
@@ -210,7 +210,7 @@ suite("Parser", function () {
         });
     });
 
-    test("complex", function () {
+    test("with complex data", function () {
         const src = `
             (example
                 abcdef
