@@ -24,6 +24,7 @@
   "scripts": {
     "test": "web-test-runner --config scripts/web-test-runner.config.mjs",
     "test:watch": "web-test-runner --config scripts/web-test-runner.config.mjs --watch",
+    "test:coverage": "web-test-runner --config scripts/web-test-runner.config.mjs --coverage",
     "lint": "eslint --config .eslintrc.cjs src/ --ext .js,.ts",
     "serve": "node scripts/serve.js",
     "build": "tsc -p tsconfig.json && node scripts/build.js",
