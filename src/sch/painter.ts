@@ -506,7 +506,7 @@ class LibTextPainter extends ItemPainter {
         // be drawn.
         const pos = libtext.world_pos;
 
-        // draw_pos already applies v_align, so set it to center to draw
+        // world_pos already applies v_align, so set it to center to draw
         // the text in the right spot.
         // Note: I'm not sure why it doesn't clear h_align like SchField
         // does.

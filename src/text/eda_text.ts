@@ -13,8 +13,13 @@ import { StrokeFont } from "./stroke_font";
 
 /** Primary text mixin
  *
- * KiCAD uses EDA_TEXT as a sort of grab-bag of various things
- * needed to render text across eeschema and pcbnew.
+ * KiCAD uses EDA_TEXT as a sort of grab-bag of various things needed to render
+ * text across both Eeschema and Pcbnew. There is a lot of meandering code
+ * because it has mostly been worked on piecemeal over the years, so there's
+ * some stuff that is a little weird and some code that does almost the same
+ * thing as other code. I've done my best to keep the structure clean while
+ * carefully matching KiCAD's behavior, but it's still a lot to wrap your
+ * head around.
  *
  * Note: Just like the underlying Font class, this all expects
  * scalled internal units instead of mm!
@@ -28,7 +33,7 @@ export class EDAText {
      * Apply "effects" parsed from schematic or board files.
      *
      * KiCAD uses Effects to encapsulate all of the various text
-     * options, this translates it into attributes.
+     * options, this translates it into TextAttributes used by Font.
      */
     apply_effects(effects: Effects) {
         this.attributes.h_align = effects.justify.horizontal;
@@ -82,18 +87,6 @@ export class EDAText {
     }
 
     public text_pos = new Vec2(0, 0);
-
-    /** Get effective rotation when drawing, taking into account any additional
-     * factors such as parent orientation. */
-    get draw_rotation() {
-        return this.text_angle;
-    }
-
-    /** Get effective position when drawing, taking into account any additional
-     * factors such as parent location. */
-    get draw_pos() {
-        return this.text_pos;
-    }
 
     public attributes = new TextAttributes();
 
@@ -174,6 +167,8 @@ export class EDAText {
     /**
      * Get the bounding box for a line or lines of text.
      *
+     * Used by .bounding_box in LibText and SchField.
+     *
      * Note: text is always treated as non-rotated.
      *
      * @param line - which line to measure, if null all lines are measured.
@@ -181,7 +176,7 @@ export class EDAText {
      *                   by eeschema for symbol text items.
      */
     get_text_box(line?: number, invert_y?: boolean): BBox {
-        const pos = this.draw_pos.copy();
+        const pos = this.text_pos.copy();
         const bbox = new BBox(0, 0, 0, 0);
         let strings: string[] = [];
         let text = this.shown_text;

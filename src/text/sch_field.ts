@@ -33,7 +33,10 @@ export class SchField extends EDAText {
         return this.text;
     }
 
-    override get draw_rotation() {
+    /** Get effective rotation when drawing, taking into the parent position
+     * orientation, and transformation.
+     */
+    get draw_rotation() {
         let this_deg = this.text_angle.degrees;
         const parent_transform = this.parent?.transform ?? Matrix3.identity();
 
