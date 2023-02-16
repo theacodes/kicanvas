@@ -1,5 +1,5 @@
 import { defaultReporter, summaryReporter } from "@web/test-runner";
-import { chromeLauncher } from "@web/test-runner-chrome";
+//import { chromeLauncher } from "@web/test-runner-chrome";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
 
 // https://modern-web.dev/docs/test-runner/cli-and-configuration/
