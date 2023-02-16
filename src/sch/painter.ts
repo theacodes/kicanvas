@@ -258,7 +258,6 @@ class TextPainter extends ItemPainter {
             this.gfx,
             schtext.shown_text,
             schtext.text_pos,
-            new Vec2(0, 0),
             schtext.attributes,
         );
         this.gfx.state.pop();
@@ -471,7 +470,6 @@ class PropertyPainter extends ItemPainter {
                 this.gfx,
                 schfield.shown_text,
                 pos,
-                new Vec2(0, 0),
                 schfield.attributes,
             );
             this.gfx.state.pop();
@@ -519,7 +517,6 @@ class LibTextPainter extends ItemPainter {
             this.gfx,
             libtext.shown_text,
             pos,
-            new Vec2(0, 0),
             libtext.attributes,
         );
 

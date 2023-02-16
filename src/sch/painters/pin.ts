@@ -603,7 +603,6 @@ export const PinLabelInternals = {
             gfx,
             edatext.shown_text,
             edatext.text_pos,
-            new Vec2(0, 0),
             edatext.attributes,
         );
     },

@@ -62,7 +62,6 @@ export class LabelPainter extends ItemPainter {
             this.gfx,
             schtext.shown_text,
             pos,
-            new Vec2(0, 0),
             schtext.attributes,
         );
 

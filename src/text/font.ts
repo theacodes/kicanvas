@@ -41,20 +41,13 @@ export abstract class Font {
         gfx: Renderer | null,
         text: string,
         position: Vec2,
-        cursor: Vec2,
         attributes: TextAttributes,
     ): void {
         if (!gfx || !text) {
             return;
         }
 
-        const adjusted_position = position.sub(cursor);
-
-        const lines = this.get_line_positions(
-            text,
-            adjusted_position,
-            attributes,
-        );
+        const lines = this.get_line_positions(text, position, attributes);
 
         gfx.state.stroke_width = attributes.stroke_width;
 
