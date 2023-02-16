@@ -22,7 +22,8 @@
     "typescript-lit-html-plugin": "^0.9.0"
   },
   "scripts": {
-    "test": "web-test-runner --config web-test-runner.config.mjs",
+    "test": "web-test-runner --config scripts/web-test-runner.config.mjs",
+    "test:watch": "web-test-runner --config scripts/web-test-runner.config.mjs --watch",
     "lint": "eslint --config .eslintrc.cjs src/ --ext .js,.ts",
     "serve": "node scripts/serve.js",
     "build": "tsc -p tsconfig.json && node scripts/build.js",
