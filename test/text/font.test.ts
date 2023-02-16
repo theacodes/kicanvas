@@ -14,8 +14,8 @@ import { TextStyle } from "../../src/text/font";
 const font = StrokeFont.default();
 
 suite("text.font.Font()", function () {
-    test(".wordbreak_markup_text()", function () {
-        let words = font["wordbreak_markup_text"](
+    test(".wordbreak_markup()", function () {
+        let words = font["wordbreak_markup"](
             "hello world 1 2 3",
             new Vec2(12700, 12700),
             new TextStyle(),
@@ -29,7 +29,7 @@ suite("text.font.Font()", function () {
         assert.equal(words[3]!.word, "2");
         assert.equal(words[4]!.word, "3");
 
-        words = font["wordbreak_markup_text"](
+        words = font["wordbreak_markup"](
             "hello world ^{1} 2 3",
             new Vec2(12700, 12700),
             new TextStyle(),
@@ -51,9 +51,9 @@ suite("text.font.Font()", function () {
         assert.equal(Math.round(words[5]!.width), 12095);
     });
 
-    test(".linebreak_text()", function () {
+    test(".break_lines()", function () {
         // TODO
-        font.linebreak_text(
+        font.break_lines(
             "hello world ^{1} 2 3",
             182880,
             new Vec2(12700, 12700),

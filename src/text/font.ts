@@ -63,18 +63,17 @@ export abstract class Font {
         gfx.state.stroke_width = attributes.stroke_width;
 
         for (const line of lines) {
-            this.draw_single_line_text(
-                gfx,
-                line.text,
-                line.position,
-                position,
-                attributes,
-            );
+            this.draw_line(gfx, line.text, line.position, position, attributes);
         }
     }
 
     /**
      * Computes the width and height of a single line of marked up text.
+     *
+     * Corresponds to KiCAD's FONT::StringBoundaryLimits
+     *
+     * Used by EDAText.get_text_box(), which, inexplicably, doesn't use
+     * get_line_bbox() for what I can only assume is historical reasons.
      *
      * @param text - the text, should be a single line of markup.
      * @param size - width and height of a glyph
@@ -82,7 +81,7 @@ export abstract class Font {
      * @param bold - note: currently ignored by stroke font, as boldness is
      *               applied by increasing the thickness.
      */
-    string_boundary_limits(
+    get_line_extents(
         text: string,
         size: Vec2,
         thickness: number,
@@ -94,7 +93,7 @@ export abstract class Font {
         style.bold = bold;
         style.italic = italic;
 
-        let { bbox } = this.draw_markup_text(
+        let { bbox } = this.get_markup_as_glyphs(
             text,
             new Vec2(0, 0),
             size,
@@ -126,7 +125,7 @@ export abstract class Font {
      * @param bold - note: ignored by stroke font, as boldness is applied by
      *               increasing the thickness.
      */
-    linebreak_text(
+    break_lines(
         text: string,
         column_width: number,
         glyph_size: Vec2,
@@ -157,11 +156,7 @@ export abstract class Font {
             let unset_line = true;
             let line_width = 0;
 
-            const words = this.wordbreak_markup_text(
-                in_line,
-                glyph_size,
-                style,
-            );
+            const words = this.wordbreak_markup(in_line, glyph_size, style);
 
             for (const { word, width } of words) {
                 if (unset_line) {
@@ -213,22 +208,16 @@ export abstract class Font {
 
     // protected interfaces below.
 
-    protected line_count(text: string): number {
-        // Note: KiCAD skips counting a newline at the end of the
-        // whole text, hence the slice.
-        const count = text.slice(0, -1).match(/\n/g)?.length;
-
-        return (count ?? 0) + 1;
-    }
-
     /**
      * Draws a single line of text.
      *
      * Multitext text must be split before calling this function.
      *
+     * Corresponds to KiCAD's Font::DrawSingleLineText
+     *
      * Used by draw()
      */
-    protected draw_single_line_text(
+    protected draw_line(
         gfx: Renderer | null,
         text: string,
         position: Vec2,
@@ -243,7 +232,7 @@ export abstract class Font {
         style.italic = attributes.italic;
         style.underline = attributes.underlined;
 
-        const { glyphs, bbox } = this.draw_markup_text(
+        const { glyphs, bbox } = this.get_markup_as_glyphs(
             text,
             position,
             attributes.size,
@@ -274,9 +263,11 @@ export abstract class Font {
     /**
      * Computes the bounding box for a single line of text.
      *
+     * Corresponds to KiCAD's FONT::boundingBoxSingleLine
+     *
      * Used by get_line_positions() and draw()
      */
-    protected bbox_single_line(
+    protected get_line_bbox(
         text: string,
         position: Vec2,
         size: Vec2,
@@ -285,7 +276,7 @@ export abstract class Font {
         const style = new TextStyle();
         style.italic = italic;
 
-        const { bbox, next_position } = this.draw_markup_text(
+        const { bbox, next_position } = this.get_markup_as_glyphs(
             text,
             position,
             size,
@@ -325,7 +316,7 @@ export abstract class Font {
                 position.x,
                 position.y + n * interline,
             );
-            const { cursor: line_end } = this.bbox_single_line(
+            const { cursor: line_end } = this.get_line_bbox(
                 line,
                 line_position,
                 attributes.size,
@@ -389,7 +380,38 @@ export abstract class Font {
         return out;
     }
 
-    protected draw_markup_node(
+    /**
+     * Converts marked up text to glyphs
+     *
+     * Corresponds to KiCAD's FONT::drawMarkup, which doesn't actually draw,
+     * just converts to glyphs.
+     *
+     * Used by string_boundary_limits(), draw_single_line_text(), and
+     * bbox_single_line()
+     */
+    protected get_markup_as_glyphs(
+        text: string,
+        position: Vec2,
+        size: Vec2,
+        angle: Angle,
+        mirror: boolean,
+        origin: Vec2,
+        style: TextStyle,
+    ): { next_position: Vec2; bbox: BBox; glyphs: Glyph[] } {
+        const markup = new Markup(text);
+        return this.get_markup_node_as_glyphs(
+            markup.root,
+            position,
+            size,
+            angle,
+            mirror,
+            origin,
+            style,
+        );
+    }
+
+    /** Internal method used by get_markup_as_glyphs */
+    protected get_markup_node_as_glyphs(
         node: MarkupNode,
         position: Vec2,
         size: Vec2,
@@ -441,7 +463,7 @@ export abstract class Font {
                 next_position: child_next_position,
                 bbox: child_bbox,
                 glyphs: child_glyphs,
-            } = this.draw_markup_node(
+            } = this.get_markup_node_as_glyphs(
                 child,
                 next_position,
                 size,
@@ -463,45 +485,16 @@ export abstract class Font {
         };
     }
 
-    /**
-     * "Draws" marked up text.
-     *
-     * Doesn't actually draw, just converts to glyphs. The name is kept to
-     * match KiCAD's internal naming.
-     *
-     * Used by string_boundary_limits(), draw_single_line_text(), and
-     * bbox_single_line()
-     *
-     */
-    protected draw_markup_text(
-        text: string,
-        position: Vec2,
-        size: Vec2,
-        angle: Angle,
-        mirror: boolean,
-        origin: Vec2,
-        style: TextStyle,
-    ): { next_position: Vec2; bbox: BBox; glyphs: Glyph[] } {
-        const markup = new Markup(text);
-        return this.draw_markup_node(
-            markup.root,
-            position,
-            size,
-            angle,
-            mirror,
-            origin,
-            style,
-        );
-    }
-
     /** Breaks text up into words, accounting for markup.
+     *
+     * Corresponds to KiCAD's FONT::workbreakMarkup
      *
      * As per KiCAD, a word can represent an actual word or a run of text
      * with subscript, superscript, or overbar applied.
      *
-     * Used by SCH_TEXTBOX & PCB_TEXTBOX.
+     * Used by SCH_TEXTBOX & PCB_TEXTBOX
      */
-    protected wordbreak_markup_text(
+    protected wordbreak_markup(
         text: string,
         size: Vec2,
         style: TextStyle,
@@ -510,6 +503,7 @@ export abstract class Font {
         return this.wordbreak_markup_node(markup.root, size, style);
     }
 
+    /** Internal method used by wordbreak_markup */
     protected wordbreak_markup_node(
         node: MarkupNode,
         size: Vec2,

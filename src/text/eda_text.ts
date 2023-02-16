@@ -204,7 +204,7 @@ export class EDAText {
         const font_size = this.text_size.copy();
         const bold = this.bold;
         const italic = this.italic;
-        let extents = font.string_boundary_limits(
+        let extents = font.get_line_extents(
             text,
             font_size,
             thickness,
@@ -235,7 +235,7 @@ export class EDAText {
         // requested.
         if (this.multiline && !line && strings.length) {
             for (const line of strings.slice(1)) {
-                extents = font.string_boundary_limits(
+                extents = font.get_line_extents(
                     line,
                     font_size,
                     thickness,

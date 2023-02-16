@@ -194,8 +194,8 @@ suite("text.stroke_font.StrokeFont()", function () {
         assert.closeTo(l_glyph.strokes[0]![3]!.y, 1039737.1, 0.5);
     });
 
-    test(".string_boundary_limits()", function () {
-        let limits = font.string_boundary_limits(
+    test(".get_line_extents()", function () {
+        let limits = font.get_line_extents(
             "hello world",
             new Vec2(12700, 12700),
             1588,
@@ -206,7 +206,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         assert.closeTo(limits.x, 107019, 0.5);
         assert.closeTo(limits.y, 16670, 0.5);
 
-        limits = font.string_boundary_limits(
+        limits = font.get_line_extents(
             "hello world",
             new Vec2(12700, 12700),
             2540,
@@ -218,8 +218,8 @@ suite("text.stroke_font.StrokeFont()", function () {
         assert.closeTo(limits.y, 19050, 0.5);
     });
 
-    test(".string_boundary_limits() with markup", function () {
-        let limits = font.string_boundary_limits(
+    test(".get_line_extents() with markup", function () {
+        let limits = font.get_line_extents(
             "hello ^{world} 1 2 3",
             new Vec2(12700, 12700),
             1588,
@@ -230,7 +230,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         assert.closeTo(limits.x, 150924, 0.5);
         assert.closeTo(limits.y, 16670, 0.5);
 
-        limits = font.string_boundary_limits(
+        limits = font.get_line_extents(
             "hello _{world} 1 2 3",
             new Vec2(12700, 12700),
             1588,
@@ -241,7 +241,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         assert.closeTo(limits.x, 150924, 0.5);
         assert.closeTo(limits.y, 16670, 0.5);
 
-        limits = font.string_boundary_limits(
+        limits = font.get_line_extents(
             "hello ~{world} 1 2 3",
             new Vec2(12700, 12700),
             1588,
@@ -252,7 +252,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         assert.closeTo(limits.x, 166164, 0.5);
         assert.closeTo(limits.y, 28862, 0.5);
 
-        limits = font.string_boundary_limits(
+        limits = font.get_line_extents(
             "hello ^{world} _{1 2 3}",
             new Vec2(12700, 12700),
             1588,

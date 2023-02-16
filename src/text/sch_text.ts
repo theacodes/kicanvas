@@ -11,6 +11,10 @@ import { EDAText } from "./eda_text";
 /**
  * Represents text objects that belong to the schematic, not to any individual
  * symbol. These are created via the "Text" tool in Eeschema.
+ *
+ * This class is also used by the LabelPainter and PinPainter, specifically
+ * for apply set_spin_style_from_angle. It might be possible to remove this
+ * class altogether in favor of just have that method somewhere.
  */
 export class SchText extends EDAText {
     constructor(text: string) {
