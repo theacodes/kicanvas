@@ -40,23 +40,22 @@ export class PinPainter extends ItemPainter {
         ];
     }
 
-    pin: schematic.PinInstance;
-    position: Vec2;
-    orientation: PinOrientation = "up";
-
     paint(layer: ViewLayer, p: schematic.PinInstance) {
         if (p.definition.hide) {
             return;
         }
 
-        this.pin = p;
-        this.position = p.definition.at.position.copy();
-        this.orientation = angle_to_orientation(p.definition.at.rotation);
+        const pin: PinInfo = {
+            pin: p,
+            def: p.definition,
+            position: p.definition.at.position.copy(),
+            orientation: angle_to_orientation(p.definition.at.rotation),
+        };
 
         const current_symbol_transform = (this.view_painter as SchematicPainter)
             .current_symbol_transform!;
 
-        this.apply_symbol_transformations(current_symbol_transform);
+        PinPainter.apply_symbol_transformations(pin, current_symbol_transform);
 
         this.gfx.state.push();
         this.gfx.state.matrix = Matrix3.identity();
@@ -66,23 +65,13 @@ export class PinPainter extends ItemPainter {
             layer.name == LayerName.symbol_pin ||
             layer.name == LayerName.interactive
         ) {
-            this.draw_pin_shape(this.gfx);
+            this.draw_pin_shape(this.gfx, pin);
         }
         if (layer.name == LayerName.symbol_foreground) {
-            this.draw_name_and_number(this.gfx);
+            this.draw_name_and_number(this.gfx, pin);
         }
 
         this.gfx.state.pop();
-    }
-
-    /** The pin definition from the library symbol */
-    get def() {
-        return this.pin.definition;
-    }
-
-    /** The associated library symbol */
-    get libsym() {
-        return this.pin.parent.lib_symbol;
     }
 
     /**
@@ -92,27 +81,30 @@ export class PinPainter extends ItemPainter {
      * it indirectly sets them through individual rotations and transforms.
      * See KiCAD's sch_painter.cpp::orientSymbol.
      */
-    apply_symbol_transformations(transforms: {
-        position: Vec2;
-        rotations: number;
-        mirror_x: boolean;
-        mirror_y: boolean;
-    }) {
+    static apply_symbol_transformations(
+        pin: PinInfo,
+        transforms: {
+            position: Vec2;
+            rotations: number;
+            mirror_x: boolean;
+            mirror_y: boolean;
+        },
+    ) {
         for (let i = 0; i < transforms.rotations; i++) {
-            this.rotate(new Vec2(0, 0), true);
+            this.rotate(pin, new Vec2(0, 0), true);
         }
 
         if (transforms.mirror_x) {
-            this.mirror_vertically(new Vec2(0, 0));
+            this.mirror_vertically(pin, new Vec2(0, 0));
         }
 
         if (transforms.mirror_y) {
-            this.mirror_horizontally(new Vec2(0, 0));
+            this.mirror_horizontally(pin, new Vec2(0, 0));
         }
 
         const parent_pos = transforms.position.multiply(new Vec2(1, -1));
 
-        this.position = this.position.add(parent_pos).multiply(new Vec2(1, -1));
+        pin.position = pin.position.add(parent_pos).multiply(new Vec2(1, -1));
     }
 
     /**
@@ -120,64 +112,64 @@ export class PinPainter extends ItemPainter {
      *
      * Based on LIB_PIN::Rotate, used by apply_symbol_transformations.
      */
-    rotate(center: Vec2, ccw = false) {
+    static rotate(pin: PinInfo, center: Vec2, ccw = false) {
         const angle = Angle.from_degrees(ccw ? -90 : 90);
-        this.position = angle.rotate_point(this.position, center);
+        pin.position = angle.rotate_point(pin.position, center);
 
         if (ccw) {
-            switch (this.orientation) {
+            switch (pin.orientation) {
                 case "right":
-                    this.orientation = "up";
+                    pin.orientation = "up";
                     break;
                 case "up":
-                    this.orientation = "left";
+                    pin.orientation = "left";
                     break;
                 case "left":
-                    this.orientation = "down";
+                    pin.orientation = "down";
                     break;
                 case "down":
-                    this.orientation = "right";
+                    pin.orientation = "right";
                     break;
             }
         } else {
-            switch (this.orientation) {
+            switch (pin.orientation) {
                 case "right":
-                    this.orientation = "down";
+                    pin.orientation = "down";
                     break;
                 case "down":
-                    this.orientation = "left";
+                    pin.orientation = "left";
                     break;
                 case "left":
-                    this.orientation = "up";
+                    pin.orientation = "up";
                     break;
                 case "up":
-                    this.orientation = "right";
+                    pin.orientation = "right";
                     break;
             }
         }
     }
 
-    mirror_horizontally(center: Vec2) {
-        this.position.x -= center.x;
-        this.position.x *= -1;
-        this.position.x += center.x;
+    static mirror_horizontally(pin: PinInfo, center: Vec2) {
+        pin.position.x -= center.x;
+        pin.position.x *= -1;
+        pin.position.x += center.x;
 
-        if (this.orientation == "right") {
-            this.orientation = "left";
-        } else if (this.orientation == "left") {
-            this.orientation = "right";
+        if (pin.orientation == "right") {
+            pin.orientation = "left";
+        } else if (pin.orientation == "left") {
+            pin.orientation = "right";
         }
     }
 
-    mirror_vertically(center: Vec2) {
-        this.position.y -= center.y;
-        this.position.y *= -1;
-        this.position.y += center.y;
+    static mirror_vertically(pin: PinInfo, center: Vec2) {
+        pin.position.y -= center.y;
+        pin.position.y *= -1;
+        pin.position.y += center.y;
 
-        if (this.orientation == "up") {
-            this.orientation = "down";
-        } else if (this.orientation == "down") {
-            this.orientation = "up";
+        if (pin.orientation == "up") {
+            pin.orientation = "down";
+        } else if (pin.orientation == "down") {
+            pin.orientation = "up";
         }
     }
 
@@ -185,18 +177,18 @@ export class PinPainter extends ItemPainter {
      * Draws the pin's shape- the pin line along with any additional decoration
      * depending on pin type.
      */
-    draw_pin_shape(gfx: Renderer) {
+    draw_pin_shape(gfx: Renderer, pin: PinInfo) {
         const { p0, dir } = PinShapeInternals.stem(
-            this.position,
-            this.orientation,
-            this.def.length,
+            pin.position,
+            pin.orientation,
+            pin.def.length,
         );
 
         PinShapeInternals.draw(
             gfx,
-            this.def.type,
-            this.def.shape,
-            this.position,
+            pin.def.type,
+            pin.def.shape,
+            pin.position,
             p0,
             dir,
         );
@@ -205,23 +197,24 @@ export class PinPainter extends ItemPainter {
     /**
      * Draw the pin's name and number, if they're visible.
      */
-    draw_name_and_number(gfx: Renderer) {
-        const name = this.def.name.text;
-        const number = this.def.number.text;
-        const pin_length = this.def.length;
-        const hide_pin_names =
-            this.libsym.pin_names.hide || !name || name == "~";
+    draw_name_and_number(gfx: Renderer, pin: PinInfo) {
+        const def = pin.def;
+        const libsym = pin.pin.parent.lib_symbol;
+        const name = def.name.text;
+        const number = def.number.text;
+        const pin_length = def.length;
+        const hide_pin_names = libsym.pin_names.hide || !name || name == "~";
         const hide_pin_numbers =
-            this.libsym.pin_numbers.hide || !number || number == "~";
+            libsym.pin_numbers.hide || !number || number == "~";
         const pin_thickness = schematic.DefaultValues.line_width;
-        const pin_name_offset = this.libsym.pin_names.offset;
+        const pin_name_offset = libsym.pin_names.offset;
         //  24 mils * ratio
         // From void SCH_PAINTER::draw( const LIB_PIN *aPin, int aLayer, bool aDimmed )
         const text_margin = 0.6096 * schematic.DefaultValues.text_offset_ratio;
         const num_thickness =
-            this.def.number.effects.font.thickness || pin_thickness;
+            def.number.effects.font.thickness || pin_thickness;
         const name_thickness =
-            this.def.number.effects.font.thickness || pin_thickness;
+            def.number.effects.font.thickness || pin_thickness;
 
         let name_placement;
         let num_placement;
@@ -234,7 +227,7 @@ export class PinPainter extends ItemPainter {
                       pin_name_offset,
                       name_thickness,
                       pin_length,
-                      this.orientation,
+                      pin.orientation,
                   );
             num_placement = hide_pin_numbers
                 ? undefined
@@ -243,7 +236,7 @@ export class PinPainter extends ItemPainter {
                       pin_thickness,
                       num_thickness,
                       pin_length,
-                      this.orientation,
+                      pin.orientation,
                   );
         } else {
             // Names are placed above, number are placed below.
@@ -254,7 +247,7 @@ export class PinPainter extends ItemPainter {
                       pin_thickness,
                       name_thickness,
                       pin_length,
-                      this.orientation,
+                      pin.orientation,
                   );
             num_placement = hide_pin_numbers
                 ? undefined
@@ -263,7 +256,7 @@ export class PinPainter extends ItemPainter {
                       pin_thickness,
                       name_thickness,
                       pin_length,
-                      this.orientation,
+                      pin.orientation,
                   );
         }
 
@@ -271,9 +264,9 @@ export class PinPainter extends ItemPainter {
             PinLabelInternals.draw(
                 gfx,
                 name,
-                this.position,
+                pin.position,
                 name_placement,
-                this.def.name.effects,
+                def.name.effects,
                 gfx.state.stroke,
             );
         }
@@ -282,15 +275,21 @@ export class PinPainter extends ItemPainter {
             PinLabelInternals.draw(
                 gfx,
                 number,
-                this.position,
+                pin.position,
                 num_placement,
-                this.def.number.effects,
+                def.number.effects,
                 gfx.state.stroke,
             );
         }
     }
 }
 
+export type PinInfo = {
+    pin: schematic.PinInstance;
+    def: schematic.PinDefinition;
+    position: Vec2;
+    orientation: PinOrientation;
+};
 type PinOrientation = "right" | "left" | "up" | "down";
 
 /**
