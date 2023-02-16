@@ -28,10 +28,7 @@ import { Color } from "../../gfx/color";
  *
  */
 
-abstract class LabelPainter extends ItemPainter {
-    schtext: SchText;
-    label: schematic.Label;
-
+export class LabelPainter extends ItemPainter {
     override classes: any[] = [];
 
     override layers_for(item: schematic.Label) {
@@ -43,18 +40,19 @@ abstract class LabelPainter extends ItemPainter {
             return;
         }
 
-        this.label = l;
-        this.schtext = new SchText(l.text);
-        this.schtext.apply_at(l.at);
-        this.schtext.apply_effects(l.effects);
+        const schtext = new SchText(l.text);
+        schtext.apply_at(l.at);
+        schtext.apply_effects(l.effects);
 
         if (l.at.rotation == 0 || l.at.rotation == 180) {
-            this.schtext.text_angle.degrees = 0;
+            schtext.text_angle.degrees = 0;
         } else if (l.at.rotation == 90 || l.at.rotation == 270) {
-            this.schtext.text_angle.degrees = 90;
+            schtext.text_angle.degrees = 90;
         }
 
-        const pos = this.schtext.text_pos.add(this.schematic_text_offset);
+        const pos = schtext.text_pos.add(
+            this.get_schematic_text_offset(l, schtext),
+        );
 
         this.gfx.state.push();
         this.gfx.state.stroke = this.color;
@@ -62,24 +60,21 @@ abstract class LabelPainter extends ItemPainter {
 
         StrokeFont.default().draw(
             this.gfx,
-            this.schtext.shown_text,
+            schtext.shown_text,
             pos,
             new Vec2(0, 0),
-            this.schtext.attributes,
+            schtext.attributes,
         );
 
-        const shape_pts = this.create_shape();
+        const shape_pts = this.create_shape(l, schtext);
         if (shape_pts) {
-            this.gfx.line(
-                shape_pts,
-                this.schtext.attributes.stroke_width / 10000,
-            );
+            this.gfx.line(shape_pts, schtext.attributes.stroke_width / 10000);
         }
 
         this.gfx.state.pop();
     }
 
-    create_shape(): Vec2[] {
+    create_shape(l: schematic.Label, schtext: SchText): Vec2[] {
         return [];
     }
 
@@ -87,22 +82,38 @@ abstract class LabelPainter extends ItemPainter {
         return new Color(1, 0, 1, 1);
     }
 
-    get text_offset(): number {
-        return (
-            schematic.DefaultValues.text_offset_ratio * this.schtext.text_size.x
+    get_text_offset(schtext: SchText): number {
+        // From SCH_TEXT::GetTextOffset, turns out SCH_LABEL is the only
+        // subclass that uses it.
+        return Math.round(
+            schematic.DefaultValues.text_offset_ratio * schtext.text_size.x,
         );
     }
 
-    get box_expansion(): number {
-        return (
-            schematic.DefaultValues.label_size_ratio * this.schtext.text_size.y
+    get_box_expansion(schtext: SchText): number {
+        // From SCH_LABEL_BASE::GetLabelBoxExpansion
+        return Math.round(
+            schematic.DefaultValues.label_size_ratio * schtext.text_size.y,
         );
     }
 
-    get schematic_text_offset(): Vec2 {
-        const dist = this.text_offset + this.schtext.attributes.stroke_width;
+    /**
+     * The offset between the schematic item's position and the actual text
+     * position
+     *
+     * This takes into account orientation and any additional distance to make
+     * the text readable (such as offsetting it from the top of a wire).
+     */
+    get_schematic_text_offset(l: schematic.Label, schtext: SchText): Vec2 {
+        // From SCH_LABEL_BASE::GetSchematicTextOffset, although it is defined
+        // on SCH_TEXT (which SCH_LABEL inherits from), but only SCH_LABEL
+        // classes actually do anything with it.
+        const dist = Math.round(
+            this.get_text_offset(schtext) +
+                schtext.get_effective_text_thickness(),
+        );
 
-        if (this.schtext.text_angle.is_vertical) {
+        if (schtext.text_angle.is_vertical) {
             return new Vec2(-dist, 0);
         } else {
             return new Vec2(0, -dist);
@@ -125,21 +136,27 @@ export class GlobalLabelPainter extends LabelPainter {
         return this.gfx.theme["label_global"] as Color;
     }
 
-    override get schematic_text_offset(): Vec2 {
-        const label = this.label as schematic.GlobalLabel;
-        const text_height = this.schtext.text_size.y;
-        let horz = this.box_expansion;
+    override get_schematic_text_offset(
+        l: schematic.Label,
+        schtext: SchText,
+    ): Vec2 {
+        const label = l as schematic.GlobalLabel;
+        const text_height = schtext.text_size.y;
+        let horz = this.get_box_expansion(schtext);
 
         // Magic number from SCH_GLOBALLABEL::GetSchematicTextOffset,
         // offsets the center of the text to accomodate overbars.
-        const vert = text_height * 0.0715;
+        let vert = text_height * 0.0715;
 
         if (["input", "bidirectional", "tri_state"].includes(label.shape)) {
             // accommodate triangular shaped tail
             horz += text_height * 0.75;
         }
 
-        switch (this.label.at.rotation) {
+        horz = Math.round(horz);
+        vert = Math.round(vert);
+
+        switch (l.at.rotation) {
             case 0:
                 return new Vec2(horz, vert);
             case 90:
@@ -149,9 +166,7 @@ export class GlobalLabelPainter extends LabelPainter {
             case 270:
                 return new Vec2(vert, horz);
             default:
-                throw new Error(
-                    `Unexpected label rotation ${this.label.at.rotation}`,
-                );
+                throw new Error(`Unexpected label rotation ${l.at.rotation}`);
         }
     }
 
@@ -159,15 +174,15 @@ export class GlobalLabelPainter extends LabelPainter {
      * Creates the label's outline shape
      * Adapted from SCH_GLOBALLABEL::CreateGraphicShape
      */
-    override create_shape(): Vec2[] {
-        const label = this.label as schematic.GlobalLabel;
-        const pos = this.schtext.text_pos;
-        const angle = Angle.from_degrees(this.label.at.rotation + 180);
-        const text_height = this.schtext.text_size.y;
-        const margin = this.box_expansion;
+    override create_shape(l: schematic.Label, schtext: SchText): Vec2[] {
+        const label = l as schematic.GlobalLabel;
+        const pos = schtext.text_pos;
+        const angle = Angle.from_degrees(l.at.rotation + 180);
+        const text_height = schtext.text_size.y;
+        const margin = this.get_box_expansion(schtext);
         const half_size = text_height / 2 + margin;
-        const symbol_length = this.schtext.get_text_box().w + 2 * margin;
-        const stroke_width = this.schtext.attributes.stroke_width;
+        const symbol_length = schtext.get_text_box().w + 2 * margin;
+        const stroke_width = schtext.attributes.stroke_width;
 
         const x = symbol_length + stroke_width + 3;
         const y = half_size + stroke_width + 3;
@@ -223,10 +238,15 @@ export class HierarchicalLabelPainter extends LabelPainter {
         return this.gfx.theme["label_hier"] as Color;
     }
 
-    override get schematic_text_offset(): Vec2 {
-        const dist = this.text_offset + this.schtext.text_width;
+    override get_schematic_text_offset(
+        l: schematic.Label,
+        schtext: SchText,
+    ): Vec2 {
+        const dist = Math.round(
+            this.get_text_offset(schtext) + schtext.text_width,
+        );
 
-        switch (this.label.at.rotation) {
+        switch (l.at.rotation) {
             case 0:
                 return new Vec2(dist, 0);
             case 90:
@@ -236,9 +256,7 @@ export class HierarchicalLabelPainter extends LabelPainter {
             case 270:
                 return new Vec2(0, dist);
             default:
-                throw new Error(
-                    `Unexpected label rotation ${this.label.at.rotation}`,
-                );
+                throw new Error(`Unexpected label rotation ${l.at.rotation}`);
         }
     }
 
@@ -246,11 +264,11 @@ export class HierarchicalLabelPainter extends LabelPainter {
      * Creates the label's outline shape
      * Adapted from SCH_HIERLABEL::CreateGraphicShape and TemplateShape.
      */
-    override create_shape(): Vec2[] {
-        const label = this.label as schematic.HierarchicalLabel;
-        const pos = this.schtext.text_pos;
-        const angle = Angle.from_degrees(this.label.at.rotation);
-        const s = this.schtext.text_width;
+    override create_shape(l: schematic.Label, schtext: SchText): Vec2[] {
+        const label = l as schematic.HierarchicalLabel;
+        const pos = schtext.text_pos;
+        const angle = Angle.from_degrees(l.at.rotation);
+        const s = schtext.text_width;
 
         let pts: Vec2[];
 
