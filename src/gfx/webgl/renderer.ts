@@ -208,8 +208,18 @@ class WebGL2RenderLayer extends RenderLayer {
     }
 
     render(transform: Matrix3) {
+        const gl = this.renderer.gl!;
         const total_transform =
             this.renderer.projection_matrix.multiply(transform);
+
+        if (this.composite_operation != "source-over") {
+            gl.blendFunc(gl.ONE_MINUS_DST_COLOR, gl.ONE_MINUS_SRC_ALPHA);
+        }
+
         this.geometry.render(total_transform, this.depth);
+
+        if (this.composite_operation != "source-over") {
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
     }
 }

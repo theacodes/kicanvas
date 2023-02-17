@@ -12,6 +12,7 @@ import { Viewer } from "../framework/viewer";
 import { Renderer } from "../gfx/renderer";
 import { BoardPainter } from "./painter";
 import { LayerName, LayerSet } from "./layers";
+import { Color } from "../gfx/color";
 
 export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;
@@ -79,6 +80,6 @@ export class BoardViewer extends Viewer {
     }
 
     override get selection_color() {
-        return theme.board.cursor;
+        return Color.white;
     }
 }

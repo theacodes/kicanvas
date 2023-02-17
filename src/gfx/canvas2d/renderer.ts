@@ -287,9 +287,7 @@ class Canvas2dRenderLayer extends RenderLayer {
 
         ctx.save();
 
-        if (this.composite_operation != "source-in") {
-            ctx.globalCompositeOperation = this.composite_operation;
-        }
+        ctx.globalCompositeOperation = this.composite_operation;
 
         const accumulated_transform = Matrix3.from_DOMMatrix(
             ctx.getTransform(),
@@ -301,10 +299,7 @@ class Canvas2dRenderLayer extends RenderLayer {
             command.render(ctx);
         }
 
-        if (this.composite_operation != "source-in") {
-            ctx.globalCompositeOperation = "source-in";
-        }
-
+        ctx.globalCompositeOperation = "source-over";
         ctx.restore();
     }
 }
