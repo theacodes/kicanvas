@@ -34,7 +34,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
             throw new Error("No target for <kicanvas-info-bar>");
         }
 
-        super.connectedCallback();
+        await super.connectedCallback();
 
         this.target.addEventListener(events.names.viewer.select, (e: Event) => {
             this.#onItemSelected(
