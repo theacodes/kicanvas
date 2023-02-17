@@ -440,7 +440,6 @@ class GrTextPainter extends ItemPainter {
             this.gfx,
             edatext.shown_text,
             edatext.text_pos,
-            new Vec2(0, 0),
             edatext.attributes,
         );
         this.gfx.state.pop();
@@ -495,7 +494,6 @@ class FpTextPainter extends ItemPainter {
             this.gfx,
             edatext.shown_text,
             edatext.text_pos,
-            new Vec2(0, 0),
             edatext.attributes,
         );
         this.gfx.state.pop();

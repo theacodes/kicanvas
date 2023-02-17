@@ -64,8 +64,8 @@ export class KiCanvasInfoBarElement extends CustomElement {
         }
 
         return html`<ul>
-            <li>${this.#footprint.properties["reference"]}</li>
-            <li>${this.#footprint.properties["value"]}</li>
+            <li>${this.#footprint.reference}</li>
+            <li>${this.#footprint.value}</li>
             <li>${this.#footprint.library_link}</li>
             <li>
                 X: ${this.#footprint.at.position.x.toFixed(3)}, Y:
