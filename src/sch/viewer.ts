@@ -12,6 +12,7 @@ import { Renderer } from "../gfx/renderer";
 import { SchematicPainter } from "./painter";
 import { LayerSet } from "./layers";
 import { Color } from "../gfx/color";
+import * as events from "../framework/events";
 
 export class SchematicViewer extends Viewer {
     schematic: sch_items.KicadSch;
@@ -20,24 +21,38 @@ export class SchematicViewer extends Viewer {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.addEventListener("kicanvas:viewer:select", (e: Event) => {
+        this.addEventListener(events.names.viewer.pick, (e: Event) => {
             const { mouse: _, items } = (e as CustomEvent).detail;
 
+            let selected;
+
             for (const { layer: _, bbox } of items) {
-                this.selected = bbox;
+                selected = bbox;
                 break;
             }
 
-            if (this.selected) {
+            if (selected && !this.selected) {
                 canvas.dispatchEvent(
-                    new CustomEvent("kicad-schematic:item-selected", {
+                    new CustomEvent(events.names.viewer.select, {
                         bubbles: true,
                         composed: true,
-                        detail: this.selected
-                            .context as sch_items.SymbolInstance,
+                        detail: selected.context,
                     }),
                 );
             }
+
+            // Picking the same item twice opens the info dialog box
+            if (selected && selected.context == this.selected?.context) {
+                canvas.dispatchEvent(
+                    new CustomEvent(events.names.viewer.inspect, {
+                        bubbles: true,
+                        composed: true,
+                        detail: selected.context,
+                    }),
+                );
+            }
+
+            this.selected = selected;
         });
     }
 

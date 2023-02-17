@@ -11,6 +11,7 @@ import { BBox } from "../math/bbox";
 import { Color } from "../gfx/color";
 import { ViewLayerSet } from "./view-layers";
 import { Polygon, Polyline } from "../gfx/shapes";
+import * as events from "../framework/events";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;
@@ -56,12 +57,10 @@ export abstract class Viewer extends EventTarget {
                 new Vec2(e.clientX - rect.left, e.clientY - rect.top),
             );
 
-            this.selected = null;
-
             const items = this.layers.query_point(mouse);
 
             this.dispatchEvent(
-                new CustomEvent("kicanvas:viewer:select", {
+                new CustomEvent(events.names.viewer.pick, {
                     detail: {
                         mouse: mouse,
                         items: items,
@@ -78,6 +77,7 @@ export abstract class Viewer extends EventTarget {
             return;
         }
 
+        this.renderer.clear_canvas();
         this.layers.render(this.viewport.camera.matrix);
     }
 
@@ -87,7 +87,6 @@ export abstract class Viewer extends EventTarget {
         }
 
         window.requestAnimationFrame(() => {
-            this.renderer.clear_canvas();
             this.draw();
         });
     }

@@ -7,12 +7,12 @@
 import * as pcb_items from "../kicad/board";
 import { WebGL2Renderer } from "../gfx/webgl/renderer";
 import * as theme from "../kicad/theme";
-
 import { Viewer } from "../framework/viewer";
 import { Renderer } from "../gfx/renderer";
 import { BoardPainter } from "./painter";
 import { LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
+import * as events from "../framework/events";
 
 export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;
@@ -21,7 +21,7 @@ export class BoardViewer extends Viewer {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.addEventListener("kicanvas:viewer:select", (e: Event) => {
+        this.addEventListener(events.names.viewer.pick, (e: Event) => {
             const { mouse: _, items } = (e as CustomEvent).detail;
 
             this.selected = null;
@@ -35,7 +35,7 @@ export class BoardViewer extends Viewer {
 
             if (this.selected) {
                 canvas.dispatchEvent(
-                    new CustomEvent("kicad-board:item-selected", {
+                    new CustomEvent(events.names.viewer.select, {
                         bubbles: true,
                         composed: true,
                         detail: this.selected.context,

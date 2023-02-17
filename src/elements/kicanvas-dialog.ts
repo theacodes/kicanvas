@@ -1,5 +1,6 @@
 import { Property } from "../kicad/schematic";
 import { $make, $on, $q } from "../utils";
+import * as events from "../framework/events";
 
 export class KiCanvasDialogElement extends HTMLElement {
     constructor() {
@@ -21,7 +22,7 @@ export class KiCanvasDialogElement extends HTMLElement {
             (e.target as HTMLInputElement).select();
         });
 
-        $on(window, "kicad-schematic:item-selected", (e: CustomEvent) => {
+        $on(window, events.names.viewer.inspect, (e: CustomEvent) => {
             this.#onItemSelected(e.target as HTMLElement, e.detail);
         });
     }
