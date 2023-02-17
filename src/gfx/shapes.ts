@@ -28,7 +28,7 @@ export class Circle {
     constructor(
         public center: Vec2,
         public radius: number,
-        public color: OptionalDefaultColor
+        public color: OptionalDefaultColor,
     ) {}
 }
 
@@ -48,7 +48,7 @@ export class Arc {
         public start_angle: Angle,
         public end_angle: Angle,
         public width: number,
-        public color: OptionalDefaultColor
+        public color: OptionalDefaultColor,
     ) {}
 }
 
@@ -63,7 +63,7 @@ export class Polyline {
     constructor(
         public points: Vec2[],
         public width: number,
-        public color: OptionalDefaultColor
+        public color: OptionalDefaultColor,
     ) {}
 
     /**
@@ -82,7 +82,7 @@ export class Polyline {
                 bb.top_left,
             ],
             width,
-            color
+            color,
         );
     }
 }
@@ -106,7 +106,9 @@ export class Polygon {
     static from_BBox(bb: BBox, color: Color) {
         return new Polygon(
             [bb.top_left, bb.top_right, bb.bottom_right, bb.bottom_left],
-            color
+            color,
         );
     }
 }
+
+export type Shape = Circle | Arc | Polygon | Polyline;
