@@ -20,7 +20,6 @@ export { ViewLayer };
  * for drill holes and such.
  */
 export enum LayerName {
-    overlay = ":Overlay",
     dwgs_user = "Dwgs.User",
     cmts_user = "Cmts.User",
     eco1_user = "Eco1.User",

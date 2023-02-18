@@ -13,7 +13,6 @@ export { ViewLayer };
 export enum LayerName {
     // Bounding boxes for clickable items
     interactive = ":Interactive",
-    overlay = ":Overlay",
     // reference, value, other symbol fields
     symbol_field = ":Symbol:Field",
     // hierarchical, global, and local labels
