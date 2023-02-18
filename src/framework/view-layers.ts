@@ -30,6 +30,7 @@ export type VisibilityType = boolean | (() => boolean);
 export class ViewLayer {
     layer_set: ViewLayerSet;
     name: string;
+    highlighted = false;
     #visible: VisibilityType;
 
     /**
@@ -74,9 +75,12 @@ export class ViewLayer {
     }
 
     dispose() {
-        if (this.graphics) {
-            this.graphics.dispose();
-        }
+        this.graphics?.dispose();
+    }
+
+    clear() {
+        this.graphics?.dispose();
+        this.items = [];
     }
 
     get visible(): boolean {
@@ -112,16 +116,21 @@ export class ViewLayer {
 export class ViewLayerSet {
     #layer_list: ViewLayer[] = [];
     #layer_map: Map<string, ViewLayer> = new Map();
+    #highlighted_layer: ViewLayer | null;
+    #overlay: ViewLayer;
 
     /**
      * Create a new LayerSet
      */
-    constructor() {}
+    constructor() {
+        this.#overlay = new ViewLayer(this, ":Overlay", true, Color.white);
+    }
 
     /**
      * Dispose of any resources held by layers
      */
     dispose() {
+        this.#overlay.dispose();
         for (const layer of this.#layer_list) {
             layer.dispose();
         }
@@ -143,15 +152,18 @@ export class ViewLayerSet {
      * Renders all the layers in the set in display order (back to front)
      */
     render(camera: Matrix3) {
+        let depth = 0.01;
         for (const layer of this.in_display_order()) {
             if (layer.visible && layer.graphics) {
-                layer.graphics.render(camera);
+                layer.graphics.render(camera, depth);
+                depth += 0.01;
             }
         }
     }
 
     /**
-     * @yields layers in the order they were added (front to back)
+     * @yields layers in the order they were added (front to back), does not
+     * include the overlay layer.
      */
     *in_order() {
         for (const layer of this.#layer_list) {
@@ -160,12 +172,27 @@ export class ViewLayerSet {
     }
 
     /**
-     * @yields layers in the order they should be drawn (back to front)
+     * @yields layers in the order they should be drawn (back to front),
+     * including the overlay layer.
      */
     *in_display_order() {
         for (let i = this.#layer_list.length - 1; i >= 0; i--) {
-            yield this.#layer_list[i]!;
+            const layer = this.#layer_list[i]!;
+
+            if (layer.highlighted) {
+                continue;
+            }
+
+            yield layer;
         }
+
+        // If a layer is highlighted, yield it last so it gets draw above
+        // everything but the overlay.
+        if (this.#highlighted_layer) {
+            yield this.#highlighted_layer;
+        }
+
+        yield this.#overlay;
     }
 
     /**
@@ -173,6 +200,30 @@ export class ViewLayerSet {
      */
     by_name(name: string): ViewLayer | undefined {
         return this.#layer_map.get(name);
+    }
+
+    get overlay() {
+        return this.#overlay;
+    }
+
+    /**
+     * Highlights a given layer, by default it's drawn above other layers.
+     */
+    highlight(layer: string | ViewLayer) {
+        if (this.#highlighted_layer) {
+            this.#highlighted_layer.highlighted = false;
+        }
+
+        if (typeof layer == "string") {
+            layer = this.by_name(layer)!;
+        }
+
+        layer.highlighted = true;
+        this.#highlighted_layer = layer;
+    }
+
+    get highlighted() {
+        return this.#highlighted_layer;
     }
 
     /**

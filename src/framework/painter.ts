@@ -67,17 +67,15 @@ export class DocumentPainter {
             }
         }
 
-        let depth = 0.001;
         for (const layer of this.layers.in_display_order()) {
-            this.paint_layer(layer, depth);
-            depth += 0.001;
+            this.paint_layer(layer);
         }
     }
 
-    paint_layer(layer: ViewLayer, depth: number) {
+    paint_layer(layer: ViewLayer) {
         const bboxes = new Map();
 
-        this.gfx.start_layer(layer.name, depth);
+        this.gfx.start_layer(layer.name);
 
         for (const item of layer.items) {
             this.gfx.start_bbox();
