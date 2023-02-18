@@ -634,12 +634,14 @@ export class PrimitiveSet {
      * Draw all the previously commit()ed primitives
      * @param matrix - complete view/projection matrix
      * @param depth - used for depth testing
+     * @parama alpha - overrides the alpha for colors
      */
-    render(matrix: Matrix3, depth = 0) {
+    render(matrix: Matrix3, depth = 0, alpha = 1) {
         if (this.#polygon_set) {
             this.#polygon_set.shader.bind();
             this.#polygon_set.shader["u_matrix"].mat3f(false, matrix.elements);
             this.#polygon_set.shader["u_depth"].f1(depth);
+            this.#polygon_set.shader["u_alpha"].f1(alpha);
             this.#polygon_set.render();
         }
 
@@ -647,6 +649,7 @@ export class PrimitiveSet {
             this.#circle_set.shader.bind();
             this.#circle_set.shader["u_matrix"].mat3f(false, matrix.elements);
             this.#circle_set.shader["u_depth"].f1(depth);
+            this.#circle_set.shader["u_alpha"].f1(alpha);
             this.#circle_set.render();
         }
 
@@ -654,6 +657,7 @@ export class PrimitiveSet {
             this.#polyline_set.shader.bind();
             this.#polyline_set.shader["u_matrix"].mat3f(false, matrix.elements);
             this.#polyline_set.shader["u_depth"].f1(depth);
+            this.#polyline_set.shader["u_alpha"].f1(alpha);
             this.#polyline_set.render();
         }
     }
