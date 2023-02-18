@@ -105,13 +105,13 @@ export abstract class Viewer extends EventTarget {
     }
 
     paint_selected() {
-        const layer = this.layers.by_name(":Overlay")!;
+        const layer = this.layers.overlay;
 
-        layer.graphics?.clear();
+        layer.clear();
 
         if (this.#selected) {
             const bb = this.#selected.copy().grow(this.#selected.w * 0.1);
-            this.renderer.start_layer(layer.name, 1);
+            this.renderer.start_layer(layer.name);
 
             this.renderer.line(
                 Polyline.from_BBox(bb, 0.254, this.selection_color),
