@@ -155,7 +155,16 @@ export class ViewLayerSet {
         let depth = 0.01;
         for (const layer of this.in_display_order()) {
             if (layer.visible && layer.graphics) {
-                layer.graphics.render(camera, depth);
+                let alpha = 1;
+
+                if (
+                    this.#highlighted_layer &&
+                    this.#highlighted_layer != layer
+                ) {
+                    alpha = 0.25;
+                }
+
+                layer.graphics.render(camera, depth, alpha);
                 depth += 0.01;
             }
         }
