@@ -206,7 +206,7 @@ class WebGL2RenderLayer extends RenderLayer {
         this.geometry?.dispose();
     }
 
-    render(transform: Matrix3, depth: number) {
+    render(transform: Matrix3, depth: number, global_alpha = 1) {
         const gl = this.renderer.gl!;
         const total_transform =
             this.renderer.projection_matrix.multiply(transform);
@@ -215,7 +215,7 @@ class WebGL2RenderLayer extends RenderLayer {
             gl.blendFunc(gl.ONE_MINUS_DST_COLOR, gl.ONE_MINUS_SRC_ALPHA);
         }
 
-        this.geometry.render(total_transform, depth);
+        this.geometry.render(total_transform, depth, global_alpha);
 
         if (this.composite_operation != "source-over") {
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

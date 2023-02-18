@@ -277,7 +277,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         }
     }
 
-    render(transform: Matrix3) {
+    render(transform: Matrix3, depth: number, global_alpha = 1) {
         const ctx = (this.renderer as Canvas2DRenderer).ctx2d;
 
         if (!ctx) {
@@ -287,6 +287,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         ctx.save();
 
         ctx.globalCompositeOperation = this.composite_operation;
+        ctx.globalAlpha = global_alpha;
 
         const accumulated_transform = Matrix3.from_DOMMatrix(
             ctx.getTransform(),
@@ -299,6 +300,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         }
 
         ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
         ctx.restore();
     }
 }

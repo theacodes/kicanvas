@@ -310,7 +310,11 @@ export abstract class RenderLayer {
 
     abstract clear(): void;
 
-    abstract render(camera: Matrix3, depth: number): void;
+    abstract render(
+        camera: Matrix3,
+        depth: number,
+        global_alpha?: number,
+    ): void;
 }
 
 export class RenderState {
