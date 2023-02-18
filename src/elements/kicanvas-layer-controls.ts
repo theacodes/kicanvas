@@ -55,6 +55,12 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         return this.shadowRoot?.querySelector("menu");
     }
 
+    get menu_items(): KiCanvasLayerControlItemElement[] {
+        return Array.from(
+            this.menu!.querySelectorAll("kicanvas-layer-control-item"),
+        );
+    }
+
     override async renderedCallback(root: ShadowRoot): Promise<void> {
         // Highlight layer when its control list item is clicked
         this.menu!.addEventListener(
@@ -63,13 +69,9 @@ export class KiCanvasLayerControlsElement extends CustomElement {
                 const item = (e as CustomEvent)
                     .detail as KiCanvasLayerControlItemElement;
 
-                this.menu!.querySelectorAll(
-                    "kicanvas-layer-control-item",
-                ).forEach((elem) => {
-                    (
-                        elem as KiCanvasLayerControlItemElement
-                    ).layer_highlighted = false;
-                });
+                for (const n of this.menu_items) {
+                    n.layer_highlighted = false;
+                }
 
                 const layer = this.viewer.layers.by_name(item.layer_name!)!;
 
@@ -105,6 +107,29 @@ export class KiCanvasLayerControlsElement extends CustomElement {
                 this.viewer.draw_soon();
             },
         );
+
+        // Show/hide all layers
+        this.shadowRoot
+            ?.querySelector("button")
+            ?.addEventListener("click", (e) => {
+                if (this.menu_items.some((n) => n.layer_visible)) {
+                    // hide all layers.
+                    for (const item of this.menu_items) {
+                        item.layer_visible = false;
+                        item.layer_highlighted = false;
+                        this.viewer.layers.by_name(item.layer_name!)!.visible =
+                            false;
+                    }
+                } else {
+                    // show all layers
+                    for (const item of this.menu_items) {
+                        item.layer_visible = true;
+                        this.viewer.layers.by_name(item.layer_name!)!.visible =
+                            true;
+                    }
+                }
+                this.viewer.draw_soon();
+            });
     }
 
     override async render() {
@@ -122,7 +147,15 @@ export class KiCanvasLayerControlsElement extends CustomElement {
             );
         }
 
-        return html`<menu>${items}</menu>`;
+        return html`
+            <div>
+                <span>Layers</span>
+                <button type="button">
+                    <span class="icon">visibility</span>
+                </button>
+            </div>
+            <menu>${items}</menu>
+        `;
     }
 }
 
@@ -205,12 +238,8 @@ class KiCanvasLayerControlItemElement extends CustomElement {
                 style="background-color: ${this.layer_color};"></span>
             <span class="name">${this.layer_name}</span>
             <button type="button" name="${this.layer_name}">
-                <span class="icon material-symbols-outlined for-visible">
-                    visibility
-                </span>
-                <span class="icon material-symbols-outlined for-hidden">
-                    visibility_off
-                </span>
+                <span class="icon for-visible">visibility</span>
+                <span class="icon for-hidden">visibility_off</span>
             </button>`;
     }
 }

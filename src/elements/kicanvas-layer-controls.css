@@ -21,8 +21,59 @@ menu {
     width: 100%;
     box-sizing: border-box;
     margin: 0;
-    padding: 0.5rem 0;
+    /* padding: 0.5rem 0; */
     flex-shrink: 1;
     display: flex;
     flex-direction: column;
+}
+
+.icon {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    -moz-font-feature-settings: "liga";
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+}
+
+div {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 0.25rem 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #8365c5;
+    color: white;
+}
+
+div span {
+    display: block;
+    flex-grow: 1;
+}
+
+button {
+    all: unset;
+    flex-shrink: 0;
+    margin-left: 1rem;
+    color: white;
+    border: 0 none;
+    background: transparent;
+    padding: 0 0.25rem 0 0.25rem;
+    margin-right: -0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+button:hover {
+    color: rgba(129, 255, 190, 1);
 }
