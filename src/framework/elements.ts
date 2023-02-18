@@ -72,6 +72,8 @@ export class CustomElement extends HTMLElement {
         return html``;
     }
 
+    async renderedCallback(root: ShadowRoot) {}
+
     async update() {
         for (const child of this.shadowRoot!.children) {
             if (child.tagName != "STYLE") {
@@ -79,6 +81,7 @@ export class CustomElement extends HTMLElement {
             }
         }
         this.shadowRoot!.appendChild(await this.render(this.shadowRoot!));
+        this.renderedCallback(this.shadowRoot!);
     }
 
     async #renderInitialContent() {
@@ -92,5 +95,6 @@ export class CustomElement extends HTMLElement {
 
         root.appendChild(style);
         root.appendChild(await this.render(root));
+        this.renderedCallback(this.shadowRoot!);
     }
 }
