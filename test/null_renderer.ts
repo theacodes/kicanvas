@@ -34,8 +34,8 @@ export class NullRenderer extends Renderer {
 
     override clear_canvas(): void {}
 
-    override start_layer(name = "test", depth = 0): void {
-        this.#active_layer = new NullRenderLayer(this, name, depth);
+    override start_layer(name = "test"): void {
+        this.#active_layer = new NullRenderLayer(this, name);
     }
 
     override end_layer(): NullRenderLayer {

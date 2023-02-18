@@ -63,11 +63,11 @@ export class Canvas2DRenderer extends Renderer {
         this.update_viewport();
     }
 
-    dispose() {
+    override dispose() {
         this.ctx2d = undefined;
     }
 
-    update_viewport() {
+    override update_viewport() {
         const dpr = window.devicePixelRatio;
         const rect = this.canvas.getBoundingClientRect();
         this.canvas.width = Math.round(rect.width * dpr);
@@ -75,7 +75,7 @@ export class Canvas2DRenderer extends Renderer {
         this.ctx2d!.setTransform();
     }
 
-    clear_canvas() {
+    override clear_canvas() {
         this.ctx2d!.setTransform();
         this.ctx2d!.scale(window.devicePixelRatio, window.devicePixelRatio);
         this.ctx2d!.fillStyle = this.background_color.to_css();
@@ -84,11 +84,11 @@ export class Canvas2DRenderer extends Renderer {
         this.ctx2d!.lineJoin = "round";
     }
 
-    start_layer(name: string, depth = 0) {
-        this.#active_layer = new Canvas2dRenderLayer(this, name, depth);
+    override start_layer(name: string) {
+        this.#active_layer = new Canvas2dRenderLayer(this, name);
     }
 
-    end_layer(): RenderLayer {
+    override end_layer(): RenderLayer {
         if (!this.#active_layer) {
             throw new Error("No active layer");
         }
@@ -124,7 +124,7 @@ export class Canvas2DRenderer extends Renderer {
     ): void {
         const circle = super.prep_circle(circle_or_center, radius, color);
 
-        if (!circle.color || circle.color.is_transparent) {
+        if (!circle.color || circle.color.is_transparent_black) {
             return;
         }
 
@@ -151,7 +151,7 @@ export class Canvas2DRenderer extends Renderer {
     ): void {
         const line = super.prep_line(line_or_points, width, color);
 
-        if (!line.color || line.color.is_transparent) {
+        if (!line.color || line.color.is_transparent_black) {
             return;
         }
 
@@ -177,7 +177,7 @@ export class Canvas2DRenderer extends Renderer {
     override polygon(polygon_or_points: Polygon | Vec2[], color?: Color): void {
         const polygon = super.prep_polygon(polygon_or_points, color);
 
-        if (!polygon.color || polygon.color.is_transparent) {
+        if (!polygon.color || polygon.color.is_transparent_black) {
             return;
         }
 
@@ -201,7 +201,7 @@ export class Canvas2DRenderer extends Renderer {
         );
     }
 
-    get layers() {
+    override get layers() {
         const layers = this.#layers;
         return {
             *[Symbol.iterator]() {
@@ -240,10 +240,9 @@ class Canvas2dRenderLayer extends RenderLayer {
     constructor(
         public override readonly renderer: Renderer,
         public override readonly name: string,
-        public override readonly depth: number = 0,
         public commands: DrawCommand[] = [],
     ) {
-        super(renderer, name, depth);
+        super(renderer, name);
     }
 
     dispose(): void {

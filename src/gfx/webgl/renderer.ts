@@ -53,6 +53,7 @@ export class WebGL2Renderer extends Renderer {
         this.gl = gl;
 
         gl.enable(gl.BLEND);
+        gl.blendEquation(gl.FUNC_ADD);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
         gl.enable(gl.DEPTH_TEST);
@@ -67,7 +68,7 @@ export class WebGL2Renderer extends Renderer {
         await PrimitiveSet.load_shaders(gl);
     }
 
-    dispose() {
+    override dispose() {
         for (const layer of this.layers) {
             layer.dispose();
         }
@@ -76,7 +77,7 @@ export class WebGL2Renderer extends Renderer {
         }
     }
 
-    update_viewport() {
+    override update_viewport() {
         if (!this.gl) {
             return;
         }
@@ -96,22 +97,21 @@ export class WebGL2Renderer extends Renderer {
         this.projection_matrix = Matrix3.orthographic(logical_w, logical_h);
     }
 
-    clear_canvas() {
+    override clear_canvas() {
         if (this.gl == null) throw new Error("Uninitialized");
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     }
 
-    start_layer(name: string, depth = 0) {
+    override start_layer(name: string, depth = 0) {
         if (this.gl == null) throw new Error("Uninitialized");
         this.#active_layer = new WebGL2RenderLayer(
             this,
             name,
-            depth,
             new PrimitiveSet(this.gl),
         );
     }
 
-    end_layer(): RenderLayer {
+    override end_layer(): RenderLayer {
         if (this.#active_layer == null) throw new Error("No active layer");
 
         this.#active_layer.geometry.commit();
@@ -177,7 +177,7 @@ export class WebGL2Renderer extends Renderer {
         this.#active_layer!.geometry.add_polygon(polygon);
     }
 
-    get layers(): Iterable<RenderLayer> {
+    override get layers(): Iterable<RenderLayer> {
         const layers = this.#layers;
         return {
             *[Symbol.iterator]() {
@@ -193,10 +193,9 @@ class WebGL2RenderLayer extends RenderLayer {
     constructor(
         public override readonly renderer: WebGL2Renderer,
         public override readonly name: string,
-        public override readonly depth: number,
         public geometry: PrimitiveSet,
     ) {
-        super(renderer, name, depth);
+        super(renderer, name);
     }
 
     dispose(): void {
@@ -207,7 +206,7 @@ class WebGL2RenderLayer extends RenderLayer {
         this.geometry?.dispose();
     }
 
-    render(transform: Matrix3) {
+    render(transform: Matrix3, depth: number) {
         const gl = this.renderer.gl!;
         const total_transform =
             this.renderer.projection_matrix.multiply(transform);
@@ -216,7 +215,7 @@ class WebGL2RenderLayer extends RenderLayer {
             gl.blendFunc(gl.ONE_MINUS_DST_COLOR, gl.ONE_MINUS_SRC_ALPHA);
         }
 
-        this.geometry.render(total_transform, this.depth);
+        this.geometry.render(total_transform, depth);
 
         if (this.composite_operation != "source-over") {
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

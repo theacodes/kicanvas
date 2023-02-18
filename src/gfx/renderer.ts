@@ -100,7 +100,7 @@ export abstract class Renderer {
      * that are all drawn at the same time and at the same depth. end_layer()
      * must be called for the graphics to actually show up.
      */
-    abstract start_layer(name: string, depth: number): void;
+    abstract start_layer(name: string): void;
 
     /**
      * Finish a layer of graphics.
@@ -142,8 +142,8 @@ export abstract class Renderer {
             );
         }
 
-        if (!circle.color || circle.color.is_transparent) {
-            circle.color = this.state.fill ?? Color.transparent;
+        if (!circle.color || circle.color.is_transparent_black) {
+            circle.color = this.state.fill ?? Color.transparent_black;
         }
 
         circle.center = this.state.matrix.transform(circle.center);
@@ -202,8 +202,8 @@ export abstract class Renderer {
             );
         }
 
-        if (!arc.color || arc.color.is_transparent) {
-            arc.color = this.state.stroke ?? Color.transparent;
+        if (!arc.color || arc.color.is_transparent_black) {
+            arc.color = this.state.stroke ?? Color.transparent_black;
         }
 
         // TODO: This should probably be its own method.
@@ -248,8 +248,8 @@ export abstract class Renderer {
             );
         }
 
-        if (!line.color || line.color.is_transparent) {
-            line.color = this.state.stroke ?? Color.transparent;
+        if (!line.color || line.color.is_transparent_black) {
+            line.color = this.state.stroke ?? Color.transparent_black;
         }
 
         line.points = Array.from(this.state.matrix.transform_all(line.points));
@@ -279,8 +279,8 @@ export abstract class Renderer {
             polygon = new Polygon(polygon_or_points, color ?? this.state.fill);
         }
 
-        if (!polygon.color || polygon.color.is_transparent) {
-            polygon.color = this.state.fill ?? Color.transparent;
+        if (!polygon.color || polygon.color.is_transparent_black) {
+            polygon.color = this.state.fill ?? Color.transparent_black;
         }
 
         polygon.points = Array.from(
@@ -304,20 +304,13 @@ export abstract class RenderLayer {
     constructor(
         public readonly renderer: Renderer,
         public readonly name: string,
-        public readonly depth: number = 0,
-    ) {
-        if (depth < 0 || depth > 1) {
-            throw new Error(
-                `Invalid depth value ${depth}, depth should be between 0 and 1.`,
-            );
-        }
-    }
+    ) {}
 
     abstract dispose(): void;
 
     abstract clear(): void;
 
-    abstract render(camera: Matrix3): void;
+    abstract render(camera: Matrix3, depth: number): void;
 }
 
 export class RenderState {
