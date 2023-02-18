@@ -20,8 +20,8 @@ import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
-import { EDAText } from "../text/eda_text";
-import { StrokeFont } from "../text/stroke_font";
+import { EDAText } from "../text/eda-text";
+import { StrokeFont } from "../text/stroke-font";
 
 class LinePainter extends ItemPainter {
     classes = [pcb_items.GrLine, pcb_items.FpLine];

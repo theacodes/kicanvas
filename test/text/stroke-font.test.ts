@@ -6,12 +6,12 @@
 
 import { AssertionError, assert } from "@esm-bundle/chai";
 
-import { StrokeFont } from "../../src/text/stroke_font";
+import { StrokeFont } from "../../src/text/stroke-font";
 import { Vec2 } from "../../src/math/vec2";
 import { Angle } from "../../src/math/angle";
 import { TextAttributes, TextStyle } from "../../src/text/font";
 import { StrokeGlyph } from "../../src/text/glyph";
-import { NullRenderer } from "../null_renderer";
+import { NullRenderer } from "../null-renderer";
 import { Polyline } from "../../src/gfx/shapes";
 
 const font = StrokeFont.default();

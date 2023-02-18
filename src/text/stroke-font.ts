@@ -9,7 +9,7 @@ import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
 import { Font, TextStyle } from "./font";
 import { Glyph, StrokeGlyph } from "./glyph";
-import * as newstroke from "./newstroke_glyphs";
+import * as newstroke from "./newstroke-glyphs";
 
 /** Stroke font
  *

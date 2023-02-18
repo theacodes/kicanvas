@@ -6,7 +6,7 @@
 
 import { At } from "../kicad/common";
 import { Angle } from "../math/angle";
-import { EDAText } from "./eda_text";
+import { EDAText } from "./eda-text";
 
 /**
  * Represents text objects that belong to the schematic, not to any individual

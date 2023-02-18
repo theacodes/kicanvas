@@ -9,7 +9,7 @@ import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
 import { Font, TextAttributes } from "./font";
-import { StrokeFont } from "./stroke_font";
+import { StrokeFont } from "./stroke-font";
 
 /** Primary text mixin
  *

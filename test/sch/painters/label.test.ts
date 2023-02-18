@@ -12,8 +12,8 @@ import {
     HierarchicalLabelPainter,
     LabelPainter,
 } from "../../../src/sch/painters/label";
-import { NullRenderer } from "../../null_renderer";
-import { SchText } from "../../../src/text/sch_text";
+import { NullRenderer } from "../../null-renderer";
+import { SchText } from "../../../src/text/sch-text";
 import { Angle } from "../../../src/math/angle";
 import { Vec2 } from "../../../src/math/vec2";
 import { GlobalLabel, HierarchicalLabel } from "../../../src/kicad/schematic";

@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { SchText } from "../../src/text/sch_text";
+import { SchText } from "../../src/text/sch-text";
 import { Angle } from "../../src/math/angle";
 
 suite("text.sch_text.SchText()", function () {

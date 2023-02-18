@@ -15,10 +15,10 @@ import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 import { ViewLayer, LayerName, LayerSet } from "./layers";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
-import { SchField } from "../text/sch_field";
-import { StrokeFont } from "../text/stroke_font";
-import { SchText } from "../text/sch_text";
-import { LibText } from "../text/lib_text";
+import { SchField } from "../text/sch-field";
+import { StrokeFont } from "../text/stroke-font";
+import { SchText } from "../text/sch-text";
+import { LibText } from "../text/lib-text";
 import { PinPainter } from "./painters/pin";
 import {
     GlobalLabelPainter,

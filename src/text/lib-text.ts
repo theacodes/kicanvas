@@ -7,7 +7,7 @@
 import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
-import { EDAText } from "./eda_text";
+import { EDAText } from "./eda-text";
 
 /**
  * Represents text objects that belong to a symbol. This is just for graphical

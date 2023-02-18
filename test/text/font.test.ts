@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { StrokeFont } from "../../src/text/stroke_font";
+import { StrokeFont } from "../../src/text/stroke-font";
 import { Vec2 } from "../../src/math/vec2";
 import { TextStyle } from "../../src/text/font";
 

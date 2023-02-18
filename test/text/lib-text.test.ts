@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { LibText } from "../../src/text/lib_text";
+import { LibText } from "../../src/text/lib-text";
 import { Vec2 } from "../../src/math/vec2";
 
 function make_text() {

@@ -7,8 +7,8 @@
 import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
 import { Camera2 } from "./camera2";
-import { PanAndZoom } from "./pan_and_zoom";
-import { CanvasSizeObserver } from "./canvas_size_observer";
+import { PanAndZoom } from "./pan-and-zoom";
+import { CanvasSizeObserver } from "./canvas-size-observer";
 import { Renderer } from "../gfx/renderer";
 import { Angle } from "../math/angle";
 
@@ -31,7 +31,7 @@ export class Viewport {
             new Vec2(0, 0),
             new Vec2(0, 0),
             1,
-            new Angle(0)
+            new Angle(0),
         );
 
         this.#observer = new CanvasSizeObserver(
@@ -39,14 +39,14 @@ export class Viewport {
             (cw, ch, lw, lh) => {
                 this.resize(cw, ch, lw, lh);
                 this.callback();
-            }
+            },
         );
 
         this.resize(
             this.renderer.canvas.clientWidth,
             this.renderer.canvas.clientHeight,
             this.renderer.canvas.width,
-            this.renderer.canvas.height
+            this.renderer.canvas.height,
         );
     }
 
@@ -61,7 +61,7 @@ export class Viewport {
         logical_w: number,
         logical_h: number,
         display_w: number,
-        display_h: number
+        display_h: number,
     ) {
         if (this.width != logical_w || this.height != logical_h) {
             this.renderer.update_viewport();
@@ -79,7 +79,7 @@ export class Viewport {
                 this.callback();
             },
             min_zoom,
-            max_zoom
+            max_zoom,
         );
     }
 

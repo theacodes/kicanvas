@@ -7,8 +7,8 @@
 import * as schematic from "../../kicad/schematic";
 import { Angle } from "../../math/angle";
 import { Vec2 } from "../../math/vec2";
-import { SchText } from "../../text/sch_text";
-import { StrokeFont } from "../../text/stroke_font";
+import { SchText } from "../../text/sch-text";
+import { StrokeFont } from "../../text/stroke-font";
 import { ItemPainter } from "../../framework/painter";
 import { LayerName, ViewLayer } from "../layers";
 import { Color } from "../../gfx/color";

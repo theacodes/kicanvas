@@ -6,7 +6,7 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { EDAText } from "../../src/text/eda_text";
+import { EDAText } from "../../src/text/eda-text";
 import { Vec2 } from "../../src/math/vec2";
 
 class EDATextImpl extends EDAText {
