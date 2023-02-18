@@ -209,7 +209,7 @@ export class Font {
     thickness = 0;
     bold = false;
     italic = false;
-    color: Color = Color.transparent;
+    color: Color = Color.transparent_black;
 
     constructor(expr?: Parseable) {
         if (expr) {

@@ -31,7 +31,7 @@ function color_maybe(
     fallback_color?: Color,
     fail_color: Color = new Color(1, 0, 0, 1),
 ) {
-    if (!color?.is_transparent) {
+    if (!color?.is_transparent_black) {
         return color!;
     }
     if (fallback_color) {
@@ -303,7 +303,7 @@ class LibSymbolPainter extends ItemPainter {
                     ) {
                         this.gfx.state.fill = outline_color as Color;
                     } else {
-                        this.gfx.state.fill = Color.transparent;
+                        this.gfx.state.fill = Color.transparent_black;
                     }
                 }
 

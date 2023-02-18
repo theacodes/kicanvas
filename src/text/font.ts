@@ -617,7 +617,7 @@ export class TextAttributes {
     italic = false;
     bold = false;
     underlined = false;
-    color: Color = Color.transparent;
+    color: Color = Color.transparent_black;
     visible = true;
     mirrored = false;
     multiline = true;
