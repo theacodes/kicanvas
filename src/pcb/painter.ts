@@ -186,13 +186,11 @@ class ZonePainter extends ItemPainter {
                 continue;
             }
 
+            let color = layer.color;
+
             // TODO: Remove
-            const color = new Color(
-                layer.color.r,
-                layer.color.g,
-                layer.color.b,
-                layer.color.a * 0.1,
-            );
+            color = new Color(1, 1, 1, 0);
+
             this.gfx.polygon(new Polygon(p.pts, color));
         }
     }
