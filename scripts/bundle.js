@@ -6,6 +6,7 @@
 
 import esbuild from "esbuild";
 import { resolve } from "path";
+import { readFile } from "fs/promises";
 
 export const ENTRY = resolve("src/index.ts");
 
@@ -21,7 +22,23 @@ export async function bundle(options = {}) {
             ".glsl": "text",
             ".css": "text",
         },
+        plugins: [CSSMinifyPlugin],
         ...options,
     };
     return { options: options, context: await esbuild.context(options) };
 }
+
+// Minify CSS when used with the file loader.
+export const CSSMinifyPlugin = {
+    name: "CSSMinifyPlugin",
+    setup(build) {
+        build.onLoad({ filter: /\.css$/ }, async (args) => {
+            const f = await readFile(args.path);
+            const css = await esbuild.transform(f, {
+                loader: "css",
+                minify: true,
+            });
+            return { loader: "text", contents: css.code };
+        });
+    },
+};
