@@ -8,38 +8,71 @@
     margin: 0;
 }
 
+.material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    -moz-font-feature-settings: "liga";
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+}
+
 :host {
     box-sizing: border-box;
+    background-color: #222;
+}
+
+menu {
+    all: unset;
+    width: 100%;
+    box-sizing: border-box;
     margin: 0;
+    padding: 0.5rem 0;
     flex-shrink: 1;
     display: flex;
     flex-direction: column;
-    background-color: #222;
-    padding: 0.5rem 0rem;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-button {
+li {
+    all: unset;
+    box-sizing: border-box;
+    padding: 0.25rem 1rem;
     color: white;
-    background: transparent;
-    padding: 0.5rem 1rem;
     text-align: left;
-    border: 0 none;
     display: flex;
     flex-direction: row;
     width: 100%;
+    align-items: center;
 }
 
-button:hover {
+button {
+    all: unset;
+}
+
+li:hover {
     background-color: #333;
 }
 
-button[visible="no"] {
+li[data-layer-visibility="hidden"] {
     color: #888;
 }
 
-button .color {
+li[data-layer-highlighted] {
+    background-color: #888;
+}
+
+li .color {
     flex-shrink: 0;
     display: block;
     width: 1rem;
@@ -47,7 +80,37 @@ button .color {
     margin-right: 0.5rem;
 }
 
-button .span {
+li .name {
     display: block;
+    flex-grow: 1;
+}
+
+li button {
     flex-shrink: 0;
+    margin-left: 1rem;
+    color: white;
+    border: 0 none;
+    background: transparent;
+    padding: 0 0.25rem 0 0.25rem;
+    margin-right: -0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+li button:hover .icon {
+    color: rgba(129, 255, 190, 1);
+}
+
+.icon[data-layer-visibility="hidden"] {
+    color: #888;
+}
+
+li[data-layer-visibility="hidden"] .icon[data-layer-visibility="visible"],
+li[data-layer-visibility="visible"] .icon[data-layer-visibility="hidden"] {
+    display: none;
+}
+
+li[data-layer-visibility="hidden"] .icon[data-layer-visibility="hidden"],
+li[data-layer-visibility="visible"] .icon[data-layer-visibility="visible"] {
+    display: revert;
 }

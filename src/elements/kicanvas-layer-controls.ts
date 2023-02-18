@@ -34,10 +34,10 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         }
 
         if (this.target.loaded) {
-            super.connectedCallback();
+            await super.connectedCallback();
         } else {
-            this.target.addEventListener(events.names.load, () => {
-                super.connectedCallback();
+            this.target.addEventListener(events.names.load, async () => {
+                await super.connectedCallback();
             });
         }
     }
@@ -46,43 +46,81 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         this.target = undefined!;
     }
 
+    get menu() {
+        return this.shadowRoot?.querySelector("menu");
+    }
+
+    override async renderedCallback(root: ShadowRoot): Promise<void> {
+        this.menu!.addEventListener("click", (e) => {
+            console.log(e);
+            this.#onClick(e);
+        });
+    }
+
     override async render() {
         const layers = this.target.viewer.layers as LayerSet;
-        const buttons: HTMLElement[] = [];
+        const buttons: ReturnType<typeof html>[] = [];
 
         for (const layer of layers.in_ui_order()) {
-            const visible = layer.visible ? "yes" : "no";
+            const visible = layer.visible ? "visible" : "hidden";
             const css_color = layer.color.to_css();
             buttons.push(
-                html`
-                <button type="button" name="${layer.name}" visible="${visible}">
-                    <span class="color" style="background-color: ${css_color};"></span>
-                    <span class="name">${layer.name}</name>
-                </button>` as HTMLElement,
+                html`<li
+                    data-layer-name="${layer.name}"
+                    data-layer-visibility="${visible}">
+                    <span
+                        class="color"
+                        style="background-color: ${css_color};"></span>
+                    <span class="name">${layer.name}</span>
+                    <button type="button" name="${layer.name}">
+                        <span
+                            class="icon material-symbols-outlined"
+                            data-layer-visibility="visible">
+                            visibility
+                        </span>
+                        <span
+                            class="icon material-symbols-outlined"
+                            data-layer-visibility="hidden">
+                            visibility_off
+                        </span>
+                    </button>
+                </li>`,
             );
         }
 
-        const content = html`${buttons}`;
-
-        this.shadowRoot!.addEventListener("click", (e) => {
-            this.#onClick(e);
-        });
-
-        return content;
+        return html`<menu>${buttons}</menu>`;
     }
 
     #onClick(e: Event) {
         const button = (e.target as HTMLElement)?.closest("button");
-        const name = button?.getAttribute("name");
+        const li = (e.target as HTMLElement)?.closest("li");
+        const name = li?.dataset["layerName"];
 
-        if (!name) {
+        if (!li || !name) {
             return;
         }
 
         const layer = this.target.viewer.layers.by_name(name)!;
 
-        layer.visible = !layer.visible;
-        button!.setAttribute("visible", layer.visible ? "yes" : "no");
+        if (button) {
+            // Toggle layer visibility
+            layer.visible = !layer.visible;
+            li.dataset["layerVisibility"] = layer.visible
+                ? "visible"
+                : "hidden";
+        } else {
+            // Highlight layer
+            this.menu!.querySelectorAll("li").forEach((elem) => {
+                delete elem.dataset["layerHighlighted"];
+            });
+
+            this.target.viewer.layers.highlight(layer);
+            layer.visible = true;
+
+            li.dataset["layerHighlighted"] = "";
+            li.dataset["layerVisibility"] = "visible";
+        }
+
         this.target.viewer.draw_soon();
     }
 }
