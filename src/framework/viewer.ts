@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Viewport } from "../scene/viewport";
+import { Viewport } from "./viewport";
 import { Renderer } from "../gfx/renderer";
 import { Vec2 } from "../math/vec2";
 import { BBox } from "../math/bbox";

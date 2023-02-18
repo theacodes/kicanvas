@@ -6,9 +6,9 @@
 
 import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
-import { Camera2 } from "./camera2";
-import { PanAndZoom } from "./pan-and-zoom";
-import { CanvasSizeObserver } from "./canvas-size-observer";
+import { Camera2 } from "../math/camera2";
+import { PanAndZoom } from "../dom/pan-and-zoom";
+import { CanvasSizeObserver } from "../dom/canvas-size-observer";
 import { Renderer } from "../gfx/renderer";
 import { Angle } from "../math/angle";
 

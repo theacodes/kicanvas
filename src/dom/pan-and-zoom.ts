@@ -6,7 +6,7 @@
 
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
-import { Camera2 } from "./camera2";
+import { Camera2 } from "../math/camera2";
 
 export type PanAndZoomCallback = () => void;
 
