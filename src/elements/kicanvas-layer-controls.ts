@@ -9,6 +9,7 @@ import { LayerSet } from "../pcb/layers";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import * as events from "../framework/events";
 import styles from "./kicanvas-layer-controls.css";
+import item_styles from "./kicanvas-layer-control-item.css";
 
 export class KiCanvasLayerControlsElement extends CustomElement {
     static override styles = styles;
@@ -17,6 +18,10 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
     constructor() {
         super();
+    }
+
+    get viewer() {
+        return this.target.viewer;
     }
 
     override async connectedCallback() {
@@ -51,90 +56,169 @@ export class KiCanvasLayerControlsElement extends CustomElement {
     }
 
     override async renderedCallback(root: ShadowRoot): Promise<void> {
-        this.menu!.addEventListener("click", (e) => {
-            this.#onClick(e);
-        });
+        // Highlight layer when its control list item is clicked
+        this.menu!.addEventListener(
+            KiCanvasLayerControlItemElement.select_event,
+            (e: Event) => {
+                const item = (e as CustomEvent)
+                    .detail as KiCanvasLayerControlItemElement;
+
+                this.menu!.querySelectorAll(
+                    "kicanvas-layer-control-item",
+                ).forEach((elem) => {
+                    (
+                        elem as KiCanvasLayerControlItemElement
+                    ).layer_highlighted = false;
+                });
+
+                const layer = this.viewer.layers.by_name(item.layer_name!)!;
+
+                // if this layer is already highlighted, de-highlight it.
+                if (this.viewer.layers.highlighted == layer) {
+                    this.viewer.layers.highlight(null);
+                }
+                // otherwise mark it as highlighted.
+                else {
+                    this.viewer.layers.highlight(layer);
+                    layer.visible = true;
+                    item.layer_visible = true;
+                    item.layer_highlighted = true;
+                }
+
+                this.viewer.draw_soon();
+            },
+        );
+
+        // Toggle layer visibility when its item's visibility control is clicked
+        this.menu!.addEventListener(
+            KiCanvasLayerControlItemElement.visibility_event,
+            (e) => {
+                const item = (e as CustomEvent)
+                    .detail as KiCanvasLayerControlItemElement;
+
+                const layer = this.viewer.layers.by_name(item.layer_name!)!;
+
+                // Toggle layer visibility
+                layer.visible = !layer.visible;
+                item.layer_visible = layer.visible;
+
+                this.viewer.draw_soon();
+            },
+        );
     }
 
     override async render() {
         const layers = this.target.viewer.layers as LayerSet;
-        const buttons: ReturnType<typeof html>[] = [];
+        const items: ReturnType<typeof html>[] = [];
 
         for (const layer of layers.in_ui_order()) {
             const visible = layer.visible ? "visible" : "hidden";
             const css_color = layer.color.to_css();
-            buttons.push(
-                html`<li
-                    data-layer-name="${layer.name}"
-                    data-layer-visibility="${visible}">
-                    <span
-                        class="color"
-                        style="background-color: ${css_color};"></span>
-                    <span class="name">${layer.name}</span>
-                    <button type="button" name="${layer.name}">
-                        <span
-                            class="icon material-symbols-outlined"
-                            data-layer-visibility="visible">
-                            visibility
-                        </span>
-                        <span
-                            class="icon material-symbols-outlined"
-                            data-layer-visibility="hidden">
-                            visibility_off
-                        </span>
-                    </button>
-                </li>`,
+            items.push(
+                html` <kicanvas-layer-control-item
+                    layer-name="${layer.name}"
+                    layer-color="${css_color}"
+                    layer-visibility="${visible}"></kicanvas-layer-control-item>`,
             );
         }
 
-        return html`<menu>${buttons}</menu>`;
-    }
-
-    #onClick(e: Event) {
-        const button = (e.target as HTMLElement)?.closest("button");
-        const li = (e.target as HTMLElement)?.closest("li");
-        const name = li?.dataset["layerName"];
-
-        if (!li || !name) {
-            return;
-        }
-
-        const layer = this.target.viewer.layers.by_name(name)!;
-
-        if (button) {
-            // Toggle layer visibility
-            layer.visible = !layer.visible;
-            li.dataset["layerVisibility"] = layer.visible
-                ? "visible"
-                : "hidden";
-
-            if (!layer.visible) {
-                delete li.dataset["layerHighlighted"];
-            }
-        } else {
-            // Highlight layer
-            this.menu!.querySelectorAll("li").forEach((elem) => {
-                delete elem.dataset["layerHighlighted"];
-            });
-
-            // if this layer is already highlighted, de-highlight it.
-            if (this.target.viewer.layers.highlighted == layer) {
-                this.target.viewer.layers.highlight(null);
-                delete li.dataset["layerHighlighted"];
-            }
-            // otherwise mark it as highlighted.
-            else {
-                this.target.viewer.layers.highlight(layer);
-                layer.visible = true;
-
-                li.dataset["layerHighlighted"] = "";
-                li.dataset["layerVisibility"] = "visible";
-            }
-        }
-
-        this.target.viewer.draw_soon();
+        return html`<menu>${items}</menu>`;
     }
 }
+
+class KiCanvasLayerControlItemElement extends CustomElement {
+    static override styles = item_styles;
+    static select_event = "kicanvas:layer-control-item:select";
+    static visibility_event = "kicanvas:layer-control-item:visibility";
+
+    constructor() {
+        super();
+    }
+
+    override async connectedCallback(): Promise<void> {
+        this.layer_visible = true;
+
+        await super.connectedCallback();
+
+        this.shadowRoot!.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            const button = (e.target as HTMLElement)?.closest("button");
+            let event_name;
+
+            // Visibility button clicked.
+            if (button) {
+                event_name = KiCanvasLayerControlItemElement.visibility_event;
+            }
+            // Otherwise, some other part of the element was clicked so it's
+            // "selected".
+            else {
+                event_name = KiCanvasLayerControlItemElement.select_event;
+            }
+
+            this.dispatchEvent(
+                new CustomEvent(event_name, {
+                    detail: this,
+                    bubbles: true,
+                }),
+            );
+        });
+    }
+
+    get layer_name() {
+        return this.getAttribute("layer-name");
+    }
+
+    get layer_color() {
+        return this.getAttribute("layer-color");
+    }
+
+    set layer_highlighted(v: boolean) {
+        if (v) {
+            this.setAttribute("layer-highlighted", "");
+        } else {
+            this.removeAttribute("layer-highlighted");
+        }
+    }
+
+    get layer_highlighted(): boolean {
+        return this.hasAttribute("layer-highlighted");
+    }
+
+    set layer_visible(v: boolean) {
+        this.setAttribute("layer-visibility", v ? "visible" : "hidden");
+
+        if (!this.layer_visible) {
+            this.layer_highlighted = false;
+        }
+    }
+
+    get layer_visible(): boolean {
+        return this.getAttribute("layer-visibility") == "visible"
+            ? true
+            : false;
+    }
+
+    override async render() {
+        return html`<span
+                class="color"
+                style="background-color: ${this.layer_color};"></span>
+            <span class="name">${this.layer_name}</span>
+            <button type="button" name="${this.layer_name}">
+                <span class="icon material-symbols-outlined for-visible">
+                    visibility
+                </span>
+                <span class="icon material-symbols-outlined for-hidden">
+                    visibility_off
+                </span>
+            </button>`;
+    }
+}
+
+window.customElements.define(
+    "kicanvas-layer-control-item",
+    KiCanvasLayerControlItemElement,
+);
 
 window.customElements.define(
     "kicanvas-layer-controls",
