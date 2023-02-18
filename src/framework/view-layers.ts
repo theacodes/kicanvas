@@ -218,9 +218,14 @@ export class ViewLayerSet {
     /**
      * Highlights a given layer, by default it's drawn above other layers.
      */
-    highlight(layer: string | ViewLayer) {
+    highlight(layer: string | ViewLayer | null) {
         if (this.#highlighted_layer) {
             this.#highlighted_layer.highlighted = false;
+        }
+
+        if (!layer) {
+            this.#highlighted_layer = null;
+            return;
         }
 
         if (typeof layer == "string") {

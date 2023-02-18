@@ -52,7 +52,6 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
     override async renderedCallback(root: ShadowRoot): Promise<void> {
         this.menu!.addEventListener("click", (e) => {
-            console.log(e);
             this.#onClick(e);
         });
     }
@@ -118,11 +117,19 @@ export class KiCanvasLayerControlsElement extends CustomElement {
                 delete elem.dataset["layerHighlighted"];
             });
 
-            this.target.viewer.layers.highlight(layer);
-            layer.visible = true;
+            // if this layer is already highlighted, de-highlight it.
+            if (this.target.viewer.layers.highlighted == layer) {
+                this.target.viewer.layers.highlight(null);
+                delete li.dataset["layerHighlighted"];
+            }
+            // otherwise mark it as highlighted.
+            else {
+                this.target.viewer.layers.highlight(layer);
+                layer.visible = true;
 
-            li.dataset["layerHighlighted"] = "";
-            li.dataset["layerVisibility"] = "visible";
+                li.dataset["layerHighlighted"] = "";
+                li.dataset["layerVisibility"] = "visible";
+            }
         }
 
         this.target.viewer.draw_soon();
