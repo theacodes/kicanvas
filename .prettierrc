@@ -3,6 +3,7 @@
   "useTabs": false,
   "printWidth": 80,
   "trailingComma": "all",
+  "bracketSameLine": true,
   "overrides": [
     {
       "files": [
