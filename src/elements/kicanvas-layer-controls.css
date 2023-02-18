@@ -29,6 +29,8 @@
 :host {
     box-sizing: border-box;
     background-color: #222;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 menu {
@@ -40,8 +42,6 @@ menu {
     flex-shrink: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 li {
@@ -64,12 +64,12 @@ li:hover {
     background-color: #333;
 }
 
-li[data-layer-visibility="hidden"] {
-    color: #888;
-}
-
 li[data-layer-highlighted] {
     background-color: #888;
+}
+
+li[data-layer-visibility="hidden"] {
+    color: #888;
 }
 
 li .color {

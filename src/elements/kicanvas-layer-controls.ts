@@ -108,6 +108,10 @@ export class KiCanvasLayerControlsElement extends CustomElement {
             li.dataset["layerVisibility"] = layer.visible
                 ? "visible"
                 : "hidden";
+
+            if (!layer.visible) {
+                delete li.dataset["layerHighlighted"];
+            }
         } else {
             // Highlight layer
             this.menu!.querySelectorAll("li").forEach((elem) => {

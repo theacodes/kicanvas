@@ -24,24 +24,31 @@ export class BoardViewer extends Viewer {
         this.addEventListener(events.names.viewer.pick, (e: Event) => {
             const { mouse: _, items } = (e as CustomEvent).detail;
 
-            this.selected = null;
+            let selected;
 
             for (const { layer: _, bbox } of items) {
                 if (bbox.context instanceof pcb_items.Footprint) {
-                    this.selected = bbox;
+                    selected = bbox;
                     break;
                 }
             }
 
-            if (this.selected) {
+            if (!selected || selected.context == this.selected?.context) {
+                // selecting the same thing twice deselects it.
+                selected = null;
+            }
+
+            if (selected) {
                 canvas.dispatchEvent(
                     new CustomEvent(events.names.viewer.select, {
                         bubbles: true,
                         composed: true,
-                        detail: this.selected.context,
+                        detail: selected.context,
                     }),
                 );
             }
+
+            this.selected = selected;
         });
     }
 
