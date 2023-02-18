@@ -71,7 +71,7 @@ export class Viewport {
         }
     }
 
-    enable_pan_and_zoom(min_zoom = 0.1, max_zoom = 100) {
+    enable_pan_and_zoom(min_zoom?: number, max_zoom?: number) {
         new PanAndZoom(
             this.renderer.canvas,
             this.camera,

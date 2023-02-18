@@ -45,7 +45,7 @@ export abstract class Viewer extends EventTarget {
             this.draw_soon();
         });
 
-        this.viewport.enable_pan_and_zoom(0.3, 200);
+        this.viewport.enable_pan_and_zoom(0.5, 190);
 
         this.#setup_events();
     }
