@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CustomElement, html } from "../framework/elements";
+import { CustomElement, html } from "../dom/custom-elements";
 import { Footprint } from "../kicad/board";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import * as events from "../framework/events";

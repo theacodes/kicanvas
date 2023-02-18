@@ -4,13 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { DropTarget } from "../framework/drag-drop";
+import { DropTarget } from "../dom/drag-drop";
 import * as theme from "../kicad/theme";
 import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
 import { KiCanvasInfoBarElement } from "./kicanvas-info-bar";
-import { CustomElement, html } from "../framework/elements";
+import { CustomElement, html } from "../dom/custom-elements";
 import styles from "./kicanvas-app.css";
 
 class KiCanvasAppElement extends CustomElement {

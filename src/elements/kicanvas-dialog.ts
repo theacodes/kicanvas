@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CustomElement, html } from "../framework/elements";
+import { CustomElement, html } from "../dom/custom-elements";
 import { SchematicSymbol } from "../kicad/schematic";
 import * as events from "../framework/events";
 import styles from "./kicanvas-dialog.css";
@@ -45,8 +45,7 @@ export class KiCanvasDialogElement extends CustomElement {
                     readonly
                     id="${prop.name}"
                     name="${prop.name}"
-                    value="${prop.text}"
-                />
+                    value="${prop.text}" />
             </div>`);
         }
 
