@@ -637,6 +637,7 @@ export class LibSymbol {
     children: LibSymbol[] = [];
     drawings: Drawing[] = [];
     pins: PinDefinition[] = [];
+    units: Map<number, LibSymbol> = new Map();
 
     #pins_by_number: Map<string, PinDefinition> = new Map();
     #properties_by_id: Map<number, Property> = new Map();
@@ -677,6 +678,13 @@ export class LibSymbol {
 
         for (const property of this.properties) {
             this.#properties_by_id.set(property.id, property);
+        }
+
+        for (const child of this.children) {
+            const unit_num = child.unit;
+            if (unit_num !== null) {
+                this.units.set(unit_num, child);
+            }
         }
     }
 
@@ -719,6 +727,18 @@ export class LibSymbol {
             }
         }
         return null;
+    }
+
+    get unit(): number | null {
+        // KiCAD encodes the symbol unit into the name, for example,
+        // MCP6001_1_1 is unit 1 and MCP6001_2_1 is unit 2.
+        // See SCH_SEXPR_PARSER::ParseSymbol.
+        const parts = this.name.split("_");
+        if (parts.length < 3) {
+            return null;
+        }
+
+        return parseInt(parts.at(-2)!, 10);
     }
 }
 
@@ -841,6 +861,10 @@ export class PinDefinition {
             ),
         );
     }
+
+    get unit() {
+        return this.parent.unit;
+    }
 }
 
 export class PinAlternate {
@@ -944,6 +968,10 @@ export class PinInstance {
 
     get definition() {
         return this.parent.lib_symbol.pin_by_number(this.number);
+    }
+
+    get unit() {
+        return this.definition.unit;
     }
 }
 
