@@ -72,6 +72,8 @@ export class CustomElement extends HTMLElement {
         this.#renderInitialContent();
     }
 
+    async disconnectedCallback() {}
+
     async initialContentCallback() {}
 
     async render(): Promise<Element | DocumentFragment> {

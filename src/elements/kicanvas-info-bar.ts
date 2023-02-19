@@ -44,7 +44,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
         });
     }
 
-    disconnectedCallback() {
+    override async disconnectedCallback() {
         this.target = undefined!;
     }
 

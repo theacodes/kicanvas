@@ -58,7 +58,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         }
     }
 
-    disconnectedCallback() {
+    override async disconnectedCallback() {
         this.target = undefined!;
     }
 
