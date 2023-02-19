@@ -4,10 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { CustomElement, html } from "../dom/custom-elements";
 import { SchematicViewer } from "../sch/viewer";
 import * as events from "../framework/events";
 
-export class KiCanvasSchematicElement extends HTMLElement {
+export class KiCanvasSchematicElement extends CustomElement {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
     selected: any[] = [];
@@ -28,16 +29,14 @@ export class KiCanvasSchematicElement extends HTMLElement {
         }
     }
 
-    async connectedCallback() {
-        this.#renderShadowDOM();
-
+    override async initialContentCallback() {
         const src = this.getAttribute("src");
         if (src) {
             this.load(src);
         }
     }
 
-    async disconnectedCallback() {
+    override async disconnectedCallback() {
         if (this.viewer) {
             this.viewer.dispose();
         }
@@ -56,10 +55,10 @@ export class KiCanvasSchematicElement extends HTMLElement {
         this.viewer.draw_soon();
     }
 
-    #renderShadowDOM() {
-        const template = document.createElement("template");
-        template.innerHTML = `
-            <style>
+    override async render() {
+        this.#canvas = html`<canvas></canvas>` as HTMLCanvasElement;
+
+        return html` <style>
                 :host {
                     display: block;
                     touch-action: none;
@@ -70,12 +69,7 @@ export class KiCanvasSchematicElement extends HTMLElement {
                     height: 100%;
                 }
             </style>
-            <canvas></canvas>
-        `;
-
-        const root = this.attachShadow({ mode: "open" });
-        root.appendChild(template.content.cloneNode(true));
-        this.#canvas = root.querySelector("canvas")!;
+            ${this.#canvas}`;
     }
 }
 
