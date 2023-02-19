@@ -4,17 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { html, CustomElement } from "../dom/custom-elements";
 import { BoardViewer } from "../pcb/viewer";
 import * as events from "../framework/events";
 
-export class KiCanvasBoardElement extends HTMLElement {
+export class KiCanvasBoardElement extends CustomElement {
     #canvas: HTMLCanvasElement;
     viewer: BoardViewer;
     selected: any[] = [];
-
-    constructor() {
-        super();
-    }
 
     get loaded() {
         return this.hasAttribute("loaded");
@@ -28,19 +25,15 @@ export class KiCanvasBoardElement extends HTMLElement {
         }
     }
 
-    async connectedCallback() {
-        this.#renderShadowDOM();
-
+    override async initialContentCallback() {
         const src = this.getAttribute("src");
         if (src) {
             this.load(src);
         }
     }
 
-    async disconnectedCallback() {
-        if (this.viewer) {
-            this.viewer.dispose();
-        }
+    override async disconnectedCallback() {
+        this.viewer?.dispose();
         this.selected = [];
     }
 
@@ -56,10 +49,10 @@ export class KiCanvasBoardElement extends HTMLElement {
         this.viewer.draw_soon();
     }
 
-    #renderShadowDOM() {
-        const template = document.createElement("template");
-        template.innerHTML = `
-            <style>
+    override async render() {
+        this.#canvas = html`<canvas></canvas>` as HTMLCanvasElement;
+
+        return html` <style>
                 :host {
                     display: block;
                     touch-action: none;
@@ -70,12 +63,7 @@ export class KiCanvasBoardElement extends HTMLElement {
                     height: 100%;
                 }
             </style>
-            <canvas></canvas>
-        `;
-
-        const root = this.attachShadow({ mode: "open" });
-        root.appendChild(template.content.cloneNode(true));
-        this.#canvas = root.querySelector("canvas")!;
+            ${this.#canvas}`;
     }
 }
 
