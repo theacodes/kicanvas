@@ -99,7 +99,7 @@ class PolylinePainter extends ItemPainter {
         );
 
         if (pl.fill?.type !== "none") {
-            this.gfx.polygon(new Polygon(pl.pts, color));
+            this.gfx.polygon(new Polygon(pl.pts, this.gfx.state.fill));
         }
     }
 }
@@ -276,41 +276,56 @@ class LibSymbolPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, s: schematic.LibSymbol) {
-        for (const c of s.children) {
-            this.paint(layer, c);
-        }
-
-        const outline_color = this.gfx.theme["component_outline"];
-        const fill_color = this.gfx.theme["component_body"];
-
         if (
-            [
+            ![
                 LayerName.symbol_background,
                 LayerName.symbol_foreground,
                 LayerName.interactive,
             ].includes(layer.name as LayerName)
         ) {
-            for (const g of s.drawings) {
-                if (g instanceof schematic.GraphicItem) {
-                    if (
-                        layer.name == LayerName.symbol_background &&
-                        g.fill?.type == "background"
-                    ) {
-                        this.gfx.state.fill = fill_color as Color;
-                    } else if (
-                        layer.name == LayerName.symbol_foreground &&
-                        g.fill?.type == "outline"
-                    ) {
-                        this.gfx.state.fill = outline_color as Color;
-                    } else {
-                        this.gfx.state.fill = Color.transparent_black;
-                    }
+            return;
+        }
+
+        // Unit 0 has graphic common to all units. See LIB_SYMBOL::GetPins and
+        // LIB_ITEM::m_unit.
+        const common_unit = s.units.get(0);
+        if (common_unit) {
+            this.#paint_unit(layer, common_unit);
+        }
+
+        const si = (this.view_painter as SchematicPainter).current_symbol;
+
+        const symbol_unit = s.units.get(si?.unit || 1);
+
+        if (symbol_unit) {
+            this.#paint_unit(layer, symbol_unit);
+        }
+    }
+
+    #paint_unit(layer: ViewLayer, s: schematic.LibSymbol) {
+        const outline_color = this.gfx.theme["component_outline"] as Color;
+        const fill_color = this.gfx.theme["component_body"] as Color;
+
+        for (const g of s.drawings) {
+            if (g instanceof schematic.GraphicItem) {
+                if (
+                    layer.name == LayerName.symbol_background &&
+                    g.fill?.type == "background"
+                ) {
+                    this.gfx.state.fill = fill_color;
+                } else if (
+                    layer.name == LayerName.symbol_foreground &&
+                    g.fill?.type == "outline"
+                ) {
+                    this.gfx.state.fill = outline_color;
+                } else {
+                    this.gfx.state.fill = Color.transparent_black;
                 }
-
-                this.gfx.state.stroke = outline_color as Color;
-
-                this.view_painter.paint_item(layer, g);
             }
+
+            this.gfx.state.stroke = outline_color;
+
+            this.view_painter.paint_item(layer, g);
         }
     }
 }
@@ -588,6 +603,9 @@ class SchematicSymbolPainter extends ItemPainter {
             ].includes(layer.name as LayerName)
         ) {
             for (const pin of si.pins) {
+                if (si.unit && pin.unit && si.unit != pin.unit) {
+                    continue;
+                }
                 this.view_painter.paint_item(layer, pin);
             }
         }
