@@ -72,6 +72,8 @@ export class CustomElement extends HTMLElement {
         this.#renderInitialContent();
     }
 
+    async initialContentCallback() {}
+
     async render(): Promise<Element | DocumentFragment> {
         return html``;
     }
@@ -100,5 +102,6 @@ export class CustomElement extends HTMLElement {
         root.appendChild(style);
         root.appendChild(await this.render());
         this.renderedCallback();
+        this.initialContentCallback();
     }
 }

@@ -24,6 +24,16 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         return this.target.viewer;
     }
 
+    get menu() {
+        return this.renderRoot.querySelector("menu");
+    }
+
+    get menu_items(): KiCanvasLayerControlItemElement[] {
+        return Array.from(
+            this.menu?.querySelectorAll("kicanvas-layer-control-item") ?? [],
+        );
+    }
+
     override async connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
@@ -38,6 +48,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
             throw new Error("No target for <kicanvas-layer-controls>");
         }
 
+        // Don't try to render until the viewer is loaded
         if (this.target.loaded) {
             await super.connectedCallback();
         } else {
@@ -51,17 +62,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         this.target = undefined!;
     }
 
-    get menu() {
-        return this.renderRoot.querySelector("menu");
-    }
-
-    get menu_items(): KiCanvasLayerControlItemElement[] {
-        return Array.from(
-            this.menu!.querySelectorAll("kicanvas-layer-control-item"),
-        );
-    }
-
-    override async renderedCallback(): Promise<void> {
+    override async initialContentCallback(): Promise<void> {
         // Highlight layer when its control list item is clicked
         this.menu!.addEventListener(
             KiCanvasLayerControlItemElement.select_event,
