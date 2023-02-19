@@ -64,24 +64,28 @@ export class CustomElement extends HTMLElement {
         super();
     }
 
+    get renderRoot(): ShadowRoot | this {
+        return this.shadowRoot ?? this;
+    }
+
     async connectedCallback() {
         this.#renderInitialContent();
     }
 
-    async render(root: ShadowRoot): Promise<Element | DocumentFragment> {
+    async render(): Promise<Element | DocumentFragment> {
         return html``;
     }
 
-    async renderedCallback(root: ShadowRoot) {}
+    async renderedCallback() {}
 
     async update() {
-        for (const child of this.shadowRoot!.children) {
+        for (const child of this.renderRoot.children) {
             if (child.tagName != "STYLE") {
                 child.remove();
             }
         }
-        this.shadowRoot!.appendChild(await this.render(this.shadowRoot!));
-        this.renderedCallback(this.shadowRoot!);
+        this.renderRoot.appendChild(await this.render());
+        this.renderedCallback();
     }
 
     async #renderInitialContent() {
@@ -94,7 +98,7 @@ export class CustomElement extends HTMLElement {
         </style>`;
 
         root.appendChild(style);
-        root.appendChild(await this.render(root));
-        this.renderedCallback(this.shadowRoot!);
+        root.appendChild(await this.render());
+        this.renderedCallback();
     }
 }

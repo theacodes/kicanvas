@@ -25,7 +25,7 @@ export class KiCanvasDialogElement extends CustomElement {
             async (e: Event) => {
                 this.#selected = (e as CustomEvent).detail;
                 await this.update();
-                this.shadowRoot?.querySelector("dialog")?.showModal();
+                this.renderRoot.querySelector("dialog")?.showModal();
             },
         );
     }

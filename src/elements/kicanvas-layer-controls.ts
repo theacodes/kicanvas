@@ -52,7 +52,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
     }
 
     get menu() {
-        return this.shadowRoot?.querySelector("menu");
+        return this.renderRoot.querySelector("menu");
     }
 
     get menu_items(): KiCanvasLayerControlItemElement[] {
@@ -61,7 +61,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         );
     }
 
-    override async renderedCallback(root: ShadowRoot): Promise<void> {
+    override async renderedCallback(): Promise<void> {
         // Highlight layer when its control list item is clicked
         this.menu!.addEventListener(
             KiCanvasLayerControlItemElement.select_event,
@@ -109,8 +109,8 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         );
 
         // Show/hide all layers
-        this.shadowRoot
-            ?.querySelector("button")
+        this.renderRoot
+            .querySelector("button")
             ?.addEventListener("click", (e) => {
                 if (this.menu_items.some((n) => n.layer_visible)) {
                     // hide all layers.
@@ -173,7 +173,7 @@ class KiCanvasLayerControlItemElement extends CustomElement {
 
         await super.connectedCallback();
 
-        this.shadowRoot!.addEventListener("click", (e) => {
+        this.renderRoot.addEventListener("click", (e) => {
             e.stopPropagation();
 
             const button = (e.target as HTMLElement)?.closest("button");
