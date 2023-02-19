@@ -125,6 +125,7 @@ export enum LayerName {
 const hole_layers = [
     LayerName.via_holes,
     LayerName.pad_holes,
+    LayerName.pad_holewalls,
     LayerName.via_through,
     LayerName.via_buriedblind,
     LayerName.via_microvia,
@@ -207,10 +208,10 @@ export class LayerSet extends BaseLayerSet {
             }
 
             // Pad layers require that the front or back layer is visible.
-            if (layer_name == ":Pads:Front") {
+            if (layer_name == LayerName.pads_front) {
                 visible = () => this.by_name(LayerName.f_cu)!.visible;
             }
-            if (layer_name == ":Pads:Back") {
+            if (layer_name == LayerName.pads_back) {
                 visible = () => this.by_name(LayerName.b_cu)!.visible;
             }
 
@@ -237,13 +238,13 @@ export class LayerSet extends BaseLayerSet {
      */
     color_for(layer_name: string): Color {
         switch (layer_name) {
-            case ":Via:Holes":
+            case LayerName.via_holes:
                 return (this.theme["via_hole"] as Color) ?? Color.white;
-            case ":Via:Through":
+            case LayerName.via_through:
                 return (this.theme["via_through"] as Color) ?? Color.white;
-            case ":Pad:Holes":
+            case LayerName.pad_holes:
                 return (this.theme["background"] as Color) ?? Color.white;
-            case ":Pad:HoleWalls":
+            case LayerName.pad_holewalls:
                 return (this.theme["pad_through_hole"] as Color) ?? Color.white;
         }
 
@@ -260,6 +261,23 @@ export class LayerSet extends BaseLayerSet {
         }
 
         return (this.theme[name] as Color) ?? Color.white;
+    }
+
+    override should_dim(layer: ViewLayer): boolean {
+        if (!this.highlighted) {
+            return false;
+        }
+
+        if (this.highlighted == layer) {
+            return false;
+        }
+
+        // Don't dim virtual layers associated with the active layer.
+        if (layer.name.endsWith(`${this.highlighted.name}`)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

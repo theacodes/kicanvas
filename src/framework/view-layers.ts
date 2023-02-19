@@ -157,10 +157,7 @@ export class ViewLayerSet {
             if (layer.visible && layer.graphics) {
                 let alpha = 1;
 
-                if (
-                    this.#highlighted_layer &&
-                    this.#highlighted_layer != layer
-                ) {
+                if (this.should_dim(layer)) {
                     alpha = 0.25;
                 }
 
@@ -168,6 +165,15 @@ export class ViewLayerSet {
                 depth += 0.01;
             }
         }
+    }
+
+    /** Returns true if the given layer should be dimmed, such as when another
+     * layer is highlighted.
+     */
+    should_dim(layer: ViewLayer) {
+        return this.#highlighted_layer && this.#highlighted_layer != layer
+            ? true
+            : false;
     }
 
     /**

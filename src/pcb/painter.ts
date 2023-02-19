@@ -17,7 +17,6 @@ import { Matrix3 } from "../math/matrix3";
 import { Angle } from "../math/angle";
 import { Renderer } from "../gfx/renderer";
 import { ViewLayer, LayerName, LayerSet } from "./layers";
-import { Color } from "../gfx/color";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { EDAText } from "../text/eda-text";
@@ -186,12 +185,7 @@ class ZonePainter extends ItemPainter {
                 continue;
             }
 
-            let color = layer.color;
-
-            // TODO: Remove
-            color = new Color(1, 1, 1, 0);
-
-            this.gfx.polygon(new Polygon(p.pts, color));
+            this.gfx.polygon(new Polygon(p.pts, layer.color));
         }
     }
 }
