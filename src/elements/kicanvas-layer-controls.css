@@ -3,6 +3,8 @@
 *::after {
     box-sizing: border-box;
     user-select: none;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 * {
@@ -76,4 +78,54 @@ button {
 
 button:hover {
     color: rgba(129, 255, 190, 1);
+}
+
+kicanvas-layer-control-item {
+    box-sizing: border-box;
+    padding: 0.25rem 1rem;
+    color: white;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+}
+
+kicanvas-layer-control-item:hover {
+    background-color: #333;
+}
+
+kicanvas-layer-control-item[layer-highlighted] {
+    background-color: #888;
+}
+
+kicanvas-layer-control-item[layer-visibility="hidden"] {
+    color: #888;
+}
+
+kicanvas-layer-control-item .color {
+    flex-shrink: 0;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+kicanvas-layer-control-item .name {
+    display: block;
+    flex-grow: 1;
+}
+
+kicanvas-layer-control-item .icon.for-hidden {
+    color: #888;
+}
+
+kicanvas-layer-control-item[layer-visibility="hidden"] .icon.for-visible,
+kicanvas-layer-control-item[layer-visibility="visible"] .icon.for-hidden {
+    display: none;
+}
+
+kicanvas-layer-control-item[layer-visibility="hidden"] .icon.for-hidden,
+kicanvas-layer-control-item[layer-visibility="visible"] .icon.for-visible {
+    display: revert;
 }

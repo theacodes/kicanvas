@@ -9,7 +9,6 @@ import { LayerSet } from "../pcb/layers";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import * as events from "../framework/events";
 import styles from "./kicanvas-layer-controls.css";
-import item_styles from "./kicanvas-layer-control-item.css";
 
 export class KiCanvasLayerControlsElement extends CustomElement {
     static override styles = styles;
@@ -161,7 +160,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 }
 
 class KiCanvasLayerControlItemElement extends CustomElement {
-    static override styles = item_styles;
+    static override useShadowRoot = false;
     static select_event = "kicanvas:layer-control-item:select";
     static visibility_event = "kicanvas:layer-control-item:visibility";
 
