@@ -21,8 +21,6 @@ export function expand_text_vars(
         text = text.replaceAll("${" + k.toUpperCase() + "}", v ?? "");
     }
 
-    // console.log(text);
-
     const escape_vars = {
         slash: "/",
         backslash: "\\",
