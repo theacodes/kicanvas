@@ -57,25 +57,52 @@ export function html(
     }
 }
 
+/**
+ * "Just enough" CustomElement helper.
+ */
 export class CustomElement extends HTMLElement {
+    /**
+     * Styles added to the shadowRoot, can be a string or list of strings.
+     */
     static styles: string | string[];
+
+    /**
+     * If true, a shadowRoot is created for this element.
+     */
+    static useShadowRoot = true;
 
     constructor() {
         super();
     }
 
+    /**
+     * Returns either the shadowRoot or this if useShadowRoot is false.
+     */
     get renderRoot(): ShadowRoot | this {
         return this.shadowRoot ?? this;
     }
 
+    /**
+     * Called when connected to the DOM
+     *
+     * By default it calls render() to place the initial content to the
+     * renderRoot.
+     */
     async connectedCallback() {
         this.#renderInitialContent();
     }
 
     async disconnectedCallback() {}
 
+    /**
+     * Called after the initial content is added to the renderRoot, perfect
+     * for registering event callbacks.
+     */
     async initialContentCallback() {}
 
+    /**
+     * Called to render content to the renderRoot.
+     */
     async render(): Promise<Element | DocumentFragment> {
         return html``;
     }
@@ -95,14 +122,17 @@ export class CustomElement extends HTMLElement {
     async #renderInitialContent() {
         const static_this = this.constructor as typeof CustomElement;
 
-        const root = this.attachShadow({ mode: "open" });
+        if ((this.constructor as typeof CustomElement).useShadowRoot) {
+            this.attachShadow({ mode: "open" });
 
-        const style = html`<style>
-            ${static_this.styles}
-        </style>`;
+            const style = html`<style>
+                ${static_this.styles}
+            </style>`;
 
-        root.appendChild(style);
-        root.appendChild(await this.render());
+            this.renderRoot.appendChild(style);
+        }
+
+        this.renderRoot.appendChild(await this.render());
         this.renderedCallback();
         this.initialContentCallback();
     }
