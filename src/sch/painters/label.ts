@@ -44,6 +44,8 @@ export class LabelPainter extends ItemPainter {
         schtext.apply_at(l.at);
         schtext.apply_effects(l.effects);
 
+        this.after_apply(l, schtext);
+
         if (l.at.rotation == 0 || l.at.rotation == 180) {
             schtext.text_angle.degrees = 0;
         } else if (l.at.rotation == 90 || l.at.rotation == 270) {
@@ -80,6 +82,8 @@ export class LabelPainter extends ItemPainter {
     get color() {
         return new Color(1, 0, 1, 1);
     }
+
+    after_apply(l: schematic.Label, schtext: SchText) {}
 
     get_text_offset(schtext: SchText): number {
         // From SCH_TEXT::GetTextOffset, turns out SCH_LABEL is the only
@@ -237,6 +241,10 @@ export class HierarchicalLabelPainter extends LabelPainter {
         return this.gfx.theme["label_hier"] as Color;
     }
 
+    override after_apply(l: schematic.HierarchicalLabel, schtext: SchText) {
+        schtext.v_align = "center";
+    }
+
     override get_schematic_text_offset(
         l: schematic.Label,
         schtext: SchText,
@@ -263,10 +271,12 @@ export class HierarchicalLabelPainter extends LabelPainter {
      * Creates the label's outline shape
      * Adapted from SCH_HIERLABEL::CreateGraphicShape and TemplateShape.
      */
-    override create_shape(l: schematic.Label, schtext: SchText): Vec2[] {
-        const label = l as schematic.HierarchicalLabel;
+    override create_shape(
+        label: schematic.HierarchicalLabel,
+        schtext: SchText,
+    ): Vec2[] {
         const pos = schtext.text_pos;
-        const angle = Angle.from_degrees(l.at.rotation);
+        const angle = Angle.from_degrees(label.at.rotation);
         const s = schtext.text_width;
 
         let pts: Vec2[];

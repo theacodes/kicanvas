@@ -422,6 +422,9 @@ class PropertyPainter extends ItemPainter {
         }
 
         let color = this.gfx.theme["fields"] as Color;
+        if (p.parent instanceof schematic.SchematicSheet) {
+            color = this.gfx.theme["sheet_fields"] as Color;
+        }
 
         switch (p.name) {
             case "Reference":
@@ -429,6 +432,12 @@ class PropertyPainter extends ItemPainter {
                 break;
             case "Value":
                 color = this.gfx.theme["value"] as Color;
+                break;
+            case "Sheet name":
+                color = this.gfx.theme["sheet_name"] as Color;
+                break;
+            case "Sheet file":
+                color = this.gfx.theme["sheet_filename"] as Color;
                 break;
         }
 
@@ -623,6 +632,84 @@ class SchematicSymbolPainter extends ItemPainter {
     }
 }
 
+class SchematicSheetPainter extends ItemPainter {
+    classes = [schematic.SchematicSheet];
+
+    layers_for(item: schematic.SchematicSheet) {
+        return [
+            LayerName.interactive,
+            LayerName.label,
+            LayerName.symbol_foreground,
+            LayerName.symbol_background,
+            LayerName.symbol_field,
+        ];
+    }
+
+    paint(layer: ViewLayer, ss: schematic.SchematicSheet) {
+        const outline_color = this.gfx.theme["sheet"] as Color;
+        const fill_color = this.gfx.theme["sheet_background"] as Color;
+        const bbox = new BBox(
+            ss.at.position.x,
+            ss.at.position.y,
+            ss.size.x,
+            ss.size.y,
+        );
+
+        if (layer.name == LayerName.symbol_background) {
+            this.gfx.polygon(Polygon.from_BBox(bbox, fill_color));
+        }
+
+        if (layer.name == LayerName.symbol_foreground) {
+            this.gfx.line(
+                Polyline.from_BBox(
+                    bbox,
+                    this.gfx.state.stroke_width,
+                    outline_color,
+                ),
+            );
+        }
+
+        if (layer.name == LayerName.symbol_field) {
+            for (const property of ss.properties) {
+                this.view_painter.paint_item(layer, property);
+            }
+        }
+
+        if (layer.name == LayerName.label) {
+            for (const pin of ss.pins) {
+                const label = new schematic.HierarchicalLabel();
+                label.at = pin.at;
+                label.effects = pin.effects;
+                label.text = pin.name;
+                label.shape = pin.shape;
+
+                switch (label.at.rotation) {
+                    case 0:
+                        label.at.rotation = 180;
+                        break;
+                    case 180:
+                        label.at.rotation = 0;
+                        break;
+                    case 90:
+                        label.at.rotation = 270;
+                        break;
+                    case 270:
+                        label.at.rotation = 90;
+                        break;
+                }
+
+                if (pin.shape == "input") {
+                    label.shape = "output";
+                } else if (pin.shape == "output") {
+                    label.shape = "input";
+                }
+
+                this.view_painter.paint_item(layer, label);
+            }
+        }
+    }
+}
+
 export class SchematicPainter extends DocumentPainter {
     constructor(gfx: Renderer, layers: LayerSet) {
         super(gfx, layers);
@@ -643,6 +730,7 @@ export class SchematicPainter extends DocumentPainter {
             new NetLabelPainter(this, gfx),
             new GlobalLabelPainter(this, gfx),
             new HierarchicalLabelPainter(this, gfx),
+            new SchematicSheetPainter(this, gfx),
         ];
     }
 
