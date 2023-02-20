@@ -33,7 +33,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         );
     }
 
-    override async connectedCallback() {
+    override connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
             if (target_id) {
@@ -49,19 +49,19 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
         // Don't try to render until the viewer is loaded
         if (this.target.loaded) {
-            await super.connectedCallback();
+            super.connectedCallback();
         } else {
             this.target.addEventListener(events.names.load, async () => {
-                await super.connectedCallback();
+                super.connectedCallback();
             });
         }
     }
 
-    override async disconnectedCallback() {
+    override disconnectedCallback() {
         this.target = undefined!;
     }
 
-    override async initialContentCallback(): Promise<void> {
+    override initialContentCallback() {
         // Highlight layer when its control list item is clicked
         this.menu!.addEventListener(
             KiCanvasLayerControlItemElement.select_event,
@@ -132,7 +132,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
             });
     }
 
-    override async render() {
+    override render() {
         const layers = this.target.viewer.layers as LayerSet;
         const items: ReturnType<typeof html>[] = [];
 
@@ -168,10 +168,10 @@ class KiCanvasLayerControlItemElement extends CustomElement {
         super();
     }
 
-    override async connectedCallback(): Promise<void> {
+    override connectedCallback() {
         this.layer_visible = true;
 
-        await super.connectedCallback();
+        super.connectedCallback();
 
         this.renderRoot.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -232,7 +232,7 @@ class KiCanvasLayerControlItemElement extends CustomElement {
             : false;
     }
 
-    override async render() {
+    override render() {
         return html`<span
                 class="color"
                 style="background-color: ${this.layer_color};"></span>

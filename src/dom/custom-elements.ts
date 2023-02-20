@@ -88,51 +88,59 @@ export class CustomElement extends HTMLElement {
      * By default it calls render() to place the initial content to the
      * renderRoot.
      */
-    async connectedCallback() {
+    connectedCallback(): void | undefined {
         this.#renderInitialContent();
     }
 
-    async disconnectedCallback() {}
+    disconnectedCallback(): void | undefined {}
 
     /**
      * Called after the initial content is added to the renderRoot, perfect
      * for registering event callbacks.
      */
-    async initialContentCallback() {}
+    initialContentCallback(): void | undefined {}
 
     /**
      * Called to render content to the renderRoot.
      */
-    async render(): Promise<Element | DocumentFragment> {
+    render(): Element | DocumentFragment {
         return html``;
     }
 
-    async renderedCallback() {}
+    renderedCallback(): void | undefined {}
 
-    async update() {
+    update(): void | undefined {
         for (const child of this.renderRoot.children) {
             if (child.tagName != "STYLE") {
                 child.remove();
             }
         }
-        this.renderRoot.appendChild(await this.render());
+        this.renderRoot.appendChild(this.render());
         this.renderedCallback();
     }
 
-    async #renderInitialContent() {
+    #renderInitialContent() {
         const static_this = this.constructor as typeof CustomElement;
 
         if ((this.constructor as typeof CustomElement).useShadowRoot) {
             this.attachShadow({ mode: "open" });
 
-            const style = html`<style>
-                ${static_this.styles}
-            </style>`;
+            if (static_this.styles) {
+                if (typeof static_this.styles == "string") {
+                    static_this.styles = [static_this.styles];
+                }
 
-            this.renderRoot.appendChild(style);
+                for (const style of static_this.styles) {
+                    this.renderRoot.appendChild(
+                        html`<style>
+                            ${style}
+                        </style>`,
+                    );
+                }
+            }
         }
 
-        this.renderRoot.appendChild(await this.render());
+        this.renderRoot.appendChild(this.render());
         this.renderedCallback();
         this.initialContentCallback();
     }

@@ -17,8 +17,8 @@ export class KiCanvasDialogElement extends CustomElement {
         super();
     }
 
-    override async connectedCallback() {
-        await super.connectedCallback();
+    override connectedCallback() {
+        super.connectedCallback();
 
         window.addEventListener(
             events.names.viewer.inspect,
@@ -30,7 +30,7 @@ export class KiCanvasDialogElement extends CustomElement {
         );
     }
 
-    override async render() {
+    override render() {
         if (!this.#selected) {
             return html``;
         }

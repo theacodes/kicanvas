@@ -29,14 +29,14 @@ export class KiCanvasSchematicElement extends CustomElement {
         }
     }
 
-    override async initialContentCallback() {
+    override initialContentCallback() {
         const src = this.getAttribute("src");
         if (src) {
             this.load(src);
         }
     }
 
-    override async disconnectedCallback() {
+    override disconnectedCallback() {
         if (this.viewer) {
             this.viewer.dispose();
         }
@@ -55,10 +55,10 @@ export class KiCanvasSchematicElement extends CustomElement {
         this.viewer.draw_soon();
     }
 
-    override async render() {
+    override render() {
         this.#canvas = html`<canvas></canvas>` as HTMLCanvasElement;
 
-        return html` <style>
+        return html`<style>
                 :host {
                     display: block;
                     touch-action: none;

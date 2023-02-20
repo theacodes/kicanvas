@@ -20,9 +20,7 @@ class KiCanvasAppElement extends CustomElement {
         super();
     }
 
-    override async connectedCallback() {
-        super.connectedCallback();
-
+    override initialContentCallback() {
         new DropTarget(this, ["kicad_sch", "kicad_pcb"], (files) => {
             this.load(files[0]!);
         });
@@ -80,7 +78,7 @@ class KiCanvasAppElement extends CustomElement {
         this.removeAttribute("loading");
     }
 
-    override async render() {
+    override render() {
         this.style.backgroundColor = theme.schematic.background.to_css();
         this.style.color = theme.schematic.note.to_css();
 

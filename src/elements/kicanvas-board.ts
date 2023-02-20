@@ -25,14 +25,14 @@ export class KiCanvasBoardElement extends CustomElement {
         }
     }
 
-    override async initialContentCallback() {
+    override initialContentCallback() {
         const src = this.getAttribute("src");
         if (src) {
             this.load(src);
         }
     }
 
-    override async disconnectedCallback() {
+    override disconnectedCallback() {
         this.viewer?.dispose();
         this.selected = [];
     }
@@ -49,7 +49,7 @@ export class KiCanvasBoardElement extends CustomElement {
         this.viewer.draw_soon();
     }
 
-    override async render() {
+    override render() {
         this.#canvas = html`<canvas></canvas>` as HTMLCanvasElement;
 
         return html` <style>

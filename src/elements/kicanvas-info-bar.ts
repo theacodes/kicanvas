@@ -20,7 +20,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
         super();
     }
 
-    override async connectedCallback() {
+    override connectedCallback() {
         if (!this.target) {
             const target_id = this.getAttribute("for");
             if (target_id) {
@@ -34,7 +34,7 @@ export class KiCanvasInfoBarElement extends CustomElement {
             throw new Error("No target for <kicanvas-info-bar>");
         }
 
-        await super.connectedCallback();
+        super.connectedCallback();
 
         this.target.addEventListener(events.names.viewer.select, (e: Event) => {
             this.#onItemSelected(
@@ -44,17 +44,16 @@ export class KiCanvasInfoBarElement extends CustomElement {
         });
     }
 
-    override async disconnectedCallback() {
+    override disconnectedCallback() {
         this.target = undefined!;
     }
 
     #onItemSelected(element: HTMLElement, detail: Footprint) {
-        console.log("Selected", detail);
         this.#footprint = detail;
         this.update();
     }
 
-    override async render() {
+    override render() {
         if (!this.#footprint) {
             return html`<ul>
                 <li>Nothing selected</li>
