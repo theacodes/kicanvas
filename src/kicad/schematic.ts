@@ -66,6 +66,7 @@ export class KicadSch {
     images: Image[] = [];
     sheet_instances?: SheetInstances;
     symbol_instances?: SymbolInstances;
+    sheets: SchematicSheet[] = [];
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -108,6 +109,7 @@ export class KicadSch {
                 P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
                 P.item("symbol_instances", SymbolInstances),
+                P.collection("sheets", "sheet", T.item(SchematicSheet)),
             ),
         );
     }
@@ -124,6 +126,7 @@ export class KicadSch {
         yield* this.symbols;
         yield* this.drawings;
         yield* this.images;
+        yield* this.sheets;
     }
 }
 
@@ -511,7 +514,7 @@ export class TextBox extends GraphicItem {
 export class Label {
     private = false;
     text: string;
-    at: At;
+    at: At = new At();
     effects = new Effects();
     fields_autoplaced = false;
     uuid?: string;
@@ -577,20 +580,23 @@ export class GlobalLabel extends Label {
 export class HierarchicalLabel extends Label {
     shape: LabelShapes = "input";
 
-    constructor(expr: Parseable) {
+    constructor(expr?: Parseable) {
         /* (hierarchical_label "h label passive" (shape passive) (at 18 30 270)
             (effects (font (size 1.27 1.27) (thickness 0.254) bold) (justify right))
             (uuid 484b38aa-713f-4f24-9fa1-63547d78e1da)) */
         super();
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("hierarchical_label"),
-                ...Label.common_expr_defs,
-                P.pair("shape", T.string),
-            ),
-        );
+
+        if (expr) {
+            Object.assign(
+                this,
+                parse_expr(
+                    expr,
+                    P.start("hierarchical_label"),
+                    ...Label.common_expr_defs,
+                    P.pair("shape", T.string),
+                ),
+            );
+        }
     }
 }
 
@@ -751,7 +757,10 @@ export class Property {
     do_not_autoplace = false;
     #effects?: Effects;
 
-    constructor(expr: Parseable, public parent: LibSymbol | SchematicSymbol) {
+    constructor(
+        expr: Parseable,
+        public parent: LibSymbol | SchematicSymbol | SchematicSheet,
+    ) {
         const parsed = parse_expr(
             expr,
             P.start("property"),
@@ -1049,6 +1058,58 @@ export class SymbolInstance {
                 P.pair("unit", T.number),
                 P.pair("value", T.string),
                 P.pair("footprint", T.string),
+            ),
+        );
+    }
+}
+
+export class SchematicSheet {
+    at: At;
+    size: Vec2;
+    fields_autoplaced: boolean;
+    stroke: Stroke;
+    fill: Fill;
+    properties: Property[] = [];
+    pins: SchematicSheetPin[] = [];
+    uuid: string;
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("sheet"),
+                P.item("at", At),
+                P.vec2("size"),
+                P.item("stroke", Stroke),
+                P.item("fill", Fill),
+                P.pair("fields_autoplaced", T.boolean),
+                P.pair("uuid", T.string),
+                P.collection("properties", "property", T.item(Property, this)),
+                P.collection("pins", "pin", T.item(SchematicSheetPin, this)),
+            ),
+        );
+    }
+}
+
+export class SchematicSheetPin {
+    at: At;
+    name: string;
+    shape: LabelShapes;
+    effects: Effects;
+    uuid: string;
+
+    constructor(expr: Parseable, public parent: SchematicSheet) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("pin"),
+                P.positional("name", T.string),
+                P.positional("shape", T.string),
+                P.item("at", At),
+                P.item("effects", Effects),
+                P.pair("uuid", T.string),
             ),
         );
     }
