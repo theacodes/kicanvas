@@ -184,12 +184,13 @@ export function* tokenize(input: string) {
                     Token.STRING,
                     input
                         .substring((start_idx ?? 0) + 1, i)
-                        .replaceAll("\\n", "\n"),
+                        .replaceAll("\\n", "\n")
+                        .replaceAll("\\\\", "\\"),
                 );
                 state = State.none;
                 escaping = false;
                 continue;
-            } else if (c === "\\") {
+            } else if (!escaping && c === "\\") {
                 escaping = true;
                 continue;
             } else {

@@ -31,7 +31,7 @@ function assert_tokens(
         assert.equal(
             parsed?.value,
             expected[1],
-            `Expected token ${expected[0].description}: ${expected[1]} found ${parsed?.type.description}:${parsed?.value}.`,
+            `Expected token ${expected[0].description}: ${expected[1]} found ${parsed?.type.description}: ${parsed?.value}.`,
         );
     }
 }
@@ -98,8 +98,17 @@ suite("kicad.tokenizer.tokenize(): s-expression tokenizer", function () {
             [STRING, "Hello, world!"],
             CLOSE_TOKEN,
         ]);
+
         tokens = tokenizer.tokenize('("a\\"b")');
         assert_tokens(tokens, [OPEN_TOKEN, [STRING, 'a\\"b'], CLOSE_TOKEN]);
+
+        tokens = tokenizer.tokenize(
+            `descr "Pololu Breakout 16-pin 15.2x20.3mm 0.6x0.8\\\\"`,
+        );
+        assert_tokens(tokens, [
+            [ATOM, "descr"],
+            [STRING, `Pololu Breakout 16-pin 15.2x20.3mm 0.6x0.8\\`],
+        ]);
     });
 });
 
