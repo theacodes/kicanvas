@@ -29,7 +29,7 @@ kicanvas-board {
     flex: 1;
 }
 
-overlay {
+section.overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -37,8 +37,19 @@ overlay {
     height: 100%;
     z-index: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+section.overlay img {
+    max-width: 20%;
+}
+
+section.overlay p {
+    text-align: center;
+    font-size: 1.5rem;
+    max-width: 50%;
 }
 
 .split-horizontal {
