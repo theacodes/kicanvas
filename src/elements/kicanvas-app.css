@@ -17,16 +17,9 @@
     height: 100%;
 }
 
-:host([loaded]) overlay,
-:host([loading]) overlay {
+:host([loaded]) section.overlay,
+:host([loading]) section.overlay {
     display: none;
-}
-
-kicanvas-schematic,
-kicanvas-board {
-    width: 100%;
-    height: 100%;
-    flex: 1;
 }
 
 section.overlay {
@@ -50,6 +43,13 @@ section.overlay p {
     text-align: center;
     font-size: 1.5rem;
     max-width: 50%;
+}
+
+kicanvas-schematic,
+kicanvas-board {
+    width: 100%;
+    height: 100%;
+    flex: 1;
 }
 
 .split-horizontal {
