@@ -302,30 +302,32 @@ class LibSymbolPainter extends ItemPainter {
         }
     }
 
-    #paint_unit(layer: ViewLayer, s: schematic.LibSymbol) {
+    #paint_unit(layer: ViewLayer, unit: schematic.LibSymbol[]) {
         const outline_color = this.gfx.theme["component_outline"] as Color;
         const fill_color = this.gfx.theme["component_body"] as Color;
 
-        for (const g of s.drawings) {
-            if (g instanceof schematic.GraphicItem) {
-                if (
-                    layer.name == LayerName.symbol_background &&
-                    g.fill?.type == "background"
-                ) {
-                    this.gfx.state.fill = fill_color;
-                } else if (
-                    layer.name == LayerName.symbol_foreground &&
-                    g.fill?.type == "outline"
-                ) {
-                    this.gfx.state.fill = outline_color;
-                } else {
-                    this.gfx.state.fill = Color.transparent_black;
+        for (const sym of unit) {
+            for (const g of sym.drawings) {
+                if (g instanceof schematic.GraphicItem) {
+                    if (
+                        layer.name == LayerName.symbol_background &&
+                        g.fill?.type == "background"
+                    ) {
+                        this.gfx.state.fill = fill_color;
+                    } else if (
+                        layer.name == LayerName.symbol_foreground &&
+                        g.fill?.type == "outline"
+                    ) {
+                        this.gfx.state.fill = outline_color;
+                    } else {
+                        this.gfx.state.fill = Color.transparent_black;
+                    }
                 }
+
+                this.gfx.state.stroke = outline_color;
+
+                this.view_painter.paint_item(layer, g);
             }
-
-            this.gfx.state.stroke = outline_color;
-
-            this.view_painter.paint_item(layer, g);
         }
     }
 }

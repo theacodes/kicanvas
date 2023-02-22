@@ -643,7 +643,7 @@ export class LibSymbol {
     children: LibSymbol[] = [];
     drawings: Drawing[] = [];
     pins: PinDefinition[] = [];
-    units: Map<number, LibSymbol> = new Map();
+    units: Map<number, LibSymbol[]> = new Map();
 
     #pins_by_number: Map<string, PinDefinition> = new Map();
     #properties_by_id: Map<number, Property> = new Map();
@@ -689,7 +689,9 @@ export class LibSymbol {
         for (const child of this.children) {
             const unit_num = child.unit;
             if (unit_num !== null) {
-                this.units.set(unit_num, child);
+                const list = this.units.get(unit_num) ?? [];
+                list.push(child);
+                this.units.set(unit_num, list);
             }
         }
     }
