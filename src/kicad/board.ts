@@ -40,6 +40,7 @@ export class KicadPCB {
     segments: (LineSegment | ArcSegment)[] = [];
     vias: Via[] = [];
     drawings: Drawing[] = [];
+    groups: Group[] = [];
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -72,6 +73,7 @@ export class KicadPCB {
                 P.collection("drawings", "gr_poly", T.item(GrPoly)),
                 P.collection("drawings", "gr_rect", T.item(GrRect)),
                 P.collection("drawings", "gr_text", T.item(GrText, this)),
+                P.collection("groups", "group", T.item(Group)),
             ),
         );
     }
@@ -1233,6 +1235,27 @@ export class Model {
                 P.object("offset", {}, P.list("xyz", T.number)),
                 P.object("scale", {}, P.list("xyz", T.number)),
                 P.object("rotate", {}, P.list("xyz", T.number)),
+            ),
+        );
+    }
+}
+
+export class Group {
+    name: string;
+    id: string;
+    locked = false;
+    members: string[];
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("group"),
+                P.positional("name", T.string),
+                P.atom("locked"),
+                P.pair("id", T.string),
+                P.list("members", T.string),
             ),
         );
     }
