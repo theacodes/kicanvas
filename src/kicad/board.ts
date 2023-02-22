@@ -295,6 +295,7 @@ export class ZoneKeepout {
             this,
             parse_expr(
                 expr,
+                P.start("keepout"),
                 P.pair("tracks", T.string),
                 P.pair("vias", T.string),
                 P.pair("pads", T.string),
@@ -801,6 +802,7 @@ class GraphicItem {
     parent?: Footprint;
     layer: string;
     tstamp: string;
+    locked = false;
 }
 
 export class Line extends GraphicItem {
@@ -821,6 +823,7 @@ export class Line extends GraphicItem {
             parse_expr(
                 expr,
                 P.start(static_this.expr_start),
+                P.atom("locked"),
                 P.pair("layer", T.string),
                 P.vec2("start"),
                 P.vec2("end"),
@@ -860,6 +863,7 @@ export class Circle extends GraphicItem {
             parse_expr(
                 expr,
                 P.start(static_this.expr_start),
+                P.atom("locked"),
                 P.vec2("center"),
                 P.vec2("end"),
                 P.pair("width", T.number),
@@ -900,6 +904,7 @@ export class Arc extends GraphicItem {
             parse_expr(
                 expr,
                 P.start(static_this.expr_start),
+                P.atom("locked"),
                 P.pair("layer", T.string),
                 P.vec2("start"),
                 P.vec2("mid"),
@@ -941,6 +946,7 @@ export class Poly extends GraphicItem {
             parse_expr(
                 expr,
                 P.start(static_this.expr_start),
+                P.atom("locked"),
                 P.pair("layer", T.string),
                 P.atom("island"),
                 P.list("pts", T.vec2),
@@ -986,6 +992,7 @@ export class Rect extends GraphicItem {
             parse_expr(
                 expr,
                 P.start(static_this.expr_start),
+                P.atom("locked"),
                 P.vec2("start"),
                 P.vec2("end"),
                 P.pair("layer", T.string),
@@ -1211,6 +1218,8 @@ export class Model {
     offset: { xyz: number[] };
     scale: { xyz: number[] };
     rotate: { xyz: number[] };
+    hide = false;
+    opacity = 1;
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -1219,6 +1228,8 @@ export class Model {
                 expr,
                 P.start("model"),
                 P.positional("filename", T.string),
+                P.atom("hide"),
+                P.pair("opacity", T.number),
                 P.object("offset", {}, P.list("xyz", T.number)),
                 P.object("scale", {}, P.list("xyz", T.number)),
                 P.object("rotate", {}, P.list("xyz", T.number)),

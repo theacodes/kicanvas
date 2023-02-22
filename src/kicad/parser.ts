@@ -329,8 +329,8 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
             def = defs_map.get(n);
 
             if (!def) {
-                console.trace(
-                    `no def for bare element ${element} at position ${n} in expression`,
+                console.warn(
+                    `no def for bare element ${element} at position ${n} in expression ${expr}`,
                 );
                 continue;
             }
@@ -344,7 +344,9 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
         }
 
         if (!def) {
-            console.log("No def found for element", element);
+            console.warn(
+                `No def found for element ${element} in expression ${expr}`,
+            );
             continue;
         }
 
