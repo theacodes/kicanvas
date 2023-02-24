@@ -141,7 +141,7 @@ export class Angle {
             const [x0, y0] = [x, y];
 
             x = y0 * sina + x0 * cosa;
-            y = y0 * cosa - x0 - sina;
+            y = y0 * cosa - x0 * sina;
         }
 
         x += origin.x;
