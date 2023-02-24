@@ -61,13 +61,16 @@ class RectPainter extends ItemPainter {
 }
 
 class PolyPainter extends ItemPainter {
-    classes = [pcb_items.GrPoly, pcb_items.FpPoly];
+    classes = [pcb_items.Poly, pcb_items.GrPoly, pcb_items.FpPoly];
 
-    layers_for(item: pcb_items.GrPoly | pcb_items.FpPoly) {
+    layers_for(item: pcb_items.Poly | pcb_items.GrPoly | pcb_items.FpPoly) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, p: pcb_items.GrPoly | pcb_items.FpPoly) {
+    paint(
+        layer: ViewLayer,
+        p: pcb_items.Poly | pcb_items.GrPoly | pcb_items.FpPoly,
+    ) {
         const color = layer.color;
 
         if (p.width) {
@@ -420,6 +423,13 @@ class GrTextPainter extends ItemPainter {
             return;
         }
 
+        if (t.render_cache) {
+            for (const poly of t.render_cache.polygons) {
+                this.view_painter.paint_item(layer, poly);
+            }
+            return;
+        }
+
         const edatext = new EDAText(t.shown_text);
 
         edatext.apply_effects(t.effects);
@@ -451,6 +461,13 @@ class FpTextPainter extends ItemPainter {
 
     paint(layer: ViewLayer, t: pcb_items.FpText) {
         if (t.hide || !t.shown_text) {
+            return;
+        }
+
+        if (t.render_cache) {
+            for (const poly of t.render_cache.polygons) {
+                this.view_painter.paint_item(layer, poly);
+            }
             return;
         }
 

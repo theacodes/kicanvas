@@ -1017,6 +1017,29 @@ export class FpRect extends Rect {
     static override expr_start = "fp_rect";
 }
 
+export class TextRenderCache {
+    text: string;
+    angle: 0;
+    polygons: Poly[];
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("render_cache"),
+                P.positional("text", T.string),
+                P.positional("angle", T.number),
+                P.collection("polygons", "polygon", T.item(Poly)),
+            ),
+        );
+
+        for (const poly of this.polygons) {
+            poly.fill = "solid";
+        }
+    }
+}
+
 export class Text {
     parent?: Footprint | Dimension | KicadPCB;
     text: string;
@@ -1026,6 +1049,8 @@ export class Text {
     hide = false;
     effects = new Effects();
     tstamp: string;
+    render_cache: TextRenderCache;
+
     #expanded_text: string;
 
     static common_expr_defs = [
@@ -1040,6 +1065,7 @@ export class Text {
         ),
         P.pair("tstamp", T.string),
         P.item("effects", Effects),
+        P.item("render_cache", TextRenderCache),
     ];
 
     get shown_text() {
