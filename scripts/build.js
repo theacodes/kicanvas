@@ -7,7 +7,7 @@
 import { bundle } from "./bundle.js";
 
 let { options, context } = await bundle({
-    outfile: "dist/kicanvas.js",
+    outfile: "www/kicanvas/kicanvas.js",
     minify: true,
 });
 
