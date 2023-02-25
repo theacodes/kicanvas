@@ -169,6 +169,30 @@ export const P = {
         };
     },
     /**
+     * Like collection but creates a map instead of an array.. For example
+     * ((a key1 1) (a key2 2) (a key3 3)) with collection_map("items", "a")
+     * would end up with {items: {key1: [a, key1, 2], ...}.
+     */
+    mapped_collection(
+        name: string,
+        accept: string,
+        keyfn: (obj: any) => string,
+        typefn: TypeProcessor = T.any,
+    ): PropertyDefinition {
+        return {
+            kind: Kind.item_list,
+            name: name,
+            accepts: [accept],
+            fn: (obj: Obj, name: string, e: ListOrAtom) => {
+                const map = obj[name] ?? new Map();
+                const val = typefn(obj, name, e);
+                const key = keyfn(val);
+                map.set(key, val);
+                return map;
+            },
+        };
+    },
+    /**
      * Accepts a dictionary. For example ((thing a 1) (thing b 2) (thing c 3)) with
      * dict("things", "thing") would end up with {things: {a: 1, b: 2, c: 3}}.
      */
