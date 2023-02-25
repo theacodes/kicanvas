@@ -912,6 +912,12 @@ export class SchematicSymbol {
     fields_autoplaced = false;
     properties: Property[] = [];
     pins: PinInstance[] = [];
+    default_instance: {
+        reference: string;
+        unit: string;
+        value: string;
+        footprint: string;
+    };
 
     constructor(expr: Parseable, public parent: KicadSch) {
         /*
@@ -943,8 +949,15 @@ export class SchematicSymbol {
             P.pair("uuid", T.string),
             P.collection("properties", "property", T.item(Property, this)),
             P.collection("pins", "pin", T.item(PinInstance, this)),
+            P.object(
+                "default_instance",
+                "default_instance",
+                P.pair("reference", T.string),
+                P.pair("unit", T.string),
+                P.pair("value", T.string),
+                P.pair("footprint", T.string),
+            ),
             // TODO: instances introduced in KiCAD 7
-            // TODO: default instance introduced in KiCAD 7
         );
 
         Object.assign(this, parsed);
