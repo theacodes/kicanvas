@@ -224,6 +224,7 @@ class PadPainter extends ItemPainter {
                 layers.push(LayerName.pad_holes);
                 break;
             case "smd":
+            case "connect":
                 break;
             default:
                 console.log("unhandled pad type:", pad);
