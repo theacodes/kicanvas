@@ -661,7 +661,7 @@ class SchematicSymbolPainter extends ItemPainter {
             layer.name == LayerName.symbol_field ||
             layer.name == LayerName.interactive
         ) {
-            for (const p of si.properties) {
+            for (const [_, p] of si.properties) {
                 this.view_painter.paint_item(layer, p);
             }
         }

@@ -910,7 +910,7 @@ export class SchematicSymbol {
     on_board = false;
     dnp = false;
     fields_autoplaced = false;
-    properties: Property[] = [];
+    properties: Map<string, Property> = new Map();
     pins: PinInstance[] = [];
     default_instance: {
         reference: string;
@@ -961,7 +961,12 @@ export class SchematicSymbol {
             P.pair("dnp", T.boolean),
             P.atom("fields_autoplaced"),
             P.pair("uuid", T.string),
-            P.collection("properties", "property", T.item(Property, this)),
+            P.mapped_collection(
+                "properties",
+                "property",
+                (p: Property) => p.name,
+                T.item(Property, this),
+            ),
             P.collection("pins", "pin", T.item(PinInstance, this)),
             P.object(
                 "default_instance",
@@ -997,6 +1002,21 @@ export class SchematicSymbol {
         );
 
         Object.assign(this, parsed);
+
+        // Default instance is used only to set the value and footprint, the
+        // other item seem to be ignored.
+        if (this.get_property_text("Value") == undefined) {
+            this.#set_property_text("Value", this.default_instance.value);
+        }
+
+        if (!this.get_property_text("Footprint") == undefined) {
+            this.#set_property_text(
+                "Footprint",
+                this.default_instance.footprint,
+            );
+        }
+
+        console.log(this.default_instance);
     }
 
     get lib_symbol(): LibSymbol {
@@ -1004,6 +1024,17 @@ export class SchematicSymbol {
         // horrible has happened, the schematic should absolutely have the
         // library symbol for this symbol instance.
         return this.parent.lib_symbols!.by_name(this.lib_name ?? this.lib_id)!;
+    }
+
+    get_property_text(name: string) {
+        return this.properties.get(name)?.text;
+    }
+
+    #set_property_text(name: string, val: string) {
+        const prop = this.properties.get(name);
+        if (prop) {
+            prop.text = val;
+        }
     }
 }
 
