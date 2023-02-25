@@ -122,6 +122,42 @@ class WirePainter extends ItemPainter {
     }
 }
 
+class BusPainter extends ItemPainter {
+    classes = [schematic.Bus];
+
+    layers_for(item: schematic.Bus) {
+        return [LayerName.wire];
+    }
+
+    paint(layer: ViewLayer, w: schematic.Bus) {
+        this.gfx.line(
+            new Polyline(
+                w.pts,
+                schematic.DefaultValues.bus_width,
+                this.gfx.theme["bus"] as Color,
+            ),
+        );
+    }
+}
+
+class BusEntryPainter extends ItemPainter {
+    classes = [schematic.BusEntry];
+
+    layers_for(item: schematic.BusEntry) {
+        return [LayerName.junction];
+    }
+
+    paint(layer: ViewLayer, be: schematic.BusEntry) {
+        this.gfx.line(
+            new Polyline(
+                [be.at.position, be.at.position.add(be.size)],
+                schematic.DefaultValues.wire_width,
+                this.gfx.theme["wire"] as Color,
+            ),
+        );
+    }
+}
+
 class CirclePainter extends ItemPainter {
     classes = [schematic.Circle];
 
@@ -719,6 +755,8 @@ export class SchematicPainter extends DocumentPainter {
             new RectanglePainter(this, gfx),
             new PolylinePainter(this, gfx),
             new WirePainter(this, gfx),
+            new BusPainter(this, gfx),
+            new BusEntryPainter(this, gfx),
             new CirclePainter(this, gfx),
             new ArcPainter(this, gfx),
             new JunctionPainter(this, gfx),
