@@ -1142,6 +1142,7 @@ export class Pad {
     clearance: number;
     thermal_width: number;
     thermal_gap: number;
+    thermal_bridge_angle: number;
     zone_connect: number;
     drill: PadDrill;
     net: Net;
@@ -1180,6 +1181,7 @@ export class Pad {
             P.pair("clearance", T.number),
             P.pair("thermal_width", T.number),
             P.pair("thermal_gap", T.number),
+            P.pair("thermal_bridge_angle", T.number),
             P.pair("zone_connect", T.number),
             P.pair("tstamp", T.string),
             P.item("drill", PadDrill),
