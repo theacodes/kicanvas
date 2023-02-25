@@ -499,31 +499,37 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
             in_bom: true,
             on_board: true,
             fields_autoplaced: true,
-            properties: [
-                {
-                    name: "Reference",
-                    text: "C?",
-                    id: 0,
-                    at: { position: { x: 5, y: -6.35 }, rotation: 90 },
-                },
-                { name: "Value", text: "10u", id: 1 },
-                {
-                    name: "Footprint",
-                    text: "Capacitor_SMD:C_0603_1608Metric",
-                    id: 2,
-                    effects: {
-                        font: { size: { x: 1.27, y: 1.27 } },
-                        hide: true,
-                    },
-                },
-                {
-                    name: "Datasheet",
-                    text: "~",
-                    id: 3,
-                    effects: { hide: true },
-                },
-            ],
             pins: [{ number: "1" }, { number: "2" }],
+        });
+
+        assert_deep_partial(sch.symbols[0]?.properties.get("Reference"), {
+            name: "Reference",
+            text: "C?",
+            id: 0,
+            at: { position: { x: 5, y: -6.35 }, rotation: 90 },
+        });
+
+        assert_deep_partial(sch.symbols[0]?.properties.get("Value"), {
+            name: "Value",
+            text: "10u",
+            id: 1,
+        });
+
+        assert_deep_partial(sch.symbols[0]?.properties.get("Footprint"), {
+            name: "Footprint",
+            text: "Capacitor_SMD:C_0603_1608Metric",
+            id: 2,
+            effects: {
+                font: { size: { x: 1.27, y: 1.27 } },
+                hide: true,
+            },
+        });
+
+        assert_deep_partial(sch.symbols[0]?.properties.get("Datasheet"), {
+            name: "Datasheet",
+            text: "~",
+            id: 3,
+            effects: { hide: true },
         });
 
         assert_deep_partial(sch.symbols[1], {
