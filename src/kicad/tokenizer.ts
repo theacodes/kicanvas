@@ -37,6 +37,30 @@ function is_whitespace(c: string) {
     return c === EOF || c === " " || c === "\n" || c === "\r" || c === "\t";
 }
 
+function is_atom(c: string) {
+    return (
+        is_alpha(c) ||
+        is_digit(c) ||
+        [
+            "-",
+            "+",
+            "_",
+            ".",
+            "*",
+            "&",
+            "$",
+            "{",
+            "}",
+            "[",
+            "]",
+            "/",
+            ":",
+            "%",
+            "=",
+        ].includes(c)
+    );
+}
+
 function error_context(input: string, index: number) {
     let start = input.slice(0, index).lastIndexOf("\n");
     if (start < 0) start = 0;
@@ -85,30 +109,15 @@ export function* tokenize(input: string) {
             } else if (is_whitespace(c)) {
                 continue;
             } else {
-                throw `Unexpected character at index ${i}: ${c}\nContext: ${error_context(
-                    input,
-                    i,
-                )}`;
+                throw new Error(
+                    `Unexpected character at index ${i}: ${c}\nContext: ${error_context(
+                        input,
+                        i,
+                    )}`,
+                );
             }
         } else if (state == State.atom) {
-            if (
-                is_alpha(c) ||
-                is_digit(c) ||
-                [
-                    "-",
-                    "+",
-                    "_",
-                    ".",
-                    "*",
-                    "&",
-                    "$",
-                    "{",
-                    "}",
-                    "/",
-                    ":",
-                    "%",
-                ].includes(c)
-            ) {
+            if (is_atom(c)) {
                 continue;
             } else if (c === ")" || is_whitespace(c)) {
                 yield new Token(Token.ATOM, input.substring(start_idx, i));
@@ -139,7 +148,7 @@ export function* tokenize(input: string) {
                 /* Special case of UUID value */
                 state = State.atom;
                 continue;
-            } else if (is_alpha(c) || ["/"].includes(c)) {
+            } else if (is_atom(c)) {
                 /* It's actually an atom, e.g. +3V3 */
                 state = State.atom;
                 continue;
@@ -175,8 +184,17 @@ export function* tokenize(input: string) {
                     yield close_token;
                 }
                 continue;
+            } else if (is_atom(c)) {
+                // It was actually an atom.
+                state = State.atom;
+                continue;
             } else {
-                throw `Unexpected character at index ${i}: ${c}, expected hexadecimal.`;
+                throw new Error(
+                    `Unexpected character at index ${i}: ${c}, expected hexadecimal.\nContext: ${error_context(
+                        input,
+                        i,
+                    )}`,
+                );
             }
         } else if (state == State.string) {
             if (!escaping && c === '"') {
@@ -198,7 +216,12 @@ export function* tokenize(input: string) {
                 continue;
             }
         } else {
-            throw `Unknown tokenizer state ${state}`;
+            throw new Error(
+                `Unknown tokenizer state ${state}\nContext: ${error_context(
+                    input,
+                    i,
+                )}`,
+            );
         }
     }
 }

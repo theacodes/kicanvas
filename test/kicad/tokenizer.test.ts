@@ -110,6 +110,19 @@ suite("kicad.tokenizer.tokenize(): s-expression tokenizer", function () {
             [STRING, `Pololu Breakout 16-pin 15.2x20.3mm 0.6x0.8\\`],
         ]);
     });
+
+    test("with base64", function () {
+        const tokens = tokenizer.tokenize(
+            "(6x84OPr6+j7y 0+6li2sAAAAASU/VORK5CYII=)",
+        );
+
+        assert_tokens(tokens, [
+            OPEN_TOKEN,
+            [ATOM, "6x84OPr6+j7y"],
+            [ATOM, "0+6li2sAAAAASU/VORK5CYII="],
+            CLOSE_TOKEN,
+        ]);
+    });
 });
 
 suite("kicad.tokenizer.listify()", function () {
