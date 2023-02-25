@@ -918,6 +918,20 @@ export class SchematicSymbol {
         value: string;
         footprint: string;
     };
+    instances: {
+        project: {
+            name: string;
+            instance: {
+                path: {
+                    path: string;
+                    reference: string;
+                    value: string;
+                    unit: string;
+                    footprint: string;
+                };
+            };
+        };
+    }[] = [];
 
     constructor(expr: Parseable, public parent: KicadSch) {
         /*
@@ -951,13 +965,35 @@ export class SchematicSymbol {
             P.collection("pins", "pin", T.item(PinInstance, this)),
             P.object(
                 "default_instance",
-                "default_instance",
+                this.default_instance,
                 P.pair("reference", T.string),
                 P.pair("unit", T.string),
                 P.pair("value", T.string),
                 P.pair("footprint", T.string),
             ),
-            // TODO: instances introduced in KiCAD 7
+            // (instances
+            //    (project "kit-dev-coldfire-xilinx_5213"
+            //      (path "/f5d7a48d-4587-4550-a504-c505ca11d375" (reference "R111") (unit 1))))
+            P.list(
+                "instances",
+                T.object(
+                    {},
+                    P.start("project"),
+                    P.positional("name", T.string),
+                    P.expr(
+                        "path",
+                        T.object(
+                            {},
+                            P.start("path"),
+                            P.positional("path"),
+                            P.pair("reference", T.string),
+                            P.pair("value", T.string),
+                            P.pair("unit", T.number),
+                            P.pair("footprint", T.string),
+                        ),
+                    ),
+                ),
+            ),
         );
 
         Object.assign(this, parsed);
@@ -1087,6 +1123,20 @@ export class SchematicSheet {
     properties: Property[] = [];
     pins: SchematicSheetPin[] = [];
     uuid: string;
+    instances: {
+        project: {
+            name: string;
+            instance: {
+                path: {
+                    path: string;
+                    reference: string;
+                    value: string;
+                    unit: string;
+                    footprint: string;
+                };
+            };
+        };
+    }[] = [];
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -1102,6 +1152,26 @@ export class SchematicSheet {
                 P.pair("uuid", T.string),
                 P.collection("properties", "property", T.item(Property, this)),
                 P.collection("pins", "pin", T.item(SchematicSheetPin, this)),
+                // (instances
+                //   (project "kit-dev-coldfire-xilinx_5213"
+                //     (path "/f5d7a48d-4587-4550-a504-c505ca11d375" (page "3"))))
+                P.list(
+                    "instances",
+                    T.object(
+                        {},
+                        P.start("project"),
+                        P.positional("name", T.string),
+                        P.expr(
+                            "path",
+                            T.object(
+                                {},
+                                P.start("path"),
+                                P.positional("path"),
+                                P.pair("page", T.string),
+                            ),
+                        ),
+                    ),
+                ),
             ),
         );
     }
