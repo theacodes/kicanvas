@@ -112,6 +112,32 @@ export class KicadSch {
                 P.collection("sheets", "sheet", T.item(SchematicSheet)),
             ),
         );
+
+        this.#update_symbol_instance_data();
+    }
+
+    #update_symbol_instance_data() {
+        // Assigns SchematicSymbol properties based on data in symbol_instances.
+        // For the moment, this does not handle hierarchical sheets.
+        // See SCH_SHEET_LIST::UpdateSymbolInstanceData
+        const instances = this.symbol_instances?.symbol_instances;
+        if (!instances) {
+            return;
+        }
+
+        for (const s of this.symbols) {
+            const path = `/${s.uuid}`;
+            const instance_data = instances.get(path);
+
+            if (!instance_data) {
+                continue;
+            }
+
+            s.set_property_text("Reference", instance_data.reference);
+            s.set_property_text("Value", instance_data.value);
+            s.set_property_text("Footprint", instance_data.footprint);
+            s.unit = instance_data.unit;
+        }
     }
 
     *items() {
@@ -1006,17 +1032,15 @@ export class SchematicSymbol {
         // Default instance is used only to set the value and footprint, the
         // other item seem to be ignored.
         if (this.get_property_text("Value") == undefined) {
-            this.#set_property_text("Value", this.default_instance.value);
+            this.set_property_text("Value", this.default_instance.value);
         }
 
         if (!this.get_property_text("Footprint") == undefined) {
-            this.#set_property_text(
+            this.set_property_text(
                 "Footprint",
                 this.default_instance.footprint,
             );
         }
-
-        console.log(this.default_instance);
     }
 
     get lib_symbol(): LibSymbol {
@@ -1030,7 +1054,7 @@ export class SchematicSymbol {
         return this.properties.get(name)?.text;
     }
 
-    #set_property_text(name: string, val: string) {
+    set_property_text(name: string, val: string) {
         const prop = this.properties.get(name);
         if (prop) {
             prop.text = val;
@@ -1101,7 +1125,7 @@ export class SheetInstance {
 }
 
 export class SymbolInstances {
-    symbol_instances: SymbolInstances[] = [];
+    symbol_instances: Map<string, SymbolInstance> = new Map();
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -1109,9 +1133,10 @@ export class SymbolInstances {
             parse_expr(
                 expr,
                 P.start("symbol_instances"),
-                P.collection(
+                P.mapped_collection(
                     "symbol_instances",
                     "path",
+                    (obj: SymbolInstance) => obj.path,
                     T.item(SymbolInstance),
                 ),
             ),
