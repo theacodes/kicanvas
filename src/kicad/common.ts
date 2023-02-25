@@ -126,7 +126,7 @@ export class TitleBlock {
     date = "";
     rev = "";
     company = "";
-    comment: Record<string, string>;
+    comment: Record<string, string> = {};
 
     constructor(expr: Parseable) {
         /*
