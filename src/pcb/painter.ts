@@ -262,14 +262,10 @@ class PadPainter extends ItemPainter {
 
                 const half_width = Math.min(half_size.x, half_size.y);
 
-                let half_len = new Vec2(
+                const half_len = new Vec2(
                     half_size.x - half_width,
                     half_size.y - half_width,
                 );
-
-                half_len = Matrix3.rotation(
-                    Angle.deg_to_rad(pad.at.rotation),
-                ).transform(half_len);
 
                 const drill_pos = center.add(pad.drill.offset);
                 const drill_start = drill_pos.sub(half_len);
