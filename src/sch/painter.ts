@@ -482,7 +482,13 @@ class PropertyPainter extends ItemPainter {
         const parent = p.parent as schematic.SchematicSymbol;
         const transform = get_symbol_transform(parent);
 
-        const schfield = new SchField(p.text, {
+        let text = p.text;
+
+        if (p.name == "Reference" && parent.unit) {
+            text += parent.unit_suffix;
+        }
+
+        const schfield = new SchField(text, {
             position: parent.at.position.multiply(10000),
             transform: transform.matrix,
         });

@@ -1060,6 +1060,24 @@ export class SchematicSymbol {
             prop.text = val;
         }
     }
+
+    get unit_suffix() {
+        if (!this.unit || this.lib_symbol.units.size <= 1) {
+            return "";
+        }
+
+        const A = "A".charCodeAt(0);
+        let unit = this.unit;
+        let suffix = "";
+
+        do {
+            const x = (unit - 1) % 26;
+            suffix = String.fromCharCode(A + x) + suffix;
+            unit = Math.trunc((unit - x) / 26);
+        } while (unit > 0);
+
+        return suffix;
+    }
 }
 
 export class PinInstance {
