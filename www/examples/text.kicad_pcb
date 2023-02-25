@@ -39,6 +39,7 @@
 
   (setup
     (pad_to_mask_clearance 0)
+    (grid_origin -50.8 -25.4)
     (pcbplotparams
       (layerselection 0x00010fc_ffffffff)
       (plot_on_all_layers_selection 0x0000000_00000000)
@@ -587,6 +588,9 @@
   (gr_text "A" (at -50.8 -25.4 90) (layer "F.Cu") (tstamp 72b986aa-0c93-4e1f-b0f1-003520a7f1aa)
     (effects (font (size 3 3) (thickness 0.375)) (justify left bottom))
   )
+  (gr_text "width < height" (at -34.8 -25.4) (layer "F.Cu") (tstamp 76bf60f6-cda3-4fed-9c11-7d49bd370acc)
+    (effects (font (size 3 1.5) (thickness 0.375)) (justify left bottom))
+  )
   (gr_text "F.Cu 3 0.75" (at 0 30.48) (layer "F.Cu") (tstamp 7725ac24-9112-4e04-ac45-184287f7f9b8)
     (effects (font (size 3 3) (thickness 0.75) bold) (justify left bottom))
   )
@@ -607,6 +611,9 @@
   )
   (gr_text "F.Cu 1.5 0 Italic Right" (at 0 5.08) (layer "F.Cu") (tstamp bd0cb0ca-a401-4689-8670-6481395eb363)
     (effects (font (size 1.5 1.5) (thickness 0.1875) italic) (justify right bottom))
+  )
+  (gr_text "height < width" (at -34.8 -22.4) (layer "F.Cu") (tstamp c5dc903d-b8ed-4a8c-833a-a9c0385eafa1)
+    (effects (font (size 1.5 3) (thickness 0.375)) (justify left bottom))
   )
   (gr_text "F.Cu 3 Normal 45" (at -50.8 40.64 45) (layer "F.Cu") (tstamp d1e8801f-ab0a-4aab-87cc-641509d4092f)
     (effects (font (size 3 3) (thickness 0.375)) (justify left bottom))

@@ -231,6 +231,10 @@ export class Font {
                     P.pair("line_spacing", T.number),
                 ),
             );
+
+            // Note: KiCAD saves height as the first number and width as the
+            // second. I have no fucking idea why they did that.
+            [this.size.x, this.size.y] = [this.size.y, this.size.x];
         }
     }
 
