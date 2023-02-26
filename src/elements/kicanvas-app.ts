@@ -12,6 +12,7 @@ import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
 import { KiCanvasInfoBarElement } from "./kicanvas-info-bar";
 import { CustomElement, html } from "../dom/custom-elements";
 import styles from "./kicanvas-app.css";
+import { GitHubUserContent } from "../services/github";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = styles;
@@ -21,9 +22,20 @@ class KiCanvasAppElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        new DropTarget(this, ["kicad_sch", "kicad_pcb"], (files) => {
-            this.load(files[0]!);
-        });
+        const url_params = new URLSearchParams(document.location.search);
+        const github_path = url_params.get("github");
+
+        if (github_path) {
+            const gh = new GitHubUserContent();
+            const gh_url = gh.convert_url(github_path);
+            (async () => {
+                this.load(await gh.get(gh_url));
+            })();
+        } else {
+            new DropTarget(this, ["kicad_sch", "kicad_pcb"], (files) => {
+                this.load(files[0]!);
+            });
+        }
     }
 
     async load(src: File) {
