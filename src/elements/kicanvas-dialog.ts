@@ -37,7 +37,7 @@ export class KiCanvasDialogElement extends CustomElement {
 
         const properties = [];
 
-        for (const prop of this.#selected.properties) {
+        for (const prop of this.#selected.properties.values()) {
             properties.push(html`<div class="property">
                 <label for="${prop.name}">${prop.name}</label>
                 <input
