@@ -5,8 +5,8 @@
 */
 
 import { html, CustomElement } from "../dom/custom-elements";
+import { KiCanvasLoadEvent } from "../framework/events";
 import { BoardViewer } from "../pcb/viewer";
-import * as events from "../framework/events";
 
 export class KiCanvasBoardElement extends CustomElement {
     #canvas: HTMLCanvasElement;
@@ -40,7 +40,7 @@ export class KiCanvasBoardElement extends CustomElement {
         await this.viewer.load(src);
 
         this.loaded = true;
-        this.dispatchEvent(new CustomEvent(events.names.load));
+        this.dispatchEvent(new KiCanvasLoadEvent());
 
         this.viewer.draw_soon();
     }

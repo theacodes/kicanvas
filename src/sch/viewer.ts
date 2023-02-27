@@ -12,7 +12,11 @@ import { Renderer } from "../gfx/renderer";
 import { SchematicPainter } from "./painter";
 import { LayerSet } from "./layers";
 import { Color } from "../gfx/color";
-import * as events from "../framework/events";
+import {
+    KiCanvasPickEvent,
+    KiCanvasSelectEvent,
+    KiCanvasInspectEvent,
+} from "../framework/events";
 
 export class SchematicViewer extends Viewer {
     schematic: sch_items.KicadSch;
@@ -21,39 +25,36 @@ export class SchematicViewer extends Viewer {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.addEventListener(events.names.viewer.pick, (e: Event) => {
-            const { mouse: _, items } = (e as CustomEvent).detail;
+        this.addEventListener(
+            KiCanvasPickEvent.type,
+            (e: KiCanvasPickEvent) => {
+                let selected = null;
 
-            let selected;
+                for (const { layer: _, bbox } of e.detail.items) {
+                    selected = bbox;
+                    break;
+                }
 
-            for (const { layer: _, bbox } of items) {
-                selected = bbox;
-                break;
-            }
+                if (selected && !this.selected) {
+                    canvas.dispatchEvent(
+                        new KiCanvasSelectEvent({
+                            item: selected.context,
+                        }),
+                    );
+                }
 
-            if (selected && !this.selected) {
-                canvas.dispatchEvent(
-                    new CustomEvent(events.names.viewer.select, {
-                        bubbles: true,
-                        composed: true,
-                        detail: selected.context,
-                    }),
-                );
-            }
+                // Picking the same item twice opens the info dialog box
+                if (selected && selected.context == this.selected?.context) {
+                    canvas.dispatchEvent(
+                        new KiCanvasInspectEvent({
+                            item: selected.context,
+                        }),
+                    );
+                }
 
-            // Picking the same item twice opens the info dialog box
-            if (selected && selected.context == this.selected?.context) {
-                canvas.dispatchEvent(
-                    new CustomEvent(events.names.viewer.inspect, {
-                        bubbles: true,
-                        composed: true,
-                        detail: selected.context,
-                    }),
-                );
-            }
-
-            this.selected = selected;
-        });
+                this.selected = selected;
+            },
+        );
     }
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {

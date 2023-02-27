@@ -5,8 +5,8 @@
 */
 
 import { CustomElement, html } from "../dom/custom-elements";
+import { KiCanvasInspectEvent } from "../framework/events";
 import { SchematicSymbol } from "../kicad/schematic";
-import * as events from "../framework/events";
 import styles from "./kicanvas-dialog.css";
 
 export class KiCanvasDialogElement extends CustomElement {
@@ -21,9 +21,9 @@ export class KiCanvasDialogElement extends CustomElement {
         super.connectedCallback();
 
         window.addEventListener(
-            events.names.viewer.inspect,
-            async (e: Event) => {
-                this.#selected = (e as CustomEvent).detail;
+            KiCanvasInspectEvent.type,
+            async (e: KiCanvasInspectEvent) => {
+                this.#selected = e.detail.item as SchematicSymbol;
                 await this.update();
                 this.renderRoot.querySelector("dialog")?.showModal();
             },

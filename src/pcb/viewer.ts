@@ -12,7 +12,7 @@ import { Renderer } from "../gfx/renderer";
 import { BoardPainter } from "./painter";
 import { LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
-import * as events from "../framework/events";
+import { KiCanvasPickEvent, KiCanvasSelectEvent } from "../framework/events";
 
 export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;
@@ -21,35 +21,36 @@ export class BoardViewer extends Viewer {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.addEventListener(events.names.viewer.pick, (e: Event) => {
-            const { mouse: _, items } = (e as CustomEvent).detail;
+        this.addEventListener(
+            KiCanvasPickEvent.type,
+            (e: KiCanvasPickEvent) => {
+                const { mouse: _, items } = (e as CustomEvent).detail;
 
-            let selected;
+                let selected;
 
-            for (const { layer: _, bbox } of items) {
-                if (bbox.context instanceof pcb_items.Footprint) {
-                    selected = bbox;
-                    break;
+                for (const { layer: _, bbox } of items) {
+                    if (bbox.context instanceof pcb_items.Footprint) {
+                        selected = bbox;
+                        break;
+                    }
                 }
-            }
 
-            if (!selected || selected.context == this.selected?.context) {
-                // selecting the same thing twice deselects it.
-                selected = null;
-            }
+                if (!selected || selected.context == this.selected?.context) {
+                    // selecting the same thing twice deselects it.
+                    selected = null;
+                }
 
-            if (selected) {
-                canvas.dispatchEvent(
-                    new CustomEvent(events.names.viewer.select, {
-                        bubbles: true,
-                        composed: true,
-                        detail: selected.context,
-                    }),
-                );
-            }
+                if (selected) {
+                    canvas.dispatchEvent(
+                        new KiCanvasSelectEvent({
+                            item: selected.context,
+                        }),
+                    );
+                }
 
-            this.selected = selected;
-        });
+                this.selected = selected;
+            },
+        );
     }
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {

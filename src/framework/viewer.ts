@@ -11,7 +11,7 @@ import { BBox } from "../math/bbox";
 import { Color } from "../gfx/color";
 import { ViewLayerSet } from "./view-layers";
 import { Polygon, Polyline } from "../gfx/shapes";
-import * as events from "../framework/events";
+import { type KiCanvasEventMap, KiCanvasPickEvent } from "./events";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;
@@ -34,6 +34,22 @@ export abstract class Viewer extends EventTarget {
         this.layers = undefined!;
         this.renderer.dispose();
         this.renderer = undefined!;
+    }
+
+    override addEventListener<K extends keyof KiCanvasEventMap>(
+        type: K,
+        listener:
+            | ((this: Viewer, ev: KiCanvasEventMap[K]) => void)
+            | { handleEvent: (ev: KiCanvasEventMap[K]) => void }
+            | null,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    override addEventListener(
+        type: string,
+        listener: EventListener | null,
+        options?: boolean | AddEventListenerOptions,
+    ): void {
+        super.addEventListener(type, listener, options);
     }
 
     abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
@@ -60,12 +76,7 @@ export abstract class Viewer extends EventTarget {
             const items = this.layers.query_point(mouse);
 
             this.dispatchEvent(
-                new CustomEvent(events.names.viewer.pick, {
-                    detail: {
-                        mouse: mouse,
-                        items: items,
-                    },
-                }),
+                new KiCanvasPickEvent({ mouse: mouse, items: items }),
             );
         });
     }

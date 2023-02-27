@@ -5,9 +5,9 @@
 */
 
 import { html, CustomElement } from "../dom/custom-elements";
+import { KiCanvasLoadEvent } from "../framework/events";
 import { LayerSet } from "../pcb/layers";
 import { KiCanvasBoardElement } from "./kicanvas-board";
-import * as events from "../framework/events";
 import styles from "./kicanvas-layer-controls.css";
 
 export class KiCanvasLayerControlsElement extends CustomElement {
@@ -51,7 +51,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         if (this.target.loaded) {
             super.connectedCallback();
         } else {
-            this.target.addEventListener(events.names.load, async () => {
+            this.target.addEventListener(KiCanvasLoadEvent.type, () => {
                 super.connectedCallback();
             });
         }

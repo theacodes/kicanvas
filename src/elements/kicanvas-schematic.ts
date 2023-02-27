@@ -5,8 +5,8 @@
 */
 
 import { CustomElement, html } from "../dom/custom-elements";
+import { KiCanvasLoadEvent } from "../framework/events";
 import { SchematicViewer } from "../sch/viewer";
-import * as events from "../framework/events";
 
 export class KiCanvasSchematicElement extends CustomElement {
     #canvas: HTMLCanvasElement;
@@ -46,7 +46,7 @@ export class KiCanvasSchematicElement extends CustomElement {
         await this.viewer.load(src);
 
         this.loaded = true;
-        this.dispatchEvent(new CustomEvent(events.names.load));
+        this.dispatchEvent(new KiCanvasLoadEvent());
 
         this.viewer.draw_soon();
     }

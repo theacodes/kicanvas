@@ -5,9 +5,9 @@
 */
 
 import { CustomElement, html } from "../dom/custom-elements";
+import { KiCanvasSelectEvent } from "../framework/events";
 import { Footprint } from "../kicad/board";
 import { KiCanvasBoardElement } from "./kicanvas-board";
-import * as events from "../framework/events";
 import styles from "./kicanvas-info-bar.css";
 
 export class KiCanvasInfoBarElement extends CustomElement {
@@ -36,12 +36,15 @@ export class KiCanvasInfoBarElement extends CustomElement {
 
         super.connectedCallback();
 
-        this.target.addEventListener(events.names.viewer.select, (e: Event) => {
-            this.#onItemSelected(
-                e.target as HTMLElement,
-                (e as CustomEvent).detail,
-            );
-        });
+        this.target.addEventListener(
+            KiCanvasSelectEvent.type,
+            (e: KiCanvasSelectEvent) => {
+                this.#onItemSelected(
+                    e.target as HTMLElement,
+                    e.detail.item as Footprint,
+                );
+            },
+        );
     }
 
     override disconnectedCallback() {
