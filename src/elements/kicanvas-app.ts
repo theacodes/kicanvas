@@ -39,7 +39,7 @@ class KiCanvasAppElement extends CustomElement {
     }
 
     async load(src: File) {
-        this.setAttribute("loading", "");
+        this.setBooleanAttribute("loading", true);
 
         this.renderRoot.querySelector("main")?.remove();
 
@@ -86,8 +86,8 @@ class KiCanvasAppElement extends CustomElement {
 
         await view_elem.load(src);
 
-        this.setAttribute("loaded", "");
-        this.removeAttribute("loading");
+        this.setBooleanAttribute("loaded", true);
+        this.setBooleanAttribute("loading", false);
     }
 
     override render() {

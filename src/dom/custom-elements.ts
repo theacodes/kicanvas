@@ -83,6 +83,42 @@ export class CustomElement extends HTMLElement {
     }
 
     /**
+     * Set a boolean attribute.
+     *
+     * Adds attribute="yes" if true, removes it altogether if false.
+     */
+    setBooleanAttribute(
+        qualifiedName: string,
+        value: boolean,
+        true_string = "yes",
+    ): void {
+        if (value) {
+            this.setAttribute(qualifiedName, true_string);
+        } else {
+            this.removeAttribute(qualifiedName);
+        }
+    }
+
+    /**
+     * Gets a boolean attribute.
+     *
+     * Returns true if the attribute is present and not set to "false" or "no".
+     */
+    getBooleanAttribute(qualifiedName: string): boolean {
+        if (!this.hasAttribute(qualifiedName)) {
+            return false;
+        }
+
+        const val = this.getAttribute(qualifiedName);
+
+        if (val == "false" || val == "no") {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Called when connected to the DOM
      *
      * By default it calls render() to place the initial content to the

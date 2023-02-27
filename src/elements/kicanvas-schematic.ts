@@ -18,15 +18,11 @@ export class KiCanvasSchematicElement extends CustomElement {
     }
 
     get loaded() {
-        return this.hasAttribute("loaded");
+        return this.getBooleanAttribute("loaded");
     }
 
     set loaded(value) {
-        if (value) {
-            this.setAttribute("loaded", "");
-        } else {
-            this.removeAttribute("loaded");
-        }
+        this.setBooleanAttribute("loaded", value);
     }
 
     override initialContentCallback() {

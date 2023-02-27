@@ -207,11 +207,7 @@ class KiCanvasLayerControlItemElement extends CustomElement {
     }
 
     set layer_highlighted(v: boolean) {
-        if (v) {
-            this.setAttribute("layer-highlighted", "");
-        } else {
-            this.removeAttribute("layer-highlighted");
-        }
+        this.setBooleanAttribute("layer-hightlighted", v);
     }
 
     get layer_highlighted(): boolean {
