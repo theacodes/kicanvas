@@ -168,11 +168,8 @@ class KiCanvasLayerControlItemElement extends CustomElement {
         super();
     }
 
-    override connectedCallback() {
-        this.layer_visible = true;
-
-        super.connectedCallback();
-
+    override initialContentCallback() {
+        super.initialContentCallback();
         this.renderRoot.addEventListener("click", (e) => {
             e.stopPropagation();
 
@@ -223,6 +220,9 @@ class KiCanvasLayerControlItemElement extends CustomElement {
     }
 
     get layer_visible(): boolean {
+        if (!this.hasAttribute("layer-visibility")) {
+            return true;
+        }
         return this.getAttribute("layer-visibility") == "visible"
             ? true
             : false;
