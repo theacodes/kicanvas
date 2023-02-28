@@ -67,9 +67,13 @@ export class DocumentPainter {
             }
         }
 
-        for (const layer of this.layers.in_display_order()) {
+        for (const layer of this.paintable_layers()) {
             this.paint_layer(layer);
         }
+    }
+
+    *paintable_layers() {
+        yield* this.layers.in_display_order();
     }
 
     paint_layer(layer: ViewLayer) {
