@@ -27,10 +27,10 @@ suite("kicad.drawing_sheet.DrawingSheet(): drawing sheet parsing", function () {
             bottom_margin: 10,
         });
 
-        assert.equal(sheet.items.length, 29);
+        assert.equal(sheet.drawings.length, 29);
 
         // (rect (name "") (start 110 34) (end 2 2) (comment "rect around the title block"))
-        const rect1 = sheet.items[0] as drawing_sheet.Rect;
+        const rect1 = sheet.drawings[0] as drawing_sheet.Rect;
 
         assert_deep_partial(rect1, {
             name: "",
@@ -40,7 +40,7 @@ suite("kicad.drawing_sheet.DrawingSheet(): drawing sheet parsing", function () {
         });
 
         // (line (name "") (start 50 2 ltcorner) (end 50 0 ltcorner) (repeat 30) (incrx 50))
-        const line1 = sheet.items[2] as drawing_sheet.Line;
+        const line1 = sheet.drawings[2] as drawing_sheet.Line;
 
         assert_deep_partial(line1, {
             name: "",
@@ -51,7 +51,7 @@ suite("kicad.drawing_sheet.DrawingSheet(): drawing sheet parsing", function () {
         });
 
         // (tbtext "1" (name "") (pos 25 1 ltcorner) (font (size 1.3 1.3)) (repeat 100) (incrx 50))
-        const text1 = sheet.items[3] as drawing_sheet.TbText;
+        const text1 = sheet.drawings[3] as drawing_sheet.TbText;
 
         assert_deep_partial(text1, {
             text: "1",
