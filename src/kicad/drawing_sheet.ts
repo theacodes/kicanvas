@@ -8,12 +8,19 @@ import { parse_expr, P, T, type Parseable } from "./parser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import { Color } from "../gfx/color.ts";
 import default_sheet from "./default_drawing_sheet.kicad_wks";
+import { Paper, expand_text_vars } from "./common.ts";
+
+export type DrawingSheetDocument = {
+    paper?: Paper;
+    text_vars: Map<string, string | undefined>;
+};
 
 export class DrawingSheet {
     version: number;
     generator: string;
-    setup: Setup;
-    items: DrawingSheetItem[] = [];
+    setup: Setup = new Setup();
+    drawings: DrawingSheetItem[] = [];
+    document?: DrawingSheetDocument;
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -24,11 +31,11 @@ export class DrawingSheet {
                 P.pair("version", T.number),
                 P.pair("generator", T.string),
                 P.item("setup", Setup),
-                P.collection("items", "line", T.item(Line)),
-                P.collection("items", "rect", T.item(Rect)),
-                P.collection("items", "polygon", T.item(Polygon)),
-                P.collection("items", "bitmap", T.item(Bitmap)),
-                P.collection("items", "tbtext", T.item(TbText)),
+                P.collection("drawings", "line", T.item(Line, this)),
+                P.collection("drawings", "rect", T.item(Rect, this)),
+                P.collection("drawings", "polygon", T.item(Polygon, this)),
+                P.collection("drawings", "bitmap", T.item(Bitmap, this)),
+                P.collection("drawings", "tbtext", T.item(TbText, this)),
             ),
         );
     }
@@ -36,32 +43,79 @@ export class DrawingSheet {
     static default() {
         return new DrawingSheet(default_sheet);
     }
+
+    *items() {
+        yield* this.drawings;
+    }
+
+    get text_vars(): Map<string, string | undefined> {
+        return this.document?.text_vars || new Map();
+    }
+
+    get paper() {
+        return this.document?.paper;
+    }
+
+    get width() {
+        return this.paper?.width ?? 297;
+    }
+
+    get height() {
+        return this.paper?.height ?? 210;
+    }
+
+    get top_left() {
+        return new Vec2(this.setup.left_margin, this.setup.top_margin);
+    }
+
+    get top_right() {
+        return new Vec2(
+            this.width - this.setup.right_margin,
+            this.setup?.top_margin,
+        );
+    }
+
+    get bottom_right() {
+        return new Vec2(
+            this.width - this.setup.right_margin,
+            this.height - this.setup.bottom_margin,
+        );
+    }
+
+    get bottom_left() {
+        return new Vec2(
+            this.setup.left_margin,
+            this.height - this.setup.bottom_margin,
+        );
+    }
 }
 
 export class Setup {
-    linewidth: number;
-    textsize: Vec2;
-    textlinewidth: number;
-    top_margin: number;
-    left_margin: number;
-    bottom_margin: number;
-    right_margin: number;
+    linewidth = 0.15;
+    textsize: Vec2 = new Vec2(1.5, 1.5);
+    textlinewidth = 0.15;
+    top_margin = 10;
+    left_margin = 10;
+    bottom_margin = 10;
+    right_margin = 10;
 
-    constructor(expr: Parseable) {
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("setup"),
-                P.pair("linewidth", T.number),
-                P.vec2("textsize"),
-                P.pair("textlinewidth", T.number),
-                P.pair("top_margin", T.number),
-                P.pair("left_margin", T.number),
-                P.pair("bottom_margin", T.number),
-                P.pair("right_margin", T.number),
-            ),
-        );
+    constructor(expr?: Parseable) {
+        if (expr) {
+            Object.assign(
+                this,
+                parse_expr(
+                    expr,
+                    P.start("setup"),
+                    P.pair("linewidth", T.number),
+                    P.vec2("textsize"),
+                    P.pair("textlinewidth", T.number),
+                    P.pair("top_margin", T.number),
+                    P.pair("left_margin", T.number),
+                    P.pair("bottom_margin", T.number),
+                    P.pair("right_margin", T.number),
+                ),
+            );
+        }
     }
 }
 
@@ -85,13 +139,18 @@ export class Coordinate {
 }
 
 export class DrawingSheetItem {
+    parent: DrawingSheet;
     name: string;
     comment: string;
     option: "page1only" | "notonpage1" | null;
-    repeat: number;
-    incrx: number;
-    incry: number;
+    repeat = 1;
+    incry = 0;
+    incrx = 0;
     linewidth: number;
+
+    constructor(parent: DrawingSheet) {
+        this.parent = parent;
+    }
 
     static common_expr_defs = [
         P.pair("name", T.string),
@@ -108,8 +167,8 @@ export class Line extends DrawingSheetItem {
     start: Coordinate;
     end: Coordinate;
 
-    constructor(expr: Parseable) {
-        super();
+    constructor(expr: Parseable, parent: DrawingSheet) {
+        super(parent);
         Object.assign(
             this,
             parse_expr(
@@ -127,8 +186,8 @@ export class Rect extends DrawingSheetItem {
     start: Coordinate;
     end: Coordinate;
 
-    constructor(expr: Parseable) {
-        super();
+    constructor(expr: Parseable, parent: DrawingSheet) {
+        super(parent);
         Object.assign(
             this,
             parse_expr(
@@ -147,8 +206,8 @@ export class Polygon extends DrawingSheetItem {
     pos: Coordinate;
     pts: Vec2[];
 
-    constructor(expr: Parseable) {
-        super();
+    constructor(expr: Parseable, parent: DrawingSheet) {
+        super(parent);
         Object.assign(
             this,
             parse_expr(
@@ -168,8 +227,8 @@ export class Bitmap extends DrawingSheetItem {
     pos: Coordinate;
     pngdata: string;
 
-    constructor(expr: Parseable) {
-        super();
+    constructor(expr: Parseable, parent: DrawingSheet) {
+        super(parent);
         Object.assign(
             this,
             parse_expr(
@@ -186,16 +245,17 @@ export class Bitmap extends DrawingSheetItem {
 
 export class TbText extends DrawingSheetItem {
     text: string;
-    incrlabel: number;
+    #expanded_text: string;
+    incrlabel = 1;
     pos: Coordinate;
     maxlen: number;
     maxheight: number;
     font: Font;
     justify: "center" | "left" | "right" | "top" | "bottom";
-    rotate: number;
+    rotate = 0;
 
-    constructor(expr: Parseable) {
-        super();
+    constructor(expr: Parseable, parent: DrawingSheet) {
+        super(parent);
         Object.assign(
             this,
             parse_expr(
@@ -213,6 +273,16 @@ export class TbText extends DrawingSheetItem {
             ),
         );
     }
+
+    get shown_text() {
+        if (!this.#expanded_text) {
+            this.#expanded_text = expand_text_vars(
+                this.text,
+                this.parent.text_vars,
+            );
+        }
+        return this.#expanded_text;
+    }
 }
 
 export class Font {
@@ -220,7 +290,7 @@ export class Font {
     face: string;
     bold: boolean;
     italic: boolean;
-    size: Vec2;
+    size: Vec2 = new Vec2(1.27, 1.27);
     linewidth: number;
 
     constructor(expr: Parseable) {
