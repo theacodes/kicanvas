@@ -76,7 +76,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
                 const layer = this.viewer.layers.by_name(item.layer_name!)!;
 
                 // if this layer is already highlighted, de-highlight it.
-                if (this.viewer.layers.highlighted == layer) {
+                if (layer.highlighted) {
                     this.viewer.layers.highlight(null);
                 }
                 // otherwise mark it as highlighted.
@@ -204,11 +204,11 @@ class KiCanvasLayerControlItemElement extends CustomElement {
     }
 
     set layer_highlighted(v: boolean) {
-        this.setBooleanAttribute("layer-hightlighted", v);
+        this.setBooleanAttribute("layer-highlighted", v);
     }
 
     get layer_highlighted(): boolean {
-        return this.hasAttribute("layer-highlighted");
+        return this.getBooleanAttribute("layer-highlighted");
     }
 
     set layer_visible(v: boolean) {
