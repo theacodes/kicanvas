@@ -10,7 +10,7 @@ import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";
 import { Renderer } from "../gfx/renderer";
 import { BoardPainter } from "./painter";
-import { LayerName, LayerSet } from "./layers";
+import { LayerNames, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { KiCanvasPickEvent, KiCanvasSelectEvent } from "../framework/events";
 import { DrawingSheet } from "../drawing_sheet/items";
@@ -92,7 +92,7 @@ export class BoardViewer extends Viewer {
     }
 
     #look_at_board() {
-        const edge_cuts = this.layers.by_name(LayerName.edge_cuts)!;
+        const edge_cuts = this.layers.by_name(LayerNames.edge_cuts)!;
         const board_bbox = edge_cuts.bbox;
         this.viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
     }
