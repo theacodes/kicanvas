@@ -13,9 +13,12 @@ import { BoardPainter } from "./painter";
 import { LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { KiCanvasPickEvent, KiCanvasSelectEvent } from "../framework/events";
+import { DrawingSheet } from "../kicad/drawing_sheet";
+import { DrawingSheetPainter } from "../drawing_sheet/painter";
 
 export class BoardViewer extends Viewer {
     board: pcb_items.KicadPCB;
+    drawing_sheet: DrawingSheet;
     #painter: BoardPainter;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -76,6 +79,13 @@ export class BoardViewer extends Viewer {
         );
 
         this.#painter.paint(this.board);
+
+        this.drawing_sheet = DrawingSheet.default();
+        this.drawing_sheet.document = this.board;
+
+        new DrawingSheetPainter(this.renderer, this.layers as LayerSet).paint(
+            this.drawing_sheet,
+        );
 
         this.#look_at_board();
         this.draw_soon();
