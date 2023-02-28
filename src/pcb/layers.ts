@@ -9,6 +9,7 @@ import {
     type VisibilityType,
     ViewLayer,
     ViewLayerSet as BaseLayerSet,
+    ViewLayerName,
 } from "../framework/view-layers";
 import { KicadPCB } from "../kicad/board";
 export { ViewLayer };
@@ -20,6 +21,7 @@ export { ViewLayer };
  * for drill holes and such.
  */
 export enum LayerName {
+    drawing_sheet = ViewLayerName.drawing_sheet,
     dwgs_user = "Dwgs.User",
     cmts_user = "Cmts.User",
     eco1_user = "Eco1.User",
@@ -238,6 +240,8 @@ export class LayerSet extends BaseLayerSet {
      */
     color_for(layer_name: string): Color {
         switch (layer_name) {
+            case LayerName.drawing_sheet:
+                return (this.theme["worksheet"] as Color) ?? Color.white;
             case LayerName.via_holes:
                 return (this.theme["via_hole"] as Color) ?? Color.white;
             case LayerName.via_through:
