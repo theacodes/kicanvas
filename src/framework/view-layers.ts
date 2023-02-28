@@ -111,6 +111,15 @@ export class ViewLayer {
 }
 
 /**
+ * Common view layer names across all viewers.
+ */
+export enum ViewLayerName {
+    overlay = ":Overlay",
+    grid = ":Grid",
+    drawing_sheet = ":DrawingSheet",
+}
+
+/**
  * Represents the complete set of view layers.
  */
 export class ViewLayerSet {
@@ -123,7 +132,12 @@ export class ViewLayerSet {
      * Create a new LayerSet
      */
     constructor() {
-        this.#overlay = new ViewLayer(this, ":Overlay", true, Color.white);
+        this.#overlay = new ViewLayer(
+            this,
+            ViewLayerName.overlay,
+            true,
+            Color.white,
+        );
     }
 
     /**
