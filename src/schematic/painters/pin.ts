@@ -13,7 +13,7 @@ import { Color } from "../../gfx/color";
 import { EDAText } from "../../text/eda-text";
 import { StrokeFont } from "../../text/stroke-font";
 import { ItemPainter } from "../../framework/painter";
-import * as schematic from "../../kicad/schematic";
+import * as schematic_items from "../items";
 import { LayerName, ViewLayer } from "../layers";
 import { SchematicPainter } from "../painter";
 import { Matrix3 } from "../../math/matrix3";
@@ -30,9 +30,9 @@ import { Matrix3 } from "../../math/matrix3";
  *
  */
 export class PinPainter extends ItemPainter {
-    override classes = [schematic.PinInstance];
+    override classes = [schematic_items.PinInstance];
 
-    override layers_for(item: schematic.PinInstance) {
+    override layers_for(item: schematic_items.PinInstance) {
         return [
             LayerName.symbol_pin,
             LayerName.symbol_foreground,
@@ -40,7 +40,7 @@ export class PinPainter extends ItemPainter {
         ];
     }
 
-    paint(layer: ViewLayer, p: schematic.PinInstance) {
+    paint(layer: ViewLayer, p: schematic_items.PinInstance) {
         if (p.definition.hide) {
             return;
         }
@@ -206,11 +206,12 @@ export class PinPainter extends ItemPainter {
         const hide_pin_names = libsym.pin_names.hide || !name || name == "~";
         const hide_pin_numbers =
             libsym.pin_numbers.hide || !number || number == "~";
-        const pin_thickness = schematic.DefaultValues.line_width;
+        const pin_thickness = schematic_items.DefaultValues.line_width;
         const pin_name_offset = libsym.pin_names.offset;
         //  24 mils * ratio
         // From void SCH_PAINTER::draw( const LIB_PIN *aPin, int aLayer, bool aDimmed )
-        const text_margin = 0.6096 * schematic.DefaultValues.text_offset_ratio;
+        const text_margin =
+            0.6096 * schematic_items.DefaultValues.text_offset_ratio;
         const num_thickness =
             def.number.effects.font.thickness || pin_thickness;
         const name_thickness =
@@ -285,8 +286,8 @@ export class PinPainter extends ItemPainter {
 }
 
 export type PinInfo = {
-    pin: schematic.PinInstance;
-    def: schematic.PinDefinition;
+    pin: schematic_items.PinInstance;
+    def: schematic_items.PinDefinition;
     position: Vec2;
     orientation: PinOrientation;
 };
@@ -348,15 +349,15 @@ export const PinShapeInternals = {
 
     draw(
         gfx: Pick<Renderer, "line" | "circle" | "arc">,
-        electrical_type: schematic.PinElectricalType,
-        shape: schematic.PinShape,
+        electrical_type: schematic_items.PinElectricalType,
+        shape: schematic_items.PinShape,
         position: Vec2,
         p0: Vec2,
         dir: Vec2,
     ) {
-        const radius = schematic.DefaultValues.pinsymbol_size;
+        const radius = schematic_items.DefaultValues.pinsymbol_size;
         const diam = radius * 2;
-        const nc_radius = schematic.DefaultValues.target_pin_radius;
+        const nc_radius = schematic_items.DefaultValues.target_pin_radius;
 
         if (electrical_type == "no_connect") {
             gfx.line([p0, position]);

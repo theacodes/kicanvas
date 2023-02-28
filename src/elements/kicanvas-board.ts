@@ -6,7 +6,7 @@
 
 import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasLoadEvent } from "../framework/events";
-import { BoardViewer } from "../pcb/viewer";
+import { BoardViewer } from "../board/viewer";
 
 export class KiCanvasBoardElement extends CustomElement {
     #canvas: HTMLCanvasElement;

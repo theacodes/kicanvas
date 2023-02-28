@@ -10,7 +10,7 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import * as drawing_sheet from "../kicad/drawing_sheet";
+import * as drawing_sheet from "./items";
 import { Vec2 } from "../math/vec2";
 import { Renderer } from "../gfx/renderer";
 import { Polyline } from "../gfx/shapes";

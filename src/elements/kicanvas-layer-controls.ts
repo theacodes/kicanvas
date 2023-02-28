@@ -6,7 +6,7 @@
 
 import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasLoadEvent } from "../framework/events";
-import { LayerSet } from "../pcb/layers";
+import { LayerSet } from "../board/layers";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import styles from "./kicanvas-layer-controls.css";
 

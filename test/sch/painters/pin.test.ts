@@ -10,7 +10,7 @@ import {
     PinPainter,
     PinShapeInternals,
     type PinInfo,
-} from "../../../src/sch/painters/pin";
+} from "../../../src/schematic/painters/pin";
 import { Vec2 } from "../../../src/math/vec2";
 
 suite("sch.painters.pin.PinPainter", function () {

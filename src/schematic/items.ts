@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
+import { parse_expr, P, T, type Parseable } from "../kicad/parser.ts";
 import { Vec2 } from "../math/vec2.ts";
-import { At, Effects, Paper, TitleBlock, Stroke } from "./common.ts";
+import { At, Effects, Paper, TitleBlock, Stroke } from "../kicad/common.ts";
 import { Color } from "../gfx/color.ts";
 
 /* Default values for various things found in schematics

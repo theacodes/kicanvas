@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
+import { parse_expr, P, T, type Parseable } from "../kicad/parser.ts";
 import { Vec2 } from "../math/vec2.ts";
-import type { List } from "./tokenizer.ts";
+import type { List } from "../kicad/tokenizer.ts";
 import {
     At,
     Effects,
@@ -14,7 +14,7 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
-} from "./common.ts";
+} from "../kicad/common.ts";
 
 export type Drawing =
     | GrLine

@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as schematic from "../../kicad/schematic";
+import * as schematic_items from "../items";
 import { Angle } from "../../math/angle";
 import { Vec2 } from "../../math/vec2";
 import { SchText } from "../../text/sch-text";
@@ -31,11 +31,11 @@ import { Color } from "../../gfx/color";
 export class LabelPainter extends ItemPainter {
     override classes: any[] = [];
 
-    override layers_for(item: schematic.Label) {
+    override layers_for(item: schematic_items.Label) {
         return [LayerName.label];
     }
 
-    override paint(layer: ViewLayer, l: schematic.Label) {
+    override paint(layer: ViewLayer, l: schematic_items.Label) {
         if (l.effects.hide) {
             return;
         }
@@ -75,7 +75,7 @@ export class LabelPainter extends ItemPainter {
         this.gfx.state.pop();
     }
 
-    create_shape(l: schematic.Label, schtext: SchText): Vec2[] {
+    create_shape(l: schematic_items.Label, schtext: SchText): Vec2[] {
         return [];
     }
 
@@ -83,20 +83,22 @@ export class LabelPainter extends ItemPainter {
         return new Color(1, 0, 1, 1);
     }
 
-    after_apply(l: schematic.Label, schtext: SchText) {}
+    after_apply(l: schematic_items.Label, schtext: SchText) {}
 
     get_text_offset(schtext: SchText): number {
         // From SCH_TEXT::GetTextOffset, turns out SCH_LABEL is the only
         // subclass that uses it.
         return Math.round(
-            schematic.DefaultValues.text_offset_ratio * schtext.text_size.x,
+            schematic_items.DefaultValues.text_offset_ratio *
+                schtext.text_size.x,
         );
     }
 
     get_box_expansion(schtext: SchText): number {
         // From SCH_LABEL_BASE::GetLabelBoxExpansion
         return Math.round(
-            schematic.DefaultValues.label_size_ratio * schtext.text_size.y,
+            schematic_items.DefaultValues.label_size_ratio *
+                schtext.text_size.y,
         );
     }
 
@@ -107,7 +109,10 @@ export class LabelPainter extends ItemPainter {
      * This takes into account orientation and any additional distance to make
      * the text readable (such as offsetting it from the top of a wire).
      */
-    get_schematic_text_offset(l: schematic.Label, schtext: SchText): Vec2 {
+    get_schematic_text_offset(
+        l: schematic_items.Label,
+        schtext: SchText,
+    ): Vec2 {
         // From SCH_LABEL_BASE::GetSchematicTextOffset, although it is defined
         // on SCH_TEXT (which SCH_LABEL inherits from), but only SCH_LABEL
         // classes actually do anything with it.
@@ -125,7 +130,7 @@ export class LabelPainter extends ItemPainter {
 }
 
 export class NetLabelPainter extends LabelPainter {
-    override classes: any[] = [schematic.NetLabel];
+    override classes: any[] = [schematic_items.NetLabel];
 
     override get color() {
         return this.gfx.theme["label_local"] as Color;
@@ -133,17 +138,17 @@ export class NetLabelPainter extends LabelPainter {
 }
 
 export class GlobalLabelPainter extends LabelPainter {
-    override classes: any[] = [schematic.GlobalLabel];
+    override classes: any[] = [schematic_items.GlobalLabel];
 
     override get color() {
         return this.gfx.theme["label_global"] as Color;
     }
 
     override get_schematic_text_offset(
-        l: schematic.Label,
+        l: schematic_items.Label,
         schtext: SchText,
     ): Vec2 {
-        const label = l as schematic.GlobalLabel;
+        const label = l as schematic_items.GlobalLabel;
         const text_height = schtext.text_size.y;
         let horz = this.get_box_expansion(schtext);
 
@@ -177,8 +182,8 @@ export class GlobalLabelPainter extends LabelPainter {
      * Creates the label's outline shape
      * Adapted from SCH_GLOBALLABEL::CreateGraphicShape
      */
-    override create_shape(l: schematic.Label, schtext: SchText): Vec2[] {
-        const label = l as schematic.GlobalLabel;
+    override create_shape(l: schematic_items.Label, schtext: SchText): Vec2[] {
+        const label = l as schematic_items.GlobalLabel;
         const pos = schtext.text_pos;
         const angle = Angle.from_degrees(l.at.rotation + 180);
         const text_height = schtext.text_size.y;
@@ -235,18 +240,21 @@ export class GlobalLabelPainter extends LabelPainter {
 }
 
 export class HierarchicalLabelPainter extends LabelPainter {
-    override classes: any[] = [schematic.HierarchicalLabel];
+    override classes: any[] = [schematic_items.HierarchicalLabel];
 
     override get color() {
         return this.gfx.theme["label_hier"] as Color;
     }
 
-    override after_apply(l: schematic.HierarchicalLabel, schtext: SchText) {
+    override after_apply(
+        l: schematic_items.HierarchicalLabel,
+        schtext: SchText,
+    ) {
         schtext.v_align = "center";
     }
 
     override get_schematic_text_offset(
-        l: schematic.Label,
+        l: schematic_items.Label,
         schtext: SchText,
     ): Vec2 {
         const dist = Math.round(
@@ -272,7 +280,7 @@ export class HierarchicalLabelPainter extends LabelPainter {
      * Adapted from SCH_HIERLABEL::CreateGraphicShape and TemplateShape.
      */
     override create_shape(
-        label: schematic.HierarchicalLabel,
+        label: schematic_items.HierarchicalLabel,
         schtext: SchText,
     ): Vec2[] {
         const pos = schtext.text_pos;

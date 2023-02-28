@@ -10,7 +10,7 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import * as pcb_items from "../kicad/board";
+import * as board_items from "./items";
 import { Arc } from "../math/arc";
 import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
@@ -23,26 +23,26 @@ import { EDAText } from "../text/eda-text";
 import { StrokeFont } from "../text/stroke-font";
 
 class LinePainter extends ItemPainter {
-    classes = [pcb_items.GrLine, pcb_items.FpLine];
+    classes = [board_items.GrLine, board_items.FpLine];
 
-    layers_for(item: pcb_items.GrLine | pcb_items.FpLine) {
+    layers_for(item: board_items.GrLine | board_items.FpLine) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, s: pcb_items.GrLine | pcb_items.FpLine) {
+    paint(layer: ViewLayer, s: board_items.GrLine | board_items.FpLine) {
         const points = [s.start, s.end];
         this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
 class RectPainter extends ItemPainter {
-    classes = [pcb_items.GrRect, pcb_items.FpRect];
+    classes = [board_items.GrRect, board_items.FpRect];
 
-    layers_for(item: pcb_items.GrRect | pcb_items.FpRect) {
+    layers_for(item: board_items.GrRect | board_items.FpRect) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, r: pcb_items.GrRect | pcb_items.FpRect) {
+    paint(layer: ViewLayer, r: board_items.GrRect | board_items.FpRect) {
         const color = layer.color;
         const points = [
             r.start,
@@ -61,15 +61,17 @@ class RectPainter extends ItemPainter {
 }
 
 class PolyPainter extends ItemPainter {
-    classes = [pcb_items.Poly, pcb_items.GrPoly, pcb_items.FpPoly];
+    classes = [board_items.Poly, board_items.GrPoly, board_items.FpPoly];
 
-    layers_for(item: pcb_items.Poly | pcb_items.GrPoly | pcb_items.FpPoly) {
+    layers_for(
+        item: board_items.Poly | board_items.GrPoly | board_items.FpPoly,
+    ) {
         return [item.layer];
     }
 
     paint(
         layer: ViewLayer,
-        p: pcb_items.Poly | pcb_items.GrPoly | pcb_items.FpPoly,
+        p: board_items.Poly | board_items.GrPoly | board_items.FpPoly,
     ) {
         const color = layer.color;
 
@@ -84,13 +86,13 @@ class PolyPainter extends ItemPainter {
 }
 
 class ArcPainter extends ItemPainter {
-    classes = [pcb_items.GrArc, pcb_items.FpArc];
+    classes = [board_items.GrArc, board_items.FpArc];
 
-    layers_for(item: pcb_items.GrArc | pcb_items.FpArc) {
+    layers_for(item: board_items.GrArc | board_items.FpArc) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, a: pcb_items.GrArc | pcb_items.FpArc) {
+    paint(layer: ViewLayer, a: board_items.GrArc | board_items.FpArc) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         this.gfx.line(new Polyline(points, arc.width, layer.color));
@@ -98,13 +100,13 @@ class ArcPainter extends ItemPainter {
 }
 
 class CirclePainter extends ItemPainter {
-    classes = [pcb_items.GrCircle, pcb_items.FpCircle];
+    classes = [board_items.GrCircle, board_items.FpCircle];
 
-    layers_for(item: pcb_items.GrCircle | pcb_items.FpCircle) {
+    layers_for(item: board_items.GrCircle | board_items.FpCircle) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, c: pcb_items.GrCircle | pcb_items.FpCircle) {
+    paint(layer: ViewLayer, c: board_items.GrCircle | board_items.FpCircle) {
         const color = layer.color;
 
         const radius = c.center.sub(c.end).magnitude;
@@ -128,26 +130,26 @@ class CirclePainter extends ItemPainter {
 }
 
 class TraceSegmentPainter extends ItemPainter {
-    classes = [pcb_items.LineSegment];
+    classes = [board_items.LineSegment];
 
-    layers_for(item: pcb_items.LineSegment) {
+    layers_for(item: board_items.LineSegment) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, s: pcb_items.LineSegment) {
+    paint(layer: ViewLayer, s: board_items.LineSegment) {
         const points = [s.start, s.end];
         this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
 class TraceArcPainter extends ItemPainter {
-    classes = [pcb_items.ArcSegment];
+    classes = [board_items.ArcSegment];
 
-    layers_for(item: pcb_items.ArcSegment) {
+    layers_for(item: board_items.ArcSegment) {
         return [item.layer];
     }
 
-    paint(layer: ViewLayer, a: pcb_items.ArcSegment) {
+    paint(layer: ViewLayer, a: board_items.ArcSegment) {
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         this.gfx.line(new Polyline(points, arc.width, layer.color));
@@ -155,13 +157,13 @@ class TraceArcPainter extends ItemPainter {
 }
 
 class ViaPainter extends ItemPainter {
-    classes = [pcb_items.Via];
+    classes = [board_items.Via];
 
-    layers_for(v: pcb_items.Via): string[] {
+    layers_for(v: board_items.Via): string[] {
         return [LayerName.via_holes, LayerName.via_through];
     }
 
-    paint(layer: ViewLayer, v: pcb_items.Via) {
+    paint(layer: ViewLayer, v: board_items.Via) {
         const color = layer.color;
         if (layer.name == LayerName.via_through) {
             this.gfx.circle(new Circle(v.at.position, v.size / 2, color));
@@ -172,14 +174,14 @@ class ViaPainter extends ItemPainter {
 }
 
 class ZonePainter extends ItemPainter {
-    classes = [pcb_items.Zone];
+    classes = [board_items.Zone];
 
-    layers_for(z: pcb_items.Zone): string[] {
+    layers_for(z: board_items.Zone): string[] {
         const layers = z.layers ?? [z.layer];
         return layers.map((l) => `:Zones:${l}`);
     }
 
-    paint(layer: ViewLayer, z: pcb_items.Zone) {
+    paint(layer: ViewLayer, z: board_items.Zone) {
         if (!z.filled_polygons) {
             return;
         }
@@ -194,9 +196,9 @@ class ZonePainter extends ItemPainter {
 }
 
 class PadPainter extends ItemPainter {
-    classes = [pcb_items.Pad];
+    classes = [board_items.Pad];
 
-    layers_for(pad: pcb_items.Pad): string[] {
+    layers_for(pad: board_items.Pad): string[] {
         // TODO: Port KiCAD's logic over.
         const layers: string[] = [];
 
@@ -234,7 +236,7 @@ class PadPainter extends ItemPainter {
         return layers;
     }
 
-    paint(layer: ViewLayer, pad: pcb_items.Pad) {
+    paint(layer: ViewLayer, pad: board_items.Pad) {
         const color = layer.color;
 
         const position_mat = Matrix3.translation(
@@ -405,13 +407,13 @@ class PadPainter extends ItemPainter {
 }
 
 class GrTextPainter extends ItemPainter {
-    classes = [pcb_items.GrText];
+    classes = [board_items.GrText];
 
-    layers_for(t: pcb_items.GrText) {
+    layers_for(t: board_items.GrText) {
         return [t.layer.name];
     }
 
-    paint(layer: ViewLayer, t: pcb_items.GrText) {
+    paint(layer: ViewLayer, t: board_items.GrText) {
         if (t.hide || !t.shown_text) {
             return;
         }
@@ -442,9 +444,9 @@ class GrTextPainter extends ItemPainter {
 }
 
 class FpTextPainter extends ItemPainter {
-    classes = [pcb_items.FpText];
+    classes = [board_items.FpText];
 
-    layers_for(t: pcb_items.FpText) {
+    layers_for(t: board_items.FpText) {
         if (t.hide) {
             return [];
         } else {
@@ -452,7 +454,7 @@ class FpTextPainter extends ItemPainter {
         }
     }
 
-    paint(layer: ViewLayer, t: pcb_items.FpText) {
+    paint(layer: ViewLayer, t: board_items.FpText) {
         if (t.hide || !t.shown_text) {
             return;
         }
@@ -503,19 +505,19 @@ class FpTextPainter extends ItemPainter {
 }
 
 class DimensionPainter extends ItemPainter {
-    classes = [pcb_items.Dimension];
+    classes = [board_items.Dimension];
 
-    layers_for(d: pcb_items.Dimension): string[] {
+    layers_for(d: board_items.Dimension): string[] {
         return [];
     }
 
-    paint(layer: ViewLayer, d: pcb_items.Dimension) {}
+    paint(layer: ViewLayer, d: board_items.Dimension) {}
 }
 
 class FootprintPainter extends ItemPainter {
-    classes = [pcb_items.Footprint];
+    classes = [board_items.Footprint];
 
-    layers_for(fp: pcb_items.Footprint): string[] {
+    layers_for(fp: board_items.Footprint): string[] {
         const layers = new Set();
         for (const item of fp.items()) {
             const item_layers = this.view_painter.layers_for(item);
@@ -526,7 +528,7 @@ class FootprintPainter extends ItemPainter {
         return Array.from(layers.values()) as string[];
     }
 
-    paint(layer: ViewLayer, fp: pcb_items.Footprint) {
+    paint(layer: ViewLayer, fp: board_items.Footprint) {
         const matrix = Matrix3.translation(
             fp.at.position.x,
             fp.at.position.y,

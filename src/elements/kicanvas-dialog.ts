@@ -6,7 +6,7 @@
 
 import { CustomElement, html } from "../dom/custom-elements";
 import { KiCanvasInspectEvent } from "../framework/events";
-import { SchematicSymbol } from "../kicad/schematic";
+import { SchematicSymbol } from "../schematic/items";
 import styles from "./kicanvas-dialog.css";
 
 export class KiCanvasDialogElement extends CustomElement {

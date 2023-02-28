@@ -4,11 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
+import { parse_expr, P, T, type Parseable } from "../kicad/parser.ts";
 import { Vec2 } from "../math/vec2.ts";
 import { Color } from "../gfx/color.ts";
 import default_sheet from "./default_drawing_sheet.kicad_wks";
-import { Paper, expand_text_vars } from "./common.ts";
+import { Paper, expand_text_vars } from "../kicad/common.ts";
 
 export type DrawingSheetDocument = {
     paper?: Paper;

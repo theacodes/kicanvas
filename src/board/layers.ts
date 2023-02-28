@@ -11,7 +11,7 @@ import {
     ViewLayerSet as BaseLayerSet,
     ViewLayerName,
 } from "../framework/view-layers";
-import { KicadPCB } from "../kicad/board";
+import { KicadPCB } from "./items";
 export { ViewLayer };
 
 /** Board view layer names

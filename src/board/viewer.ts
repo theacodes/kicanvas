@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as pcb_items from "../kicad/board";
+import * as board_items from "./items";
 import { WebGL2Renderer } from "../gfx/webgl/renderer";
 import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";
@@ -13,11 +13,11 @@ import { BoardPainter } from "./painter";
 import { LayerName, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
 import { KiCanvasPickEvent, KiCanvasSelectEvent } from "../framework/events";
-import { DrawingSheet } from "../kicad/drawing_sheet";
+import { DrawingSheet } from "../drawing_sheet/items";
 import { DrawingSheetPainter } from "../drawing_sheet/painter";
 
 export class BoardViewer extends Viewer {
-    board: pcb_items.KicadPCB;
+    board: board_items.KicadPCB;
     drawing_sheet: DrawingSheet;
     #painter: BoardPainter;
 
@@ -32,7 +32,7 @@ export class BoardViewer extends Viewer {
                 let selected;
 
                 for (const { layer: _, bbox } of items) {
-                    if (bbox.context instanceof pcb_items.Footprint) {
+                    if (bbox.context instanceof board_items.Footprint) {
                         selected = bbox;
                         break;
                     }
@@ -70,7 +70,7 @@ export class BoardViewer extends Viewer {
             pcb_text = await (await window.fetch(src)).text();
         }
 
-        this.board = new pcb_items.KicadPCB(pcb_text);
+        this.board = new board_items.KicadPCB(pcb_text);
 
         this.layers = new LayerSet(this.board, this.renderer.theme);
         this.#painter = new BoardPainter(

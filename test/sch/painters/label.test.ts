@@ -11,12 +11,12 @@ import {
     GlobalLabelPainter,
     HierarchicalLabelPainter,
     LabelPainter,
-} from "../../../src/sch/painters/label";
+} from "../../../src/schematic/painters/label";
 import { NullRenderer } from "../../null-renderer";
 import { SchText } from "../../../src/text/sch-text";
 import { Angle } from "../../../src/math/angle";
 import { Vec2 } from "../../../src/math/vec2";
-import { GlobalLabel, HierarchicalLabel } from "../../../src/kicad/schematic";
+import { GlobalLabel, HierarchicalLabel } from "../../../src/schematic/items";
 
 const renderer = new NullRenderer();
 const layer_set = new ViewLayerSet();

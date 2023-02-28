@@ -6,7 +6,7 @@
 
 import { CustomElement, html } from "../dom/custom-elements";
 import { KiCanvasLoadEvent } from "../framework/events";
-import { SchematicViewer } from "../sch/viewer";
+import { SchematicViewer } from "../schematic/viewer";
 
 export class KiCanvasSchematicElement extends CustomElement {
     #canvas: HTMLCanvasElement;

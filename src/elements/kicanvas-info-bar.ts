@@ -6,7 +6,7 @@
 
 import { CustomElement, html } from "../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../framework/events";
-import { Footprint } from "../kicad/board";
+import { Footprint } from "../board/items";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import styles from "./kicanvas-info-bar.css";
 
