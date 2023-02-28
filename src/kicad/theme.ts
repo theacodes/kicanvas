@@ -87,7 +87,7 @@ export const board = {
     via_hole: Color.from_css("rgb(40, 38, 52)"),
     via_micro: Color.from_css("rgb(255, 148, 0)"),
     via_through: Color.from_css("rgb(227, 209, 46)"),
-    worksheet: Color.from_css("rgb(99, 78, 137)"),
+    worksheet: Color.from_css("rgb(100, 190, 203)"),
 };
 
 export const palette = [
@@ -142,5 +142,5 @@ export const schematic = {
     sheet_name: Color.from_css("rgb(129, 238, 255)"),
     value: Color.from_css("rgb(129, 238, 255)"),
     wire: Color.from_css("rgb(174, 129, 255)"),
-    worksheet: Color.from_css("rgb(99, 78, 137)"),
+    worksheet: Color.from_css("rgb(100, 190, 203)"),
 };
