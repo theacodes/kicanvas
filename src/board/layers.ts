@@ -20,7 +20,7 @@ export { ViewLayer };
  * there are also several graphical layers that are "virtual", such as layers
  * for drill holes and such.
  */
-export enum LayerName {
+export enum LayerNames {
     drawing_sheet = ViewLayerName.drawing_sheet,
     dwgs_user = "Dwgs.User",
     cmts_user = "Cmts.User",
@@ -42,11 +42,8 @@ export enum LayerName {
     pad_holes = ":Pad:Holes",
     pad_holewalls = ":Pad:HoleWalls",
     via_through = ":Via:Through",
-    via_buriedblind = ":Via:BuriedBlind",
-    via_microvia = ":Via:MicroVia",
     pads_front = ":Pads:Front",
     f_cu = "F.Cu",
-    zones_f_cu = ":Zones:F.Cu",
     f_mask = "F.Mask",
     f_silks = "F.SilkS",
     f_adhes = "F.Adhes",
@@ -54,68 +51,37 @@ export enum LayerName {
     f_crtyd = "F.CrtYd",
     f_fab = "F.Fab",
     in1_cu = "In1.Cu",
-    zones_in1_cu = ":Zones:In1.Cu",
     in2_cu = "In2.Cu",
-    zones_in2_cu = ":Zones:In2.Cu",
     in3_cu = "In3.Cu",
-    zones_in3_cu = ":Zones:In3.Cu",
     in4_cu = "In4.Cu",
-    zones_in4_cu = ":Zones:In4.Cu",
     in5_cu = "In5.Cu",
-    zones_in5_cu = ":Zones:In5.Cu",
     in6_cu = "In6.Cu",
-    zones_in6_cu = ":Zones:In6.Cu",
     in7_cu = "In7.Cu",
-    zones_in7_cu = ":Zones:In7.Cu",
     in8_cu = "In8.Cu",
-    zones_in8_cu = ":Zones:In8.Cu",
     in9_cu = "In9.Cu",
-    zones_in9_cu = ":Zones:In9.Cu",
     in10_cu = "In10.Cu",
-    zones_in10_cu = ":Zones:In10.Cu",
     in11_cu = "In11.Cu",
-    zones_in11_cu = ":Zones:In11.Cu",
     in12_cu = "In12.Cu",
-    zones_in12_cu = ":Zones:In12.Cu",
     in13_cu = "In13.Cu",
-    zones_in13_cu = ":Zones:In13.Cu",
     in14_cu = "In14.Cu",
-    zones_in14_cu = ":Zones:In14.Cu",
     in15_cu = "In15.Cu",
-    zones_in15_cu = ":Zones:In15.Cu",
     in16_cu = "In16.Cu",
-    zones_in16_cu = ":Zones:In16.Cu",
     in17_cu = "In17.Cu",
-    zones_in17_cu = ":Zones:In17.Cu",
     in18_cu = "In18.Cu",
-    zones_in18_cu = ":Zones:In18.Cu",
     in19_cu = "In19.Cu",
-    zones_in19_cu = ":Zones:In19.Cu",
     in20_cu = "In20.Cu",
-    zones_in20_cu = ":Zones:In20.Cu",
     in21_cu = "In21.Cu",
-    zones_in21_cu = ":Zones:In21.Cu",
     in22_cu = "In22.Cu",
-    zones_in22_cu = ":Zones:In22.Cu",
     in23_cu = "In23.Cu",
-    zones_in23_cu = ":Zones:In23.Cu",
     in24_cu = "In24.Cu",
-    zones_in24_cu = ":Zones:In24.Cu",
     in25_cu = "In25.Cu",
-    zones_in25_cu = ":Zones:In25.Cu",
     in26_cu = "In26.Cu",
-    zones_in26_cu = ":Zones:In26.Cu",
     in27_cu = "In27.Cu",
-    zones_in27_cu = ":Zones:In27.Cu",
     in28_cu = "In28.Cu",
-    zones_in28_cu = ":Zones:In28.Cu",
     in29_cu = "In29.Cu",
-    zones_in29_cu = ":Zones:In29.Cu",
     in30_cu = "In30.Cu",
-    zones_in30_cu = ":Zones:In30.Cu",
     pads_back = ":Pads:Back",
     b_cu = "B.Cu",
-    zones_b_cu = ":Zones:B.Cu",
     b_mask = "B.Mask",
     b_silks = "B.SilkS",
     b_adhes = "B.Adhes",
@@ -124,49 +90,76 @@ export enum LayerName {
     b_fab = "B.Fab",
 }
 
-const hole_layers = [
-    LayerName.via_holes,
-    LayerName.pad_holes,
-    LayerName.pad_holewalls,
-    LayerName.via_through,
-    LayerName.via_buriedblind,
-    LayerName.via_microvia,
+const HoleLayerNames = [
+    LayerNames.via_holes,
+    LayerNames.pad_holes,
+    LayerNames.pad_holewalls,
+    LayerNames.via_through,
 ];
 
-const copper_layers = [
-    LayerName.f_cu,
-    LayerName.in1_cu,
-    LayerName.in2_cu,
-    LayerName.in3_cu,
-    LayerName.in4_cu,
-    LayerName.in5_cu,
-    LayerName.in6_cu,
-    LayerName.in7_cu,
-    LayerName.in8_cu,
-    LayerName.in9_cu,
-    LayerName.in10_cu,
-    LayerName.in11_cu,
-    LayerName.in12_cu,
-    LayerName.in13_cu,
-    LayerName.in14_cu,
-    LayerName.in15_cu,
-    LayerName.in16_cu,
-    LayerName.in17_cu,
-    LayerName.in18_cu,
-    LayerName.in19_cu,
-    LayerName.in20_cu,
-    LayerName.in21_cu,
-    LayerName.in22_cu,
-    LayerName.in23_cu,
-    LayerName.in24_cu,
-    LayerName.in25_cu,
-    LayerName.in26_cu,
-    LayerName.in27_cu,
-    LayerName.in28_cu,
-    LayerName.in29_cu,
-    LayerName.in30_cu,
-    LayerName.b_cu,
+const CopperLayerNames = [
+    LayerNames.f_cu,
+    LayerNames.in1_cu,
+    LayerNames.in2_cu,
+    LayerNames.in3_cu,
+    LayerNames.in4_cu,
+    LayerNames.in5_cu,
+    LayerNames.in6_cu,
+    LayerNames.in7_cu,
+    LayerNames.in8_cu,
+    LayerNames.in9_cu,
+    LayerNames.in10_cu,
+    LayerNames.in11_cu,
+    LayerNames.in12_cu,
+    LayerNames.in13_cu,
+    LayerNames.in14_cu,
+    LayerNames.in15_cu,
+    LayerNames.in16_cu,
+    LayerNames.in17_cu,
+    LayerNames.in18_cu,
+    LayerNames.in19_cu,
+    LayerNames.in20_cu,
+    LayerNames.in21_cu,
+    LayerNames.in22_cu,
+    LayerNames.in23_cu,
+    LayerNames.in24_cu,
+    LayerNames.in25_cu,
+    LayerNames.in26_cu,
+    LayerNames.in27_cu,
+    LayerNames.in28_cu,
+    LayerNames.in29_cu,
+    LayerNames.in30_cu,
+    LayerNames.b_cu,
 ];
+
+export enum CopperVirtualLayerNames {
+    zones = "Zones",
+}
+
+export function virtual_layer_for(
+    physical_layer: string,
+    virtual_name: CopperVirtualLayerNames,
+) {
+    return `:${physical_layer}:${virtual_name}`;
+}
+
+// const ZoneLayerNames = CopperLayerNames.map((l) =>
+//     virtual_layer_for(l, CopperVirtualLayerNames.zones),
+// );
+
+function is_virtual(name: string) {
+    return name.startsWith(":");
+}
+
+function is_virtual_for(physical_layer: string, layer_name: string) {
+    return (
+        is_virtual(layer_name) && layer_name.startsWith(`:${physical_layer}:`)
+    );
+}
+
+function is_copper(name: string) {
+    return name.endsWith(".Cu");
+}
 
 /**
  * Board view layer set
@@ -188,40 +181,43 @@ export class LayerSet extends BaseLayerSet {
             board_layers.set(l.canonical_name, l);
         }
 
-        for (const layer_name of Object.values(LayerName)) {
+        for (const layer_name of Object.values(LayerNames)) {
             // Skip physical layers that aren't present on the board.
-            if (!layer_name.startsWith(":") && !board_layers.has(layer_name)) {
-                continue;
-            }
-
-            // Skip virtual zone layers for physical layers that aren't present on the board.
-            if (
-                layer_name.startsWith(":Zones:") &&
-                !board_layers.has(layer_name.slice(7))
-            ) {
+            if (!is_virtual(layer_name) && !board_layers.has(layer_name)) {
                 continue;
             }
 
             let visible: VisibilityType = true;
 
             // These virtual layers require at least one visible copper layer to be shown.
-            if (hole_layers.includes(layer_name)) {
+            if (HoleLayerNames.includes(layer_name)) {
                 visible = () => this.is_any_copper_layer_visible();
             }
 
             // Pad layers require that the front or back layer is visible.
-            if (layer_name == LayerName.pads_front) {
-                visible = () => this.by_name(LayerName.f_cu)!.visible;
+            if (layer_name == LayerNames.pads_front) {
+                visible = () => this.by_name(LayerNames.f_cu)!.visible;
             }
-            if (layer_name == LayerName.pads_back) {
-                visible = () => this.by_name(LayerName.b_cu)!.visible;
+            if (layer_name == LayerNames.pads_back) {
+                visible = () => this.by_name(LayerNames.b_cu)!.visible;
             }
 
+            // Copper layers require additional virual layers for zones and
+            // blind/buried vias. Those are generated here.
             // Zone virtual layers for copper layers require that the referenced
             // copper layer is visible.
-            if (layer_name.startsWith(":Zones:")) {
-                const copper_layer_name = layer_name.slice(7);
-                visible = () => this.by_name(copper_layer_name)!.visible;
+            if (is_copper(layer_name)) {
+                this.add(
+                    new ViewLayer(
+                        this,
+                        virtual_layer_for(
+                            layer_name,
+                            CopperVirtualLayerNames.zones,
+                        ),
+                        () => this.by_name(layer_name)!.visible,
+                        this.color_for(layer_name),
+                    ),
+                );
             }
 
             this.add(
@@ -240,15 +236,15 @@ export class LayerSet extends BaseLayerSet {
      */
     color_for(layer_name: string): Color {
         switch (layer_name) {
-            case LayerName.drawing_sheet:
+            case LayerNames.drawing_sheet:
                 return (this.theme["worksheet"] as Color) ?? Color.white;
-            case LayerName.via_holes:
+            case LayerNames.via_holes:
                 return (this.theme["via_hole"] as Color) ?? Color.white;
-            case LayerName.via_through:
+            case LayerNames.via_through:
                 return (this.theme["via_through"] as Color) ?? Color.white;
-            case LayerName.pad_holes:
+            case LayerNames.pad_holes:
                 return (this.theme["background"] as Color) ?? Color.white;
-            case LayerName.pad_holewalls:
+            case LayerNames.pad_holewalls:
                 return (this.theme["pad_through_hole"] as Color) ?? Color.white;
         }
 
@@ -267,57 +263,40 @@ export class LayerSet extends BaseLayerSet {
         return (this.theme[name] as Color) ?? Color.white;
     }
 
-    override should_dim(layer: ViewLayer): boolean {
-        if (!this.highlighted) {
-            return false;
-        }
-
-        if (this.highlighted == layer) {
-            return false;
-        }
-
-        // Don't dim virtual layers associated with the active layer.
-        if (layer.name.endsWith(`${this.highlighted.name}`)) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * @yields layers that coorespond to board layers that should be
      *      displayed in the layer selection UI
      */
     *in_ui_order() {
         const order = [
-            ...copper_layers,
-            LayerName.f_adhes,
-            LayerName.b_adhes,
-            LayerName.f_paste,
-            LayerName.b_paste,
-            LayerName.f_silks,
-            LayerName.b_silks,
-            LayerName.f_mask,
-            LayerName.b_mask,
-            LayerName.dwgs_user,
-            LayerName.cmts_user,
-            LayerName.eco1_user,
-            LayerName.eco2_user,
-            LayerName.edge_cuts,
-            LayerName.margin,
-            LayerName.f_crtyd,
-            LayerName.b_crtyd,
-            LayerName.f_fab,
-            LayerName.b_fab,
-            LayerName.user_1,
-            LayerName.user_2,
-            LayerName.user_3,
-            LayerName.user_4,
-            LayerName.user_5,
-            LayerName.user_6,
-            LayerName.user_7,
-            LayerName.user_8,
-            LayerName.user_9,
+            ...CopperLayerNames,
+            LayerNames.f_adhes,
+            LayerNames.b_adhes,
+            LayerNames.f_paste,
+            LayerNames.b_paste,
+            LayerNames.f_silks,
+            LayerNames.b_silks,
+            LayerNames.f_mask,
+            LayerNames.b_mask,
+            LayerNames.dwgs_user,
+            LayerNames.cmts_user,
+            LayerNames.eco1_user,
+            LayerNames.eco2_user,
+            LayerNames.edge_cuts,
+            LayerNames.margin,
+            LayerNames.f_crtyd,
+            LayerNames.b_crtyd,
+            LayerNames.f_fab,
+            LayerNames.b_fab,
+            LayerNames.user_1,
+            LayerNames.user_2,
+            LayerNames.user_3,
+            LayerNames.user_4,
+            LayerNames.user_5,
+            LayerNames.user_6,
+            LayerNames.user_7,
+            LayerNames.user_8,
+            LayerNames.user_9,
         ];
 
         for (const name of order) {
@@ -333,12 +312,33 @@ export class LayerSet extends BaseLayerSet {
      * @returns true if any copper layer is enabled and visible.
      */
     is_any_copper_layer_visible(): boolean {
-        for (const name of copper_layers) {
+        for (const name of CopperLayerNames) {
             const layer = this.by_name(name);
             if (layer?.visible) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Highlights the given layer.
+     *
+     * The board viewer has to make sure to also highlight associated virtual
+     * layers when a physical layer is highlighted
+     */
+    override highlight(layer: string | ViewLayer | null): void {
+        let layer_name = "";
+        if (layer instanceof ViewLayer) {
+            layer_name = layer.name;
+        } else if (typeof layer == "string") {
+            layer_name = layer;
+        }
+
+        const matching_layers = this.query(
+            (l) => l.name == layer_name || is_virtual_for(layer_name, l.name),
+        );
+
+        super.highlight(matching_layers);
     }
 }
