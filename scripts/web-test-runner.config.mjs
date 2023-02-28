@@ -7,6 +7,7 @@ import { esbuildPlugin } from "@web/dev-server-esbuild";
 export default {
     files: "test/**/*.test.ts",
     nodeResolve: true,
+    debugger: true,
     // browsers: [
     //     chromeLauncher({
     //         concurrency: 1,
@@ -24,6 +25,7 @@ export default {
                 ".css": "text",
                 ".kicad_pcb": "text",
                 ".kicad_sch": "text",
+                ".kicad_wks": "text",
             },
         }),
     ],
