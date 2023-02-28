@@ -125,7 +125,6 @@ export enum ViewLayerName {
 export class ViewLayerSet {
     #layer_list: ViewLayer[] = [];
     #layer_map: Map<string, ViewLayer> = new Map();
-    #highlighted_layer: ViewLayer | null;
     #overlay: ViewLayer;
 
     /**
@@ -167,11 +166,13 @@ export class ViewLayerSet {
      */
     render(camera: Matrix3) {
         let depth = 0.01;
+        const should_dim = this.is_any_layer_highlighted();
+
         for (const layer of this.in_display_order()) {
             if (layer.visible && layer.graphics) {
                 let alpha = 1;
 
-                if (this.should_dim(layer)) {
+                if (should_dim && !layer.highlighted) {
                     alpha = 0.25;
                 }
 
@@ -179,15 +180,6 @@ export class ViewLayerSet {
                 depth += 0.01;
             }
         }
-    }
-
-    /** Returns true if the given layer should be dimmed, such as when another
-     * layer is highlighted.
-     */
-    should_dim(layer: ViewLayer) {
-        return this.#highlighted_layer && this.#highlighted_layer != layer
-            ? true
-            : false;
     }
 
     /**
@@ -208,17 +200,19 @@ export class ViewLayerSet {
         for (let i = this.#layer_list.length - 1; i >= 0; i--) {
             const layer = this.#layer_list[i]!;
 
-            if (layer.highlighted) {
-                continue;
+            if (!layer.highlighted) {
+                yield layer;
             }
-
-            yield layer;
         }
 
-        // If a layer is highlighted, yield it last so it gets draw above
-        // everything but the overlay.
-        if (this.#highlighted_layer) {
-            yield this.#highlighted_layer;
+        // Go back through the layers and yield the highlighted ones. These
+        // are drawn after regular layers.
+        for (let i = this.#layer_list.length - 1; i >= 0; i--) {
+            const layer = this.#layer_list[i]!;
+
+            if (layer.highlighted) {
+                yield layer;
+            }
         }
 
         yield this.#overlay;
@@ -231,33 +225,65 @@ export class ViewLayerSet {
         return this.#layer_map.get(name);
     }
 
+    /**
+     * Returns all layers that "match" the given pattern.
+     */
+    *query(predicate: (l: ViewLayer) => boolean) {
+        for (const l of this.#layer_list) {
+            if (predicate(l)) {
+                yield l;
+            }
+        }
+    }
+
+    /**
+     * Gets the special overlay layer, which is always visible and always
+     * drawn above all others.
+     */
     get overlay() {
         return this.#overlay;
     }
 
     /**
-     * Highlights a given layer, by default it's drawn above other layers.
+     * Highlights the given layer(s), by default they're drawn above other layers.
      */
-    highlight(layer: string | ViewLayer | null) {
-        if (this.#highlighted_layer) {
-            this.#highlighted_layer.highlighted = false;
+    highlight(
+        layer_or_layers:
+            | string
+            | ViewLayer
+            | null
+            | Iterable<string | ViewLayer>,
+    ) {
+        let layer_names: string[];
+
+        if (layer_or_layers instanceof ViewLayer) {
+            layer_names = [layer_or_layers.name];
+        } else if (typeof layer_or_layers == "string") {
+            layer_names = [layer_or_layers];
+        } else if (!layer_or_layers) {
+            layer_names = [];
+        } else {
+            layer_names = Array.from(layer_or_layers).map((v) =>
+                v instanceof ViewLayer ? v.name : v,
+            );
         }
 
-        if (!layer) {
-            this.#highlighted_layer = null;
-            return;
+        for (const l of this.#layer_list) {
+            if (layer_names.includes(l.name)) {
+                l.highlighted = true;
+            } else {
+                l.highlighted = false;
+            }
         }
-
-        if (typeof layer == "string") {
-            layer = this.by_name(layer)!;
-        }
-
-        layer.highlighted = true;
-        this.#highlighted_layer = layer;
     }
 
-    get highlighted() {
-        return this.#highlighted_layer;
+    is_any_layer_highlighted() {
+        for (const l of this.#layer_list) {
+            if (l.highlighted) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
