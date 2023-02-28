@@ -16,7 +16,13 @@ import { Vec2 } from "../math/vec2";
 import { Matrix3 } from "../math/matrix3";
 import { Angle } from "../math/angle";
 import { Renderer } from "../gfx/renderer";
-import { ViewLayer, LayerName, LayerSet } from "./layers";
+import {
+    ViewLayer,
+    LayerNames,
+    LayerSet,
+    virtual_layer_for,
+    CopperVirtualLayerNames,
+} from "./layers";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { EDAText } from "../text/eda-text";
@@ -160,14 +166,14 @@ class ViaPainter extends ItemPainter {
     classes = [board_items.Via];
 
     layers_for(v: board_items.Via): string[] {
-        return [LayerName.via_holes, LayerName.via_through];
+        return [LayerNames.via_holes, LayerNames.via_through];
     }
 
     paint(layer: ViewLayer, v: board_items.Via) {
         const color = layer.color;
-        if (layer.name == LayerName.via_through) {
+        if (layer.name == LayerNames.via_through) {
             this.gfx.circle(new Circle(v.at.position, v.size / 2, color));
-        } else if (layer.name == LayerName.via_holes) {
+        } else if (layer.name == LayerNames.via_holes) {
             this.gfx.circle(new Circle(v.at.position, v.drill / 2, color));
         }
     }
@@ -178,7 +184,9 @@ class ZonePainter extends ItemPainter {
 
     layers_for(z: board_items.Zone): string[] {
         const layers = z.layers ?? [z.layer];
-        return layers.map((l) => `:Zones:${l}`);
+        return layers.map((l) =>
+            virtual_layer_for(l, CopperVirtualLayerNames.zones),
+        );
     }
 
     paint(layer: ViewLayer, z: board_items.Zone) {
@@ -204,14 +212,14 @@ class PadPainter extends ItemPainter {
 
         for (const layer of pad.layers) {
             if (layer == "*.Cu") {
-                layers.push(LayerName.f_cu);
-                layers.push(LayerName.b_cu);
+                layers.push(LayerNames.f_cu);
+                layers.push(LayerNames.b_cu);
             } else if (layer == "*.Mask") {
-                layers.push(LayerName.f_mask);
-                layers.push(LayerName.b_mask);
+                layers.push(LayerNames.f_mask);
+                layers.push(LayerNames.b_mask);
             } else if (layer == "*.Paste") {
-                layers.push(LayerName.f_paste);
-                layers.push(LayerName.b_paste);
+                layers.push(LayerNames.f_paste);
+                layers.push(LayerNames.b_paste);
             } else {
                 layers.push(layer);
             }
@@ -219,11 +227,11 @@ class PadPainter extends ItemPainter {
 
         switch (pad.type) {
             case "thru_hole":
-                layers.push(LayerName.pad_holewalls);
-                layers.push(LayerName.pad_holes);
+                layers.push(LayerNames.pad_holewalls);
+                layers.push(LayerNames.pad_holes);
                 break;
             case "np_thru_hole":
-                layers.push(LayerName.pad_holes);
+                layers.push(LayerNames.pad_holes);
                 break;
             case "smd":
             case "connect":
@@ -251,7 +259,7 @@ class PadPainter extends ItemPainter {
 
         const center = new Vec2(0, 0);
 
-        if (layer.name == LayerName.pad_holes && pad.drill != null) {
+        if (layer.name == LayerNames.pad_holes && pad.drill != null) {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 this.gfx.circle(
