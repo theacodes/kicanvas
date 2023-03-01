@@ -41,7 +41,7 @@ export enum LayerNames {
     via_holes = ":Via:Holes",
     pad_holes = ":Pad:Holes",
     pad_holewalls = ":Pad:HoleWalls",
-    via_through = ":Via:Through",
+    via_holewalls = ":Via:HoleWalls",
     pads_front = ":Pads:Front",
     f_cu = "F.Cu",
     f_mask = "F.Mask",
@@ -94,7 +94,7 @@ const HoleLayerNames = [
     LayerNames.via_holes,
     LayerNames.pad_holes,
     LayerNames.pad_holewalls,
-    LayerNames.via_through,
+    LayerNames.via_holewalls,
 ];
 
 const CopperLayerNames = [
@@ -133,6 +133,8 @@ const CopperLayerNames = [
 ];
 
 export enum CopperVirtualLayerNames {
+    bb_via_holes = "BBViaHoles",
+    bb_via_hole_walls = "BBViaHoleWalls",
     zones = "Zones",
 }
 
@@ -142,10 +144,6 @@ export function virtual_layer_for(
 ) {
     return `:${physical_layer}:${virtual_name}`;
 }
-
-// const ZoneLayerNames = CopperLayerNames.map((l) =>
-//     virtual_layer_for(l, CopperVirtualLayerNames.zones),
-// );
 
 function is_virtual(name: string) {
     return name.startsWith(":");
@@ -159,6 +157,24 @@ function is_virtual_for(physical_layer: string, layer_name: string) {
 
 function is_copper(name: string) {
     return name.endsWith(".Cu");
+}
+
+export function* copper_layers_between(
+    start_layer_name: string,
+    end_layer_name: string,
+) {
+    let found_start = false;
+    for (const layer_name of CopperLayerNames) {
+        if (layer_name == start_layer_name) {
+            found_start = true;
+        }
+        if (found_start) {
+            yield layer_name;
+        }
+        if (layer_name == end_layer_name) {
+            return;
+        }
+    }
 }
 
 /**
@@ -212,6 +228,28 @@ export class LayerSet extends BaseLayerSet {
                         this,
                         virtual_layer_for(
                             layer_name,
+                            CopperVirtualLayerNames.bb_via_holes,
+                        ),
+                        () => this.by_name(layer_name)!.visible,
+                        this.color_for(LayerNames.via_holes),
+                    ),
+                );
+                this.add(
+                    new ViewLayer(
+                        this,
+                        virtual_layer_for(
+                            layer_name,
+                            CopperVirtualLayerNames.bb_via_hole_walls,
+                        ),
+                        () => this.by_name(layer_name)!.visible,
+                        this.color_for(LayerNames.via_holewalls),
+                    ),
+                );
+                this.add(
+                    new ViewLayer(
+                        this,
+                        virtual_layer_for(
+                            layer_name,
                             CopperVirtualLayerNames.zones,
                         ),
                         () => this.by_name(layer_name)!.visible,
@@ -240,7 +278,7 @@ export class LayerSet extends BaseLayerSet {
                 return (this.theme["worksheet"] as Color) ?? Color.white;
             case LayerNames.via_holes:
                 return (this.theme["via_hole"] as Color) ?? Color.white;
-            case LayerNames.via_through:
+            case LayerNames.via_holewalls:
                 return (this.theme["via_through"] as Color) ?? Color.white;
             case LayerNames.pad_holes:
                 return (this.theme["background"] as Color) ?? Color.white;

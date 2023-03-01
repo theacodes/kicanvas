@@ -22,11 +22,13 @@ import {
     LayerSet,
     virtual_layer_for,
     CopperVirtualLayerNames,
+    copper_layers_between,
 } from "./layers";
 import { Circle, Polygon, Polyline } from "../gfx/shapes";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { EDAText } from "../text/eda-text";
 import { StrokeFont } from "../text/stroke-font";
+import { Color } from "../gfx/color";
 
 class LinePainter extends ItemPainter {
     classes = [board_items.GrLine, board_items.FpLine];
@@ -166,15 +168,62 @@ class ViaPainter extends ItemPainter {
     classes = [board_items.Via];
 
     layers_for(v: board_items.Via): string[] {
-        return [LayerNames.via_holes, LayerNames.via_through];
+        if (v.layers) {
+            // blind/buried vias have two layers - the start and end layer,
+            // and should only be drawn on the layers they're actually on.
+            const layers = [];
+
+            for (const cu_layer of copper_layers_between(
+                v.layers[0]!,
+                v.layers[1]!,
+            )) {
+                layers.push(
+                    virtual_layer_for(
+                        cu_layer,
+                        CopperVirtualLayerNames.bb_via_holes,
+                    ),
+                );
+                layers.push(
+                    virtual_layer_for(
+                        cu_layer,
+                        CopperVirtualLayerNames.bb_via_hole_walls,
+                    ),
+                );
+            }
+            return layers;
+        } else {
+            return [LayerNames.via_holes, LayerNames.via_holewalls];
+        }
     }
 
     paint(layer: ViewLayer, v: board_items.Via) {
         const color = layer.color;
-        if (layer.name == LayerNames.via_through) {
+        if (layer.name.endsWith("HoleWalls")) {
             this.gfx.circle(new Circle(v.at.position, v.size / 2, color));
-        } else if (layer.name == LayerNames.via_holes) {
+        } else if (layer.name.endsWith("Holes")) {
             this.gfx.circle(new Circle(v.at.position, v.drill / 2, color));
+
+            // Draw start and end layer markers
+            if ((v.type == "blind" || v.type == "micro") && v.layers) {
+                this.gfx.arc(
+                    v.at.position,
+                    v.size / 2 - v.size / 8,
+                    Angle.from_degrees(180 + 70),
+                    Angle.from_degrees(360 - 70),
+                    v.size / 4,
+                    layer.layer_set.by_name(v.layers[0]!)?.color ??
+                        Color.transparent_black,
+                );
+                this.gfx.arc(
+                    v.at.position,
+                    v.size / 2 - v.size / 8,
+                    Angle.from_degrees(70),
+                    Angle.from_degrees(180 - 70),
+                    v.size / 4,
+                    layer.layer_set.by_name(v.layers[1]!)?.color ??
+                        Color.transparent_black,
+                );
+            }
         }
     }
 }
