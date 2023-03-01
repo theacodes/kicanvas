@@ -29,12 +29,13 @@ function offset_point(
     sheet: drawing_sheet.DrawingSheet,
     point: Vec2,
     anchor: drawing_sheet.Coordinate["anchor"],
+    constrain = true,
 ) {
     const tl = sheet.top_left;
     const tr = sheet.top_right;
     const bl = sheet.bottom_left;
     const br = sheet.bottom_right;
-    const bbox = sheet.bbox;
+    const bbox = sheet.margin_bbox;
 
     switch (anchor) {
         case "ltcorner":
@@ -51,7 +52,7 @@ function offset_point(
             break;
     }
 
-    if (!bbox.contains_point(point)) {
+    if (constrain && !bbox.contains_point(point)) {
         return;
     }
 
@@ -113,8 +114,14 @@ class RectPainter extends ItemPainter {
                     sheet,
                     r.start.position.add(offset),
                     r.start.anchor,
+                    i > 0,
                 ),
-                offset_point(sheet, r.end.position.add(offset), r.end.anchor),
+                offset_point(
+                    sheet,
+                    r.end.position.add(offset),
+                    r.end.anchor,
+                    i > 0,
+                ),
             ];
 
             if (!start || !end) {

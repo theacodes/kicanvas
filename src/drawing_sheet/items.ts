@@ -46,6 +46,14 @@ export class DrawingSheet {
     }
 
     *items() {
+        // Yield a rect to draw the page outline
+        yield new Rect(
+            `(rect (name "") (start ${-this.setup.left_margin} ${-this.setup
+                .right_margin} ltcorner) (end ${-this.setup
+                .right_margin} ${-this.setup
+                .bottom_margin} rbcorner) (comment "page outline"))`,
+            this,
+        );
         yield* this.drawings;
     }
 
@@ -90,10 +98,12 @@ export class DrawingSheet {
         );
     }
 
-    get bbox() {
-        const tl = this.top_left;
-        const br = this.bottom_right;
-        return BBox.from_corners(tl.x, tl.y, br.x, br.y);
+    get margin_bbox() {
+        return BBox.from_points([this.top_left, this.bottom_right]);
+    }
+
+    get page_bbox() {
+        return BBox.from_corners(0, 0, this.width, this.height);
     }
 }
 
@@ -195,6 +205,7 @@ export class Rect extends DrawingSheetItem {
 
     constructor(expr: Parseable, parent: DrawingSheet) {
         super(parent);
+
         Object.assign(
             this,
             parse_expr(

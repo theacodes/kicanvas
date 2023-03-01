@@ -92,7 +92,7 @@ export class BoardViewer extends Viewer {
     }
 
     look_at_sheet() {
-        this.viewport.camera.bbox = this.drawing_sheet.bbox.grow(10);
+        this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
     }
 
     look_at_board() {
