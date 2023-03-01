@@ -87,11 +87,15 @@ export class BoardViewer extends Viewer {
             this.drawing_sheet,
         );
 
-        this.#look_at_board();
+        this.look_at_sheet();
         this.draw_soon();
     }
 
-    #look_at_board() {
+    look_at_sheet() {
+        this.viewport.camera.bbox = this.drawing_sheet.bbox.grow(10);
+    }
+
+    look_at_board() {
         const edge_cuts = this.layers.by_name(LayerNames.edge_cuts)!;
         const board_bbox = edge_cuts.bbox;
         this.viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);

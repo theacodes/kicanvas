@@ -9,6 +9,7 @@ import { Vec2 } from "../math/vec2.ts";
 import { Color } from "../gfx/color.ts";
 import default_sheet from "./default_drawing_sheet.kicad_wks";
 import { Paper, expand_text_vars } from "../kicad/common.ts";
+import { BBox } from "../math/bbox.ts";
 
 export type DrawingSheetDocument = {
     paper?: Paper;
@@ -87,6 +88,12 @@ export class DrawingSheet {
             this.setup.left_margin,
             this.height - this.setup.bottom_margin,
         );
+    }
+
+    get bbox() {
+        const tl = this.top_left;
+        const br = this.bottom_right;
+        return BBox.from_corners(tl.x, tl.y, br.x, br.y);
     }
 }
 

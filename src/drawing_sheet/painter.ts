@@ -20,10 +20,10 @@ import {
     ViewLayerSet,
     ViewLayerName,
 } from "../framework/view-layers";
-import { BBox } from "../math/bbox";
 import { StrokeFont } from "../text/stroke-font";
 import { EDAText } from "../text/eda-text";
 import { Angle } from "../math/angle";
+import { BBox } from "../math/bbox";
 
 function offset_point(
     sheet: drawing_sheet.DrawingSheet,
@@ -34,7 +34,7 @@ function offset_point(
     const tr = sheet.top_right;
     const bl = sheet.bottom_left;
     const br = sheet.bottom_right;
-    const bbox = BBox.from_corners(tl.x, tl.y, br.x, br.y);
+    const bbox = sheet.bbox;
 
     switch (anchor) {
         case "ltcorner":
