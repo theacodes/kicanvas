@@ -1,12 +1,14 @@
 kicanvas-layer-controls {
+    display: block;
+    height: 100%;
     background-color: #222;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 100%;
     user-select: none;
 }
 
 kicanvas-layer-controls kc-ui-panel-body {
+    display: block;
     padding: 0;
 }
 

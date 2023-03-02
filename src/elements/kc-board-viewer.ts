@@ -41,12 +41,15 @@ export class KCBoardViewerElement extends CustomElement {
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
             <kc-ui-view>
-                <kc-ui-activity-bar>
+                <kc-ui-activity-bar group="inspect">
                     <kc-ui-activity-bar-start>
-                        <button tooltip-left="Layers" class="active">
+                        <button
+                            tooltip-left="Layers"
+                            class="active"
+                            name="layers">
                             <kc-ui-icon>layers</kc-ui-icon>
                         </button>
-                        <button tooltip-left="View controls">
+                        <button tooltip-left="Objects" name="objects">
                             <kc-ui-icon>visibility</kc-ui-icon>
                         </button>
                         <button tooltip-left="Footprints">
@@ -69,7 +72,14 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-activity-bar-end>
                 </kc-ui-activity-bar>
             </kc-ui-view>
-            <kc-ui-view> ${layer_controls_elem} </kc-ui-view>
+            <kc-ui-view>
+                <kc-ui-activity group="inspect" name="layers" active>
+                    ${layer_controls_elem}
+                </kc-ui-activity>
+                <kc-ui-activity group="inspect" name="objects">
+                    Objects
+                </kc-ui-activity>
+            </kc-ui-view>
         </kc-ui-split-view>`;
     }
 }

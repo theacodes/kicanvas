@@ -461,7 +461,7 @@ kc-ui-panel-body.no-padding {
 }
 
 /*
-    Activity bar
+    Activity bar & activity visibility
 */
 
 kc-ui-activity-bar {
@@ -519,4 +519,13 @@ kc-ui-activity-bar button:focus {
 
 kc-ui-activity-bar button span.material {
     font-size: 2rem;
+}
+
+kc-ui-activity {
+    display: none;
+    height: 100%;
+}
+
+kc-ui-activity[active] {
+    display: block;
 }
