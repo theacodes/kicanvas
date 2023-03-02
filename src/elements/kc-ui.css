@@ -114,35 +114,6 @@
 }
 
 /*
-    Resets
-*/
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-* {
-    margin: 0;
-}
-
-/*
-    Host styles
-*/
-
-:host {
-    display: block;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-}
-
-/*
-    Basic element styles
-*/
-
-/*
     Scrollbar
 */
 
