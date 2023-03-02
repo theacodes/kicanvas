@@ -22,6 +22,11 @@ class KiCanvasAppElement extends CustomElement {
     }
 
     override initialContentCallback() {
+        const src = this.getAttribute("src");
+        if (src) {
+            this.load(src);
+        }
+
         const url_params = new URLSearchParams(document.location.search);
         const github_path = url_params.get("github");
 
@@ -38,7 +43,11 @@ class KiCanvasAppElement extends CustomElement {
         }
     }
 
-    async load(src: File) {
+    async load(src: File | string) {
+        if (typeof src == "string") {
+            src = new File([await (await window.fetch(src)).blob()], src);
+        }
+
         this.setBooleanAttribute("loading", true);
 
         this.renderRoot.querySelector("main")?.remove();
