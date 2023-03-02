@@ -292,22 +292,22 @@ button:focus {
     outline: var(--button-focus-outline);
 }
 
-button[success] {
+button.success {
     background: var(--button-success-bg);
     color: var(--button-success-fg);
 }
 
-button[success]:hover {
+button.success:hover {
     background: var(--button-success-hover-bg);
     color: var(--button-success-hover-fg);
 }
 
-button[danger] {
+button.danger {
     background: var(--button-danger-bg);
     color: var(--button-danger-fg);
 }
 
-button[danger]:hover {
+button.danger:hover {
     background: var(--button-danger-hover-bg);
     color: var(--button-danger-hover-fg);
 }
@@ -374,6 +374,22 @@ kc-ui-view {
 kc-ui-view.grow {
     flex-basis: unset;
     flex-grow: 999;
+}
+
+kc-ui-view.min-width-10 {
+    min-width: calc(1200px * 0.1);
+}
+
+kc-ui-view.min-width-15 {
+    min-width: calc(1200px * 0.15);
+}
+
+kc-ui-view.min-width-20 {
+    min-width: calc(1200px * 0.2);
+}
+
+kc-ui-view.min-width-25 {
+    min-width: calc(1200px * 0.25);
 }
 
 /*
@@ -470,8 +486,7 @@ kc-ui-activity-bar button {
         background var(--transition-time-short) ease;
 }
 
-kc-ui-activity-bar button:active,
-kc-ui-activity-bar button.active {
+kc-ui-activity-bar button[aria-selected="true"] {
     background: #1f1f1f;
     color: var(--activity-bar-active-fg);
     /* border-left: 2px solid var(--activity-bar-active-fg); */

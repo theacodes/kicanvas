@@ -45,23 +45,23 @@ export class KCBoardViewerElement extends CustomElement {
                     <kc-ui-activity-bar-start>
                         <button
                             tooltip-left="Layers"
-                            class="active"
-                            name="layers">
+                            name="layers"
+                            aria-selected="true">
                             <kc-ui-icon>layers</kc-ui-icon>
                         </button>
                         <button tooltip-left="Objects" name="objects">
-                            <kc-ui-icon>visibility</kc-ui-icon>
-                        </button>
-                        <button tooltip-left="Footprints">
                             <kc-ui-icon>category</kc-ui-icon>
                         </button>
-                        <button tooltip-left="Nets">
+                        <button tooltip-left="Footprints" name="footprints">
+                            <kc-ui-icon>footprint</kc-ui-icon>
+                        </button>
+                        <button tooltip-left="Nets" name="nets">
                             <kc-ui-icon>hub</kc-ui-icon>
                         </button>
-                        <button tooltip-left="Properties">
+                        <button tooltip-left="Properties" name="properties">
                             <kc-ui-icon>list</kc-ui-icon>
                         </button>
-                        <button tooltip-left="Info">
+                        <button tooltip-left="Info" name="info">
                             <kc-ui-icon>info</kc-ui-icon>
                         </button>
                     </kc-ui-activity-bar-start>
@@ -72,12 +72,54 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-activity-bar-end>
                 </kc-ui-activity-bar>
             </kc-ui-view>
-            <kc-ui-view>
+            <kc-ui-view class="min-width-15">
                 <kc-ui-activity group="inspect" name="layers" active>
                     ${layer_controls_elem}
                 </kc-ui-activity>
                 <kc-ui-activity group="inspect" name="objects">
-                    Objects
+                    <kc-ui-panel>
+                        <kc-ui-panel-header>
+                            <kc-ui-panel-header-text>
+                                Objects
+                            </kc-ui-panel-header-text>
+                        </kc-ui-panel-header>
+                    </kc-ui-panel>
+                </kc-ui-activity>
+                <kc-ui-activity group="inspect" name="footprints">
+                    <kc-ui-panel>
+                        <kc-ui-panel-header>
+                            <kc-ui-panel-header-text>
+                                Footprints
+                            </kc-ui-panel-header-text>
+                        </kc-ui-panel-header>
+                    </kc-ui-panel>
+                </kc-ui-activity>
+                <kc-ui-activity group="inspect" name="nets">
+                    <kc-ui-panel>
+                        <kc-ui-panel-header>
+                            <kc-ui-panel-header-text>
+                                Nets
+                            </kc-ui-panel-header-text>
+                        </kc-ui-panel-header>
+                    </kc-ui-panel>
+                </kc-ui-activity>
+                <kc-ui-activity group="inspect" name="properties">
+                    <kc-ui-panel>
+                        <kc-ui-panel-header>
+                            <kc-ui-panel-header-text>
+                                Properties
+                            </kc-ui-panel-header-text>
+                        </kc-ui-panel-header>
+                    </kc-ui-panel>
+                </kc-ui-activity>
+                <kc-ui-activity group="inspect" name="info">
+                    <kc-ui-panel>
+                        <kc-ui-panel-header>
+                            <kc-ui-panel-header-text>
+                                Info
+                            </kc-ui-panel-header-text>
+                        </kc-ui-panel-header>
+                    </kc-ui-panel>
                 </kc-ui-activity>
             </kc-ui-view>
         </kc-ui-split-view>`;
