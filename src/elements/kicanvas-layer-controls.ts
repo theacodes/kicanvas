@@ -11,6 +11,7 @@ import { KiCanvasBoardElement } from "./kicanvas-board";
 import styles from "./kicanvas-layer-controls.css";
 
 export class KiCanvasLayerControlsElement extends CustomElement {
+    static override useShadowRoot = false;
     static override styles = styles;
 
     target: KiCanvasBoardElement;
@@ -23,13 +24,14 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         return this.target.viewer;
     }
 
-    get menu() {
-        return this.renderRoot.querySelector("menu");
+    get panel_body() {
+        return this.renderRoot.querySelector("kc-ui-panel-body")!;
     }
 
-    get menu_items(): KiCanvasLayerControlItemElement[] {
+    get items(): KiCanvasLayerControlItemElement[] {
         return Array.from(
-            this.menu?.querySelectorAll("kicanvas-layer-control-item") ?? [],
+            this.panel_body?.querySelectorAll("kicanvas-layer-control-item") ??
+                [],
         );
     }
 
@@ -63,13 +65,13 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
     override initialContentCallback() {
         // Highlight layer when its control list item is clicked
-        this.menu!.addEventListener(
+        this.panel_body.addEventListener(
             KiCanvasLayerControlItemElement.select_event,
             (e: Event) => {
                 const item = (e as CustomEvent)
                     .detail as KiCanvasLayerControlItemElement;
 
-                for (const n of this.menu_items) {
+                for (const n of this.items) {
                     n.layer_highlighted = false;
                 }
 
@@ -92,7 +94,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         );
 
         // Toggle layer visibility when its item's visibility control is clicked
-        this.menu!.addEventListener(
+        this.panel_body.addEventListener(
             KiCanvasLayerControlItemElement.visibility_event,
             (e) => {
                 const item = (e as CustomEvent)
@@ -112,9 +114,9 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         this.renderRoot
             .querySelector("button")
             ?.addEventListener("click", (e) => {
-                if (this.menu_items.some((n) => n.layer_visible)) {
+                if (this.items.some((n) => n.layer_visible)) {
                     // hide all layers.
-                    for (const item of this.menu_items) {
+                    for (const item of this.items) {
                         item.layer_visible = false;
                         item.layer_highlighted = false;
                         this.viewer.layers.by_name(item.layer_name!)!.visible =
@@ -122,7 +124,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
                     }
                 } else {
                     // show all layers
-                    for (const item of this.menu_items) {
+                    for (const item of this.items) {
                         item.layer_visible = true;
                         this.viewer.layers.by_name(item.layer_name!)!.visible =
                             true;
@@ -148,13 +150,17 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         }
 
         return html`
-            <div>
-                <span>Layers</span>
-                <button type="button">
-                    <span class="icon">visibility</span>
-                </button>
-            </div>
-            <menu>${items}</menu>
+            <kc-ui-panel>
+                <kc-ui-panel-header>
+                    <kc-ui-panel-header-text>Layers</kc-ui-panel-header-text>
+                    <kc-ui-panel-header-actions>
+                        <button type="button">
+                            <kc-ui-icon>visibility</kc-ui-icon>
+                        </button>
+                    </kc-ui-panel-header-actions>
+                </kc-ui-panel-header>
+                <kc-ui-panel-body> ${items} </kc-ui-panel-body>
+            </kc-ui-panel>
         `;
     }
 }
@@ -234,8 +240,8 @@ class KiCanvasLayerControlItemElement extends CustomElement {
                 style="background-color: ${this.layer_color};"></span>
             <span class="name">${this.layer_name}</span>
             <button type="button" name="${this.layer_name}">
-                <span class="icon for-visible">visibility</span>
-                <span class="icon for-hidden">visibility_off</span>
+                <kc-ui-icon class="icon for-visible">visibility</kc-ui-icon>
+                <kc-ui-icon class="icon for-hidden">visibility_off</kc-ui-icon>
             </button>`;
     }
 }

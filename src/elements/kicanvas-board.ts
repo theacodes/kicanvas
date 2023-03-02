@@ -48,7 +48,7 @@ export class KiCanvasBoardElement extends CustomElement {
     override render() {
         this.#canvas = html`<canvas></canvas>` as HTMLCanvasElement;
 
-        return html` <style>
+        return html`<style>
                 :host {
                     display: block;
                     touch-action: none;

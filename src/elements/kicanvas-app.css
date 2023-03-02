@@ -68,3 +68,11 @@ kicanvas-board {
     height: 100%;
     overflow: hidden;
 }
+
+/*                                         */
+
+kc-board-viewer {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+}
