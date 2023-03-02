@@ -160,19 +160,19 @@ export class CustomElement extends HTMLElement {
 
         if ((this.constructor as typeof CustomElement).useShadowRoot) {
             this.attachShadow({ mode: "open" });
+        }
 
-            if (static_this.styles) {
-                if (typeof static_this.styles == "string") {
-                    static_this.styles = [static_this.styles];
-                }
+        if (static_this.styles) {
+            if (typeof static_this.styles == "string") {
+                static_this.styles = [static_this.styles];
+            }
 
-                for (const style of static_this.styles) {
-                    this.renderRoot.appendChild(
-                        html`<style>
-                            ${style}
-                        </style>`,
-                    );
-                }
+            for (const style of static_this.styles) {
+                this.renderRoot.appendChild(
+                    html`<style>
+                        ${style}
+                    </style>`,
+                );
             }
         }
 
