@@ -13,9 +13,9 @@
         0.1rem 0.15rem 0.15rem var(--elevation-shadow-color),
         0.2rem 0.3rem 0.2rem var(--elevation-shadow-color);
 
-    --tooltikc-ui-bg: #8864cb;
-    --tooltikc-ui-fg: #f8f8f0;
-    --tooltikc-ui-border: 1px solid #131218;
+    --tooltip-bg: #8864cb;
+    --tooltip-fg: #f8f8f0;
+    --tooltip-border: 1px solid #131218;
 
     --workspace-bg: #282634;
     --workspace-fg: #f8f8f0;
@@ -51,9 +51,9 @@
     --status-bar-button-disabled-bg: inherit;
     --status-bar-button-disabled-fg: #888;
 
-    --panel-bg: #282634;
+    --panel-bg: #131218;
     --panel-fg: #f8f8f0;
-    --panel-border: 2px solid #131218;
+    --panel-border: 2px solid #282634;
     --panel-title-bg: #8864cb;
     --panel-title-fg: #f8f8f0;
     --panel-title-border: 1px solid #634e89;
@@ -111,6 +111,8 @@
     --list-item-focus-bg: #ae81ff;
     --list-item-hover-bg: #64cb96;
     --list-item-hover-fg: #131218;
+
+    --grid-outline: #634e89;
 }
 
 /*
@@ -381,7 +383,7 @@ kc-ui-view.min-width-10 {
 }
 
 kc-ui-view.min-width-15 {
-    min-width: calc(1200px * 0.15);
+    min-width: calc(max(1200px * 0.15, 15%));
 }
 
 kc-ui-view.min-width-20 {
@@ -390,6 +392,58 @@ kc-ui-view.min-width-20 {
 
 kc-ui-view.min-width-25 {
     min-width: calc(1200px * 0.25);
+}
+
+kc-ui-view.max-width-10 {
+    max-width: calc(1200px * 0.1);
+}
+
+kc-ui-view.max-width-15 {
+    max-width: calc(max(1200px * 0.15, 15%));
+}
+
+kc-ui-view.max-width-20 {
+    max-width: calc(1200px * 0.2);
+}
+
+kc-ui-view.max-width-25 {
+    max-width: calc(1200px * 0.25);
+}
+
+kc-ui-grid {
+    display: grid;
+    gap: 1px;
+}
+
+kc-ui-grid > * {
+    padding: 0.2rem;
+}
+
+kc-ui-grid-title {
+    grid-column-end: span 2;
+}
+
+kc-ui-grid[columns="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+kc-ui-grid.outline {
+    background-color: var(--grid-outline);
+    border-bottom: 1px solid var(--grid-outline);
+}
+
+kc-ui-grid.outline > * {
+    background-color: var(--bg);
+}
+
+kc-ui-grid.text-wrap-clip > * {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+kc-ui-grid.outline > kc-ui-grid-title {
+    background-color: var(--grid-outline);
 }
 
 /*
@@ -404,6 +458,7 @@ kc-ui-panel {
     flex-direction: column;
     background: var(--panel-bg);
     color: var(--panel-fg);
+    --bg: var(--panel-bg);
 }
 
 kc-ui-panel:last-child {
@@ -414,7 +469,7 @@ kc-ui-panel-header {
     flex: 0;
     width: 100%;
     text-align: left;
-    padding: 0.2rem 0.8rem;
+    padding: 0.2rem 0.8rem 0.2rem 0.4rem;
     font-weight: bold;
     display: flex;
     align-items: center;

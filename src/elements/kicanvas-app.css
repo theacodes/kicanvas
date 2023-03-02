@@ -76,3 +76,8 @@ kc-board-viewer {
     height: 100%;
     flex: 1;
 }
+
+kc-board-info-panel kc-ui-grid {
+    font-weight: 300;
+    font-size: 0.9rem;
+}

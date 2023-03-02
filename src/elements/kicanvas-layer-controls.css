@@ -32,7 +32,7 @@ kicanvas-layer-controls button:hover {
 
 kicanvas-layer-control-item {
     box-sizing: border-box;
-    padding: 0.1rem 0.75rem;
+    padding: 0.1rem 0.8rem 0.1rem 0.4rem;
     color: white;
     text-align: left;
     display: flex;
