@@ -7,6 +7,9 @@
 import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
+import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
+
+import "./kc-board-info-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -34,9 +37,14 @@ export class KCBoardViewerElement extends CustomElement {
         this.board_elm =
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
 
-        const layer_controls_elem =
+        const layer_controls_elm =
             html`<kicanvas-layer-controls></kicanvas-layer-controls>` as KiCanvasLayerControlsElement;
-        layer_controls_elem.target = this.board_elm;
+        layer_controls_elm.target = this.board_elm;
+
+        const info_panel_elm =
+            html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
+        console.log(info_panel_elm);
+        info_panel_elm.target = this.board_elm;
 
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
@@ -72,9 +80,9 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-activity-bar-end>
                 </kc-ui-activity-bar>
             </kc-ui-view>
-            <kc-ui-view class="min-width-15">
+            <kc-ui-view class="min-width-20 max-width-20">
                 <kc-ui-activity group="inspect" name="layers" active>
-                    ${layer_controls_elem}
+                    ${layer_controls_elm}
                 </kc-ui-activity>
                 <kc-ui-activity group="inspect" name="objects">
                     <kc-ui-panel>
@@ -113,13 +121,7 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-panel>
                 </kc-ui-activity>
                 <kc-ui-activity group="inspect" name="info">
-                    <kc-ui-panel>
-                        <kc-ui-panel-header>
-                            <kc-ui-panel-header-text>
-                                Info
-                            </kc-ui-panel-header-text>
-                        </kc-ui-panel-header>
-                    </kc-ui-panel>
+                    ${info_panel_elm}
                 </kc-ui-activity>
             </kc-ui-view>
         </kc-ui-split-view>`;
