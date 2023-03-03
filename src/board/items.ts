@@ -15,6 +15,8 @@ import {
     TitleBlock,
     expand_text_vars,
 } from "../kicad/common.ts";
+import { BBox } from "../math/bbox.ts";
+import { Arc as MathArc } from "../math/arc.ts";
 
 export type Drawing =
     | GrLine
@@ -92,6 +94,17 @@ export class KicadPCB {
             vars.set(p.name, p.value);
         }
         return vars;
+    }
+
+    get edge_cuts_bbox(): BBox {
+        let bbox = new BBox(0, 0, 0, 0);
+        for (const item of this.drawings) {
+            if (item.layer != "Edge.Cuts" || !(item instanceof GraphicItem)) {
+                continue;
+            }
+            bbox = BBox.combine([bbox, item.bbox]);
+        }
+        return bbox;
     }
 }
 
@@ -805,6 +818,14 @@ class GraphicItem {
     layer: string;
     tstamp: string;
     locked = false;
+
+    /**
+     * Get the nominal bounding box for the item. This does not include any
+     * stroke or other expansion.
+     */
+    get bbox() {
+        return new BBox(0, 0, 0, 0);
+    }
 }
 
 export class Line extends GraphicItem {
@@ -836,6 +857,10 @@ export class Line extends GraphicItem {
         );
 
         this.width ??= this.stroke?.width || 0;
+    }
+
+    override get bbox() {
+        return BBox.from_points([this.start, this.end]);
     }
 }
 
@@ -878,6 +903,15 @@ export class Circle extends GraphicItem {
 
         this.width ??= this.stroke?.width || 0;
     }
+
+    override get bbox() {
+        const radius = this.center.sub(this.end).magnitude;
+        const radial = new Vec2(radius, radius);
+        return BBox.from_points([
+            this.center.sub(radial),
+            this.center.add(radial),
+        ]);
+    }
 }
 
 export class GrCircle extends Circle {
@@ -918,6 +952,19 @@ export class Arc extends GraphicItem {
         );
 
         this.width ??= this.stroke?.width || 0;
+    }
+
+    get arc() {
+        return MathArc.from_three_points(
+            this.start,
+            this.mid,
+            this.end,
+            this.width,
+        );
+    }
+
+    override get bbox() {
+        return this.arc.bbox;
     }
 }
 
@@ -960,6 +1007,10 @@ export class Poly extends GraphicItem {
         );
 
         this.width ??= this.stroke?.width || 0;
+    }
+
+    override get bbox(): BBox {
+        return BBox.from_points(this.pts);
     }
 }
 
@@ -1006,6 +1057,10 @@ export class Rect extends GraphicItem {
         );
 
         this.width ??= this.stroke?.width || 0;
+    }
+
+    override get bbox(): BBox {
+        return BBox.from_points([this.start, this.end]);
     }
 }
 
