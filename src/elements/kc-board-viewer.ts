@@ -53,78 +53,79 @@ export class KCBoardViewerElement extends CustomElement {
 
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
-            <kc-ui-view>
-                <kc-ui-activity-bar group="inspect">
-                    <kc-ui-activity-bar-start>
-                        <button
-                            tooltip-left="Layers"
-                            name="layers"
-                            aria-selected="true">
-                            <kc-ui-icon>layers</kc-ui-icon>
-                        </button>
-                        <button tooltip-left="Objects" name="objects">
-                            <kc-ui-icon>category</kc-ui-icon>
-                        </button>
-                        <button tooltip-left="Footprints" name="footprints">
-                            <kc-ui-icon>footprint</kc-ui-icon>
-                        </button>
-                        <button tooltip-left="Nets" name="nets">
-                            <kc-ui-icon>hub</kc-ui-icon>
-                        </button>
-                        <button tooltip-left="Properties" name="properties">
-                            <kc-ui-icon>list</kc-ui-icon>
-                        </button>
-                        <button tooltip-left="Info" name="info">
-                            <kc-ui-icon>info</kc-ui-icon>
-                        </button>
-                    </kc-ui-activity-bar-start>
-                    <kc-ui-activity-bar-end>
-                        <button tooltip-left="Help">
-                            <kc-ui-icon>help</kc-ui-icon>
-                        </button>
-                    </kc-ui-activity-bar-end>
-                </kc-ui-activity-bar>
-            </kc-ui-view>
-            <kc-ui-view
-                class="max-width-20 min-width-20 activity-container"
-                current-activity="layers">
-                <kc-ui-activity group="inspect" name="layers" active>
-                    ${layer_controls_elm}
-                </kc-ui-activity>
-                <kc-ui-activity group="inspect" name="objects">
-                    <kc-ui-panel>
-                        <kc-ui-panel-header>
-                            <kc-ui-panel-header-text>
-                                Objects
-                            </kc-ui-panel-header-text>
-                        </kc-ui-panel-header>
-                    </kc-ui-panel>
-                </kc-ui-activity>
-                <kc-ui-activity group="inspect" name="footprints">
-                    ${footprints_panel_elm}
-                </kc-ui-activity>
-                <kc-ui-activity group="inspect" name="nets">
-                    <kc-ui-panel>
-                        <kc-ui-panel-header>
-                            <kc-ui-panel-header-text>
-                                Nets
-                            </kc-ui-panel-header-text>
-                        </kc-ui-panel-header>
-                    </kc-ui-panel>
-                </kc-ui-activity>
-                <kc-ui-activity group="inspect" name="properties">
-                    <kc-ui-panel>
-                        <kc-ui-panel-header>
-                            <kc-ui-panel-header-text>
-                                Properties
-                            </kc-ui-panel-header-text>
-                        </kc-ui-panel-header>
-                    </kc-ui-panel>
-                </kc-ui-activity>
-                <kc-ui-activity group="inspect" name="info">
-                    ${info_panel_elm}
-                </kc-ui-activity>
-            </kc-ui-view>
+            <kc-ui-view-resizer></kc-ui-view-resizer>
+            <kc-ui-split-view vertical class="activity-container">
+                <kc-ui-view class="fixed activity-bar-container">
+                    <kc-ui-activity-bar group="inspect">
+                        <kc-ui-activity-bar-start>
+                            <button
+                                tooltip-left="Layers"
+                                name="layers"
+                                aria-selected="true">
+                                <kc-ui-icon>layers</kc-ui-icon>
+                            </button>
+                            <button tooltip-left="Objects" name="objects">
+                                <kc-ui-icon>category</kc-ui-icon>
+                            </button>
+                            <button tooltip-left="Footprints" name="footprints">
+                                <kc-ui-icon>footprint</kc-ui-icon>
+                            </button>
+                            <button tooltip-left="Nets" name="nets">
+                                <kc-ui-icon>hub</kc-ui-icon>
+                            </button>
+                            <button tooltip-left="Properties" name="properties">
+                                <kc-ui-icon>list</kc-ui-icon>
+                            </button>
+                            <button tooltip-left="Info" name="info">
+                                <kc-ui-icon>info</kc-ui-icon>
+                            </button>
+                        </kc-ui-activity-bar-start>
+                        <kc-ui-activity-bar-end>
+                            <button tooltip-left="Help">
+                                <kc-ui-icon>help</kc-ui-icon>
+                            </button>
+                        </kc-ui-activity-bar-end>
+                    </kc-ui-activity-bar>
+                </kc-ui-view>
+                <kc-ui-view class="activity-item-container">
+                    <kc-ui-activity group="inspect" name="layers" active>
+                        ${layer_controls_elm}
+                    </kc-ui-activity>
+                    <kc-ui-activity group="inspect" name="objects">
+                        <kc-ui-panel>
+                            <kc-ui-panel-header>
+                                <kc-ui-panel-header-text>
+                                    Objects
+                                </kc-ui-panel-header-text>
+                            </kc-ui-panel-header>
+                        </kc-ui-panel>
+                    </kc-ui-activity>
+                    <kc-ui-activity group="inspect" name="footprints">
+                        ${footprints_panel_elm}
+                    </kc-ui-activity>
+                    <kc-ui-activity group="inspect" name="nets">
+                        <kc-ui-panel>
+                            <kc-ui-panel-header>
+                                <kc-ui-panel-header-text>
+                                    Nets
+                                </kc-ui-panel-header-text>
+                            </kc-ui-panel-header>
+                        </kc-ui-panel>
+                    </kc-ui-activity>
+                    <kc-ui-activity group="inspect" name="properties">
+                        <kc-ui-panel>
+                            <kc-ui-panel-header>
+                                <kc-ui-panel-header-text>
+                                    Properties
+                                </kc-ui-panel-header-text>
+                            </kc-ui-panel-header>
+                        </kc-ui-panel>
+                    </kc-ui-activity>
+                    <kc-ui-activity group="inspect" name="info">
+                        ${info_panel_elm}
+                    </kc-ui-activity>
+                </kc-ui-view>
+            </kc-ui-split-view>
         </kc-ui-split-view>`;
     }
 }

@@ -351,6 +351,7 @@ kc-ui-icon {
 
 kc-ui-app {
     width: 100%;
+    height: 100%;
     flex-grow: 1;
     display: flex;
     flex-direction: row;
@@ -360,7 +361,6 @@ kc-ui-app {
 kc-ui-split-view {
     display: flex;
     height: 100%;
-    width: 100%;
     overflow: hidden;
 }
 
@@ -381,41 +381,23 @@ kc-ui-view {
     flex-direction: column;
 }
 
-kc-ui-view.grow {
+kc-ui-view.grow,
+kc-ui-split-view.grow {
     flex-basis: unset;
     flex-grow: 999;
 }
 
-kc-ui-view.min-width-10 {
-    min-width: calc(1200px * 0.1);
+kc-ui-view.shrink,
+kc-ui-split-view.shrink {
+    flex-grow: 0;
+    flex-shrink: 1;
+    width: unset;
 }
 
-kc-ui-view.min-width-15 {
-    min-width: calc(max(1200px * 0.15, 15%));
-}
-
-kc-ui-view.min-width-20 {
-    min-width: calc(1200px * 0.2);
-}
-
-kc-ui-view.min-width-25 {
-    min-width: calc(1200px * 0.25);
-}
-
-kc-ui-view.max-width-10 {
-    max-width: calc(1200px * 0.1);
-}
-
-kc-ui-view.max-width-15 {
-    max-width: calc(max(1200px * 0.15, 15%));
-}
-
-kc-ui-view.max-width-20 {
-    max-width: calc(1200px * 0.2);
-}
-
-kc-ui-view.max-width-25 {
-    max-width: calc(1200px * 0.25);
+kc-ui-view.fixed,
+kc-ui-split-view.fixed {
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 kc-ui-grid {
@@ -452,6 +434,28 @@ kc-ui-grid.text-wrap-clip > * {
 
 kc-ui-grid.outline > kc-ui-grid-title {
     background-color: var(--grid-outline);
+}
+
+/*
+    Resizer
+*/
+
+kc-ui-view-resizer {
+    display: block;
+    width: 6px;
+    margin-left: -6px;
+    cursor: col-resize;
+    background-color: transparent;
+    transition: background-color var(--transition-time-medium) ease;
+}
+
+kc-ui-view-resizer:hover {
+    background-color: var(--scrollbar-hover-bg);
+    transition: background-color var(--transition-time-short) ease;
+}
+kc-ui-view-resizer:hover.active,
+kc-ui-view-resizer.active {
+    background-color: var(--scrollbar-active-fg);
 }
 
 /*
@@ -515,6 +519,11 @@ kc-ui-panel-body.no-padding {
     Activity bar & activity visibility
 */
 
+kc-ui-split-view.activity-container {
+    min-width: calc(max(20%, 200px));
+    max-width: calc(max(20%, 200px));
+}
+
 kc-ui-activity-bar {
     flex-shrink: 0;
     /* width: 2rem; */
@@ -568,16 +577,6 @@ kc-ui-activity-bar button:focus {
 
 kc-ui-activity-bar button span.material {
     font-size: 2rem;
-}
-
-.activity-container {
-    transition: width var(--transition-time-very-short) ease,
-        min-width var(--transition-time-very-short) ease;
-}
-
-.activity-container:not([current-activity]) {
-    width: 0;
-    min-width: 0;
 }
 
 kc-ui-activity {
