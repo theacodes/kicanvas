@@ -12,6 +12,8 @@ import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
 
 import "./kc-board-info-panel";
 import "./kc-board-footprints-panel";
+import "./kc-board-properties-panel";
+import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -51,12 +53,16 @@ export class KCBoardViewerElement extends CustomElement {
             html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
         info_panel_elm.target = this.board_elm;
 
+        const properties_panel_elm =
+            html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
+        properties_panel_elm.target = this.board_elm;
+
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
             <kc-ui-view-resizer></kc-ui-view-resizer>
             <kc-ui-split-view vertical class="activity-container">
                 <kc-ui-view class="fixed activity-bar-container">
-                    <kc-ui-activity-bar group="inspect">
+                    <kc-ui-activity-bar>
                         <kc-ui-activity-bar-start>
                             <button
                                 tooltip-left="Layers"
@@ -88,10 +94,10 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-activity-bar>
                 </kc-ui-view>
                 <kc-ui-view class="activity-item-container">
-                    <kc-ui-activity group="inspect" name="layers" active>
+                    <kc-ui-activity name="layers" active>
                         ${layer_controls_elm}
                     </kc-ui-activity>
-                    <kc-ui-activity group="inspect" name="objects">
+                    <kc-ui-activity name="objects">
                         <kc-ui-panel>
                             <kc-ui-panel-header>
                                 <kc-ui-panel-header-text>
@@ -100,10 +106,10 @@ export class KCBoardViewerElement extends CustomElement {
                             </kc-ui-panel-header>
                         </kc-ui-panel>
                     </kc-ui-activity>
-                    <kc-ui-activity group="inspect" name="footprints">
+                    <kc-ui-activity name="footprints">
                         ${footprints_panel_elm}
                     </kc-ui-activity>
-                    <kc-ui-activity group="inspect" name="nets">
+                    <kc-ui-activity name="nets">
                         <kc-ui-panel>
                             <kc-ui-panel-header>
                                 <kc-ui-panel-header-text>
@@ -112,16 +118,10 @@ export class KCBoardViewerElement extends CustomElement {
                             </kc-ui-panel-header>
                         </kc-ui-panel>
                     </kc-ui-activity>
-                    <kc-ui-activity group="inspect" name="properties">
-                        <kc-ui-panel>
-                            <kc-ui-panel-header>
-                                <kc-ui-panel-header-text>
-                                    Properties
-                                </kc-ui-panel-header-text>
-                            </kc-ui-panel-header>
-                        </kc-ui-panel>
+                    <kc-ui-activity name="properties">
+                        ${properties_panel_elm}
                     </kc-ui-activity>
-                    <kc-ui-activity group="inspect" name="info">
+                    <kc-ui-activity name="info">
                         ${info_panel_elm}
                     </kc-ui-activity>
                 </kc-ui-view>

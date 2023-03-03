@@ -577,3 +577,7 @@ dl.property-list dt.header {
     grid-column-end: span 2;
     background-color: var(--grid-outline);
 }
+
+dl.property-list kc-ui-icon {
+    vertical-align: middle;
+}
