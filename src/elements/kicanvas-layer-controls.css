@@ -25,11 +25,6 @@ kicanvas-layer-controls button {
     align-items: center;
 }
 
-kicanvas-layer-controls button:hover {
-    background: transparent;
-    color: rgba(129, 255, 190, 1);
-}
-
 kicanvas-layer-control-item {
     box-sizing: border-box;
     padding: 0.1rem 0.8rem 0.1rem 0.4rem;
@@ -42,15 +37,28 @@ kicanvas-layer-control-item {
 }
 
 kicanvas-layer-control-item:hover {
-    background-color: #333;
+    background-color: var(--list-item-hover-bg);
+    color: var(--list-item-hover-fg);
+}
+
+kicanvas-layer-control-item:hover button {
+    color: var(--list-item-bg);
+}
+
+kicanvas-layer-control-item:hover button:hover {
+    background: transparent;
+    box-shadow: none;
+    color: var(--list-item-fg);
 }
 
 kicanvas-layer-control-item[layer-highlighted] {
-    background-color: #888;
+    background-color: var(--list-item-active-bg);
+    color: var(--list-item-active-fg);
 }
 
 kicanvas-layer-control-item[layer-visibility="hidden"] {
-    color: #888;
+    background-color: var(--list-item-disabled-bg);
+    color: var(--list-item-disabled-fg);
 }
 
 kicanvas-layer-control-item .color {

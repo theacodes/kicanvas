@@ -38,8 +38,9 @@
     --title-bar-button-disabled-bg: inherit;
     --title-bar-button-disabled-fg: #888;
 
-    --activity-bar-bg: #363636;
-    --activity-bar-fg: #888;
+    --activity-bar-bg: #282634;
+    --activity-bar-fg: #f8f8f0;
+    --activity-bar-active-bg: #131218;
     --activity-bar-active-fg: #f8f8f0;
 
     --status-bar-bg: #8864cb;
@@ -54,7 +55,7 @@
     --panel-bg: #131218;
     --panel-fg: #f8f8f0;
     --panel-border: 2px solid #282634;
-    --panel-title-bg: #8864cb;
+    --panel-title-bg: #8077a8;
     --panel-title-fg: #f8f8f0;
     --panel-title-border: 1px solid #634e89;
     --panel-title-button-bg: transparent;
@@ -107,12 +108,18 @@
     --input-error-border: #cb6488;
     --input-range-handle-shadow: 1px 1px 5px 5px rgba(180, 180, 180, 0.2);
 
+    --list-item-bg: var(--panel-bg);
+    --list-item-fg: var(--panel-fg);
     --list-item-active-bg: #634e89;
+    --list-item-active-fg: var(--list-item-fg);
     --list-item-focus-bg: #ae81ff;
+    --list-item-focus-fg: #634e89;
     --list-item-hover-bg: #64cb96;
-    --list-item-hover-fg: #131218;
+    --list-item-hover-fg: var(--list-item-bg);
+    --list-item-disabled-bg: var(--list-item-bg);
+    --list-item-disabled-fg: #888;
 
-    --grid-outline: #634e89;
+    --grid-outline: #433e56;
 }
 
 /*
@@ -470,7 +477,6 @@ kc-ui-panel-header {
     width: 100%;
     text-align: left;
     padding: 0.2rem 0.8rem 0.2rem 0.4rem;
-    font-weight: bold;
     display: flex;
     align-items: center;
     background: var(--panel-title-bg);
@@ -496,6 +502,8 @@ kc-ui-panel-body {
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1 0;
+    font-weight: 300;
+    font-size: 1rem;
 }
 
 kc-ui-panel-body.no-padding {
@@ -542,16 +550,15 @@ kc-ui-activity-bar button {
 }
 
 kc-ui-activity-bar button[aria-selected="true"] {
-    background: #1f1f1f;
+    background: var(--activity-bar-active-bg);
     color: var(--activity-bar-active-fg);
-    /* border-left: 2px solid var(--activity-bar-active-fg); */
 }
 
 kc-ui-activity-bar button:hover {
-    background: transparent;
     cursor: pointer;
-    color: var(--activity-bar-active-fg);
     box-shadow: none;
+    color: var(--activity-bar-active-fg);
+    background: var(--activity-bar-active-bg);
 }
 
 kc-ui-activity-bar button:focus {
