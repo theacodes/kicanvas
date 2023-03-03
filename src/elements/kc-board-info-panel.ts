@@ -24,6 +24,7 @@ export class KCBoardInfoPanelElement extends NeedsViewer(
     override render() {
         const ds = this.viewer.drawing_sheet;
         const board = this.viewer.board;
+        const board_bbox = board.edge_cuts_bbox;
 
         const comments = Object.entries(board.title_block?.comment || {}).map(
             ([k, v]) =>
@@ -61,6 +62,21 @@ export class KCBoardInfoPanelElement extends NeedsViewer(
                         <div>Company</div>
                         <div>${board.title_block?.company}</div>
                         ${comments}
+                        <div>Dimensions</div>
+                        <div>
+                            ${board_bbox.w.toFixed(1)} mm x
+                            ${board_bbox.h.toFixed(1)} mm
+                        </div>
+                        <div>Footprints</div>
+                        <div>${board.footprints.length}</div>
+                        <div>Nets</div>
+                        <div>${board.nets.length}</div>
+                        <div>Track segments</div>
+                        <div>${board.segments.length}</div>
+                        <div>Vias</div>
+                        <div>${board.vias.length}</div>
+                        <div>Zones</div>
+                        <div>${board.zones.length}</div>
                         <div>Pad to mask clearance</div>
                         <div>${board.setup?.pad_to_mask_clearance ?? 0} mm</div>
                         <div>Soldermask min width</div>
