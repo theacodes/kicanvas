@@ -43,7 +43,6 @@ export class KCBoardViewerElement extends CustomElement {
 
         const info_panel_elm =
             html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
-        console.log(info_panel_elm);
         info_panel_elm.target = this.board_elm;
 
         return html` <kc-ui-split-view vertical>

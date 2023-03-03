@@ -5,24 +5,17 @@
 */
 
 import { html, CustomElement } from "../dom/custom-elements";
-import { KiCanvasLoadEvent } from "../framework/events";
 import { LayerSet } from "../board/layers";
-import { KiCanvasBoardElement } from "./kicanvas-board";
+import { NeedsViewer } from "./kc-mixins";
+import { BoardViewer } from "../board/viewer";
 import styles from "./kc-layer-controls.css";
 
-export class KCLayerControlsElement extends CustomElement {
+export class KCLayerControlsElement extends NeedsViewer(
+    CustomElement,
+    BoardViewer,
+) {
     static override useShadowRoot = false;
     static override styles = styles;
-
-    target: KiCanvasBoardElement;
-
-    constructor() {
-        super();
-    }
-
-    get viewer() {
-        return this.target.viewer;
-    }
 
     get panel_body() {
         return this.renderRoot.querySelector("kc-ui-panel-body")!;
@@ -35,31 +28,10 @@ export class KCLayerControlsElement extends CustomElement {
     }
 
     override connectedCallback() {
-        if (!this.target) {
-            const target_id = this.getAttribute("for");
-            if (target_id) {
-                this.target = document.getElementById(
-                    target_id,
-                ) as KiCanvasBoardElement;
-            }
-        }
-
-        if (!this.target) {
-            throw new Error("No target");
-        }
-
-        // Don't try to render until the viewer is loaded
-        if (this.target.loaded) {
+        (async () => {
+            await this.viewer_loaded();
             super.connectedCallback();
-        } else {
-            this.target.addEventListener(KiCanvasLoadEvent.type, () => {
-                super.connectedCallback();
-            });
-        }
-    }
-
-    override disconnectedCallback() {
-        this.target = undefined!;
+        })();
     }
 
     override initialContentCallback() {
@@ -134,7 +106,7 @@ export class KCLayerControlsElement extends CustomElement {
     }
 
     override render() {
-        const layers = this.target.viewer.layers as LayerSet;
+        const layers = this.viewer.layers as LayerSet;
         const items: ReturnType<typeof html>[] = [];
 
         for (const layer of layers.in_ui_order()) {

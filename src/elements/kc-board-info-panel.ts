@@ -4,55 +4,26 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { BoardViewer } from "../board/viewer";
 import { html, CustomElement } from "../dom/custom-elements";
-import { KiCanvasLoadEvent } from "../framework/events";
-import { KiCanvasBoardElement } from "./kicanvas-board";
+import { NeedsViewer } from "./kc-mixins";
 
-export class KCBoardInfoPanelElement extends CustomElement {
+export class KCBoardInfoPanelElement extends NeedsViewer(
+    CustomElement,
+    BoardViewer,
+) {
     static override useShadowRoot = false;
 
-    target: KiCanvasBoardElement;
-
-    constructor() {
-        super();
-    }
-
-    get viewer() {
-        return this.target.viewer;
-    }
-
     override connectedCallback() {
-        console.log("Connected");
-        if (!this.target) {
-            const target_id = this.getAttribute("for");
-            if (target_id) {
-                this.target = document.getElementById(
-                    target_id,
-                ) as KiCanvasBoardElement;
-            }
-        }
-
-        if (!this.target) {
-            throw new Error("No target");
-        }
-
-        // Don't try to render until the viewer is loaded
-        if (this.target.loaded) {
+        (async () => {
+            await this.viewer_loaded();
             super.connectedCallback();
-        } else {
-            this.target.addEventListener(KiCanvasLoadEvent.type, () => {
-                super.connectedCallback();
-            });
-        }
-    }
-
-    override disconnectedCallback() {
-        this.target = undefined!;
+        })();
     }
 
     override render() {
-        const ds = this.target.viewer.drawing_sheet;
-        const board = this.target.viewer.board;
+        const ds = this.viewer.drawing_sheet;
+        const board = this.viewer.board;
 
         const comments = Object.entries(board.title_block?.comment || {}).map(
             ([k, v]) =>
