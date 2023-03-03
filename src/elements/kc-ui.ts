@@ -33,6 +33,7 @@ window.customElements.define("kc-ui-app", KCUIAppElement);
  */
 class KCUIActivityBarElement extends CustomElement {
     static override useShadowRoot = false;
+    current_activity: string | null;
 
     get group() {
         return this.getAttribute("group");
@@ -44,11 +45,21 @@ class KCUIActivityBarElement extends CustomElement {
         );
     }
 
+    get activity_container() {
+        return this.activities[0]?.parentElement;
+    }
+
     get buttons() {
         return this.renderRoot.querySelectorAll(`button`);
     }
 
     override initialContentCallback() {
+        for (const activity of this.activities) {
+            if (activity.getAttribute("active") != null) {
+                this.current_activity = activity.getAttribute("name");
+            }
+        }
+
         this.renderRoot.addEventListener("click", (e) => {
             const active_btn = (e.target as HTMLElement).closest("button");
 
@@ -56,8 +67,25 @@ class KCUIActivityBarElement extends CustomElement {
                 return;
             }
 
+            if (this.current_activity == active_btn.name) {
+                this.current_activity = null;
+            } else {
+                this.current_activity = active_btn.name;
+            }
+
+            if (this.activity_container) {
+                if (this.current_activity) {
+                    this.activity_container.setAttribute(
+                        "current-activity",
+                        this.current_activity,
+                    );
+                } else {
+                    this.activity_container.removeAttribute("current-activity");
+                }
+            }
+
             for (const activity of this.activities) {
-                if (activity.getAttribute("name") == active_btn.name) {
+                if (activity.getAttribute("name") == this.current_activity) {
                     activity.setAttribute("active", "");
                 } else {
                     activity.removeAttribute("active");
@@ -65,7 +93,7 @@ class KCUIActivityBarElement extends CustomElement {
             }
 
             for (const btn of this.buttons) {
-                if (btn.name == active_btn.name) {
+                if (btn.name == this.current_activity) {
                     btn.ariaSelected = "true";
                 } else {
                     btn.ariaSelected = "false";

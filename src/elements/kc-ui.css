@@ -2,6 +2,7 @@
     Variables
 */
 :host {
+    --transition-time-very-short: 100ms;
     --transition-time-short: 200ms;
     --transition-time-medium: 500ms;
 
@@ -567,6 +568,16 @@ kc-ui-activity-bar button:focus {
 
 kc-ui-activity-bar button span.material {
     font-size: 2rem;
+}
+
+.activity-container {
+    transition: width var(--transition-time-very-short) ease,
+        min-width var(--transition-time-very-short) ease;
+}
+
+.activity-container:not([current-activity]) {
+    width: 0;
+    min-width: 0;
 }
 
 kc-ui-activity {

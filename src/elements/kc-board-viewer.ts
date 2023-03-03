@@ -85,7 +85,9 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-activity-bar-end>
                 </kc-ui-activity-bar>
             </kc-ui-view>
-            <kc-ui-view class="min-width-20 max-width-20">
+            <kc-ui-view
+                class="max-width-20 min-width-20 activity-container"
+                current-activity="layers">
                 <kc-ui-activity group="inspect" name="layers" active>
                     ${layer_controls_elm}
                 </kc-ui-activity>
