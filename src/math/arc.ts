@@ -5,6 +5,7 @@
 */
 
 import { Angle } from "./angle";
+import { BBox } from "./bbox";
 import { Vec2 } from "./vec2";
 
 /**
@@ -58,6 +59,30 @@ export class Arc {
         return new Arc(center, radius, start_angle, end_angle, width);
     }
 
+    get start_radial() {
+        return this.center.add(
+            this.start_angle.rotate_point(new Vec2(this.radius, 0)),
+        );
+    }
+
+    get end_radial() {
+        return this.center.add(
+            this.end_angle.rotate_point(new Vec2(this.radius, 0)),
+        );
+    }
+
+    get mid_angle() {
+        return new Angle(
+            (this.start_angle.radians + this.end_angle.radians) / 2,
+        );
+    }
+
+    get mid_radial() {
+        return this.center.add(
+            this.mid_angle.rotate_point(new Vec2(this.radius, 0)),
+        );
+    }
+
     /**
      * Approximate the Arc using a polyline
      */
@@ -94,6 +119,39 @@ export class Arc {
         }
 
         return points;
+    }
+
+    /**
+     * Get a bounding box that encloses the entire arc.
+     */
+    get bbox(): BBox {
+        // An arc's bbox contains at least three points: the radial for the
+        // start angle, the radial for the end angle, and the radial inbetween.
+        // However, that doesn't cover all cases. Whenever the arc crosses an
+        // axis, the radial at that axis must also be included.
+        const points = [this.start_radial, this.mid_radial, this.end_radial];
+
+        if (this.start_angle.degrees < 0 && this.end_angle.degrees >= 0) {
+            points.push(this.center.add(new Vec2(this.radius, 0)));
+        }
+
+        if (this.start_angle.degrees < 90 && this.end_angle.degrees >= 90) {
+            points.push(this.center.add(new Vec2(0, this.radius)));
+        }
+
+        if (this.start_angle.degrees < 180 && this.end_angle.degrees >= 180) {
+            points.push(this.center.add(new Vec2(-this.radius, 0)));
+        }
+
+        if (this.start_angle.degrees < 270 && this.end_angle.degrees >= 270) {
+            points.push(this.center.add(new Vec2(0, this.radius)));
+        }
+
+        if (this.start_angle.degrees < 360 && this.end_angle.degrees >= 360) {
+            points.push(this.center.add(new Vec2(0, this.radius)));
+        }
+
+        return BBox.from_points(points);
     }
 }
 
