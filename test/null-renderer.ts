@@ -30,7 +30,7 @@ export class NullRenderer extends Renderer {
 
     override async dispose() {}
 
-    override update_viewport(): void {}
+    override update_canvas_size(): void {}
 
     override clear_canvas(): void {}
 

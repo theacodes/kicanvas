@@ -60,24 +60,31 @@ export class Canvas2DRenderer extends Renderer {
         }
 
         this.ctx2d = ctx2d;
-        this.update_viewport();
+        this.update_canvas_size();
     }
 
     override dispose() {
         this.ctx2d = undefined;
     }
 
-    override update_viewport() {
+    override update_canvas_size() {
         const dpr = window.devicePixelRatio;
         const rect = this.canvas.getBoundingClientRect();
-        this.canvas.width = Math.round(rect.width * dpr);
-        this.canvas.height = Math.round(rect.height * dpr);
-        this.ctx2d!.setTransform();
+        const pixel_w = Math.round(rect.width * dpr);
+        const pixel_h = Math.round(rect.height * dpr);
+
+        if (this.canvas.width != pixel_w || this.canvas.height != pixel_h) {
+            this.canvas.width = Math.round(rect.width * dpr);
+            this.canvas.height = Math.round(rect.height * dpr);
+        }
     }
 
     override clear_canvas() {
+        this.update_canvas_size();
+
         this.ctx2d!.setTransform();
         this.ctx2d!.scale(window.devicePixelRatio, window.devicePixelRatio);
+
         this.ctx2d!.fillStyle = this.background_color.to_css();
         this.ctx2d!.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx2d!.lineCap = "round";

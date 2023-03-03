@@ -63,7 +63,7 @@ export class WebGL2Renderer extends Renderer {
         gl.clearDepth(0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        this.update_viewport();
+        this.update_canvas_size();
 
         await PrimitiveSet.load_shaders(gl);
     }
@@ -77,7 +77,7 @@ export class WebGL2Renderer extends Renderer {
         }
     }
 
-    override update_viewport() {
+    override update_canvas_size() {
         if (!this.gl) {
             return;
         }
@@ -90,6 +90,10 @@ export class WebGL2Renderer extends Renderer {
         const pixel_w = Math.round(rect.width * dpr);
         const pixel_h = Math.round(rect.height * dpr);
 
+        if (this.canvas_size.x == pixel_w && this.canvas_size.y == pixel_h) {
+            return;
+        }
+
         this.canvas.width = pixel_w;
         this.canvas.height = pixel_h;
 
@@ -99,6 +103,10 @@ export class WebGL2Renderer extends Renderer {
 
     override clear_canvas() {
         if (this.gl == null) throw new Error("Uninitialized");
+
+        // Upate canvas size and projection matrix if needed
+        this.update_canvas_size();
+
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     }
 

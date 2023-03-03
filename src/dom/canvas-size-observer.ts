@@ -4,12 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-type ResizeObserverCallback = (
-    clientWidth: number,
-    clientHeight: number,
-    pixelWidth: number,
-    pixelHeight: number
-) => void;
+type ResizeObserverCallback = (canvas: HTMLCanvasElement) => void;
 
 /**
  * Like ResizeObserver, but specific to HTMLCanvasElement.
@@ -26,10 +21,10 @@ export class CanvasSizeObserver {
      */
     constructor(
         public canvas: HTMLCanvasElement,
-        private callback: ResizeObserverCallback
+        private callback: ResizeObserverCallback,
     ) {
         this.#observer = new ResizeObserver(() => {
-            this.resize();
+            this.callback(this.canvas);
         });
         this.#observer.observe(canvas);
     }
@@ -47,6 +42,5 @@ export class CanvasSizeObserver {
         const c = this.canvas;
         c.width = c.clientWidth * window.devicePixelRatio;
         c.height = c.clientHeight * window.devicePixelRatio;
-        this.callback(c.clientWidth, c.clientHeight, c.width, c.height);
     }
 }

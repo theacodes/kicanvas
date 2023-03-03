@@ -36,18 +36,13 @@ export class Viewport {
 
         this.#observer = new CanvasSizeObserver(
             this.renderer.canvas,
-            (cw, ch, lw, lh) => {
-                this.resize(cw, ch, lw, lh);
+            (canvas) => {
+                this.#update_camera(canvas);
                 this.callback();
             },
         );
 
-        this.resize(
-            this.renderer.canvas.clientWidth,
-            this.renderer.canvas.clientHeight,
-            this.renderer.canvas.width,
-            this.renderer.canvas.height,
-        );
+        this.#update_camera(this.renderer.canvas);
     }
 
     dispose() {
@@ -55,18 +50,15 @@ export class Viewport {
     }
 
     /**
-     * Resize the viewport
+     * Update the camera with the new canvas size.
      */
-    resize(
-        logical_w: number,
-        logical_h: number,
-        display_w: number,
-        display_h: number,
-    ) {
-        if (this.width != logical_w || this.height != logical_h) {
-            this.renderer.update_viewport();
-            this.width = logical_w;
-            this.height = logical_h;
+    #update_camera(canvas: HTMLCanvasElement) {
+        if (
+            this.width != canvas.clientWidth ||
+            this.height != canvas.clientHeight
+        ) {
+            this.width = canvas.clientWidth;
+            this.height = canvas.clientHeight;
             this.camera.viewport_size = new Vec2(this.width, this.height);
         }
     }

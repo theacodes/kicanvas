@@ -33,6 +33,7 @@ export abstract class Renderer {
     #current_bbox: BBox | null;
 
     canvas: HTMLCanvasElement;
+    canvas_size: Vec2 = new Vec2(0, 0);
     state: RenderStateStack = new RenderStateStack();
     theme: Record<string, Color | Record<string, Color>>;
 
@@ -49,11 +50,10 @@ export abstract class Renderer {
     }
 
     /**
-     * Update the canvas and context with the new viewport size. Should be
-     * called whenever the size of the underlying canvas element changes.
-     * Typically, this is done via CanvasResizeObserver.
+     * Update the canvas and context with the new viewport size if needed. This
+     * is typicallyed called by clear_canvas().
      */
-    abstract update_viewport(): void;
+    abstract update_canvas_size(): void;
 
     /**
      * Clear the canvas. Typically called at the start of a frame.
