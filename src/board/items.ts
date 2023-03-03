@@ -722,7 +722,25 @@ export class Footprint {
     zone_connect: number;
     thermal_width: number;
     thermal_gap: number;
-    attr: string[] = [];
+    attr: {
+        through_hole: boolean;
+        smd: boolean;
+        virtual: boolean;
+        board_only: boolean;
+        exclude_from_pos_files: boolean;
+        exclude_from_bom: boolean;
+        allow_solder_mask_bridges: boolean;
+        allow_missing_courtyard: boolean;
+    } = {
+        through_hole: false,
+        smd: false,
+        virtual: false,
+        board_only: false,
+        exclude_from_pos_files: false,
+        exclude_from_bom: false,
+        allow_solder_mask_bridges: false,
+        allow_missing_courtyard: false,
+    };
     properties: Record<string, string> = {};
     drawings: FootprintDrawings[] = [];
     pads: Pad[] = [];
@@ -756,7 +774,18 @@ export class Footprint {
                 P.pair("zone_connect", T.number),
                 P.pair("thermal_width", T.number),
                 P.pair("thermal_gap", T.number),
-                P.list("attr", T.string),
+                P.object(
+                    "attr",
+                    this.attr,
+                    P.atom("through_hole"),
+                    P.atom("smd"),
+                    P.atom("virtual"),
+                    P.atom("board_only"),
+                    P.atom("exclude_from_pos_files"),
+                    P.atom("exclude_from_bom"),
+                    P.atom("allow_solder_mask_bridges"),
+                    P.atom("allow_missing_courtyard"),
+                ),
                 P.dict("properties", "property", T.string),
                 P.collection("drawings", "fp_line", T.item(FpLine, this)),
                 P.collection("drawings", "fp_circle", T.item(FpCircle, this)),
