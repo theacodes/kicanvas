@@ -8,8 +8,10 @@ import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 import { KCLayerControlsElement } from "./kc-layer-controls";
 import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
+import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
 
 import "./kc-board-info-panel";
+import "./kc-board-footprints-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -40,6 +42,10 @@ export class KCBoardViewerElement extends CustomElement {
         const layer_controls_elm =
             html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
         layer_controls_elm.target = this.board_elm;
+
+        const footprints_panel_elm =
+            html`<kc-board-footprints-panel></kc-board-footprints-panel>` as KCBoardFootprintsPanelElement;
+        footprints_panel_elm.target = this.board_elm;
 
         const info_panel_elm =
             html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
@@ -93,13 +99,7 @@ export class KCBoardViewerElement extends CustomElement {
                     </kc-ui-panel>
                 </kc-ui-activity>
                 <kc-ui-activity group="inspect" name="footprints">
-                    <kc-ui-panel>
-                        <kc-ui-panel-header>
-                            <kc-ui-panel-header-text>
-                                Footprints
-                            </kc-ui-panel-header-text>
-                        </kc-ui-panel-header>
-                    </kc-ui-panel>
+                    ${footprints_panel_elm}
                 </kc-ui-activity>
                 <kc-ui-activity group="inspect" name="nets">
                     <kc-ui-panel>
