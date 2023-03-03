@@ -6,7 +6,7 @@
 
 import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasBoardElement } from "./kicanvas-board";
-import { KiCanvasLayerControlsElement } from "./kicanvas-layer-controls";
+import { KCLayerControlsElement } from "./kc-layer-controls";
 import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
 
 import "./kc-board-info-panel";
@@ -38,7 +38,7 @@ export class KCBoardViewerElement extends CustomElement {
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
 
         const layer_controls_elm =
-            html`<kicanvas-layer-controls></kicanvas-layer-controls>` as KiCanvasLayerControlsElement;
+            html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
         layer_controls_elm.target = this.board_elm;
 
         const info_panel_elm =

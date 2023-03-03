@@ -8,9 +8,9 @@ import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasLoadEvent } from "../framework/events";
 import { LayerSet } from "../board/layers";
 import { KiCanvasBoardElement } from "./kicanvas-board";
-import styles from "./kicanvas-layer-controls.css";
+import styles from "./kc-layer-controls.css";
 
-export class KiCanvasLayerControlsElement extends CustomElement {
+export class KCLayerControlsElement extends CustomElement {
     static override useShadowRoot = false;
     static override styles = styles;
 
@@ -28,10 +28,9 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         return this.renderRoot.querySelector("kc-ui-panel-body")!;
     }
 
-    get items(): KiCanvasLayerControlItemElement[] {
+    get items(): KCLayerControlItemElement[] {
         return Array.from(
-            this.panel_body?.querySelectorAll("kicanvas-layer-control-item") ??
-                [],
+            this.panel_body?.querySelectorAll("kc-layer-control-item") ?? [],
         );
     }
 
@@ -46,7 +45,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
         }
 
         if (!this.target) {
-            throw new Error("No target for <kicanvas-layer-controls>");
+            throw new Error("No target");
         }
 
         // Don't try to render until the viewer is loaded
@@ -66,10 +65,10 @@ export class KiCanvasLayerControlsElement extends CustomElement {
     override initialContentCallback() {
         // Highlight layer when its control list item is clicked
         this.panel_body.addEventListener(
-            KiCanvasLayerControlItemElement.select_event,
+            KCLayerControlItemElement.select_event,
             (e: Event) => {
                 const item = (e as CustomEvent)
-                    .detail as KiCanvasLayerControlItemElement;
+                    .detail as KCLayerControlItemElement;
 
                 for (const n of this.items) {
                     n.layer_highlighted = false;
@@ -95,10 +94,10 @@ export class KiCanvasLayerControlsElement extends CustomElement {
 
         // Toggle layer visibility when its item's visibility control is clicked
         this.panel_body.addEventListener(
-            KiCanvasLayerControlItemElement.visibility_event,
+            KCLayerControlItemElement.visibility_event,
             (e) => {
                 const item = (e as CustomEvent)
-                    .detail as KiCanvasLayerControlItemElement;
+                    .detail as KCLayerControlItemElement;
 
                 const layer = this.viewer.layers.by_name(item.layer_name!)!;
 
@@ -142,10 +141,10 @@ export class KiCanvasLayerControlsElement extends CustomElement {
             const visible = layer.visible ? "visible" : "hidden";
             const css_color = layer.color.to_css();
             items.push(
-                html` <kicanvas-layer-control-item
+                html` <kc-layer-control-item
                     layer-name="${layer.name}"
                     layer-color="${css_color}"
-                    layer-visibility="${visible}"></kicanvas-layer-control-item>`,
+                    layer-visibility="${visible}"></kc-layer-control-item>`,
             );
         }
 
@@ -165,7 +164,7 @@ export class KiCanvasLayerControlsElement extends CustomElement {
     }
 }
 
-class KiCanvasLayerControlItemElement extends CustomElement {
+class KCLayerControlItemElement extends CustomElement {
     static override useShadowRoot = false;
     static select_event = "kicanvas:layer-control-item:select";
     static visibility_event = "kicanvas:layer-control-item:visibility";
@@ -184,12 +183,12 @@ class KiCanvasLayerControlItemElement extends CustomElement {
 
             // Visibility button clicked.
             if (button) {
-                event_name = KiCanvasLayerControlItemElement.visibility_event;
+                event_name = KCLayerControlItemElement.visibility_event;
             }
             // Otherwise, some other part of the element was clicked so it's
             // "selected".
             else {
-                event_name = KiCanvasLayerControlItemElement.select_event;
+                event_name = KCLayerControlItemElement.select_event;
             }
 
             this.dispatchEvent(
@@ -247,11 +246,8 @@ class KiCanvasLayerControlItemElement extends CustomElement {
 }
 
 window.customElements.define(
-    "kicanvas-layer-control-item",
-    KiCanvasLayerControlItemElement,
+    "kc-layer-control-item",
+    KCLayerControlItemElement,
 );
 
-window.customElements.define(
-    "kicanvas-layer-controls",
-    KiCanvasLayerControlsElement,
-);
+window.customElements.define("kc-layer-controls", KCLayerControlsElement);
