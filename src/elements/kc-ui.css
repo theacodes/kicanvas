@@ -400,42 +400,6 @@ kc-ui-split-view.fixed {
     flex-shrink: 0;
 }
 
-kc-ui-grid {
-    display: grid;
-    gap: 1px;
-}
-
-kc-ui-grid > * {
-    padding: 0.2rem;
-}
-
-kc-ui-grid-title {
-    grid-column-end: span 2;
-}
-
-kc-ui-grid[columns="2"] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-kc-ui-grid.outline {
-    background-color: var(--grid-outline);
-    border-bottom: 1px solid var(--grid-outline);
-}
-
-kc-ui-grid.outline > * {
-    background-color: var(--bg);
-}
-
-kc-ui-grid.text-wrap-clip > * {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-kc-ui-grid.outline > kc-ui-grid-title {
-    background-color: var(--grid-outline);
-}
-
 /*
     Resizer
 */
@@ -586,4 +550,30 @@ kc-ui-activity {
 
 kc-ui-activity[active] {
     display: block;
+}
+
+/*
+    Property list (grid style) dls
+*/
+dl.property-list {
+    display: grid;
+    gap: 1px;
+    grid-template-columns: fit-content(50%) 1fr;
+    background-color: var(--grid-outline);
+    border-bottom: 1px solid var(--grid-outline);
+}
+
+dl.property-list > * {
+    padding: 0.2rem;
+    background-color: var(--bg);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    user-select: all;
+}
+
+dl.property-list dt.header {
+    user-select: none;
+    grid-column-end: span 2;
+    background-color: var(--grid-outline);
 }

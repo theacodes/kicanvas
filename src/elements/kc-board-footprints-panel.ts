@@ -38,12 +38,13 @@ export class KCBoardFootprintsPanelElement extends NeedsViewer(
         });
 
         for (const fp of footprints) {
-            const elm = html`<div>${fp.reference || "REF"}</div>
-                <div>${fp.value || "VAL"}</div>`;
+            const entry = `<dt>${fp.reference || "REF"}</dt><dd>${
+                fp.value || "VAL"
+            }</dd>`;
             if (fp.layer == "F.Cu") {
-                front_footprints.push(elm);
+                front_footprints.push(entry);
             } else {
-                back_footprints.push(elm);
+                back_footprints.push(entry);
             }
         }
 
@@ -55,12 +56,12 @@ export class KCBoardFootprintsPanelElement extends NeedsViewer(
                     >
                 </kc-ui-panel-header>
                 <kc-ui-panel-body class="no-padding">
-                    <kc-ui-grid class="outline text-wrap-clip" columns="2">
-                        <kc-ui-grid-title>Front</kc-ui-grid-title>
+                    <dl class="property-list">
+                        <dt class="header">Front</dt>
                         ${front_footprints}
-                        <kc-ui-grid-title>Back</kc-ui-grid-title>
+                        <dt class="header">Back</dt>
                         ${back_footprints}
-                    </kc-ui-grid>
+                    </dl>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
