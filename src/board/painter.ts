@@ -101,7 +101,7 @@ class ArcPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, a: board_items.GrArc | board_items.FpArc) {
-        const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
+        const arc = a.arc;
         const points = arc.to_polyline();
         this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
