@@ -15,6 +15,7 @@ import { Color } from "../gfx/color";
 import { KiCanvasPickEvent, KiCanvasSelectEvent } from "../framework/events";
 import { DrawingSheet } from "../drawing_sheet/items";
 import { DrawingSheetPainter } from "../drawing_sheet/painter";
+import { BBox } from "../math/bbox";
 
 export class BoardViewer extends Viewer {
     board: board_items.KicadPCB;
@@ -24,34 +25,37 @@ export class BoardViewer extends Viewer {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.addEventListener(
-            KiCanvasPickEvent.type,
-            (e: KiCanvasPickEvent) => {
-                const { mouse: _, items } = (e as CustomEvent).detail;
-
-                let selected;
-
-                for (const { layer: _, bbox } of items) {
-                    if (bbox.context instanceof board_items.Footprint) {
-                        selected = bbox;
-                        break;
-                    }
-                }
-
-                if (!selected || selected.context == this.selected?.context) {
-                    // selecting the same thing twice deselects it.
-                    selected = null;
-                }
-
-                canvas.dispatchEvent(
-                    new KiCanvasSelectEvent({
-                        item: selected?.context,
-                    }),
-                );
-
-                this.selected = selected;
-            },
+        this.addEventListener(KiCanvasPickEvent.type, (e) =>
+            this.on_canvas_pick(e),
         );
+    }
+
+    private on_canvas_pick(e: KiCanvasPickEvent) {
+        const { mouse: _, items } = (e as CustomEvent).detail;
+
+        let selected;
+
+        for (const { layer: _, bbox } of items) {
+            if (bbox.context instanceof board_items.Footprint) {
+                // use the nominal footprint bbox, since this bbox may
+                // just be from a pad or something.
+                selected = bbox.context.bbox;
+                break;
+            }
+        }
+
+        if (!selected || selected.context == this.selected?.context) {
+            // selecting the same thing twice deselects it.
+            selected = null;
+        }
+
+        this.canvas.dispatchEvent(
+            new KiCanvasSelectEvent({
+                item: selected?.context,
+            }),
+        );
+
+        this.selected = selected;
     }
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
@@ -87,6 +91,27 @@ export class BoardViewer extends Viewer {
 
         this.look_at_sheet();
         this.draw_soon();
+    }
+
+    select(item: board_items.Footprint | string | BBox) {
+        if (typeof item == "string") {
+            for (const fp of this.board.footprints) {
+                if (fp.reference == item) {
+                    item = fp;
+                    break;
+                }
+            }
+        }
+
+        if (item instanceof board_items.Footprint) {
+            item = item.bbox;
+        }
+
+        if (!item || !(item instanceof BBox)) {
+            console.log("Could not find", item);
+        }
+
+        this.selected = item as BBox;
     }
 
     look_at_sheet() {
