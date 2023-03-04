@@ -10,52 +10,13 @@ import * as theme from "../kicad/theme";
 import { Viewer } from "../framework/viewer";
 import { Renderer } from "../gfx/renderer";
 import { SchematicPainter } from "./painter";
-import { LayerSet } from "./layers";
-import { Color } from "../gfx/color";
-import {
-    KiCanvasPickEvent,
-    KiCanvasSelectEvent,
-    KiCanvasInspectEvent,
-} from "../framework/events";
+import { LayerSet, ViewLayer } from "./layers";
+import { BBox } from "../math/bbox";
+import { Vec2 } from "../math/vec2";
 
 export class SchematicViewer extends Viewer {
     schematic: KicadSch;
     #painter: SchematicPainter;
-
-    constructor(canvas: HTMLCanvasElement) {
-        super(canvas);
-
-        this.addEventListener(
-            KiCanvasPickEvent.type,
-            (e: KiCanvasPickEvent) => {
-                let selected = null;
-
-                for (const { layer: _, bbox } of e.detail.items) {
-                    selected = bbox;
-                    break;
-                }
-
-                if (selected && !this.selected) {
-                    canvas.dispatchEvent(
-                        new KiCanvasSelectEvent({
-                            item: selected.context,
-                        }),
-                    );
-                }
-
-                // Picking the same item twice opens the info dialog box
-                if (selected && selected.context == this.selected?.context) {
-                    canvas.dispatchEvent(
-                        new KiCanvasInspectEvent({
-                            item: selected.context,
-                        }),
-                    );
-                }
-
-                this.selected = selected;
-            },
-        );
-    }
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new Canvas2DRenderer(canvas);
@@ -85,16 +46,23 @@ export class SchematicViewer extends Viewer {
 
         this.#painter.paint(this.schematic);
 
-        this.#look_at_schematic();
-        this.draw_soon();
-    }
-
-    #look_at_schematic() {
         const bb = this.layers.bbox;
         this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
+
+        this.draw();
     }
 
-    override get selection_color(): Color {
-        return Color.white;
+    protected override on_pick(
+        mouse: Vec2,
+        items: Generator<{ layer: ViewLayer; bbox: BBox }, void, unknown>,
+    ): void {
+        let selected = null;
+
+        for (const { bbox } of items) {
+            selected = bbox;
+            break;
+        }
+
+        this.selected = selected;
     }
 }

@@ -48,7 +48,7 @@ export class KiCanvasSchematicElement extends CustomElement {
         this.loaded = true;
         this.dispatchEvent(new KiCanvasLoadEvent());
 
-        this.viewer.draw_soon();
+        this.viewer.draw();
     }
 
     override render() {

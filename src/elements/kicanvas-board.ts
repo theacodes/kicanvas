@@ -48,7 +48,7 @@ export class KiCanvasBoardElement extends CustomElement {
 
         this.loaded = true;
 
-        this.viewer.draw_soon();
+        this.viewer.draw();
     }
 
     override render() {

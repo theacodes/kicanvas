@@ -11,7 +11,11 @@ import { BBox } from "../math/bbox";
 import { Color } from "../gfx/color";
 import { ViewLayerSet } from "./view-layers";
 import { Polygon, Polyline } from "../gfx/shapes";
-import { type KiCanvasEventMap, KiCanvasPickEvent } from "./events";
+import {
+    type KiCanvasEventMap,
+    KiCanvasSelectEvent,
+    KiCanvasLoadEvent,
+} from "./events";
 
 export abstract class Viewer extends EventTarget {
     canvas: HTMLCanvasElement;
@@ -19,11 +23,19 @@ export abstract class Viewer extends EventTarget {
     viewport: Viewport;
     layers: ViewLayerSet;
     #selected: BBox | null;
+    #loaded_promise: Promise<boolean>;
+    #loaded_promise_resolve_reject: [
+        (result: boolean) => void,
+        (result: boolean) => void,
+    ];
 
     constructor(canvas: HTMLCanvasElement) {
         super();
         this.canvas = canvas;
         this.renderer = this.create_renderer(canvas);
+        this.#loaded_promise = new Promise((resolve, reject) => {
+            this.#loaded_promise_resolve_reject = [resolve, reject];
+        });
     }
 
     dispose() {
@@ -58,15 +70,11 @@ export abstract class Viewer extends EventTarget {
         await this.renderer.setup();
 
         this.viewport = new Viewport(this.renderer, () => {
-            this.draw_soon();
+            this.draw();
         });
 
         this.viewport.enable_pan_and_zoom(0.5, 190);
 
-        this.#setup_events();
-    }
-
-    #setup_events() {
         this.canvas.addEventListener("click", (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const mouse = this.viewport.camera.screen_to_world(
@@ -74,16 +82,31 @@ export abstract class Viewer extends EventTarget {
             );
 
             const items = this.layers.query_point(mouse);
-
-            this.dispatchEvent(
-                new KiCanvasPickEvent({ mouse: mouse, items: items }),
-            );
+            this.on_pick(mouse, items);
         });
     }
 
-    abstract load(url: string | URL | File): Promise<void>;
+    public abstract load(url: string | URL | File): Promise<void>;
 
-    protected draw() {
+    public get loaded() {
+        return this.#loaded_promise;
+    }
+
+    protected set_loaded(value: boolean) {
+        if (value) {
+            this.#loaded_promise_resolve_reject[0](true);
+            this.dispatchEvent(new KiCanvasLoadEvent());
+        } else {
+            this.#loaded_promise_resolve_reject[1](false);
+        }
+    }
+
+    protected on_pick(
+        mouse: Vec2,
+        items: ReturnType<ViewLayerSet["query_point"]>,
+    ) {}
+
+    protected on_draw() {
         if (!this.layers) {
             return;
         }
@@ -92,30 +115,40 @@ export abstract class Viewer extends EventTarget {
         this.layers.render(this.viewport.camera.matrix);
     }
 
-    draw_soon() {
+    public draw() {
         if (!this.viewport) {
             return;
         }
 
         window.requestAnimationFrame(() => {
-            this.draw();
+            this.on_draw();
         });
     }
 
-    get selected(): BBox | null {
+    public get selected(): BBox | null {
         return this.#selected;
     }
 
-    set selected(bb: BBox | null) {
+    public set selected(bb: BBox | null) {
+        const previous = this.#selected;
         this.#selected = bb?.copy() || null;
-        this.paint_selected();
+
+        // Notify event listeners
+        this.dispatchEvent(
+            new KiCanvasSelectEvent({
+                item: this.#selected?.context,
+                previous: previous?.context,
+            }),
+        );
+
+        setTimeout(() => this.paint_selected());
     }
 
-    get selection_color() {
+    public get selection_color() {
         return Color.white;
     }
 
-    paint_selected() {
+    protected paint_selected() {
         const layer = this.layers.overlay;
 
         layer.clear();
@@ -135,6 +168,6 @@ export abstract class Viewer extends EventTarget {
             layer.graphics.composite_operation = "overlay";
         }
 
-        this.draw_soon();
+        this.draw();
     }
 }

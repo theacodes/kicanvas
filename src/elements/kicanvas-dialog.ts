@@ -5,7 +5,6 @@
 */
 
 import { CustomElement, html } from "../dom/custom-elements";
-import { KiCanvasInspectEvent } from "../framework/events";
 import { SchematicSymbol } from "../schematic/items";
 import styles from "./kicanvas-dialog.css";
 
@@ -20,14 +19,15 @@ export class KiCanvasDialogElement extends CustomElement {
     override connectedCallback() {
         super.connectedCallback();
 
-        window.addEventListener(
-            KiCanvasInspectEvent.type,
-            async (e: KiCanvasInspectEvent) => {
-                this.#selected = e.detail.item as SchematicSymbol;
-                await this.update();
-                this.renderRoot.querySelector("dialog")?.showModal();
-            },
-        );
+        // TODO: Fix this to use new event stuff
+        // window.addEventListener(
+        //     KiCanvasInspectEvent.type,
+        //     async (e: KiCanvasInspectEvent) => {
+        //         this.#selected = e.detail.item as SchematicSymbol;
+        //         await this.update();
+        //         this.renderRoot.querySelector("dialog")?.showModal();
+        //     },
+        // );
     }
 
     override render() {
