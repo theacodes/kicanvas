@@ -59,7 +59,7 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
                     item.layer_highlighted = true;
                 }
 
-                this.viewer.draw_soon();
+                this.viewer.draw();
             },
         );
 
@@ -76,7 +76,7 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
                 layer.visible = !layer.visible;
                 item.layer_visible = layer.visible;
 
-                this.viewer.draw_soon();
+                this.viewer.draw();
             },
         );
 
@@ -100,7 +100,7 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
                             true;
                     }
                 }
-                this.viewer.draw_soon();
+                this.viewer.draw();
             });
     }
 
