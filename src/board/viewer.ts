@@ -82,8 +82,6 @@ export class BoardViewer extends Viewer {
     }
 
     select(item: board_items.Footprint | string | BBox | null) {
-        console.log("Selecting", item);
-
         // If item is a string, find the footprint by uuid or reference.
         if (typeof item == "string") {
             for (const fp of this.board.footprints) {

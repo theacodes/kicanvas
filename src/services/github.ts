@@ -57,8 +57,6 @@ export class GitHub {
 
         this.last_response = response;
 
-        console.log(response.headers);
-
         this.rate_limit_remaining = parseInt(
             response.headers.get("x-ratelimit-remaining") ?? "",
             10,
