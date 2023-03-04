@@ -18,32 +18,28 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
             this.viewer = await this.requestLazyContext("viewer");
             await this.viewer.loaded;
             super.connectedCallback();
+            this.setup_events();
         })();
+    }
 
+    private setup_events() {
         this.addEventListener("click", (e) => {
             const li = (e.target as HTMLElement).closest(
                 "li[data-uuid]",
-            ) as HTMLLIElement;
+            ) as HTMLLIElement | null;
 
-            if (!li) {
+            const uuid = li?.dataset["uuid"] as string;
+
+            if (!uuid) {
                 return;
             }
 
-            const uuid = li.dataset["uuid"] as string;
+            this.viewer.select(uuid);
+        });
 
-            if (this.viewer.selected?.context.uuid == uuid) {
-                // clicking twice should move to the properties panel
-                this.dispatchEvent(
-                    new KiCanvasSelectEvent({
-                        item: this.viewer.selected?.context,
-                    }),
-                );
-            } else {
-                // clicking once just highlights the item.
-                // TODO: this should maybe just be an event as well?
-                this.viewer.select(li.dataset["uuid"] as string);
-            }
-
+        // Update the selected item in the list whenever the viewer's
+        // selection changes.
+        this.viewer.addEventListener(KiCanvasSelectEvent.type, () => {
             this.mark_selected_item();
         });
     }
@@ -54,7 +50,7 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
         ) as NodeListOf<HTMLLIElement>;
     }
 
-    mark_selected_item() {
+    private mark_selected_item() {
         for (const el of this.items) {
             const current =
                 el.dataset["uuid"] == this.viewer.selected?.context.uuid;

@@ -35,25 +35,25 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
 
     constructor() {
         super();
-        this.provideLazyContext("viewer", () => this.board_elm.viewer);
+        this.provideLazyContext("viewer", () => this.viewer);
     }
 
-    get loaded() {
-        return this.board_elm?.loaded;
+    get viewer() {
+        return this.board_elm.viewer;
     }
 
     override initialContentCallback() {
         // When an item is selected, update the properties panel and footprints
         // panel.
-        this.addEventListener(
-            KiCanvasSelectEvent.type,
-            (e: KiCanvasSelectEvent) => {
-                this.footprints_panel_elm.mark_selected_item();
-                this.properties_panel_elm.selected_item = e.detail
-                    .item as Footprint;
+        this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+            this.properties_panel_elm.selected_item = e.detail
+                .item as Footprint;
+
+            // Selecting the same item twice should show the properties panel.
+            if (e.detail.item == e.detail.previous) {
                 this.activity_bar_elm.change_activity("properties");
-            },
-        );
+            }
+        });
     }
 
     override disconnectedCallback() {}
