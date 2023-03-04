@@ -18,10 +18,19 @@ export class KiCanvasBoardElement extends CustomElement {
     }
 
     set loaded(value) {
+        const old = this.loaded;
         this.setBooleanAttribute("loaded", value);
+        if (value == true && !old) {
+            this.dispatchEvent(new KiCanvasLoadEvent());
+        }
     }
 
     override initialContentCallback() {
+        this.viewer = new BoardViewer(this.#canvas);
+        this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+            this.loaded = true;
+        });
+
         const src = this.getAttribute("src");
         if (src) {
             this.load(src);
@@ -34,13 +43,10 @@ export class KiCanvasBoardElement extends CustomElement {
     }
 
     async load(src: File | string) {
-        this.viewer = new BoardViewer(this.#canvas);
-
         await this.viewer.setup();
         await this.viewer.load(src);
 
         this.loaded = true;
-        this.dispatchEvent(new KiCanvasLoadEvent());
 
         this.viewer.draw_soon();
     }
