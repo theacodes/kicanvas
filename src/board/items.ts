@@ -17,6 +17,8 @@ import {
 } from "../kicad/common.ts";
 import { BBox } from "../math/bbox.ts";
 import { Arc as MathArc } from "../math/arc.ts";
+import { Matrix3 } from "../math/matrix3.ts";
+import { Angle } from "../math/angle.ts";
 
 export type Drawing =
     | GrLine
@@ -746,6 +748,7 @@ export class Footprint {
     pads: Pad[] = [];
     zones: Zone[] = [];
     models: Model[] = [];
+    #bbox: BBox;
 
     constructor(expr: Parseable, public parent: KicadPCB) {
         Object.assign(
@@ -839,6 +842,44 @@ export class Footprint {
         }
 
         return new Map([...this.parent.text_vars, ...vars]);
+    }
+
+    /**
+     * Get the nominal bounding box for this footprint.
+     *
+     * This does not take into account text drawings.
+     */
+    get bbox() {
+        if (!this.#bbox) {
+            // Based on FOOTPRINT::GetBoundingBox, excludes text items.
+
+            // start with a small bbox centered on the footprint's position,
+            // so that even if there aren't any items there's still *some*
+            // footprint.
+            let bbox = new BBox(
+                this.at.position.x - 0.25,
+                this.at.position.y - 0.25,
+                0.5,
+                0.5,
+            );
+
+            const matrix = Matrix3.translation(
+                this.at.position.x,
+                this.at.position.y,
+            ).rotate_self(Angle.deg_to_rad(this.at.rotation));
+
+            for (const item of this.drawings) {
+                if (item instanceof FpText) {
+                    continue;
+                }
+
+                bbox = BBox.combine([bbox, item.bbox.transform(matrix)]);
+            }
+
+            bbox.context = this;
+            this.#bbox = bbox;
+        }
+        return this.#bbox;
     }
 }
 
