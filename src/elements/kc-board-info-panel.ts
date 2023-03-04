@@ -5,18 +5,17 @@
 */
 
 import { BoardViewer } from "../board/viewer";
+import { WithContext } from "../dom/context";
 import { html, CustomElement } from "../dom/custom-elements";
-import { NeedsViewer } from "./kc-mixins";
 
-export class KCBoardInfoPanelElement extends NeedsViewer(
-    CustomElement,
-    BoardViewer,
-) {
+export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
+    viewer: BoardViewer;
 
     override connectedCallback() {
         (async () => {
-            await this.viewer_loaded();
+            this.viewer = await this.requestLazyContext("viewer");
+            await this.viewer.loaded;
             super.connectedCallback();
         })();
     }

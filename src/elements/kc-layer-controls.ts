@@ -6,16 +6,14 @@
 
 import { html, CustomElement } from "../dom/custom-elements";
 import { LayerSet } from "../board/layers";
-import { NeedsViewer } from "./kc-mixins";
 import { BoardViewer } from "../board/viewer";
+import { WithContext } from "../dom/context";
 import styles from "./kc-layer-controls.css";
 
-export class KCLayerControlsElement extends NeedsViewer(
-    CustomElement,
-    BoardViewer,
-) {
+export class KCLayerControlsElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
     static override styles = styles;
+    viewer: BoardViewer;
 
     get panel_body() {
         return this.renderRoot.querySelector("kc-ui-panel-body")!;
@@ -29,7 +27,8 @@ export class KCLayerControlsElement extends NeedsViewer(
 
     override connectedCallback() {
         (async () => {
-            await this.viewer_loaded();
+            this.viewer = await this.requestLazyContext("viewer");
+            await this.viewer.loaded;
             super.connectedCallback();
         })();
     }

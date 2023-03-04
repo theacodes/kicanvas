@@ -5,19 +5,18 @@
 */
 
 import { BoardViewer } from "../board/viewer";
+import { WithContext } from "../dom/context";
 import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../framework/events";
-import { NeedsViewer } from "./kc-mixins";
 
-export class KCBoardFootprintsPanelElement extends NeedsViewer(
-    CustomElement,
-    BoardViewer,
-) {
+export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
+    viewer: BoardViewer;
 
     override connectedCallback() {
         (async () => {
-            await this.viewer_loaded();
+            this.viewer = await this.requestLazyContext("viewer");
+            await this.viewer.loaded;
             super.connectedCallback();
         })();
 
