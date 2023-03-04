@@ -12,7 +12,11 @@ import { Renderer } from "../gfx/renderer";
 import { BoardPainter } from "./painter";
 import { LayerNames, LayerSet } from "./layers";
 import { Color } from "../gfx/color";
-import { KiCanvasPickEvent, KiCanvasSelectEvent } from "../framework/events";
+import {
+    KiCanvasLoadEvent,
+    KiCanvasPickEvent,
+    KiCanvasSelectEvent,
+} from "../framework/events";
 import { DrawingSheet } from "../drawing_sheet/items";
 import { DrawingSheetPainter } from "../drawing_sheet/painter";
 import { BBox } from "../math/bbox";
@@ -20,10 +24,16 @@ import { BBox } from "../math/bbox";
 export class BoardViewer extends Viewer {
     board: board_items.KicadPCB;
     drawing_sheet: DrawingSheet;
+    loaded: Promise<boolean>;
+    #resolve_loaded: () => void;
     #painter: BoardPainter;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
+
+        this.loaded = new Promise((resolve) => {
+            this.#resolve_loaded = resolve as () => void;
+        });
 
         this.addEventListener(KiCanvasPickEvent.type, (e) =>
             this.on_canvas_pick(e),
@@ -91,6 +101,9 @@ export class BoardViewer extends Viewer {
 
         this.look_at_sheet();
         this.draw_soon();
+
+        this.#resolve_loaded();
+        this.dispatchEvent(new KiCanvasLoadEvent());
     }
 
     select(item: board_items.Footprint | string | BBox) {
