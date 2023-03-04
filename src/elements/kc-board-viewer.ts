@@ -50,7 +50,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
                 .item as Footprint;
 
             // Selecting the same item twice should show the properties panel.
-            if (e.detail.item == e.detail.previous) {
+            if (e.detail.item && e.detail.item == e.detail.previous) {
                 this.activity_bar_elm.change_activity("properties");
             }
         });
