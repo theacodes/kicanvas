@@ -43,13 +43,11 @@ export class BoardViewer extends Viewer {
                     selected = null;
                 }
 
-                if (selected) {
-                    canvas.dispatchEvent(
-                        new KiCanvasSelectEvent({
-                            item: selected.context,
-                        }),
-                    );
-                }
+                canvas.dispatchEvent(
+                    new KiCanvasSelectEvent({
+                        item: selected?.context,
+                    }),
+                );
 
                 this.selected = selected;
             },

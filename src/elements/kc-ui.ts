@@ -20,7 +20,7 @@ import kc_ui_styles from "./kc-ui.css";
  *
  * It provides an open child DOM and the associated kc-ui.css stylesheet.
  */
-class KCUIAppElement extends CustomElement {
+export class KCUIAppElement extends CustomElement {
     static override styles = kc_ui_styles;
     static override useShadowRoot = false;
 }
@@ -32,7 +32,7 @@ window.customElements.define("kc-ui-app", KCUIAppElement);
  *
  * Presently it's only able to resize the element to its immediate right.
  */
-class KCUIViewResizerElement extends CustomElement {
+export class KCUIViewResizerElement extends CustomElement {
     static override useShadowRoot = false;
     override initialContentCallback() {
         const prev = this.previousElementSibling! as HTMLElement;
@@ -87,32 +87,33 @@ window.customElements.define("kc-ui-view-resizer", KCUIViewResizerElement);
  * kc-ui-activity-bar allows switching between related kc-ui-activity instances,
  * sort of like a tab bar.
  */
-class KCUIActivityBarElement extends CustomElement {
+export class KCUIActivityBarElement extends CustomElement {
     static override useShadowRoot = false;
-    current_activity: string | null;
+    private priv_current_activity: string | null;
 
-    get activity_elms() {
+    private get activity_elms() {
         return this.activity_item_container.querySelectorAll("kc-ui-activity");
     }
 
-    get activity_item_container() {
+    private get activity_item_container() {
         return this.container.querySelector(
             ".activity-item-container",
         )! as HTMLElement;
     }
 
-    get button_elms() {
+    private get button_elms() {
         return this.renderRoot.querySelectorAll(`button`);
     }
 
-    get container() {
+    private get container() {
         return this.closest(".activity-container")! as HTMLElement;
     }
 
     override initialContentCallback() {
         for (const activity of this.activity_elms) {
             if (activity.getAttribute("active") != null) {
-                this.current_activity = activity.getAttribute("name");
+                this.change_activity(activity.getAttribute("name")!);
+                break;
             }
         }
 
@@ -123,47 +124,55 @@ class KCUIActivityBarElement extends CustomElement {
                 return;
             }
 
-            // Clicking on the selected activity will deselect it.
-            if (this.current_activity == active_btn.name) {
-                this.current_activity = null;
-            } else {
-                this.current_activity = active_btn.name;
-            }
-
-            // Mark the selected activity icon button as selected, clearing
-            // the others.
-            for (const btn of this.button_elms) {
-                if (btn.name == this.current_activity) {
-                    btn.ariaSelected = "true";
-                } else {
-                    btn.ariaSelected = "false";
-                }
-            }
-
-            // If there's no current activity, collapse the activity item
-            // container
-            if (!this.current_activity) {
-                this.container.style.width = "unset";
-                // unset minWidth so the container can shrink.
-                this.container.style.minWidth = "unset";
-                // clear maxWidth, since the resizer will changes it.
-                this.container.style.maxWidth = "";
-                this.activity_item_container.style.width = "0px";
-                return;
-            } else {
-                this.container.style.minWidth = "";
-                this.activity_item_container.style.width = "";
-            }
-
-            // Mark the selected activity element active, clearing the others.
-            for (const activity of this.activity_elms) {
-                if (activity.getAttribute("name") == this.current_activity) {
-                    activity.setAttribute("active", "");
-                } else {
-                    activity.removeAttribute("active");
-                }
-            }
+            this.change_activity(active_btn.name, true);
         });
+    }
+
+    get active_activity() {
+        return this.priv_current_activity;
+    }
+
+    change_activity(name: string, toggle = false) {
+        // Clicking on the selected activity will deselect it.
+        if (this.priv_current_activity == name && toggle) {
+            this.priv_current_activity = null;
+        } else {
+            this.priv_current_activity = name;
+        }
+
+        // Mark the selected activity icon button as selected, clearing
+        // the others.
+        for (const btn of this.button_elms) {
+            if (btn.name == this.priv_current_activity) {
+                btn.ariaSelected = "true";
+            } else {
+                btn.ariaSelected = "false";
+            }
+        }
+
+        // If there's no current activity, collapse the activity item
+        // container
+        if (!this.priv_current_activity) {
+            this.container.style.width = "unset";
+            // unset minWidth so the container can shrink.
+            this.container.style.minWidth = "unset";
+            // clear maxWidth, since the resizer will changes it.
+            this.container.style.maxWidth = "";
+            this.activity_item_container.style.width = "0px";
+            return;
+        } else {
+            this.container.style.minWidth = "";
+            this.activity_item_container.style.width = "";
+        }
+
+        // Mark the selected activity element active, clearing the others.
+        for (const activity of this.activity_elms) {
+            if (activity.getAttribute("name") == this.priv_current_activity) {
+                activity.setAttribute("active", "");
+            } else {
+                activity.removeAttribute("active");
+            }
+        }
     }
 }
 

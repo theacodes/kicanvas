@@ -5,31 +5,15 @@
 */
 
 import { Footprint } from "../board/items";
-import { BoardViewer } from "../board/viewer";
 import { html, CustomElement } from "../dom/custom-elements";
-import { KiCanvasSelectEvent } from "../framework/events";
-import { NeedsViewer } from "./kc-mixins";
 
-export class KCBoardPropertiesPanelElement extends NeedsViewer(
-    CustomElement,
-    BoardViewer,
-) {
+export class KCBoardPropertiesPanelElement extends CustomElement {
     static override useShadowRoot = false;
-    selected_item: Footprint;
+    private priv_selected_item: Footprint;
 
-    override connectedCallback() {
-        (async () => {
-            await this.viewer_loaded();
-            super.connectedCallback();
-        })();
-
-        (this.target as HTMLElement).addEventListener(
-            KiCanvasSelectEvent.type,
-            (e: KiCanvasSelectEvent) => {
-                this.selected_item = e.detail.item as Footprint;
-                this.update();
-            },
-        );
+    set selected_item(item: Footprint) {
+        this.priv_selected_item = item;
+        this.update();
     }
 
     override render() {
@@ -45,10 +29,10 @@ export class KCBoardPropertiesPanelElement extends NeedsViewer(
 
         let entries;
 
-        if (!this.selected_item) {
+        if (!this.priv_selected_item) {
             entries = header("No item selected");
         } else {
-            const itm = this.selected_item;
+            const itm = this.priv_selected_item;
 
             const properties = Object.entries(itm.properties)
                 .map(([k, v]) => {

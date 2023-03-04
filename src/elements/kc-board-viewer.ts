@@ -9,11 +9,15 @@ import { KiCanvasBoardElement } from "./kicanvas-board";
 import { KCLayerControlsElement } from "./kc-layer-controls";
 import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
 import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
+import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
+import { KCUIActivityBarElement } from "./kc-ui";
 
+import "./kc-layer-controls";
 import "./kc-board-info-panel";
 import "./kc-board-footprints-panel";
 import "./kc-board-properties-panel";
-import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
+import { KiCanvasSelectEvent } from "../framework/events";
+import { Footprint } from "../board/items";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -24,12 +28,24 @@ export class KCBoardViewerElement extends CustomElement {
     static override useShadowRoot = false;
 
     board_elm: KiCanvasBoardElement;
+    activity_bar_elm: KCUIActivityBarElement;
+    properties_panel_elm: KCBoardPropertiesPanelElement;
 
     get loaded() {
         return this.board_elm?.loaded;
     }
 
-    override initialContentCallback() {}
+    override initialContentCallback() {
+        // Show properties panel when an item is selected
+        this.board_elm.addEventListener(
+            KiCanvasSelectEvent.type,
+            (e: KiCanvasSelectEvent) => {
+                this.properties_panel_elm.selected_item = e.detail
+                    .item as Footprint;
+                this.activity_bar_elm.change_activity("properties");
+            },
+        );
+    }
 
     override disconnectedCallback() {}
 
@@ -40,6 +56,37 @@ export class KCBoardViewerElement extends CustomElement {
     override render() {
         this.board_elm =
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
+
+        this.activity_bar_elm = html`<kc-ui-activity-bar>
+            <kc-ui-activity-bar-start>
+                <button
+                    tooltip-left="Layers"
+                    name="layers"
+                    aria-selected="true">
+                    <kc-ui-icon>layers</kc-ui-icon>
+                </button>
+                <button tooltip-left="Objects" name="objects">
+                    <kc-ui-icon>category</kc-ui-icon>
+                </button>
+                <button tooltip-left="Footprints" name="footprints">
+                    <kc-ui-icon>footprint</kc-ui-icon>
+                </button>
+                <button tooltip-left="Nets" name="nets">
+                    <kc-ui-icon>hub</kc-ui-icon>
+                </button>
+                <button tooltip-left="Properties" name="properties">
+                    <kc-ui-icon>list</kc-ui-icon>
+                </button>
+                <button tooltip-left="Info" name="info">
+                    <kc-ui-icon>info</kc-ui-icon>
+                </button>
+            </kc-ui-activity-bar-start>
+            <kc-ui-activity-bar-end>
+                <button tooltip-left="Help">
+                    <kc-ui-icon>help</kc-ui-icon>
+                </button>
+            </kc-ui-activity-bar-end>
+        </kc-ui-activity-bar>` as KCUIActivityBarElement;
 
         const layer_controls_elm =
             html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
@@ -53,45 +100,16 @@ export class KCBoardViewerElement extends CustomElement {
             html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
         info_panel_elm.target = this.board_elm;
 
-        const properties_panel_elm =
+        this.properties_panel_elm =
             html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
-        properties_panel_elm.target = this.board_elm;
+        this.properties_panel_elm.target = this.board_elm;
 
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
             <kc-ui-view-resizer></kc-ui-view-resizer>
             <kc-ui-split-view vertical class="activity-container">
                 <kc-ui-view class="fixed activity-bar-container">
-                    <kc-ui-activity-bar>
-                        <kc-ui-activity-bar-start>
-                            <button
-                                tooltip-left="Layers"
-                                name="layers"
-                                aria-selected="true">
-                                <kc-ui-icon>layers</kc-ui-icon>
-                            </button>
-                            <button tooltip-left="Objects" name="objects">
-                                <kc-ui-icon>category</kc-ui-icon>
-                            </button>
-                            <button tooltip-left="Footprints" name="footprints">
-                                <kc-ui-icon>footprint</kc-ui-icon>
-                            </button>
-                            <button tooltip-left="Nets" name="nets">
-                                <kc-ui-icon>hub</kc-ui-icon>
-                            </button>
-                            <button tooltip-left="Properties" name="properties">
-                                <kc-ui-icon>list</kc-ui-icon>
-                            </button>
-                            <button tooltip-left="Info" name="info">
-                                <kc-ui-icon>info</kc-ui-icon>
-                            </button>
-                        </kc-ui-activity-bar-start>
-                        <kc-ui-activity-bar-end>
-                            <button tooltip-left="Help">
-                                <kc-ui-icon>help</kc-ui-icon>
-                            </button>
-                        </kc-ui-activity-bar-end>
-                    </kc-ui-activity-bar>
+                    ${this.activity_bar_elm}
                 </kc-ui-view>
                 <kc-ui-view class="activity-item-container">
                     <kc-ui-activity name="layers" active>
@@ -119,7 +137,7 @@ export class KCBoardViewerElement extends CustomElement {
                         </kc-ui-panel>
                     </kc-ui-activity>
                     <kc-ui-activity name="properties">
-                        ${properties_panel_elm}
+                        ${this.properties_panel_elm}
                     </kc-ui-activity>
                     <kc-ui-activity name="info">
                         ${info_panel_elm}
