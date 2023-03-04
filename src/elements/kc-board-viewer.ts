@@ -11,26 +11,32 @@ import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
 import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
 import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
 import { KCUIActivityBarElement } from "./kc-ui";
+import { KiCanvasSelectEvent } from "../framework/events";
+import { Footprint } from "../board/items";
+import { WithContext } from "../dom/context";
 
 import "./kc-layer-controls";
 import "./kc-board-info-panel";
 import "./kc-board-footprints-panel";
 import "./kc-board-properties-panel";
-import { KiCanvasSelectEvent } from "../framework/events";
-import { Footprint } from "../board/items";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
  * up the actual board viewer as well as interface controls. It's basically
  * KiCanvas's version of PCBNew.
  */
-export class KCBoardViewerElement extends CustomElement {
+export class KCBoardViewerElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
 
     board_elm: KiCanvasBoardElement;
     activity_bar_elm: KCUIActivityBarElement;
     properties_panel_elm: KCBoardPropertiesPanelElement;
     footprints_panel_elm: KCBoardFootprintsPanelElement;
+
+    constructor() {
+        super();
+        this.provideLazyContext("viewer", () => this.board_elm.viewer);
+    }
 
     get loaded() {
         return this.board_elm?.loaded;
@@ -93,15 +99,12 @@ export class KCBoardViewerElement extends CustomElement {
 
         const layer_controls_elm =
             html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
-        layer_controls_elm.target = this.board_elm;
 
         this.footprints_panel_elm =
             html`<kc-board-footprints-panel></kc-board-footprints-panel>` as KCBoardFootprintsPanelElement;
-        this.footprints_panel_elm.target = this.board_elm;
 
         const info_panel_elm =
             html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
-        info_panel_elm.target = this.board_elm;
 
         this.properties_panel_elm =
             html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
