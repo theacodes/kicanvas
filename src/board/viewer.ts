@@ -49,13 +49,13 @@ export class BoardViewer extends Viewer {
             selected = null;
         }
 
+        this.selected = selected;
+
         this.canvas.dispatchEvent(
             new KiCanvasSelectEvent({
                 item: selected?.context,
             }),
         );
-
-        this.selected = selected;
     }
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
@@ -96,7 +96,7 @@ export class BoardViewer extends Viewer {
     select(item: board_items.Footprint | string | BBox) {
         if (typeof item == "string") {
             for (const fp of this.board.footprints) {
-                if (fp.reference == item) {
+                if (fp.uuid == item || fp.reference == item) {
                     item = fp;
                     break;
                 }
