@@ -816,6 +816,10 @@ export class Footprint {
         }
     }
 
+    get uuid() {
+        return this.tstamp;
+    }
+
     *items(): Generator<FootprintDrawings | Pad | Zone, void, undefined> {
         yield* this.drawings ?? [];
         yield* this.zones ?? [];
