@@ -102,7 +102,6 @@ export class KCBoardViewerElement extends CustomElement {
 
         this.properties_panel_elm =
             html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
-        this.properties_panel_elm.target = this.board_elm;
 
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
