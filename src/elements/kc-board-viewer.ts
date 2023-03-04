@@ -4,21 +4,23 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, CustomElement } from "../dom/custom-elements";
-import { KiCanvasBoardElement } from "./kicanvas-board";
-import { KCLayerControlsElement } from "./kc-layer-controls";
-import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
-import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
-import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
-import { KCUIActivityBarElement } from "./kc-ui";
-import { KiCanvasSelectEvent } from "../framework/events";
 import { Footprint } from "../board/items";
 import { WithContext } from "../dom/context";
+import { CustomElement, html } from "../dom/custom-elements";
+import { KiCanvasSelectEvent } from "../framework/events";
+import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
+import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
+import { KCBoardNetsPanelElement } from "./kc-board-nets-panel";
+import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
+import { KCLayerControlsElement } from "./kc-layer-controls";
+import { KCUIActivityBarElement } from "./kc-ui";
+import { KiCanvasBoardElement } from "./kicanvas-board";
 
-import "./kc-layer-controls";
-import "./kc-board-info-panel";
 import "./kc-board-footprints-panel";
+import "./kc-board-info-panel";
+import "./kc-board-nets-panel";
 import "./kc-board-properties-panel";
+import "./kc-layer-controls";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -100,6 +102,9 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
         const layer_controls_elm =
             html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
 
+        const nets_panel_elm =
+            html`<kc-board-nets-panel></kc-board-nets-panel>` as KCBoardNetsPanelElement;
+
         this.footprints_panel_elm =
             html`<kc-board-footprints-panel></kc-board-footprints-panel>` as KCBoardFootprintsPanelElement;
 
@@ -133,13 +138,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
                         ${this.footprints_panel_elm}
                     </kc-ui-activity>
                     <kc-ui-activity name="nets">
-                        <kc-ui-panel>
-                            <kc-ui-panel-header>
-                                <kc-ui-panel-header-text>
-                                    Nets
-                                </kc-ui-panel-header-text>
-                            </kc-ui-panel-header>
-                        </kc-ui-panel>
+                        ${nets_panel_elm}
                     </kc-ui-activity>
                     <kc-ui-activity name="properties">
                         ${this.properties_panel_elm}

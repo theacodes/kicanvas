@@ -622,6 +622,10 @@ ul.item-list li span {
     overflow: hidden;
 }
 
+ul.item-list li span.very-narrow {
+    max-width: 50px;
+}
+
 ul.item-list li span.narrow {
     max-width: 100px;
 }
