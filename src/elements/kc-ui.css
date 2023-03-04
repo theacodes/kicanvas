@@ -553,8 +553,9 @@ kc-ui-activity[active] {
 }
 
 /*
-    Property list (grid style) dls
+    Property list (grid style) dl elements
 */
+
 dl.property-list {
     display: grid;
     gap: 1px;
@@ -580,4 +581,70 @@ dl.property-list dt.header {
 
 dl.property-list kc-ui-icon {
     vertical-align: middle;
+}
+
+/*
+    item-lists
+*/
+ul.item-list {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    background-color: var(--list-item-bg);
+    color: var(--list-item-fg);
+}
+
+ul.item-list li {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0.2rem;
+    user-select: none;
+    border-bottom: 1px solid var(--grid-outline);
+    background-color: transparent;
+    transition: color var(--transition-time-short) ease,
+        background-color var(--transition-time-short) ease;
+}
+
+ul.item-list li:hover {
+    background-color: var(--list-item-hover-bg);
+    color: var(--list-item-hover-fg);
+}
+
+ul.item-list li span {
+    flex: 1 1 100%;
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+ul.item-list li span.narrow {
+    max-width: 100px;
+}
+
+ul.item-list li.header,
+ul.item-list li.header:hover {
+    user-select: none;
+    background-color: var(--grid-outline);
+    color: var(--list-item-fg);
+}
+
+ul.item-list li[aria-role="button"] {
+    cursor: pointer;
+}
+
+ul.item-list li[aria-current="true"] {
+    cursor: pointer;
+    background-color: var(--list-item-active-bg);
+    color: var(--list-item-active-fg);
+}
+
+ul.item-list li[aria-disabled="true"] {
+    cursor: pointer;
+    background-color: var(--list-item-disabled-bg);
+    color: var(--list-item-disabled-fg);
 }
