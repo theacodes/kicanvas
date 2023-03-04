@@ -24,18 +24,33 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
     private setup_events() {
         this.addEventListener("click", (e) => {
             const li = (e.target as HTMLElement).closest(
-                "li[data-uuid]",
+                "li[data-number]",
             ) as HTMLLIElement | null;
 
-            const uuid = li?.dataset["uuid"] as string;
+            const number = parseInt(li?.dataset["number"] as string, 10);
 
-            if (!uuid) {
+            if (!number) {
                 return;
             }
 
-            console.log("Selected net:", uuid);
+            this.viewer.highlight_net(number);
+            this.mark_selected_item(number);
         });
     }
+
+    private get items() {
+        return this.renderRoot.querySelectorAll(
+            "li[data-number]",
+        ) as NodeListOf<HTMLLIElement>;
+    }
+
+    private mark_selected_item(number: number) {
+        for (const el of this.items) {
+            const current = el.dataset["number"] == `${number}`;
+            el.ariaCurrent = current ? "true" : "false";
+        }
+    }
+
     override render() {
         const board = this.viewer.board;
 

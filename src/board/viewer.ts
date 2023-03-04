@@ -108,6 +108,11 @@ export class BoardViewer extends Viewer {
         this.selected = item;
     }
 
+    highlight_net(net: number) {
+        this.#painter.paint_net(this.board, net);
+        this.draw();
+    }
+
     look_at_sheet() {
         this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
     }

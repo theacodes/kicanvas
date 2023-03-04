@@ -29,8 +29,16 @@ import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { EDAText } from "../text/eda-text";
 import { StrokeFont } from "../text/stroke-font";
 import { Color } from "../gfx/color";
+import { ViewLayerName } from "../framework/view-layers";
 
-class LinePainter extends ItemPainter {
+abstract class BoardItemPainter extends ItemPainter {
+    /** Alias for BoardPainter.filter_net */
+    get filter_net(): number | null {
+        return (this.view_painter as BoardPainter).filter_net;
+    }
+}
+
+class LinePainter extends BoardItemPainter {
     classes = [board_items.GrLine, board_items.FpLine];
 
     layers_for(item: board_items.GrLine | board_items.FpLine) {
@@ -38,12 +46,14 @@ class LinePainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, s: board_items.GrLine | board_items.FpLine) {
+        if (this.filter_net) return;
+
         const points = [s.start, s.end];
         this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
-class RectPainter extends ItemPainter {
+class RectPainter extends BoardItemPainter {
     classes = [board_items.GrRect, board_items.FpRect];
 
     layers_for(item: board_items.GrRect | board_items.FpRect) {
@@ -51,6 +61,8 @@ class RectPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, r: board_items.GrRect | board_items.FpRect) {
+        if (this.filter_net) return;
+
         const color = layer.color;
         const points = [
             r.start,
@@ -68,7 +80,7 @@ class RectPainter extends ItemPainter {
     }
 }
 
-class PolyPainter extends ItemPainter {
+class PolyPainter extends BoardItemPainter {
     classes = [board_items.Poly, board_items.GrPoly, board_items.FpPoly];
 
     layers_for(
@@ -81,6 +93,8 @@ class PolyPainter extends ItemPainter {
         layer: ViewLayer,
         p: board_items.Poly | board_items.GrPoly | board_items.FpPoly,
     ) {
+        if (this.filter_net) return;
+
         const color = layer.color;
 
         if (p.width) {
@@ -93,7 +107,7 @@ class PolyPainter extends ItemPainter {
     }
 }
 
-class ArcPainter extends ItemPainter {
+class ArcPainter extends BoardItemPainter {
     classes = [board_items.GrArc, board_items.FpArc];
 
     layers_for(item: board_items.GrArc | board_items.FpArc) {
@@ -101,13 +115,15 @@ class ArcPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, a: board_items.GrArc | board_items.FpArc) {
+        if (this.filter_net) return;
+
         const arc = a.arc;
         const points = arc.to_polyline();
         this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
-class CirclePainter extends ItemPainter {
+class CirclePainter extends BoardItemPainter {
     classes = [board_items.GrCircle, board_items.FpCircle];
 
     layers_for(item: board_items.GrCircle | board_items.FpCircle) {
@@ -115,6 +131,8 @@ class CirclePainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, c: board_items.GrCircle | board_items.FpCircle) {
+        if (this.filter_net) return;
+
         const color = layer.color;
 
         const radius = c.center.sub(c.end).magnitude;
@@ -137,7 +155,7 @@ class CirclePainter extends ItemPainter {
     }
 }
 
-class TraceSegmentPainter extends ItemPainter {
+class TraceSegmentPainter extends BoardItemPainter {
     classes = [board_items.LineSegment];
 
     layers_for(item: board_items.LineSegment) {
@@ -145,12 +163,16 @@ class TraceSegmentPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, s: board_items.LineSegment) {
+        if (this.filter_net && s.net != this.filter_net) {
+            return;
+        }
+
         const points = [s.start, s.end];
         this.gfx.line(new Polyline(points, s.width, layer.color));
     }
 }
 
-class TraceArcPainter extends ItemPainter {
+class TraceArcPainter extends BoardItemPainter {
     classes = [board_items.ArcSegment];
 
     layers_for(item: board_items.ArcSegment) {
@@ -158,13 +180,17 @@ class TraceArcPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, a: board_items.ArcSegment) {
+        if (this.filter_net && a.net != this.filter_net) {
+            return;
+        }
+
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
         const points = arc.to_polyline();
         this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
-class ViaPainter extends ItemPainter {
+class ViaPainter extends BoardItemPainter {
     classes = [board_items.Via];
 
     layers_for(v: board_items.Via): string[] {
@@ -197,8 +223,15 @@ class ViaPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, v: board_items.Via) {
+        if (this.filter_net && v.net != this.filter_net) {
+            return;
+        }
+
         const color = layer.color;
-        if (layer.name.endsWith("HoleWalls")) {
+        if (
+            layer.name.endsWith("HoleWalls") ||
+            layer.name == ViewLayerName.overlay
+        ) {
             this.gfx.circle(new Circle(v.at.position, v.size / 2, color));
         } else if (layer.name.endsWith("Holes")) {
             this.gfx.circle(new Circle(v.at.position, v.drill / 2, color));
@@ -228,7 +261,7 @@ class ViaPainter extends ItemPainter {
     }
 }
 
-class ZonePainter extends ItemPainter {
+class ZonePainter extends BoardItemPainter {
     classes = [board_items.Zone];
 
     layers_for(z: board_items.Zone): string[] {
@@ -242,8 +275,16 @@ class ZonePainter extends ItemPainter {
         if (!z.filled_polygons) {
             return;
         }
+
+        if (this.filter_net && z.net != this.filter_net) {
+            return;
+        }
+
         for (const p of z.filled_polygons) {
-            if (!layer.name.includes(p.layer)) {
+            if (
+                !layer.name.includes(p.layer) &&
+                layer.name != ViewLayerName.overlay
+            ) {
                 continue;
             }
 
@@ -252,7 +293,7 @@ class ZonePainter extends ItemPainter {
     }
 }
 
-class PadPainter extends ItemPainter {
+class PadPainter extends BoardItemPainter {
     classes = [board_items.Pad];
 
     layers_for(pad: board_items.Pad): string[] {
@@ -294,6 +335,10 @@ class PadPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, pad: board_items.Pad) {
+        if (this.filter_net && pad.net?.number != this.filter_net) {
+            return;
+        }
+
         const color = layer.color;
 
         const position_mat = Matrix3.translation(
@@ -463,7 +508,7 @@ class PadPainter extends ItemPainter {
     }
 }
 
-class GrTextPainter extends ItemPainter {
+class GrTextPainter extends BoardItemPainter {
     classes = [board_items.GrText];
 
     layers_for(t: board_items.GrText) {
@@ -471,6 +516,8 @@ class GrTextPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, t: board_items.GrText) {
+        if (this.filter_net) return;
+
         if (t.hide || !t.shown_text) {
             return;
         }
@@ -500,7 +547,7 @@ class GrTextPainter extends ItemPainter {
     }
 }
 
-class FpTextPainter extends ItemPainter {
+class FpTextPainter extends BoardItemPainter {
     classes = [board_items.FpText];
 
     layers_for(t: board_items.FpText) {
@@ -512,6 +559,8 @@ class FpTextPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, t: board_items.FpText) {
+        if (this.filter_net) return;
+
         if (t.hide || !t.shown_text) {
             return;
         }
@@ -561,17 +610,19 @@ class FpTextPainter extends ItemPainter {
     }
 }
 
-class DimensionPainter extends ItemPainter {
+class DimensionPainter extends BoardItemPainter {
     classes = [board_items.Dimension];
 
     layers_for(d: board_items.Dimension): string[] {
         return [];
     }
 
-    paint(layer: ViewLayer, d: board_items.Dimension) {}
+    paint(layer: ViewLayer, d: board_items.Dimension) {
+        if (this.filter_net) return;
+    }
 }
 
-class FootprintPainter extends ItemPainter {
+class FootprintPainter extends BoardItemPainter {
     classes = [board_items.Footprint];
 
     layers_for(fp: board_items.Footprint): string[] {
@@ -596,7 +647,10 @@ class FootprintPainter extends ItemPainter {
 
         for (const item of fp.items()) {
             const item_layers = this.view_painter.layers_for(item);
-            if (item_layers.includes(layer.name)) {
+            if (
+                layer.name == ViewLayerName.overlay ||
+                item_layers.includes(layer.name)
+            ) {
                 this.view_painter.paint_item(layer, item);
             }
         }
@@ -627,5 +681,33 @@ export class BoardPainter extends DocumentPainter {
             new FpTextPainter(this, gfx),
             new DimensionPainter(this, gfx),
         ];
+    }
+
+    // Used to filter out items by net when highlighting nets. Painters
+    // should use this to determine whether to draw or skip the current item.
+    filter_net: number | null = null;
+
+    paint_net(board: board_items.KicadPCB, net: number) {
+        const layer = this.layers.overlay;
+
+        this.filter_net = net;
+
+        layer.clear();
+        layer.color = Color.white;
+        this.gfx.start_layer(layer.name);
+
+        for (const item of board.items()) {
+            const painter = this.painter_for(item);
+
+            if (!painter) {
+                continue;
+            }
+
+            this.paint_item(layer, item);
+        }
+
+        layer.graphics = this.gfx.end_layer();
+        layer.graphics.composite_operation = "overlay";
+        this.filter_net = null;
     }
 }
