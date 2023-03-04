@@ -30,16 +30,19 @@ export class KCBoardViewerElement extends CustomElement {
     board_elm: KiCanvasBoardElement;
     activity_bar_elm: KCUIActivityBarElement;
     properties_panel_elm: KCBoardPropertiesPanelElement;
+    footprints_panel_elm: KCBoardFootprintsPanelElement;
 
     get loaded() {
         return this.board_elm?.loaded;
     }
 
     override initialContentCallback() {
-        // Show properties panel when an item is selected
-        this.board_elm.addEventListener(
+        // When an item is selected, update the properties panel and footprints
+        // panel.
+        this.addEventListener(
             KiCanvasSelectEvent.type,
             (e: KiCanvasSelectEvent) => {
+                this.footprints_panel_elm.mark_selected_item();
                 this.properties_panel_elm.selected_item = e.detail
                     .item as Footprint;
                 this.activity_bar_elm.change_activity("properties");
@@ -92,9 +95,9 @@ export class KCBoardViewerElement extends CustomElement {
             html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
         layer_controls_elm.target = this.board_elm;
 
-        const footprints_panel_elm =
+        this.footprints_panel_elm =
             html`<kc-board-footprints-panel></kc-board-footprints-panel>` as KCBoardFootprintsPanelElement;
-        footprints_panel_elm.target = this.board_elm;
+        this.footprints_panel_elm.target = this.board_elm;
 
         const info_panel_elm =
             html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
@@ -124,7 +127,7 @@ export class KCBoardViewerElement extends CustomElement {
                         </kc-ui-panel>
                     </kc-ui-activity>
                     <kc-ui-activity name="footprints">
-                        ${footprints_panel_elm}
+                        ${this.footprints_panel_elm}
                     </kc-ui-activity>
                     <kc-ui-activity name="nets">
                         <kc-ui-panel>
