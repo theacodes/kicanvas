@@ -13,9 +13,11 @@ import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
 import { KCBoardNetsPanelElement } from "./kc-board-nets-panel";
 import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
 import { KCLayerControlsElement } from "./kc-layer-controls";
-import { KCUIActivityBarElement } from "./kc-ui";
+import { KCUIActivitySideBarElement } from "./kc-ui-activity-side-bar";
 import { KiCanvasBoardElement } from "./kicanvas-board";
 
+// import dependent elements so they're registered before use.
+import "./kc-ui-activity-side-bar";
 import "./kc-board-footprints-panel";
 import "./kc-board-info-panel";
 import "./kc-board-nets-panel";
@@ -31,7 +33,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
 
     board_elm: KiCanvasBoardElement;
-    activity_bar_elm: KCUIActivityBarElement;
+    activity_bar_elm: KCUIActivitySideBarElement;
     properties_panel_elm: KCBoardPropertiesPanelElement;
     footprints_panel_elm: KCBoardFootprintsPanelElement;
 
@@ -68,37 +70,6 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
         this.board_elm =
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
 
-        this.activity_bar_elm = html`<kc-ui-activity-bar>
-            <kc-ui-activity-bar-start>
-                <button
-                    tooltip-left="Layers"
-                    name="layers"
-                    aria-selected="true">
-                    <kc-ui-icon>layers</kc-ui-icon>
-                </button>
-                <button tooltip-left="Objects" name="objects">
-                    <kc-ui-icon>category</kc-ui-icon>
-                </button>
-                <button tooltip-left="Footprints" name="footprints">
-                    <kc-ui-icon>footprint</kc-ui-icon>
-                </button>
-                <button tooltip-left="Nets" name="nets">
-                    <kc-ui-icon>hub</kc-ui-icon>
-                </button>
-                <button tooltip-left="Properties" name="properties">
-                    <kc-ui-icon>list</kc-ui-icon>
-                </button>
-                <button tooltip-left="Info" name="info">
-                    <kc-ui-icon>info</kc-ui-icon>
-                </button>
-            </kc-ui-activity-bar-start>
-            <kc-ui-activity-bar-end>
-                <button tooltip-left="Help">
-                    <kc-ui-icon>help</kc-ui-icon>
-                </button>
-            </kc-ui-activity-bar-end>
-        </kc-ui-activity-bar>` as KCUIActivityBarElement;
-
         const layer_controls_elm =
             html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
 
@@ -114,40 +85,50 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
         this.properties_panel_elm =
             html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
 
+        this.activity_bar_elm = html`<kc-ui-activity-side-bar>
+            <kc-ui-activity
+                slot="activities"
+                name="Layers"
+                icon="layers"
+                active>
+                ${layer_controls_elm}
+            </kc-ui-activity>
+            <kc-ui-activity slot="activities" name="Objects" icon="category">
+                <kc-ui-panel>
+                    <kc-ui-panel-header>
+                        <kc-ui-panel-header-text>
+                            Objects
+                        </kc-ui-panel-header-text>
+                    </kc-ui-panel-header>
+                </kc-ui-panel>
+            </kc-ui-activity>
+            <kc-ui-activity
+                slot="activities"
+                name="Footprints"
+                icon="footprint">
+                ${this.footprints_panel_elm}
+            </kc-ui-activity>
+            <kc-ui-activity slot="activities" name="Nets" icon="hub">
+                ${nets_panel_elm}
+            </kc-ui-activity>
+            <kc-ui-activity slot="activities" name="Properties" icon="list">
+                ${this.properties_panel_elm}
+            </kc-ui-activity>
+            <kc-ui-activity slot="activities" name="Board info" icon="info">
+                ${info_panel_elm}
+            </kc-ui-activity>
+            <kc-ui-activity
+                slot="activities"
+                name="Help"
+                icon="help"
+                button-location="bottom">
+            </kc-ui-activity>
+        </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
+
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
             <kc-ui-view-resizer></kc-ui-view-resizer>
-            <kc-ui-split-view vertical class="activity-container">
-                <kc-ui-view class="fixed activity-bar-container">
-                    ${this.activity_bar_elm}
-                </kc-ui-view>
-                <kc-ui-view class="activity-item-container">
-                    <kc-ui-activity name="layers" active>
-                        ${layer_controls_elm}
-                    </kc-ui-activity>
-                    <kc-ui-activity name="objects">
-                        <kc-ui-panel>
-                            <kc-ui-panel-header>
-                                <kc-ui-panel-header-text>
-                                    Objects
-                                </kc-ui-panel-header-text>
-                            </kc-ui-panel-header>
-                        </kc-ui-panel>
-                    </kc-ui-activity>
-                    <kc-ui-activity name="footprints">
-                        ${this.footprints_panel_elm}
-                    </kc-ui-activity>
-                    <kc-ui-activity name="nets">
-                        ${nets_panel_elm}
-                    </kc-ui-activity>
-                    <kc-ui-activity name="properties">
-                        ${this.properties_panel_elm}
-                    </kc-ui-activity>
-                    <kc-ui-activity name="info">
-                        ${info_panel_elm}
-                    </kc-ui-activity>
-                </kc-ui-view>
-            </kc-ui-split-view>
+            ${this.activity_bar_elm}
         </kc-ui-split-view>`;
     }
 }
