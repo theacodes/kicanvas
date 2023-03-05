@@ -302,8 +302,12 @@ class PadPainter extends BoardItemPainter {
 
         for (const layer of pad.layers) {
             if (layer == "*.Cu") {
-                layers.push(LayerNames.f_cu);
-                layers.push(LayerNames.b_cu);
+                layers.push(LayerNames.pads_front);
+                layers.push(LayerNames.pads_back);
+            } else if (layer == "F.Cu") {
+                layers.push(LayerNames.pads_front);
+            } else if (layer == "B.Cu") {
+                layers.push(LayerNames.pads_back);
             } else if (layer == "*.Mask") {
                 layers.push(LayerNames.f_mask);
                 layers.push(LayerNames.b_mask);
