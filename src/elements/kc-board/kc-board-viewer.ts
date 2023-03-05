@@ -10,19 +10,16 @@ import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
 import { KCUIActivitySideBarElement } from "../kc-ui-activity-side-bar";
 import { KiCanvasBoardElement } from "../kicanvas-board";
-import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
-import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
-import { KCBoardNetsPanelElement } from "./kc-board-nets-panel";
 import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
-import { KCBoardLayersPanelElement } from "./kc-board-layers-panel";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui-activity-side-bar";
 import "./kc-board-footprints-panel";
 import "./kc-board-info-panel";
-import "./kc-board-nets-panel";
-import "./kc-board-properties-panel";
 import "./kc-board-layers-panel";
+import "./kc-board-nets-panel";
+import "./kc-board-objects-panel";
+import "./kc-board-properties-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -35,7 +32,6 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
     board_elm: KiCanvasBoardElement;
     activity_bar_elm: KCUIActivitySideBarElement;
     properties_panel_elm: KCBoardPropertiesPanelElement;
-    footprints_panel_elm: KCBoardFootprintsPanelElement;
 
     constructor() {
         super();
@@ -70,52 +66,30 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
         this.board_elm =
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
 
-        const layer_controls_elm =
-            html`<kc-board-layers-panel></kc-board-layers-panel>` as KCBoardLayersPanelElement;
-
-        const nets_panel_elm =
-            html`<kc-board-nets-panel></kc-board-nets-panel>` as KCBoardNetsPanelElement;
-
-        this.footprints_panel_elm =
-            html`<kc-board-footprints-panel></kc-board-footprints-panel>` as KCBoardFootprintsPanelElement;
-
-        const info_panel_elm =
-            html`<kc-board-info-panel></kc-board-info-panel>` as KCBoardInfoPanelElement;
-
         this.properties_panel_elm =
             html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
-            <kc-ui-activity
-                slot="activities"
-                name="Layers"
-                icon="layers"
-                active>
-                ${layer_controls_elm}
+            <kc-ui-activity slot="activities" name="Layers" icon="layers">
+                <kc-board-layers-panel></kc-board-layers-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Objects" icon="category">
-                <kc-ui-panel>
-                    <kc-ui-panel-header>
-                        <kc-ui-panel-header-text>
-                            Objects
-                        </kc-ui-panel-header-text>
-                    </kc-ui-panel-header>
-                </kc-ui-panel>
+                <kc-board-objects-panel></kc-board-objects-panel>
             </kc-ui-activity>
             <kc-ui-activity
                 slot="activities"
                 name="Footprints"
                 icon="footprint">
-                ${this.footprints_panel_elm}
+                <kc-board-footprints-panel></kc-board-footprints-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Nets" icon="hub">
-                ${nets_panel_elm}
+                <kc-board-nets-panel></kc-board-nets-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Properties" icon="list">
                 ${this.properties_panel_elm}
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Board info" icon="info">
-                ${info_panel_elm}
+                <kc-board-info-panel></kc-board-info-panel>
             </kc-ui-activity>
             <kc-ui-activity
                 slot="activities"
