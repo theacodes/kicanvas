@@ -93,7 +93,7 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
                     >
                 </kc-ui-panel-header>
                 <kc-ui-panel-body class="no-padding">
-                    <ul class="item-list">
+                    <ul class="item-list outline">
                         <li class="header">Front</dt>
                         ${front_footprints}
                         <li class="header">Back</dt>

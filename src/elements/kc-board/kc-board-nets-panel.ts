@@ -71,7 +71,7 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
                     <kc-ui-panel-header-text>Nets</kc-ui-panel-header-text>
                 </kc-ui-panel-header>
                 <kc-ui-panel-body class="no-padding">
-                    <ul class="item-list">
+                    <ul class="item-list outline">
                         ${nets}
                     </ul>
                 </kc-ui-panel-body>
