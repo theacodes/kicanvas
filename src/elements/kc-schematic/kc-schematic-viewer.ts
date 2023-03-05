@@ -7,11 +7,12 @@
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
+import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
-import { KiCanvasSchematicElement } from "../kicanvas-schematic";
+import "./kc-schematic-properties-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -53,7 +54,8 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
             html`<kicanvas-schematic></kicanvas-schematic>` as KiCanvasSchematicElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
-            <kc-ui-activity slot="activities" name="Layers" icon="layers">
+            <kc-ui-activity slot="activities" name="Properties" icon="list">
+                <kc-schematic-properties-panel></kc-schematic-properties-panel>
             </kc-ui-activity>
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
