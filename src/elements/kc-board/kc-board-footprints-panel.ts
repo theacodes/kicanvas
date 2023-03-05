@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BoardViewer } from "../board/viewer";
-import { WithContext } from "../dom/context";
-import { html, CustomElement } from "../dom/custom-elements";
-import { KiCanvasSelectEvent } from "../framework/events";
+import { BoardViewer } from "../../board/viewer";
+import { WithContext } from "../../dom/context";
+import { html, CustomElement } from "../../dom/custom-elements";
+import { KiCanvasSelectEvent } from "../../framework/events";
 
 export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;

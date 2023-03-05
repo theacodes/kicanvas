@@ -4,13 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, CustomElement } from "../dom/custom-elements";
-import { LayerSet } from "../board/layers";
-import { BoardViewer } from "../board/viewer";
-import { WithContext } from "../dom/context";
-import styles from "./kc-layer-controls.css";
+import { LayerSet } from "../../board/layers";
+import { BoardViewer } from "../../board/viewer";
+import { WithContext } from "../../dom/context";
+import { CustomElement, html } from "../../dom/custom-elements";
+import styles from "./kc-board-layers-panel.css";
 
-export class KCLayerControlsElement extends WithContext(CustomElement) {
+export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
     static override styles = styles;
     viewer: BoardViewer;
@@ -19,7 +19,7 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
         return this.renderRoot.querySelector("kc-ui-panel-body")!;
     }
 
-    get items(): KCLayerControlItemElement[] {
+    get items(): KCBoardLayerControlElement[] {
         return Array.from(
             this.panel_body?.querySelectorAll("kc-layer-control-item") ?? [],
         );
@@ -36,10 +36,10 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
     override initialContentCallback() {
         // Highlight layer when its control list item is clicked
         this.panel_body.addEventListener(
-            KCLayerControlItemElement.select_event,
+            KCBoardLayerControlElement.select_event,
             (e: Event) => {
                 const item = (e as CustomEvent)
-                    .detail as KCLayerControlItemElement;
+                    .detail as KCBoardLayerControlElement;
 
                 for (const n of this.items) {
                     n.layer_highlighted = false;
@@ -65,10 +65,10 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
 
         // Toggle layer visibility when its item's visibility control is clicked
         this.panel_body.addEventListener(
-            KCLayerControlItemElement.visibility_event,
+            KCBoardLayerControlElement.visibility_event,
             (e) => {
                 const item = (e as CustomEvent)
-                    .detail as KCLayerControlItemElement;
+                    .detail as KCBoardLayerControlElement;
 
                 const layer = this.viewer.layers.by_name(item.layer_name!)!;
 
@@ -112,10 +112,10 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
             const visible = layer.visible ? "visible" : "hidden";
             const css_color = layer.color.to_css();
             items.push(
-                html` <kc-layer-control-item
+                html` <kc-board-layer-control
                     layer-name="${layer.name}"
                     layer-color="${css_color}"
-                    layer-visibility="${visible}"></kc-layer-control-item>`,
+                    layer-visibility="${visible}"></kc-board-layer-control>`,
             );
         }
 
@@ -135,10 +135,10 @@ export class KCLayerControlsElement extends WithContext(CustomElement) {
     }
 }
 
-class KCLayerControlItemElement extends CustomElement {
+class KCBoardLayerControlElement extends CustomElement {
     static override useShadowRoot = false;
-    static select_event = "kicanvas:layer-control-item:select";
-    static visibility_event = "kicanvas:layer-control-item:visibility";
+    static select_event = "kicanvas:layer-control:select";
+    static visibility_event = "kicanvas:layer-control:visibility";
 
     constructor() {
         super();
@@ -154,12 +154,12 @@ class KCLayerControlItemElement extends CustomElement {
 
             // Visibility button clicked.
             if (button) {
-                event_name = KCLayerControlItemElement.visibility_event;
+                event_name = KCBoardLayerControlElement.visibility_event;
             }
             // Otherwise, some other part of the element was clicked so it's
             // "selected".
             else {
-                event_name = KCLayerControlItemElement.select_event;
+                event_name = KCBoardLayerControlElement.select_event;
             }
 
             this.dispatchEvent(
@@ -217,8 +217,11 @@ class KCLayerControlItemElement extends CustomElement {
 }
 
 window.customElements.define(
-    "kc-layer-control-item",
-    KCLayerControlItemElement,
+    "kc-board-layer-control",
+    KCBoardLayerControlElement,
 );
 
-window.customElements.define("kc-layer-controls", KCLayerControlsElement);
+window.customElements.define(
+    "kc-board-layers-panel",
+    KCBoardLayersPanelElement,
+);

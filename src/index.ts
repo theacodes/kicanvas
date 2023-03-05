@@ -4,10 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import "./elements/kc-board/kc-board-viewer";
 import "./elements/kc-ui";
-import "./elements/kicanvas-board";
-import "./elements/kc-layer-controls";
-import "./elements/kicanvas-schematic";
-import "./elements/kicanvas-dialog";
-import "./elements/kc-board-viewer";
 import "./elements/kicanvas-app";
+import "./elements/kicanvas-board";
+import "./elements/kicanvas-dialog";
+import "./elements/kicanvas-schematic";

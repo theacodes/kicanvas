@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Footprint } from "../board/items";
-import { html, CustomElement } from "../dom/custom-elements";
+import { Footprint } from "../../board/items";
+import { html, CustomElement } from "../../dom/custom-elements";
 
 export class KCBoardPropertiesPanelElement extends CustomElement {
     static override useShadowRoot = false;

@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BoardViewer } from "../board/viewer";
-import { WithContext } from "../dom/context";
-import { html, CustomElement } from "../dom/custom-elements";
+import { BoardViewer } from "../../board/viewer";
+import { WithContext } from "../../dom/context";
+import { html, CustomElement } from "../../dom/custom-elements";
 
 export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;

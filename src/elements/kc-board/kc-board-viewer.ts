@@ -4,25 +4,25 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Footprint } from "../board/items";
-import { WithContext } from "../dom/context";
-import { CustomElement, html } from "../dom/custom-elements";
-import { KiCanvasSelectEvent } from "../framework/events";
+import { Footprint } from "../../board/items";
+import { WithContext } from "../../dom/context";
+import { CustomElement, html } from "../../dom/custom-elements";
+import { KiCanvasSelectEvent } from "../../framework/events";
+import { KCUIActivitySideBarElement } from "../kc-ui-activity-side-bar";
+import { KiCanvasBoardElement } from "../kicanvas-board";
 import { KCBoardFootprintsPanelElement } from "./kc-board-footprints-panel";
 import { KCBoardInfoPanelElement } from "./kc-board-info-panel";
 import { KCBoardNetsPanelElement } from "./kc-board-nets-panel";
 import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
-import { KCLayerControlsElement } from "./kc-layer-controls";
-import { KCUIActivitySideBarElement } from "./kc-ui-activity-side-bar";
-import { KiCanvasBoardElement } from "./kicanvas-board";
+import { KCBoardLayersPanelElement } from "./kc-board-layers-panel";
 
 // import dependent elements so they're registered before use.
-import "./kc-ui-activity-side-bar";
+import "../kc-ui-activity-side-bar";
 import "./kc-board-footprints-panel";
 import "./kc-board-info-panel";
 import "./kc-board-nets-panel";
 import "./kc-board-properties-panel";
-import "./kc-layer-controls";
+import "./kc-board-layers-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -71,7 +71,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
 
         const layer_controls_elm =
-            html`<kc-layer-controls></kc-layer-controls>` as KCLayerControlsElement;
+            html`<kc-board-layers-panel></kc-board-layers-panel>` as KCBoardLayersPanelElement;
 
         const nets_panel_elm =
             html`<kc-board-nets-panel></kc-board-nets-panel>` as KCBoardNetsPanelElement;

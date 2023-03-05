@@ -1,4 +1,4 @@
-kc-layer-controls {
+kc-board-layers-panel {
     display: block;
     height: 100%;
     overflow-y: auto;
@@ -6,11 +6,11 @@ kc-layer-controls {
     user-select: none;
 }
 
-kc-layer-controls kc-ui-panel-body {
+kc-board-layers-panel kc-ui-panel-body {
     padding: 0;
 }
 
-kc-layer-controls button {
+kc-board-layers-panel button {
     all: unset;
     flex-shrink: 0;
     margin-left: 1rem;
@@ -23,7 +23,7 @@ kc-layer-controls button {
     align-items: center;
 }
 
-kc-layer-control-item {
+kc-board-layer-control {
     box-sizing: border-box;
     padding: 0.1rem 0.8rem 0.1rem 0.4rem;
     color: white;
@@ -34,36 +34,36 @@ kc-layer-control-item {
     align-items: center;
 }
 
-kc-layer-control-item:hover {
+kc-board-layer-control:hover {
     background-color: var(--list-item-hover-bg);
     color: var(--list-item-hover-fg);
 }
 
-kc-layer-control-item:hover button {
+kc-board-layer-control:hover button {
     color: var(--list-item-bg);
 }
 
-kc-layer-control-item:hover button:hover {
+kc-board-layer-control:hover button:hover {
     background: transparent;
     box-shadow: none;
     color: var(--list-item-fg);
 }
 
-kc-layer-control-item[layer-highlighted] {
+kc-board-layer-control[layer-highlighted] {
     background-color: var(--list-item-active-bg);
     color: var(--list-item-active-fg);
 }
 
-kc-layer-control-item[layer-highlighted]:hover button {
+kc-board-layer-control[layer-highlighted]:hover button {
     color: var(--list-item-fg);
 }
 
-kc-layer-control-item[layer-visibility="hidden"] {
+kc-board-layer-control[layer-visibility="hidden"] {
     background-color: var(--list-item-disabled-bg);
     color: var(--list-item-disabled-fg);
 }
 
-kc-layer-control-item .color {
+kc-board-layer-control .color {
     flex-shrink: 0;
     display: block;
     width: 1rem;
@@ -71,21 +71,21 @@ kc-layer-control-item .color {
     margin-right: 0.5rem;
 }
 
-kc-layer-control-item .name {
+kc-board-layer-control .name {
     display: block;
     flex-grow: 1;
 }
 
-kc-layer-control-item .icon.for-hidden {
+kc-board-layer-control .icon.for-hidden {
     color: #888;
 }
 
-kc-layer-control-item[layer-visibility="hidden"] .icon.for-visible,
-kc-layer-control-item[layer-visibility="visible"] .icon.for-hidden {
+kc-board-layer-control[layer-visibility="hidden"] .icon.for-visible,
+kc-board-layer-control[layer-visibility="visible"] .icon.for-hidden {
     display: none;
 }
 
-kc-layer-control-item[layer-visibility="hidden"] .icon.for-hidden,
-kc-layer-control-item[layer-visibility="visible"] .icon.for-visible {
+kc-board-layer-control[layer-visibility="hidden"] .icon.for-hidden,
+kc-board-layer-control[layer-visibility="visible"] .icon.for-visible {
     display: revert;
 }

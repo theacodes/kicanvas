@@ -4,13 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { CustomElement, html } from "../dom/custom-elements";
 import { DropTarget } from "../dom/drag-drop";
 import * as theme from "../kicad/theme";
-import { KiCanvasSchematicElement } from "./kicanvas-schematic";
-import { CustomElement, html } from "../dom/custom-elements";
-import kicanvas_app_styles from "./kicanvas-app.css";
 import { GitHubUserContent } from "../services/github";
-import { KCBoardViewerElement } from "./kc-board-viewer";
+import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
+import kicanvas_app_styles from "./kicanvas-app.css";
+import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = kicanvas_app_styles;
