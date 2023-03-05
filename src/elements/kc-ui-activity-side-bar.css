@@ -31,13 +31,7 @@ div.bar {
 }
 
 div.start {
-    display: block;
     flex: 1;
-}
-
-div.end {
-    display: block;
-    flex: 0 1;
 }
 
 div.activities {
