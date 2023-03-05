@@ -13,6 +13,7 @@ import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
 import "./kc-schematic-properties-panel";
+import "./kc-schematic-info-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -56,6 +57,9 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
             <kc-ui-activity slot="activities" name="Properties" icon="list">
                 <kc-schematic-properties-panel></kc-schematic-properties-panel>
+            </kc-ui-activity>
+            <kc-ui-activity slot="activities" name="Info" icon="info">
+                <kc-schematic-info-panel></kc-schematic-info-panel>
             </kc-ui-activity>
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
