@@ -327,7 +327,8 @@ button.danger:hover {
     Icons
 */
 
-kc-ui-icon {
+kc-ui-icon,
+kc-ui-app ::part(icon) {
     font-family: "Material Symbols Outlined";
     font-weight: normal;
     font-style: normal;

@@ -71,8 +71,19 @@ export class CustomElement extends HTMLElement {
      */
     static useShadowRoot = true;
 
+    /**
+     * Exports nested shadow dom parts
+     * https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/exportparts
+     */
+    static exportparts: string[] = [];
+
     constructor() {
         super();
+
+        const static_this = this.constructor as typeof CustomElement;
+        if (static_this.exportparts) {
+            this.setAttribute("exportparts", static_this.exportparts.join(","));
+        }
     }
 
     /**

@@ -73,25 +73,6 @@ button:focus {
     outline: none;
 }
 
-kc-ui-icon {
-    font-family: "Material Symbols Outlined";
-    font-weight: normal;
-    font-style: normal;
-    font-size: inherit;
-    line-height: inherit;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: "liga";
-    -moz-font-feature-settings: "liga";
-    font-feature-settings: "liga";
-    -webkit-font-smoothing: antialiased;
-    user-select: none;
-}
-
 ::slotted(kc-ui-activity) {
     display: none;
     height: 100%;

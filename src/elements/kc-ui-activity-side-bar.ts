@@ -14,6 +14,7 @@ import kc_ui_activity_side_bar_styles from "./kc-ui-activity-side-bar.css";
 export class KCUIActivitySideBarElement extends CustomElement {
     static override useShadowRoot = true;
     static override styles = kc_ui_activity_side_bar_styles;
+    static override exportparts = ["icon"];
 
     #activity: string | null | undefined;
 
@@ -44,7 +45,7 @@ export class KCUIActivitySideBarElement extends CustomElement {
                         tooltip-left="${name}"
                         name="${name?.toLowerCase()}"
                         title="${name}">
-                        <kc-ui-icon>${icon}</kc-ui-icon>
+                        <kc-ui-icon part="icon">${icon}</kc-ui-icon>
                     </button>
                 ` as Element,
             );
