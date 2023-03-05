@@ -107,6 +107,7 @@
     --input-error-fg: #f8f8f0;
     --input-error-bg: #cb6488;
     --input-error-border: #cb6488;
+    --input-range-bg: #8077a8;
     --input-range-handle-shadow: 1px 1px 5px 5px rgba(180, 180, 180, 0.2);
 
     --list-item-bg: var(--panel-bg);
@@ -244,7 +245,7 @@ input[type="range"]:focus {
 
 input[type="range"]::-webkit-slider-runnable-track {
     box-sizing: border-box;
-    background: var(--input-bg);
+    background: var(--input-range-bg);
     height: 0.5rem;
     border: 1px solid transparent;
     border-radius: 0.5rem;
@@ -467,7 +468,7 @@ kc-ui-panel-header-actions {
 kc-ui-panel-body {
     width: 100%;
     min-height: 0;
-    padding: 0rem 0.5rem 0rem 0.5rem;
+    padding: 0.1rem 0.8rem 0.1rem 0.4rem;
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1 0;
@@ -531,10 +532,13 @@ ul.item-list li {
     flex-wrap: nowrap;
     padding: 0.2rem;
     user-select: none;
-    border-bottom: 1px solid var(--grid-outline);
     background-color: transparent;
     transition: color var(--transition-time-short) ease,
         background-color var(--transition-time-short) ease;
+}
+
+ul.item-list.outline li {
+    border-bottom: 1px solid var(--grid-outline);
 }
 
 ul.item-list li:hover {
@@ -579,4 +583,46 @@ ul.item-list li[aria-disabled="true"] {
     cursor: pointer;
     background-color: var(--list-item-disabled-bg);
     color: var(--list-item-disabled-fg);
+}
+
+/*
+    Control lists
+*/
+
+ul.control-list {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    background-color: var(--list-item-bg);
+    color: var(--list-item-fg);
+}
+
+ul.control-list li {
+    all: unset;
+    box-sizing: border-box;
+    margin-top: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    user-select: none;
+    background-color: transparent;
+    transition: color var(--transition-time-short) ease,
+        background-color var(--transition-time-short) ease;
+}
+
+ul.control-list li label {
+    flex: 1 1 100%;
+    display: block;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+ul.control-list li input {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
 }
