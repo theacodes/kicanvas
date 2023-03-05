@@ -665,7 +665,7 @@ export class LibSymbol {
     };
     in_bom = false;
     on_board = false;
-    properties: Property[] = [];
+    properties: Map<string, Property> = new Map();
     children: LibSymbol[] = [];
     drawings: Drawing[] = [];
     pins: PinDefinition[] = [];
@@ -691,7 +691,12 @@ export class LibSymbol {
                 ),
                 P.pair("in_bom", T.boolean),
                 P.pair("on_board", T.boolean),
-                P.collection("properties", "property", T.item(Property, this)),
+                P.mapped_collection(
+                    "properties",
+                    "property",
+                    (p: Property) => p.name,
+                    T.item(Property, this),
+                ),
                 P.collection("pins", "pin", T.item(PinDefinition, this)),
                 P.collection("children", "symbol", T.item(LibSymbol, this)),
                 P.collection("drawings", "arc", T.item(Arc, this)),
@@ -708,7 +713,7 @@ export class LibSymbol {
             this.#pins_by_number.set(pin.number.text, pin);
         }
 
-        for (const property of this.properties) {
+        for (const property of this.properties.values()) {
             this.#properties_by_id.set(property.id, property);
         }
 
@@ -747,7 +752,7 @@ export class LibSymbol {
         );
     }
 
-    has_property(id: number) {
+    has_property_with_id(id: number) {
         return this.#properties_by_id.has(id);
     }
 
@@ -756,11 +761,23 @@ export class LibSymbol {
             return this.#properties_by_id.get(id)!;
         }
         for (const child of this.children) {
-            if (child.has_property(id)) {
+            if (child.has_property_with_id(id)) {
                 return child.property_by_id(id);
             }
         }
         return null;
+    }
+
+    get unit_count(): number {
+        // Unit 0 is common to all units, so it doesn't count towards
+        // the total number of units.
+        let count = this.units.size;
+
+        if (this.units.has(0)) {
+            count -= 1;
+        }
+
+        return count;
     }
 
     get unit(): number | null {
@@ -773,6 +790,22 @@ export class LibSymbol {
         }
 
         return parseInt(parts.at(-2)!, 10);
+    }
+
+    get description(): string {
+        return this.properties.get("ki_description")?.text ?? "";
+    }
+
+    get keywords(): string {
+        return this.properties.get("ki_keywords")?.text ?? "";
+    }
+
+    get footprint_filters(): string {
+        return this.properties.get("ki_fp_filters")?.text ?? "";
+    }
+
+    get units_interchangable(): boolean {
+        return this.properties.get("ki_locked")?.text ? false : true;
     }
 }
 
@@ -1077,6 +1110,15 @@ export class SchematicSymbol {
         } while (unit > 0);
 
         return suffix;
+    }
+
+    get unit_pins() {
+        return this.pins.filter((pin) => {
+            if (this.unit && pin.unit && this.unit != pin.unit) {
+                return false;
+            }
+            return true;
+        });
     }
 }
 
