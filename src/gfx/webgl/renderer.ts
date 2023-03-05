@@ -23,7 +23,7 @@ export class WebGL2Renderer extends Renderer {
     #active_layer: WebGL2RenderLayer | null;
 
     /** Projection matrix for clip -> screen */
-    projection_matrix: Matrix3;
+    projection_matrix: Matrix3 = Matrix3.identity();
 
     /** WebGL backend */
     gl?: WebGL2RenderingContext;
