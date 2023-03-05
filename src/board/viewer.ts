@@ -113,6 +113,48 @@ export class BoardViewer extends Viewer {
         this.draw();
     }
 
+    private set_layers_opacity(layers: Generator<ViewLayer>, opacity: number) {
+        for (const layer of layers) {
+            layer.opacity = opacity;
+        }
+        this.draw();
+    }
+
+    set track_opacity(value: number) {
+        this.set_layers_opacity(
+            (this.layers as LayerSet).copper_layers(),
+            value,
+        );
+    }
+
+    set via_opacity(value: number) {
+        this.set_layers_opacity((this.layers as LayerSet).via_layers(), value);
+    }
+
+    set zone_opacity(value: number) {
+        this.set_layers_opacity((this.layers as LayerSet).zone_layers(), value);
+    }
+
+    set pad_opacity(value: number) {
+        this.set_layers_opacity((this.layers as LayerSet).pad_layers(), value);
+    }
+
+    set pad_hole_opacity(value: number) {
+        this.set_layers_opacity(
+            (this.layers as LayerSet).pad_hole_layers(),
+            value,
+        );
+    }
+
+    set grid_opacity(value: number) {
+        this.set_layers_opacity((this.layers as LayerSet).grid_layers(), value);
+    }
+
+    set page_opacity(value: number) {
+        this.layers.by_name(LayerNames.drawing_sheet)!.opacity = value;
+        this.draw();
+    }
+
     look_at_sheet() {
         this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
     }
