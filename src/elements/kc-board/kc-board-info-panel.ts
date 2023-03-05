@@ -63,7 +63,6 @@ export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
                             `${board_bbox.w.toFixed(1)} x
                             ${board_bbox.h.toFixed(1)} mm`,
                         )}
-                        </div>
                         ${entry("Footprints", board.footprints.length)}
                         ${entry("Nets", board.nets.length)}
                         ${entry("Track segments", board.segments.length)}
