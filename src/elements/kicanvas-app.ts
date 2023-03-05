@@ -9,10 +9,12 @@ import { DropTarget } from "../dom/drag-drop";
 import * as theme from "../kicad/theme";
 import { GitHubUserContent } from "../services/github";
 import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
+import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
-import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 
 import "./kc-ui/kc-ui";
+import "./kc-board/kc-board-viewer";
+import "./kc-schematic/kc-schematic-viewer";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = kicanvas_app_styles;
@@ -54,14 +56,14 @@ class KiCanvasAppElement extends CustomElement {
 
         const extension = src.name.split(".").at(-1);
 
-        let view_elem: KiCanvasSchematicElement | KCBoardViewerElement;
+        let view_elem: KCSchematicViewerElement | KCBoardViewerElement;
         let content;
 
         switch (extension) {
             case "kicad_sch":
                 view_elem =
-                    html`<kicanvas-schematic></kicanvas-schematic>` as KiCanvasSchematicElement;
-                content = html`<main>${view_elem}</main>`;
+                    html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
+                content = html`<kc-ui-app>${view_elem}</kc-ui-app>`;
                 break;
 
             case "kicad_pcb":

@@ -13,19 +13,24 @@ export class KiCanvasSchematicElement extends CustomElement {
     viewer: SchematicViewer;
     selected: any[] = [];
 
-    constructor() {
-        super();
-    }
-
     get loaded() {
         return this.getBooleanAttribute("loaded");
     }
 
     set loaded(value) {
+        const old = this.loaded;
         this.setBooleanAttribute("loaded", value);
+        if (value == true && !old) {
+            this.dispatchEvent(new KiCanvasLoadEvent());
+        }
     }
 
     override initialContentCallback() {
+        this.viewer = new SchematicViewer(this.#canvas);
+        this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+            this.loaded = true;
+        });
+
         const src = this.getAttribute("src");
         if (src) {
             this.load(src);
@@ -33,20 +38,15 @@ export class KiCanvasSchematicElement extends CustomElement {
     }
 
     override disconnectedCallback() {
-        if (this.viewer) {
-            this.viewer.dispose();
-        }
+        this.viewer?.dispose();
         this.selected = [];
     }
 
     async load(src: File | string) {
-        this.viewer = new SchematicViewer(this.#canvas);
-
         await this.viewer.setup();
         await this.viewer.load(src);
 
         this.loaded = true;
-        this.dispatchEvent(new KiCanvasLoadEvent());
 
         this.viewer.draw();
     }
