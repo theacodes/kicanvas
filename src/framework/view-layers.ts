@@ -40,6 +40,11 @@ export class ViewLayer {
     color: Color;
 
     /**
+     * The layer opacity is used when rendering the layer.
+     */
+    opacity: number;
+
+    /**
      * Board or schematic items on this layer.
      */
     items: any[];
@@ -170,7 +175,7 @@ export class ViewLayerSet {
 
         for (const layer of this.in_display_order()) {
             if (layer.visible && layer.graphics) {
-                let alpha = 1;
+                let alpha = layer.opacity;
 
                 if (should_dim && !layer.highlighted) {
                     alpha = 0.25;
