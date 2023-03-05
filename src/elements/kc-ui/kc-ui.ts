@@ -12,7 +12,7 @@
  *
  */
 
-import { CustomElement } from "../dom/custom-elements";
+import { CustomElement } from "../../dom/custom-elements";
 import kc_ui_styles from "./kc-ui.css";
 
 /**

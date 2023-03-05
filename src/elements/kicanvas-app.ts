@@ -12,7 +12,7 @@ import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
 import { KiCanvasSchematicElement } from "./kicanvas-schematic";
 
-import "./kc-ui";
+import "./kc-ui/kc-ui";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = kicanvas_app_styles;

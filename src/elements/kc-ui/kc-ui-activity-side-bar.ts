@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CustomElement, html } from "../dom/custom-elements";
+import { CustomElement, html } from "../../dom/custom-elements";
 import kc_ui_activity_side_bar_styles from "./kc-ui-activity-side-bar.css";
 
 /**

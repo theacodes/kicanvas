@@ -7,11 +7,11 @@
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
-import { KCUIActivitySideBarElement } from "../kc-ui-activity-side-bar";
+import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
 import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
-import "../kc-ui-activity-side-bar";
+import "../kc-ui/kc-ui-activity-side-bar";
 import "./kc-board-footprints-panel";
 import "./kc-board-info-panel";
 import "./kc-board-layers-panel";

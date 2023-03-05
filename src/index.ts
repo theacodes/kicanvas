@@ -5,7 +5,6 @@
 */
 
 import "./elements/kc-board/kc-board-viewer";
-import "./elements/kc-ui";
 import "./elements/kicanvas-app";
 import "./elements/kicanvas-board";
 import "./elements/kicanvas-dialog";
