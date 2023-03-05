@@ -21,7 +21,7 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
 
     get items(): KCBoardLayerControlElement[] {
         return Array.from(
-            this.panel_body?.querySelectorAll("kc-layer-control-item") ?? [],
+            this.panel_body?.querySelectorAll("kc-board-layer-control") ?? [],
         );
     }
 
@@ -84,6 +84,7 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
         this.renderRoot
             .querySelector("button")
             ?.addEventListener("click", (e) => {
+                e.stopPropagation();
                 if (this.items.some((n) => n.layer_visible)) {
                     // hide all layers.
                     for (const item of this.items) {
