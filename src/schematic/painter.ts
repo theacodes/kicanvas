@@ -655,10 +655,7 @@ class SchematicSymbolPainter extends ItemPainter {
                 LayerName.interactive,
             ].includes(layer.name as LayerName)
         ) {
-            for (const pin of si.pins) {
-                if (si.unit && pin.unit && si.unit != pin.unit) {
-                    continue;
-                }
+            for (const pin of si.unit_pins) {
                 this.view_painter.paint_item(layer, pin);
             }
         }
