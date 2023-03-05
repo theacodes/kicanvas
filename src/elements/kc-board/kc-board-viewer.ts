@@ -4,13 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Footprint } from "../../board/items";
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
 import { KCUIActivitySideBarElement } from "../kc-ui-activity-side-bar";
 import { KiCanvasBoardElement } from "../kicanvas-board";
-import { KCBoardPropertiesPanelElement } from "./kc-board-properties-panel";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui-activity-side-bar";
@@ -31,7 +29,6 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
 
     board_elm: KiCanvasBoardElement;
     activity_bar_elm: KCUIActivitySideBarElement;
-    properties_panel_elm: KCBoardPropertiesPanelElement;
 
     constructor() {
         super();
@@ -43,12 +40,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
     }
 
     override initialContentCallback() {
-        // When an item is selected, update the properties panel and footprints
-        // panel.
         this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
-            this.properties_panel_elm.selected_item = e.detail
-                .item as Footprint;
-
             // Selecting the same item twice should show the properties panel.
             if (e.detail.item && e.detail.item == e.detail.previous) {
                 this.activity_bar_elm.change_activity("properties");
@@ -65,9 +57,6 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
     override render() {
         this.board_elm =
             html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
-
-        this.properties_panel_elm =
-            html`<kc-board-properties-panel></kc-board-properties-panel>` as KCBoardPropertiesPanelElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
             <kc-ui-activity slot="activities" name="Layers" icon="layers">
@@ -86,7 +75,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
                 <kc-board-nets-panel></kc-board-nets-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Properties" icon="list">
-                ${this.properties_panel_elm}
+                <kc-board-properties-panel></kc-board-properties-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Board info" icon="info">
                 <kc-board-info-panel></kc-board-info-panel>

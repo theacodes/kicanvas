@@ -5,15 +5,30 @@
 */
 
 import { Footprint } from "../../board/items";
-import { html, CustomElement } from "../../dom/custom-elements";
+import { BoardViewer } from "../../board/viewer";
+import { WithContext } from "../../dom/context";
+import { CustomElement, html } from "../../dom/custom-elements";
+import { KiCanvasSelectEvent } from "../../framework/events";
 
-export class KCBoardPropertiesPanelElement extends CustomElement {
+export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
-    private priv_selected_item: Footprint;
+    viewer: BoardViewer;
+    selected_item?: Footprint;
 
-    set selected_item(item: Footprint) {
-        this.priv_selected_item = item;
-        this.update();
+    override connectedCallback() {
+        (async () => {
+            this.viewer = await this.requestLazyContext("viewer");
+            await this.viewer.loaded;
+            super.connectedCallback();
+            this.setup_events();
+        })();
+    }
+
+    private setup_events() {
+        this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+            this.selected_item = e.detail.item as Footprint;
+            this.update();
+        });
     }
 
     override render() {
@@ -29,10 +44,10 @@ export class KCBoardPropertiesPanelElement extends CustomElement {
 
         let entries;
 
-        if (!this.priv_selected_item) {
+        if (!this.selected_item) {
             entries = header("No item selected");
         } else {
-            const itm = this.priv_selected_item;
+            const itm = this.selected_item;
 
             const properties = Object.entries(itm.properties)
                 .map(([k, v]) => {
