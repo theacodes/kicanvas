@@ -21,6 +21,7 @@ export { ViewLayer };
  * for drill holes and such.
  */
 export enum LayerNames {
+    grid = ViewLayerName.grid,
     drawing_sheet = ViewLayerName.drawing_sheet,
     dwgs_user = "Dwgs.User",
     cmts_user = "Cmts.User",
@@ -276,6 +277,16 @@ export class LayerSet extends BaseLayerSet {
         switch (layer_name) {
             case LayerNames.drawing_sheet:
                 return (this.theme["worksheet"] as Color) ?? Color.white;
+            case LayerNames.pads_front:
+                return (
+                    (this.theme["copper"] as Record<string, Color>)?.["f"] ??
+                    Color.white
+                );
+            case LayerNames.pads_back:
+                return (
+                    (this.theme["copper"] as Record<string, Color>)?.["b"] ??
+                    Color.white
+                );
             case LayerNames.via_holes:
                 return (this.theme["via_hole"] as Color) ?? Color.white;
             case LayerNames.via_holewalls:
@@ -346,13 +357,67 @@ export class LayerSet extends BaseLayerSet {
         }
     }
 
+    *copper_layers() {
+        for (const name of CopperLayerNames) {
+            const layer = this.by_name(name);
+            if (layer) {
+                yield layer;
+            }
+        }
+    }
+
+    *via_layers() {
+        yield this.by_name(LayerNames.via_holes)!;
+        yield this.by_name(LayerNames.via_holewalls)!;
+
+        for (const copper_name of CopperLayerNames) {
+            for (const virtual_name of [
+                CopperVirtualLayerNames.bb_via_hole_walls,
+                CopperVirtualLayerNames.bb_via_holes,
+            ]) {
+                const layer = this.by_name(
+                    virtual_layer_for(copper_name, virtual_name),
+                );
+                if (layer) {
+                    yield layer;
+                }
+            }
+        }
+    }
+
+    *zone_layers() {
+        for (const copper_name of CopperLayerNames) {
+            const zones_name = virtual_layer_for(
+                copper_name,
+                CopperVirtualLayerNames.zones,
+            );
+            const layer = this.by_name(zones_name);
+            if (layer) {
+                yield layer;
+            }
+        }
+    }
+
+    *pad_layers() {
+        yield this.by_name(LayerNames.pads_front)!;
+        yield this.by_name(LayerNames.pads_back)!;
+    }
+
+    *pad_hole_layers() {
+        yield this.by_name(LayerNames.pad_holes)!;
+        yield this.by_name(LayerNames.pad_holewalls)!;
+    }
+
+    *grid_layers() {
+        yield this.by_name(ViewLayerName.grid)!;
+    }
+
     /**
      * @returns true if any copper layer is enabled and visible.
      */
     is_any_copper_layer_visible(): boolean {
-        for (const name of CopperLayerNames) {
-            const layer = this.by_name(name);
-            if (layer?.visible) {
+        for (const layer of this.copper_layers()) {
+            if (layer.visible) {
                 return true;
             }
         }
