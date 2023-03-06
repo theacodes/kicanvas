@@ -71,9 +71,7 @@ export class BoardViewer extends Viewer {
 
         for (const { layer: _, bbox } of items) {
             if (bbox.context instanceof board_items.Footprint) {
-                // use the nominal footprint bbox, since this bbox may
-                // just be from a pad or something.
-                selected = bbox.context.bbox;
+                selected = bbox.context;
                 break;
             }
         }
