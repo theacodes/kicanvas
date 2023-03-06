@@ -163,6 +163,11 @@ export class KicadSch {
         }
         return null;
     }
+
+    get text_vars(): Map<string, string | undefined> {
+        const vars = new Map(this.title_block?.text_vars);
+        return vars;
+    }
 }
 
 export class Fill {
