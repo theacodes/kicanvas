@@ -58,7 +58,19 @@ export class DrawingSheet {
     }
 
     get text_vars(): Map<string, string | undefined> {
-        return this.document?.text_vars || new Map();
+        const vars = this.document?.text_vars || new Map();
+        vars.set("PAPER", this.paper?.size || "");
+        // TODO: Mock values for now, should be provided by the project
+        // when that's implemented.
+        // Sheet number
+        vars.set("#", "1");
+        // Sheet count
+        vars.set("##", "1");
+        // Sheet path (hierarchical path)
+        vars.set("SHEETPATH", "/");
+        // KiCAD Version
+        vars.set("KICAD_VERSION", "KiCanvas Alpha");
+        return vars;
     }
 
     get paper() {
