@@ -47,10 +47,13 @@ export class SchematicViewer extends Viewer {
         }
 
         // Setup graphical layers
-        this.layers = new LayerSet();
+        this.layers = new LayerSet(this.renderer.theme);
 
         // Paint the schematic
-        this.#painter = new SchematicPainter(this.renderer, this.layers);
+        this.#painter = new SchematicPainter(
+            this.renderer,
+            this.layers as LayerSet,
+        );
         this.#painter.paint(this.schematic);
 
         // Paint the drawing sheet

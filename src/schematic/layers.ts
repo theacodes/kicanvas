@@ -5,10 +5,11 @@
 */
 
 import {
-    ViewLayerSet as BaseLayerSet,
     ViewLayerName as BaseLayerName,
+    ViewLayerSet as BaseLayerSet,
     ViewLayer,
 } from "../framework/view-layers";
+import { Color } from "../gfx/color";
 export { ViewLayer };
 
 export enum LayerName {
@@ -42,10 +43,7 @@ export enum LayerName {
  * "virtual" layers used to make sure things are drawn in the right order.
  */
 export class LayerSet extends BaseLayerSet {
-    /**
-     * Create a new LayerSet
-     */
-    constructor() {
+    constructor(public theme: Record<string, Color | Record<string, Color>>) {
         super();
 
         for (const name of Object.values(LayerName)) {
@@ -53,6 +51,8 @@ export class LayerSet extends BaseLayerSet {
         }
 
         this.by_name(LayerName.interactive)!.visible = false;
+        this.by_name(LayerName.drawing_sheet)!.color =
+            (this.theme["worksheet"] as Color) ?? Color.white;
     }
 
     override *interactive_layers(): Generator<ViewLayer, void, unknown> {
