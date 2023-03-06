@@ -314,6 +314,18 @@ export class ViewLayerSet {
     }
 
     /**
+     * @yields bboxes on interactive layers for the given item.
+     */
+    *query_item_bboxes(item: any) {
+        for (const layer of this.interactive_layers()) {
+            const bbox = layer.bboxes.get(item);
+            if (bbox) {
+                yield bbox;
+            }
+        }
+    }
+
+    /**
      * @return a bounding box encompassing all elements from all layers.
      */
     get bbox() {
