@@ -6,6 +6,7 @@
 
 import {
     ViewLayerSet as BaseLayerSet,
+    ViewLayerName as BaseLayerName,
     ViewLayer,
 } from "../framework/view-layers";
 export { ViewLayer };
@@ -30,7 +31,8 @@ export enum LayerName {
     symbol_pin = ":Symbol:Pin",
     // symbol body fill
     symbol_background = ":Symbol:Background",
-    grid = ":Grid",
+    drawing_sheet = BaseLayerName.drawing_sheet,
+    grid = BaseLayerName.grid,
 }
 
 /**

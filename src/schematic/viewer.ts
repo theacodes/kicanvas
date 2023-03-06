@@ -5,6 +5,7 @@
 */
 
 import { DrawingSheet } from "../drawing_sheet/items";
+import { DrawingSheetPainter } from "../drawing_sheet/painter";
 import { Viewer } from "../framework/viewer";
 import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
 import { Renderer } from "../gfx/renderer";
@@ -39,7 +40,7 @@ export class SchematicViewer extends Viewer {
         // Parse the schematic and load the default drawing sheet
         this.schematic = new KicadSch(sch_text);
         this.drawing_sheet = DrawingSheet.default();
-        //this.drawing_sheet.document = this.schematic;
+        this.drawing_sheet.document = this.schematic;
 
         if (this.layers) {
             this.layers.dispose();
@@ -53,9 +54,9 @@ export class SchematicViewer extends Viewer {
         this.#painter.paint(this.schematic);
 
         // Paint the drawing sheet
-        // new DrawingSheetPainter(this.renderer, this.layers as LayerSet).paint(
-        //     this.drawing_sheet,
-        // );
+        new DrawingSheetPainter(this.renderer, this.layers as LayerSet).paint(
+            this.drawing_sheet,
+        );
 
         const bb = this.layers.bbox;
         this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
