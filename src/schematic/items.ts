@@ -68,7 +68,7 @@ export class KicadSch {
     symbol_instances?: SymbolInstances;
     sheets: SchematicSheet[] = [];
 
-    constructor(expr: Parseable) {
+    constructor(public filename: string, expr: Parseable) {
         Object.assign(
             this,
             parse_expr(
@@ -166,6 +166,7 @@ export class KicadSch {
 
     get text_vars(): Map<string, string | undefined> {
         const vars = new Map(this.title_block?.text_vars);
+        vars.set("FILENAME", this.filename);
         return vars;
     }
 }

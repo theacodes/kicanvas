@@ -46,7 +46,7 @@ export class KicadPCB {
     drawings: Drawing[] = [];
     groups: Group[] = [];
 
-    constructor(expr: Parseable) {
+    constructor(public filename: string, expr: Parseable) {
         Object.assign(
             this,
             parse_expr(
@@ -95,6 +95,7 @@ export class KicadPCB {
         for (const p of this.properties) {
             vars.set(p.name, p.value);
         }
+        vars.set("FILENAME", this.filename);
         return vars;
     }
 

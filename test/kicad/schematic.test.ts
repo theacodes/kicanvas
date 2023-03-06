@@ -17,7 +17,7 @@ import symbols_sch_src from "./files/symbols.kicad_sch";
 
 suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     test("with empty schematic file", function () {
-        const sch = new schematic.KicadSch(empty_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", empty_sch_src);
 
         assert_deep_partial(sch, {
             version: 20211123,
@@ -28,7 +28,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     });
 
     test("with paper settings & title block", function () {
-        const sch = new schematic.KicadSch(paper_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", paper_sch_src);
 
         assert_deep_partial(sch.paper, {
             size: "User",
@@ -53,7 +53,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     });
 
     test("with wires, buses, no connects, and junctions", function () {
-        const sch = new schematic.KicadSch(wires_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", wires_sch_src);
 
         assert.equal(sch.wires.length, 11);
 
@@ -159,7 +159,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     });
 
     test("with labels", function () {
-        const sch = new schematic.KicadSch(labels_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", labels_sch_src);
 
         assert.equal(sch.net_labels.length, 6);
         assert_deep_partial(sch.net_labels[0], {
@@ -243,7 +243,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     });
 
     test("with drawings", function () {
-        const sch = new schematic.KicadSch(drawings_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", drawings_sch_src);
 
         assert.equal(sch.drawings.length, 13);
 
@@ -310,7 +310,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     });
 
     test("with library symbols", function () {
-        const sch = new schematic.KicadSch(symbols_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", symbols_sch_src);
 
         assert.equal(sch.lib_symbols!.symbols.length, 4);
 
@@ -488,7 +488,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     });
 
     test("with symbols", function () {
-        const sch = new schematic.KicadSch(symbols_sch_src);
+        const sch = new schematic.KicadSch("test.kicad_sch", symbols_sch_src);
 
         assert.equal(sch.symbols.length, 5);
 

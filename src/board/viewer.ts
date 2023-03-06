@@ -29,14 +29,18 @@ export class BoardViewer extends Viewer {
 
     override async load(src: string | URL | File) {
         let pcb_text;
+        let pcb_filename;
         if (src instanceof File) {
             pcb_text = await src.text();
+            pcb_filename = src.name;
         } else {
             pcb_text = await (await window.fetch(src)).text();
+            pcb_filename =
+                new URL(src).pathname.split("/").at(-1) ?? "unknown.kicad_pcb";
         }
 
         // Parse the board and load the default drawing sheet.
-        this.board = new board_items.KicadPCB(pcb_text);
+        this.board = new board_items.KicadPCB(pcb_filename, pcb_text);
         this.drawing_sheet = DrawingSheet.default();
         this.drawing_sheet.document = this.board;
 

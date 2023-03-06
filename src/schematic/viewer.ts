@@ -31,14 +31,18 @@ export class SchematicViewer extends Viewer {
 
     override async load(src: string | URL | File) {
         let sch_text;
+        let sch_filename;
         if (src instanceof File) {
             sch_text = await src.text();
+            sch_filename = src.name;
         } else {
             sch_text = await (await window.fetch(src)).text();
+            sch_filename =
+                new URL(src).pathname.split("/").at(-1) ?? "unknown.kicad_sch";
         }
 
         // Parse the schematic and load the default drawing sheet
-        this.schematic = new KicadSch(sch_text);
+        this.schematic = new KicadSch(sch_filename, sch_text);
         this.drawing_sheet = DrawingSheet.default();
         this.drawing_sheet.document = this.schematic;
 
