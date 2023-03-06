@@ -10,9 +10,8 @@ import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
 import { Renderer } from "../gfx/renderer";
 import * as theme from "../kicad/theme";
 import { BBox } from "../math/bbox";
-import { Vec2 } from "../math/vec2";
-import { KicadSch } from "./items";
-import { LayerSet, ViewLayer } from "./layers";
+import { KicadSch, SchematicSymbol } from "./items";
+import { LayerSet } from "./layers";
 import { SchematicPainter } from "./painter";
 
 export class SchematicViewer extends Viewer {
@@ -67,17 +66,31 @@ export class SchematicViewer extends Viewer {
         this.set_loaded(true);
     }
 
-    protected override on_pick(
-        mouse: Vec2,
-        items: Generator<{ layer: ViewLayer; bbox: BBox }, void, unknown>,
+    public override select(
+        value: SchematicSymbol | string | BBox | null,
     ): void {
-        let selected = null;
+        let item = value;
 
-        for (const { bbox } of items) {
-            selected = bbox;
-            break;
+        // If item is a string, find the symbol by uuid or reference.
+        if (typeof item == "string") {
+            item = this.schematic.find_symbol(item);
         }
 
-        this.selected = selected;
+        // If it's a symbol, find the bounding box for it.
+        if (item instanceof SchematicSymbol) {
+            const bboxes = this.layers.query_item_bboxes(item);
+            item = bboxes.next().value ?? null;
+        }
+
+        // If value wasn't explicitly null and none of the above found a suitable
+        // selection, give up.
+        if (value != null && !(item instanceof BBox)) {
+            console.log(value, item);
+            throw new Error(
+                `Unable to select item ${value}, could not find an object that matched.`,
+            );
+        }
+
+        this.selected = item ?? null;
     }
 }
