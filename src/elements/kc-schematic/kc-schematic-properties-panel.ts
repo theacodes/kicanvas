@@ -18,7 +18,6 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
     selected_item?: SchematicSymbol;
 
     override connectedCallback() {
-        console.log("connected");
         (async () => {
             this.viewer = await this.requestLazyContext("viewer");
             await this.viewer.loaded;
