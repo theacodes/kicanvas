@@ -1094,6 +1094,14 @@ export class SchematicSymbol {
         }
     }
 
+    get reference() {
+        return this.get_property_text("Reference") ?? "?";
+    }
+
+    get value() {
+        return this.get_property_text("Value") ?? "";
+    }
+
     get unit_suffix() {
         if (!this.unit || this.lib_symbol.units.size <= 1) {
             return "";
