@@ -101,11 +101,6 @@ export abstract class Viewer extends EventTarget {
         }
     }
 
-    protected on_pick(
-        mouse: Vec2,
-        items: ReturnType<ViewLayerSet["query_point"]>,
-    ) {}
-
     protected on_draw() {
         if (!this.layers) {
             return;
@@ -123,6 +118,24 @@ export abstract class Viewer extends EventTarget {
         window.requestAnimationFrame(() => {
             this.on_draw();
         });
+    }
+
+    protected on_pick(
+        mouse: Vec2,
+        items: ReturnType<ViewLayerSet["query_point"]>,
+    ) {
+        let selected = null;
+
+        for (const { bbox } of items) {
+            selected = bbox;
+            break;
+        }
+
+        this.select(selected);
+    }
+
+    public select(item: BBox | null) {
+        this.selected = item;
     }
 
     public get selected(): BBox | null {
