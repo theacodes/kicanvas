@@ -81,15 +81,12 @@ export class BoardViewer extends Viewer {
         this.select(selected);
     }
 
-    select(item: board_items.Footprint | string | BBox | null) {
+    override select(value: board_items.Footprint | string | BBox | null) {
+        let item = value;
+
         // If item is a string, find the footprint by uuid or reference.
         if (typeof item == "string") {
-            for (const fp of this.board.footprints) {
-                if (fp.uuid == item || fp.reference == item) {
-                    item = fp;
-                    break;
-                }
-            }
+            item = this.board.find_footprint(item);
         }
 
         // If it's a footprint, use the footprint's nominal bounding box.
@@ -97,15 +94,15 @@ export class BoardViewer extends Viewer {
             item = item.bbox;
         }
 
-        // If item wasn't explicitly null and none of the above found a suitable
+        // If value wasn't explicitly null and none of the above found a suitable
         // selection, give up.
-        if (item != null && !(item instanceof BBox)) {
+        if (value != null && !(item instanceof BBox)) {
             throw new Error(
-                `Unable to select item ${item}, could not find an object that matched.`,
+                `Unable to select item ${value}, could not find an object that matched.`,
             );
         }
 
-        this.selected = item;
+        this.selected = item ?? null;
     }
 
     highlight_net(net: number) {
