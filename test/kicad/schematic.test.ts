@@ -321,32 +321,6 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
             pin_names: { offset: 0.254, hide: false },
             in_bom: true,
             on_board: true,
-            properties: [
-                {
-                    name: "Reference",
-                    text: "C",
-                    id: 0,
-                    at: { position: { x: 0.635, y: 2.54 }, rotation: 0 },
-                },
-                {
-                    name: "Value",
-                    text: "C",
-                    id: 1,
-                },
-                {
-                    name: "Footprint",
-                    text: "",
-                    id: 2,
-                },
-                {
-                    name: "Datasheet",
-                    text: "~",
-                    id: 3,
-                    effects: {
-                        hide: true,
-                    },
-                },
-            ],
             children: [
                 {
                     name: "C_0_1",
@@ -385,6 +359,34 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
                     ],
                 },
             ],
+        });
+
+        assert_deep_partial(lib_c?.properties.get("Reference"), {
+            name: "Reference",
+            text: "C",
+            id: 0,
+            at: { position: { x: 0.635, y: 2.54 }, rotation: 0 },
+        });
+
+        assert_deep_partial(lib_c?.properties.get("Value"), {
+            name: "Value",
+            text: "C",
+            id: 1,
+        });
+
+        assert_deep_partial(lib_c?.properties.get("Footprint"), {
+            name: "Footprint",
+            text: "",
+            id: 2,
+        });
+
+        assert_deep_partial(lib_c?.properties.get("Datasheet"), {
+            name: "Datasheet",
+            text: "~",
+            id: 3,
+            effects: {
+                hide: true,
+            },
         });
 
         // For this one, just checking that it parsed the Arc drawing
@@ -480,10 +482,17 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
             pin_names: { offset: 0 },
             in_bom: true,
             on_board: true,
-            properties: [
-                { name: "Reference", text: "#PWR", effects: { hide: true } },
-                { name: "Value", text: "GND" },
-            ],
+        });
+
+        assert_deep_partial(lib_gnd?.properties.get("Reference"), {
+            name: "Reference",
+            text: "#PWR",
+            effects: { hide: true },
+        });
+
+        assert_deep_partial(lib_gnd?.properties.get("Value"), {
+            name: "Value",
+            text: "GND",
         });
     });
 
