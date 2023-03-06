@@ -12,6 +12,7 @@ import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
+import "./kc-schematic-symbols-panel";
 import "./kc-schematic-properties-panel";
 import "./kc-schematic-info-panel";
 
@@ -55,6 +56,9 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
             html`<kicanvas-schematic></kicanvas-schematic>` as KiCanvasSchematicElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
+            <kc-ui-activity slot="activities" name="Symbols" icon="interests">
+                <kc-schematic-symbols-panel></kc-schematic-symbols-panel>
+            </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Properties" icon="list">
                 <kc-schematic-properties-panel></kc-schematic-properties-panel>
             </kc-ui-activity>
