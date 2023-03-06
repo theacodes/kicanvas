@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { SchematicViewer } from "../../schematic/viewer";
 import { WithContext } from "../../dom/context";
-import { html, CustomElement } from "../../dom/custom-elements";
+import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
+import { SchematicViewer } from "../../schematic/viewer";
 
 export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -34,7 +34,7 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
                 return;
             }
 
-            //this.viewer.select(uuid);
+            this.viewer.select(uuid);
         });
 
         // Update the selected item in the list whenever the viewer's
