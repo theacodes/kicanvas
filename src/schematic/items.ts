@@ -154,6 +154,15 @@ export class KicadSch {
         yield* this.images;
         yield* this.sheets;
     }
+
+    find_symbol(uuid_or_ref: string) {
+        for (const sym of this.symbols) {
+            if (sym.uuid == uuid_or_ref || sym.reference == uuid_or_ref) {
+                return sym;
+            }
+        }
+        return null;
+    }
 }
 
 export class Fill {

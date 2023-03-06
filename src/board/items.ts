@@ -108,6 +108,15 @@ export class KicadPCB {
         }
         return bbox;
     }
+
+    find_footprint(uuid_or_ref: string) {
+        for (const fp of this.footprints) {
+            if (fp.uuid == uuid_or_ref || fp.reference == uuid_or_ref) {
+                return fp;
+            }
+        }
+        return null;
+    }
 }
 
 export class Property {
