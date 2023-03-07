@@ -98,7 +98,6 @@ class KiCanvasAppElement extends CustomElement {
                 <img src="kicanvas.png" />
                 <p>Drag & drop your kicad schematic or board file here.</p>
             </section>
-            <kicanvas-dialog></kicanvas-dialog>
         `;
     }
 }

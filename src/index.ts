@@ -7,5 +7,4 @@
 import "./elements/kc-board/kc-board-viewer";
 import "./elements/kicanvas-app";
 import "./elements/kicanvas-board";
-import "./elements/kicanvas-dialog";
 import "./elements/kicanvas-schematic";
