@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@open-wc/semantic-dom-diff": "^0.19.7",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "@web/dev-server-esbuild": "^0.3.3",
