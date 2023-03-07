@@ -35,15 +35,16 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
 
     override render() {
         const collator = new Intl.Collator(undefined, { numeric: true });
-        const header = (name: string) => `<dt class="header">${name}</dt>`;
+        const header = (name: string) => html`<dt class="header">${name}</dt>`;
 
         const entry = (name: string, desc?: any, suffix = "") =>
-            `<dt>${name}</dt><dd>${desc ?? ""} ${suffix}</dd>`;
+            html`<dt>${name}</dt>
+                <dd>${desc ?? ""} ${suffix}</dd>`;
 
         const checkbox = (value?: boolean) =>
             value
-                ? `<kc-ui-icon>check</kc-ui-icon>`
-                : `<kc-ui-icon>close</kc-ui-icon>`;
+                ? html`<kc-ui-icon>check</kc-ui-icon>`
+                : html`<kc-ui-icon>close</kc-ui-icon>`;
 
         let entries;
 
@@ -53,59 +54,51 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
             const itm = this.selected_item;
             const lib = itm.lib_symbol;
 
-            const properties = Array.from(itm.properties.values())
-                .map((v) => {
-                    return entry(v.name, v.text);
-                })
-                .join("");
+            const properties = Array.from(itm.properties.values()).map((v) => {
+                return entry(v.name, v.text);
+            });
 
             const pins = itm.unit_pins
                 .sort((a, b) => collator.compare(a.number, b.number))
                 .map((p) => {
                     return entry(p.number, p.definition.name.text);
-                })
-                .join("");
+                });
 
-            entries = `
-            ${header("Basic properties")}
-            ${entry("X", itm.at.position.x.toFixed(4), "mm")}
-            ${entry("Y", itm.at.position.y.toFixed(4), "mm")}
-            ${entry("Orientation", itm.at.rotation, "°")}
-            ${entry(
-                "Mirror",
-                itm.mirror == "x"
-                    ? "Around X axis"
-                    : itm.mirror == "y"
-                    ? "Around Y axis"
-                    : "Not mirrored",
-            )}
-            ${header("Instance properties")}
-            ${entry("Library link", itm.lib_name ?? itm.lib_id)}
-            ${
-                itm.unit
+            entries = html`
+                ${header("Basic properties")}
+                ${entry("X", itm.at.position.x.toFixed(4), "mm")}
+                ${entry("Y", itm.at.position.y.toFixed(4), "mm")}
+                ${entry("Orientation", itm.at.rotation, "°")}
+                ${entry(
+                    "Mirror",
+                    itm.mirror == "x"
+                        ? "Around X axis"
+                        : itm.mirror == "y"
+                        ? "Around Y axis"
+                        : "Not mirrored",
+                )}
+                ${header("Instance properties")}
+                ${entry("Library link", itm.lib_name ?? itm.lib_id)}
+                ${itm.unit
                     ? entry(
                           "Unit",
                           String.fromCharCode("A".charCodeAt(0) + itm.unit - 1),
                       )
-                    : ""
-            }
-            ${entry("In BOM", checkbox(itm.in_bom))}
-            ${entry("On board", checkbox(itm.in_bom))}
-            ${entry("Populate", checkbox(!itm.dnp))}
-            ${header("Fields")}
-            ${properties}
-            ${header("Symbol properties")}
-            ${entry("Name", lib.name)}
-            ${entry("Description", lib.description)}
-            ${entry("Keywords", lib.keywords)}
-            ${entry("Power", checkbox(lib.power))}
-            ${entry("Units", lib.unit_count)}
-            ${entry(
-                "Units are interchangeable",
-                checkbox(lib.units_interchangable),
-            )}
-            ${header("Pins")}
-            ${pins}
+                    : ""}
+                ${entry("In BOM", checkbox(itm.in_bom))}
+                ${entry("On board", checkbox(itm.in_bom))}
+                ${entry("Populate", checkbox(!itm.dnp))} ${header("Fields")}
+                ${properties} ${header("Symbol properties")}
+                ${entry("Name", lib.name)}
+                ${entry("Description", lib.description)}
+                ${entry("Keywords", lib.keywords)}
+                ${entry("Power", checkbox(lib.power))}
+                ${entry("Units", lib.unit_count)}
+                ${entry(
+                    "Units are interchangeable",
+                    checkbox(lib.units_interchangable),
+                )}
+                ${header("Pins")} ${pins}
             `;
         }
 

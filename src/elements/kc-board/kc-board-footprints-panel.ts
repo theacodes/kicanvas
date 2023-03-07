@@ -77,7 +77,9 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
         for (const fp of footprints) {
             const ref = fp.reference || "REF";
             const val = fp.value || "VAL";
-            const entry = `<li data-uuid="${fp.uuid}" aria-role="button"><span class="narrow">${ref}</span><span>${val}</span></li>`;
+            const entry = html`<li data-uuid="${fp.uuid}" aria-role="button">
+                <span class="narrow">${ref}</span><span>${val}</span>
+            </li>`;
             if (fp.layer == "F.Cu") {
                 front_footprints.push(entry);
             } else {
@@ -94,9 +96,9 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
                 </kc-ui-panel-header>
                 <kc-ui-panel-body class="no-padding">
                     <ul class="item-list outline">
-                        <li class="header">Front</dt>
+                        <li class="header">Front</li>
                         ${front_footprints}
-                        <li class="header">Back</dt>
+                        <li class="header">Back</li>
                         ${back_footprints}
                     </ul>
                 </kc-ui-panel-body>

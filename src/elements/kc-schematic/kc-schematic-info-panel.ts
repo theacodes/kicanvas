@@ -24,14 +24,15 @@ export class KCSchematicInfoPanel extends WithContext(CustomElement) {
         const ds = this.viewer.drawing_sheet;
         const schematic = this.viewer.schematic;
 
-        const header = (name: string) => `<dt class="header">${name}</dt>`;
+        const header = (name: string) => html`<dt class="header">${name}</dt>`;
 
         const entry = (name: string, desc?: any, suffix = "") =>
-            `<dt>${name}</dt><dd>${desc} ${suffix}</dd>`;
+            html`<dt>${name}</dt>
+                <dd>${desc} ${suffix}</dd>`;
 
         const comments = Object.entries(
             schematic.title_block?.comment || {},
-        ).map(([k, v]) => entry(`<d>Comment ${k}`, v));
+        ).map(([k, v]) => entry(`Comment ${k}`, v));
 
         return html`
             <kc-ui-panel>

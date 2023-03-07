@@ -25,13 +25,14 @@ export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
         const board = this.viewer.board;
         const board_bbox = board.edge_cuts_bbox;
 
-        const header = (name: string) => `<dt class="header">${name}</dt>`;
+        const header = (name: string) => html`<dt class="header">${name}</dt>`;
 
         const entry = (name: string, desc?: any, suffix = "") =>
-            `<dt>${name}</dt><dd>${desc} ${suffix}</dd>`;
+            html`<dt>${name}</dt>
+                <dd>${desc} ${suffix}</dd>`;
 
         const comments = Object.entries(board.title_block?.comment || {}).map(
-            ([k, v]) => entry(`<d>Comment ${k}`, v),
+            ([k, v]) => entry(`Comment ${k}`, v),
         );
 
         return html`

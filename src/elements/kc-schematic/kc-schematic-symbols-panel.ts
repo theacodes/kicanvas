@@ -62,13 +62,16 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
         const collator = new Intl.Collator(undefined, { numeric: true });
         const schematic = this.viewer.schematic;
         const symbols = schematic.symbols.slice();
-        const symbol_elms: string[] = [];
-        const power_symbol_elms: string[] = [];
+        const symbol_elms: HTMLElement[] = [];
+        const power_symbol_elms: HTMLElement[] = [];
 
         symbols.sort((a, b) => collator.compare(a.reference, b.reference));
 
         for (const sym of symbols) {
-            const entry = `<li data-uuid="${sym.uuid}" aria-role="button"><span class="narrow">${sym.reference}</span><span>${sym.value}</span></li>`;
+            const entry = html`<li data-uuid="${sym.uuid}" aria-role="button">
+                <span class="narrow">${sym.reference}</span
+                ><span>${sym.value}</span>
+            </li>` as HTMLElement;
             if (sym.lib_symbol.power) {
                 power_symbol_elms.push(entry);
             } else {
