@@ -4,58 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-type ElementOrFragment = HTMLElement | DocumentFragment;
-
-/**
- * A basic html tagged template literal.
- * It allows html elements (and arrays thereof) to be used in template literals
- * while preserving their identity in the final rendered object.
- */
-export function html(
-    strings: TemplateStringsArray,
-    ...values: any[]
-): ElementOrFragment {
-    const replacements: ElementOrFragment[] = [];
-    let out = "";
-
-    for (let i = 0; i < values.length; i++) {
-        let value = values[i];
-        out += strings[i];
-
-        if (!Array.isArray(value)) {
-            value = [value];
-        }
-
-        for (const v of value) {
-            if (v instanceof HTMLElement || v instanceof DocumentFragment) {
-                replacements.push(v);
-                out += `<slot replace></slot>`;
-            } else {
-                out += `${v}`;
-            }
-        }
-    }
-
-    out += strings[strings.length - 1];
-
-    const template = document.createElement(`template`);
-    template.innerHTML = out;
-
-    const content = document.importNode(template.content, true);
-
-    const slots = content.querySelectorAll("slot[replace]");
-    for (let i = 0; i < slots.length; i++) {
-        const slot = slots[i]!;
-        const replacement = replacements[i]!;
-        slot.replaceWith(replacement);
-    }
-
-    if (content.childElementCount == 1) {
-        return content.firstElementChild as HTMLElement;
-    } else {
-        return content;
-    }
-}
+import { html, literal } from "./templates";
+export { html, literal };
 
 /**
  * "Just enough" CustomElement helper.
@@ -181,13 +131,14 @@ export class CustomElement extends HTMLElement {
             for (const style of static_this.styles) {
                 this.renderRoot.appendChild(
                     html`<style>
-                        ${style}
+                        ${literal`${style}`}
                     </style>`,
                 );
             }
         }
 
-        this.renderRoot.appendChild(this.render());
+        const content = this.render();
+        this.renderRoot.appendChild(content);
         this.renderedCallback();
         this.initialContentCallback();
     }
