@@ -9,7 +9,7 @@ import { html, literal } from "../../src/dom/templates";
 
 use(chaiDomDiff);
 
-suite("dom.html", function () {
+suite("dom.templates", function () {
     test("no interpolated values", function () {
         assert.dom.equal(html`<div>hello!</div>`, `<div>hello!</div>`);
         assert.dom.equal(
