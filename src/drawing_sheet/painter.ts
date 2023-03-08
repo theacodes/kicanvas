@@ -18,7 +18,7 @@ import { ItemPainter, DocumentPainter } from "../framework/painter";
 import {
     ViewLayer,
     ViewLayerSet,
-    ViewLayerName,
+    ViewLayerNames,
 } from "../framework/view-layers";
 import { StrokeFont } from "../text/stroke-font";
 import { EDAText } from "../text/eda-text";
@@ -63,7 +63,7 @@ class LinePainter extends ItemPainter {
     classes = [drawing_sheet.Line];
 
     override layers_for(item: unknown): string[] {
-        return [ViewLayerName.drawing_sheet];
+        return [ViewLayerNames.drawing_sheet];
     }
 
     paint(layer: ViewLayer, l: drawing_sheet.Line) {
@@ -100,7 +100,7 @@ class RectPainter extends ItemPainter {
     classes = [drawing_sheet.Rect];
 
     override layers_for(item: unknown): string[] {
-        return [ViewLayerName.drawing_sheet];
+        return [ViewLayerNames.drawing_sheet];
     }
 
     paint(layer: ViewLayer, r: drawing_sheet.Rect) {
@@ -145,7 +145,7 @@ class TbTextPainter extends ItemPainter {
     classes = [drawing_sheet.TbText];
 
     override layers_for(item: unknown): string[] {
-        return [ViewLayerName.drawing_sheet];
+        return [ViewLayerNames.drawing_sheet];
     }
 
     paint(layer: ViewLayer, t: drawing_sheet.TbText) {
@@ -236,6 +236,6 @@ export class DrawingSheetPainter extends DocumentPainter {
     }
 
     override *paintable_layers(): Generator<ViewLayer, void, unknown> {
-        yield this.layers.by_name(ViewLayerName.drawing_sheet)!;
+        yield this.layers.by_name(ViewLayerNames.drawing_sheet)!;
     }
 }

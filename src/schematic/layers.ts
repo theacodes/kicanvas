@@ -5,14 +5,14 @@
 */
 
 import {
-    ViewLayerName as BaseLayerName,
+    ViewLayerNames as BaseLayerNames,
     ViewLayerSet as BaseLayerSet,
     ViewLayer,
 } from "../framework/view-layers";
 import { Color } from "../gfx/color";
 export { ViewLayer };
 
-export enum LayerName {
+export enum LayerNames {
     // Bounding boxes for clickable items
     interactive = ":Interactive",
     // reference, value, other symbol fields
@@ -32,8 +32,8 @@ export enum LayerName {
     symbol_pin = ":Symbol:Pin",
     // symbol body fill
     symbol_background = ":Symbol:Background",
-    drawing_sheet = BaseLayerName.drawing_sheet,
-    grid = BaseLayerName.grid,
+    drawing_sheet = BaseLayerNames.drawing_sheet,
+    grid = BaseLayerNames.grid,
 }
 
 /**
@@ -46,17 +46,17 @@ export class LayerSet extends BaseLayerSet {
     constructor(public theme: Record<string, Color | Record<string, Color>>) {
         super();
 
-        for (const name of Object.values(LayerName)) {
+        for (const name of Object.values(LayerNames)) {
             this.add(new ViewLayer(this, name));
         }
 
-        this.by_name(LayerName.interactive)!.visible = false;
-        this.by_name(LayerName.drawing_sheet)!.color =
+        this.by_name(LayerNames.interactive)!.visible = false;
+        this.by_name(LayerNames.drawing_sheet)!.color =
             (this.theme["worksheet"] as Color) ?? Color.white;
     }
 
     override *interactive_layers(): Generator<ViewLayer, void, unknown> {
         // Only the top interactive layer is clickable for schematics
-        yield this.by_name(LayerName.interactive)!;
+        yield this.by_name(LayerNames.interactive)!;
     }
 }

@@ -9,7 +9,7 @@ import {
     type VisibilityType,
     ViewLayer,
     ViewLayerSet as BaseLayerSet,
-    ViewLayerName,
+    ViewLayerNames as BaseLayerNames,
 } from "../framework/view-layers";
 import { KicadPCB } from "./items";
 export { ViewLayer };
@@ -87,8 +87,8 @@ export enum LayerNames {
     b_paste = "B.Paste",
     b_crtyd = "B.CrtYd",
     b_fab = "B.Fab",
-    drawing_sheet = ViewLayerName.drawing_sheet,
-    grid = ViewLayerName.grid,
+    drawing_sheet = BaseLayerNames.drawing_sheet,
+    grid = BaseLayerNames.grid,
 }
 
 const HoleLayerNames = [

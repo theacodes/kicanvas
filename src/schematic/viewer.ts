@@ -14,7 +14,7 @@ import * as theme from "../kicad/theme";
 import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
 import { KicadSch, SchematicSymbol } from "./items";
-import { LayerSet, LayerName } from "./layers";
+import { LayerSet, LayerNames } from "./layers";
 import { SchematicPainter } from "./painter";
 
 export class SchematicViewer extends Viewer {
@@ -72,7 +72,7 @@ export class SchematicViewer extends Viewer {
         this.#grid = new Grid(
             this.renderer,
             this.viewport.camera,
-            this.layers.by_name(LayerName.grid)!,
+            this.layers.by_name(LayerNames.grid)!,
             new Vec2(0, 0),
         );
 

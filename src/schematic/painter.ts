@@ -13,7 +13,7 @@ import { Arc as MathArc } from "../math/arc";
 import { BBox } from "../math/bbox";
 import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
-import { ViewLayer, LayerName, LayerSet } from "./layers";
+import { ViewLayer, LayerNames, LayerSet } from "./layers";
 import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { SchField } from "../text/sch-field";
 import { StrokeFont } from "../text/stroke-font";
@@ -44,7 +44,7 @@ class RectanglePainter extends ItemPainter {
     classes = [schematic_items.Rectangle];
 
     layers_for(item: schematic_items.Rectangle) {
-        return [LayerName.notes];
+        return [LayerNames.notes];
     }
 
     paint(layer: ViewLayer, r: schematic_items.Rectangle) {
@@ -80,7 +80,7 @@ class PolylinePainter extends ItemPainter {
     classes = [schematic_items.Polyline];
 
     layers_for(item: schematic_items.Polyline) {
-        return [LayerName.notes];
+        return [LayerNames.notes];
     }
 
     paint(layer: ViewLayer, pl: schematic_items.Polyline) {
@@ -108,7 +108,7 @@ class WirePainter extends ItemPainter {
     classes = [schematic_items.Wire];
 
     layers_for(item: schematic_items.Wire) {
-        return [LayerName.wire];
+        return [LayerNames.wire];
     }
 
     paint(layer: ViewLayer, w: schematic_items.Wire) {
@@ -126,7 +126,7 @@ class BusPainter extends ItemPainter {
     classes = [schematic_items.Bus];
 
     layers_for(item: schematic_items.Bus) {
-        return [LayerName.wire];
+        return [LayerNames.wire];
     }
 
     paint(layer: ViewLayer, w: schematic_items.Bus) {
@@ -144,7 +144,7 @@ class BusEntryPainter extends ItemPainter {
     classes = [schematic_items.BusEntry];
 
     layers_for(item: schematic_items.BusEntry) {
-        return [LayerName.junction];
+        return [LayerNames.junction];
     }
 
     paint(layer: ViewLayer, be: schematic_items.BusEntry) {
@@ -162,7 +162,7 @@ class CirclePainter extends ItemPainter {
     classes = [schematic_items.Circle];
 
     layers_for(item: schematic_items.Circle) {
-        return [LayerName.notes];
+        return [LayerNames.notes];
     }
 
     paint(layer: ViewLayer, c: schematic_items.Circle) {
@@ -190,7 +190,7 @@ class ArcPainter extends ItemPainter {
     classes = [schematic_items.Arc];
 
     layers_for(item: schematic_items.Arc) {
-        return [LayerName.notes];
+        return [LayerNames.notes];
     }
 
     paint(layer: ViewLayer, a: schematic_items.Arc) {
@@ -221,7 +221,7 @@ class JunctionPainter extends ItemPainter {
     classes = [schematic_items.Junction];
 
     layers_for(item: schematic_items.Junction) {
-        return [LayerName.junction];
+        return [LayerNames.junction];
     }
 
     paint(layer: ViewLayer, j: schematic_items.Junction) {
@@ -236,7 +236,7 @@ class NoConnectPainter extends ItemPainter {
     classes = [schematic_items.NoConnect];
 
     layers_for(item: schematic_items.NoConnect) {
-        return [LayerName.junction];
+        return [LayerNames.junction];
     }
 
     paint(layer: ViewLayer, nc: schematic_items.NoConnect): void {
@@ -274,7 +274,7 @@ class TextPainter extends ItemPainter {
     classes = [schematic_items.Text];
 
     layers_for(item: schematic_items.Text) {
-        return [LayerName.notes];
+        return [LayerNames.notes];
     }
 
     paint(layer: ViewLayer, t: schematic_items.Text) {
@@ -305,19 +305,19 @@ class LibSymbolPainter extends ItemPainter {
 
     layers_for(item: schematic_items.LibSymbol) {
         return [
-            LayerName.symbol_foreground,
-            LayerName.symbol_foreground,
-            LayerName.symbol_field,
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_field,
         ];
     }
 
     paint(layer: ViewLayer, s: schematic_items.LibSymbol) {
         if (
             ![
-                LayerName.symbol_background,
-                LayerName.symbol_foreground,
-                LayerName.interactive,
-            ].includes(layer.name as LayerName)
+                LayerNames.symbol_background,
+                LayerNames.symbol_foreground,
+                LayerNames.interactive,
+            ].includes(layer.name as LayerNames)
         ) {
             return;
         }
@@ -346,12 +346,12 @@ class LibSymbolPainter extends ItemPainter {
             for (const g of sym.drawings) {
                 if (g instanceof schematic_items.GraphicItem) {
                     if (
-                        layer.name == LayerName.symbol_background &&
+                        layer.name == LayerNames.symbol_background &&
                         g.fill?.type == "background"
                     ) {
                         this.gfx.state.fill = fill_color;
                     } else if (
-                        layer.name == LayerName.symbol_foreground &&
+                        layer.name == LayerNames.symbol_foreground &&
                         g.fill?.type == "outline"
                     ) {
                         this.gfx.state.fill = outline_color;
@@ -451,7 +451,7 @@ class PropertyPainter extends ItemPainter {
     classes = [schematic_items.Property];
 
     layers_for(item: schematic_items.Property) {
-        return [LayerName.symbol_field, LayerName.interactive];
+        return [LayerNames.symbol_field, LayerNames.interactive];
     }
 
     paint(layer: ViewLayer, p: schematic_items.Property) {
@@ -529,7 +529,7 @@ class PropertyPainter extends ItemPainter {
             bbox.top_left,
         ]);
 
-        if (layer.name == LayerName.interactive) {
+        if (layer.name == LayerNames.interactive) {
             // drawing text is expensive, just draw the bbox for the interactive layer.
             this.gfx.line(new Polyline(Array.from(bbox_pts), 0.1, Color.white));
         } else {
@@ -549,7 +549,7 @@ class LibTextPainter extends ItemPainter {
     classes = [schematic_items.LibText];
 
     layers_for(item: schematic_items.LibText) {
-        return [LayerName.symbol_foreground];
+        return [LayerNames.symbol_foreground];
     }
 
     paint(layer: ViewLayer, lt: schematic_items.LibText) {
@@ -617,16 +617,16 @@ class SchematicSymbolPainter extends ItemPainter {
 
     layers_for(item: schematic_items.SchematicSymbol) {
         return [
-            LayerName.interactive,
-            LayerName.symbol_foreground,
-            LayerName.symbol_background,
-            LayerName.symbol_field,
-            LayerName.symbol_pin,
+            LayerNames.interactive,
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_background,
+            LayerNames.symbol_field,
+            LayerNames.symbol_pin,
         ];
     }
 
     paint(layer: ViewLayer, si: schematic_items.SchematicSymbol) {
-        if (layer.name == LayerName.interactive && si.lib_symbol.power) {
+        if (layer.name == LayerNames.interactive && si.lib_symbol.power) {
             // Don't draw power symbols on the interactive layer.
             return;
         }
@@ -650,10 +650,10 @@ class SchematicSymbolPainter extends ItemPainter {
 
         if (
             [
-                LayerName.symbol_pin,
-                LayerName.symbol_foreground,
-                LayerName.interactive,
-            ].includes(layer.name as LayerName)
+                LayerNames.symbol_pin,
+                LayerNames.symbol_foreground,
+                LayerNames.interactive,
+            ].includes(layer.name as LayerNames)
         ) {
             for (const pin of si.unit_pins) {
                 this.view_painter.paint_item(layer, pin);
@@ -661,8 +661,8 @@ class SchematicSymbolPainter extends ItemPainter {
         }
 
         if (
-            layer.name == LayerName.symbol_field ||
-            layer.name == LayerName.interactive
+            layer.name == LayerNames.symbol_field ||
+            layer.name == LayerNames.interactive
         ) {
             for (const [_, p] of si.properties) {
                 this.view_painter.paint_item(layer, p);
@@ -678,11 +678,11 @@ class SchematicSheetPainter extends ItemPainter {
 
     layers_for(item: schematic_items.SchematicSheet) {
         return [
-            LayerName.interactive,
-            LayerName.label,
-            LayerName.symbol_foreground,
-            LayerName.symbol_background,
-            LayerName.symbol_field,
+            LayerNames.interactive,
+            LayerNames.label,
+            LayerNames.symbol_foreground,
+            LayerNames.symbol_background,
+            LayerNames.symbol_field,
         ];
     }
 
@@ -696,11 +696,11 @@ class SchematicSheetPainter extends ItemPainter {
             ss.size.y,
         );
 
-        if (layer.name == LayerName.symbol_background) {
+        if (layer.name == LayerNames.symbol_background) {
             this.gfx.polygon(Polygon.from_BBox(bbox, fill_color));
         }
 
-        if (layer.name == LayerName.symbol_foreground) {
+        if (layer.name == LayerNames.symbol_foreground) {
             this.gfx.line(
                 Polyline.from_BBox(
                     bbox,
@@ -710,13 +710,13 @@ class SchematicSheetPainter extends ItemPainter {
             );
         }
 
-        if (layer.name == LayerName.symbol_field) {
+        if (layer.name == LayerNames.symbol_field) {
             for (const property of ss.properties) {
                 this.view_painter.paint_item(layer, property);
             }
         }
 
-        if (layer.name == LayerName.label) {
+        if (layer.name == LayerNames.label) {
             for (const pin of ss.pins) {
                 const label = new schematic_items.HierarchicalLabel();
                 label.at = pin.at;

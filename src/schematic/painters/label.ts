@@ -10,7 +10,7 @@ import { Vec2 } from "../../math/vec2";
 import { SchText } from "../../text/sch-text";
 import { StrokeFont } from "../../text/stroke-font";
 import { ItemPainter } from "../../framework/painter";
-import { LayerName, ViewLayer } from "../layers";
+import { LayerNames, ViewLayer } from "../layers";
 import { Color } from "../../gfx/color";
 
 /**
@@ -32,7 +32,7 @@ export class LabelPainter extends ItemPainter {
     override classes: any[] = [];
 
     override layers_for(item: schematic_items.Label) {
-        return [LayerName.label];
+        return [LayerNames.label];
     }
 
     override paint(layer: ViewLayer, l: schematic_items.Label) {

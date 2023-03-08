@@ -29,7 +29,7 @@ import { ItemPainter, DocumentPainter } from "../framework/painter";
 import { EDAText } from "../text/eda-text";
 import { StrokeFont } from "../text/stroke-font";
 import { Color } from "../gfx/color";
-import { ViewLayerName } from "../framework/view-layers";
+import { ViewLayerNames } from "../framework/view-layers";
 
 abstract class BoardItemPainter extends ItemPainter {
     /** Alias for BoardPainter.filter_net */
@@ -230,7 +230,7 @@ class ViaPainter extends BoardItemPainter {
         const color = layer.color;
         if (
             layer.name.endsWith("HoleWalls") ||
-            layer.name == ViewLayerName.overlay
+            layer.name == ViewLayerNames.overlay
         ) {
             this.gfx.circle(new Circle(v.at.position, v.size / 2, color));
         } else if (layer.name.endsWith("Holes")) {
@@ -283,7 +283,7 @@ class ZonePainter extends BoardItemPainter {
         for (const p of z.filled_polygons) {
             if (
                 !layer.name.includes(p.layer) &&
-                layer.name != ViewLayerName.overlay
+                layer.name != ViewLayerNames.overlay
             ) {
                 continue;
             }
@@ -652,7 +652,7 @@ class FootprintPainter extends BoardItemPainter {
         for (const item of fp.items()) {
             const item_layers = this.view_painter.layers_for(item);
             if (
-                layer.name == ViewLayerName.overlay ||
+                layer.name == ViewLayerNames.overlay ||
                 item_layers.includes(layer.name)
             ) {
                 this.view_painter.paint_item(layer, item);

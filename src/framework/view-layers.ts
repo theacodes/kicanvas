@@ -11,6 +11,15 @@ import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 
 /**
+ * Common view layer names across all viewers.
+ */
+export enum ViewLayerNames {
+    overlay = ":Overlay",
+    drawing_sheet = ":DrawingSheet",
+    grid = ":Grid",
+}
+
+/**
  * View layers
  *
  * KiCanvas's structure uses view layers to gather schematic or board items.
@@ -116,15 +125,6 @@ export class ViewLayer {
 }
 
 /**
- * Common view layer names across all viewers.
- */
-export enum ViewLayerName {
-    overlay = ":Overlay",
-    drawing_sheet = ":DrawingSheet",
-    grid = ":Grid",
-}
-
-/**
  * Represents the complete set of view layers.
  */
 export class ViewLayerSet {
@@ -138,7 +138,7 @@ export class ViewLayerSet {
     constructor() {
         this.#overlay = new ViewLayer(
             this,
-            ViewLayerName.overlay,
+            ViewLayerNames.overlay,
             true,
             Color.white,
         );
@@ -292,7 +292,7 @@ export class ViewLayerSet {
     }
 
     *grid_layers() {
-        yield this.by_name(ViewLayerName.grid)!;
+        yield this.by_name(ViewLayerNames.grid)!;
     }
 
     /**

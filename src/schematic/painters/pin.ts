@@ -14,7 +14,7 @@ import { EDAText } from "../../text/eda-text";
 import { StrokeFont } from "../../text/stroke-font";
 import { ItemPainter } from "../../framework/painter";
 import * as schematic_items from "../items";
-import { LayerName, ViewLayer } from "../layers";
+import { LayerNames, ViewLayer } from "../layers";
 import { SchematicPainter } from "../painter";
 import { Matrix3 } from "../../math/matrix3";
 
@@ -34,9 +34,9 @@ export class PinPainter extends ItemPainter {
 
     override layers_for(item: schematic_items.PinInstance) {
         return [
-            LayerName.symbol_pin,
-            LayerName.symbol_foreground,
-            LayerName.interactive,
+            LayerNames.symbol_pin,
+            LayerNames.symbol_foreground,
+            LayerNames.interactive,
         ];
     }
 
@@ -62,12 +62,12 @@ export class PinPainter extends ItemPainter {
         this.gfx.state.stroke = this.gfx.theme["pin"] as Color;
 
         if (
-            layer.name == LayerName.symbol_pin ||
-            layer.name == LayerName.interactive
+            layer.name == LayerNames.symbol_pin ||
+            layer.name == LayerNames.interactive
         ) {
             this.draw_pin_shape(this.gfx, pin);
         }
-        if (layer.name == LayerName.symbol_foreground) {
+        if (layer.name == LayerNames.symbol_foreground) {
             this.draw_name_and_number(this.gfx, pin);
         }
 
