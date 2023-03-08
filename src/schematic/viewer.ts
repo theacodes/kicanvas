@@ -76,6 +76,9 @@ export class SchematicViewer extends Viewer {
             new Vec2(0, 0),
         );
 
+        // Set the camera's bounds
+        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(20);
+
         // Position the camera and draw the scene.
         const bb = this.layers.bbox;
         this.viewport.camera.bbox = bb.grow(bb.w * 0.1);

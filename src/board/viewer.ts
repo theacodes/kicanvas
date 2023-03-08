@@ -69,6 +69,9 @@ export class BoardViewer extends Viewer {
             this.board.setup?.grid_origin ?? new Vec2(0, 0),
         );
 
+        // Set the camera's bounds
+        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(20);
+
         // Position the camera and draw the scene.
         this.look_at_sheet();
         this.draw();
