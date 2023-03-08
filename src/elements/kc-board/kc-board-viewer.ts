@@ -65,10 +65,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
             <kc-ui-activity slot="activities" name="Objects" icon="category">
                 <kc-board-objects-panel></kc-board-objects-panel>
             </kc-ui-activity>
-            <kc-ui-activity
-                slot="activities"
-                name="Footprints"
-                icon="footprint">
+            <kc-ui-activity slot="activities" name="Footprints" icon="memory">
                 <kc-board-footprints-panel></kc-board-footprints-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Nets" icon="hub">
