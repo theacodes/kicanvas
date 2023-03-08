@@ -4,8 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Vec2 } from "../math/vec2";
+import { BBox } from "../math/bbox";
 import { Camera2 } from "../math/camera2";
+import { Vec2 } from "../math/vec2";
 
 const line_delta_multiplier = 8;
 const page_delta_multiplier = 24;
@@ -34,49 +35,48 @@ export class PanAndZoom {
         public callback: PanAndZoomCallback,
         public min_zoom = 0.5,
         public max_zoom = 10,
+        public bounds?: BBox,
     ) {
         this.target.addEventListener(
             "wheel",
-            (e) => {
-                e.preventDefault();
-
-                let dx = e.deltaX;
-                let dy = e.deltaY;
-
-                // shift modifier flips the X and Y axes (horizontal scroll)
-                if (dx == 0 && e.shiftKey) {
-                    [dx, dy] = [dy, dx];
-                }
-
-                // work around line/page scrolling
-                if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-                    dx *= line_delta_multiplier;
-                    dy *= line_delta_multiplier;
-                } else if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-                    dx *= page_delta_multiplier;
-                    dy *= page_delta_multiplier;
-                }
-
-                // work around browsers setting a huge scroll distance
-                dx =
-                    Math.sign(dx) *
-                    Math.min(page_delta_multiplier, Math.abs(dx));
-                dy =
-                    Math.sign(dy) *
-                    Math.min(page_delta_multiplier, Math.abs(dy));
-
-                // pinch zoom
-                if (e.ctrlKey) {
-                    this.#rect = this.target.getBoundingClientRect();
-                    this.#handle_zoom(dy, this.#relative_mouse_pos(e));
-                }
-                // pan
-                else {
-                    this.#handle_pan(dx, dy);
-                }
-            },
+            (e: WheelEvent) => this.#on_wheel(e),
             { passive: false },
         );
+    }
+
+    #on_wheel(e: WheelEvent) {
+        e.preventDefault();
+
+        let dx = e.deltaX;
+        let dy = e.deltaY;
+
+        // shift modifier flips the X and Y axes (horizontal scroll)
+        if (dx == 0 && e.shiftKey) {
+            [dx, dy] = [dy, dx];
+        }
+
+        // work around line/page scrolling
+        if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+            dx *= line_delta_multiplier;
+            dy *= line_delta_multiplier;
+        } else if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+            dx *= page_delta_multiplier;
+            dy *= page_delta_multiplier;
+        }
+
+        // work around browsers setting a huge scroll distance
+        dx = Math.sign(dx) * Math.min(page_delta_multiplier, Math.abs(dx));
+        dy = Math.sign(dy) * Math.min(page_delta_multiplier, Math.abs(dy));
+
+        // pinch zoom
+        if (e.ctrlKey) {
+            this.#rect = this.target.getBoundingClientRect();
+            this.#handle_zoom(dy, this.#relative_mouse_pos(e));
+        }
+        // pan
+        else {
+            this.#handle_pan(dx, dy);
+        }
     }
 
     #relative_mouse_pos(e: MouseEvent) {
@@ -90,7 +90,14 @@ export class PanAndZoom {
         const delta = new Vec2(dx * pan_speed, dy * pan_speed).multiply(
             1 / this.camera.zoom,
         );
-        this.camera.center.set(this.camera.center.add(delta));
+
+        let center = this.camera.center.add(delta);
+
+        if (this.bounds) {
+            center = this.bounds.constrain_point(center);
+        }
+
+        this.camera.center.set(center);
 
         if (this.callback) {
             this.callback();
