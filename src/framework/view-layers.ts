@@ -80,7 +80,7 @@ export class ViewLayer {
     }
 
     dispose() {
-        this.graphics?.dispose();
+        this.clear();
     }
 
     clear() {
@@ -120,8 +120,8 @@ export class ViewLayer {
  */
 export enum ViewLayerName {
     overlay = ":Overlay",
-    grid = ":Grid",
     drawing_sheet = ":DrawingSheet",
+    grid = ":Grid",
 }
 
 /**
@@ -289,6 +289,10 @@ export class ViewLayerSet {
             }
         }
         return false;
+    }
+
+    *grid_layers() {
+        yield this.by_name(ViewLayerName.grid)!;
     }
 
     /**
