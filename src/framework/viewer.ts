@@ -70,7 +70,7 @@ export abstract class Viewer extends EventTarget {
         await this.renderer.setup();
 
         this.viewport = new Viewport(this.renderer, () => {
-            this.draw();
+            this.on_viewport_change();
         });
 
         this.viewport.enable_pan_and_zoom(0.5, 190);
@@ -84,6 +84,10 @@ export abstract class Viewer extends EventTarget {
             const items = this.layers.query_point(mouse);
             this.on_pick(mouse, items);
         });
+    }
+
+    protected on_viewport_change() {
+        this.draw();
     }
 
     public abstract load(url: string | URL | File): Promise<void>;
