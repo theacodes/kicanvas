@@ -85,6 +85,10 @@ export class DrawingSheet {
         return this.paper?.height ?? 210;
     }
 
+    get size() {
+        return new Vec2(this.width, this.height);
+    }
+
     get top_left() {
         return new Vec2(this.setup.left_margin, this.setup.top_margin);
     }
