@@ -13,7 +13,7 @@
     "@typescript-eslint/parser": "^5.48.2",
     "@web/dev-server-esbuild": "^0.3.3",
     "@web/test-runner": "^0.15.0",
-    "esbuild": "^0.17.3",
+    "esbuild": "^0.17.11",
     "esbuild-plugin-copy": "^2.0.2",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
