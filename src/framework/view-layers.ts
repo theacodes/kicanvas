@@ -7,7 +7,6 @@
 import { Color } from "../gfx/color";
 import { RenderLayer } from "../gfx/renderer";
 import { BBox } from "../math/bbox";
-import { Matrix3 } from "../math/matrix3";
 import { Vec2 } from "../math/vec2";
 
 /**
@@ -163,27 +162,6 @@ export class ViewLayerSet {
         for (const layer of layers) {
             this.#layer_list.push(layer);
             this.#layer_map.set(layer.name, layer);
-        }
-    }
-
-    /**
-     * Renders all the layers in the set in display order (back to front)
-     */
-    render(camera: Matrix3) {
-        let depth = 0.01;
-        const should_dim = this.is_any_layer_highlighted();
-
-        for (const layer of this.in_display_order()) {
-            if (layer.visible && layer.graphics) {
-                let alpha = layer.opacity;
-
-                if (should_dim && !layer.highlighted) {
-                    alpha = 0.25;
-                }
-
-                layer.graphics.render(camera, depth, alpha);
-                depth += 0.01;
-            }
         }
     }
 

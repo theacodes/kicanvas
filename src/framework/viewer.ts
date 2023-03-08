@@ -111,7 +111,24 @@ export abstract class Viewer extends EventTarget {
         }
 
         this.renderer.clear_canvas();
-        this.layers.render(this.viewport.camera.matrix);
+
+        // Render all layers in display order (back to front)
+        let depth = 0.01;
+        const camera = this.viewport.camera.matrix;
+        const should_dim = this.layers.is_any_layer_highlighted();
+
+        for (const layer of this.layers.in_display_order()) {
+            if (layer.visible && layer.graphics) {
+                let alpha = layer.opacity;
+
+                if (should_dim && !layer.highlighted) {
+                    alpha = 0.25;
+                }
+
+                layer.graphics.render(camera, depth, alpha);
+                depth += 0.01;
+            }
+        }
     }
 
     public draw() {
