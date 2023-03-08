@@ -21,8 +21,6 @@ export { ViewLayer };
  * for drill holes and such.
  */
 export enum LayerNames {
-    grid = ViewLayerName.grid,
-    drawing_sheet = ViewLayerName.drawing_sheet,
     dwgs_user = "Dwgs.User",
     cmts_user = "Cmts.User",
     eco1_user = "Eco1.User",
@@ -89,6 +87,8 @@ export enum LayerNames {
     b_paste = "B.Paste",
     b_crtyd = "B.CrtYd",
     b_fab = "B.Fab",
+    drawing_sheet = ViewLayerName.drawing_sheet,
+    grid = ViewLayerName.grid,
 }
 
 const HoleLayerNames = [
@@ -406,10 +406,6 @@ export class LayerSet extends BaseLayerSet {
     *pad_hole_layers() {
         yield this.by_name(LayerNames.pad_holes)!;
         yield this.by_name(LayerNames.pad_holewalls)!;
-    }
-
-    *grid_layers() {
-        yield this.by_name(ViewLayerName.grid)!;
     }
 
     /**
