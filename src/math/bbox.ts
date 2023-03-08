@@ -218,6 +218,13 @@ export class BBox {
         return new BBox(this.x, -this.y, this.w, -this.h);
     }
 
+    /** returns true if this box contains the other */
+    contains(other: BBox) {
+        return (
+            this.contains_point(other.start) && this.contains_point(other.end)
+        );
+    }
+
     /**
      * @returns true if the point is within the bounding box.
      */
