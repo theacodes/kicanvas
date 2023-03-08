@@ -6,19 +6,22 @@
 
 import { DrawingSheet } from "../drawing_sheet/items";
 import { DrawingSheetPainter } from "../drawing_sheet/painter";
+import { Grid } from "../framework/grid";
 import { Viewer } from "../framework/viewer";
 import { Canvas2DRenderer } from "../gfx/canvas2d/renderer";
 import { Renderer } from "../gfx/renderer";
 import * as theme from "../kicad/theme";
 import { BBox } from "../math/bbox";
+import { Vec2 } from "../math/vec2";
 import { KicadSch, SchematicSymbol } from "./items";
-import { LayerSet } from "./layers";
+import { LayerSet, LayerName } from "./layers";
 import { SchematicPainter } from "./painter";
 
 export class SchematicViewer extends Viewer {
     schematic: KicadSch;
     drawing_sheet: DrawingSheet;
     #painter: SchematicPainter;
+    #grid: Grid;
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new Canvas2DRenderer(canvas);
@@ -65,6 +68,15 @@ export class SchematicViewer extends Viewer {
             this.drawing_sheet,
         );
 
+        // Create the grid
+        this.#grid = new Grid(
+            this.renderer,
+            this.viewport.camera,
+            this.layers.by_name(LayerName.grid)!,
+            new Vec2(0, 0),
+        );
+
+        // Position the camera and draw the scene.
         const bb = this.layers.bbox;
         this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
 
@@ -72,6 +84,11 @@ export class SchematicViewer extends Viewer {
 
         // Mark the viewer as loaded and notify event listeners
         this.set_loaded(true);
+    }
+
+    protected override on_viewport_change(): void {
+        super.on_viewport_change();
+        this.#grid?.update();
     }
 
     public override select(
