@@ -15,10 +15,12 @@ import { Vec2 } from "../math/vec2";
 import * as board_items from "./items";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import { BoardPainter } from "./painter";
+import { Grid } from "../framework/grid";
 
 export class BoardViewer extends Viewer {
     board: board_items.KicadPCB;
     drawing_sheet: DrawingSheet;
+    #grid: Grid;
     #painter: BoardPainter;
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
@@ -59,12 +61,25 @@ export class BoardViewer extends Viewer {
             this.drawing_sheet,
         );
 
+        // Create the grid
+        this.#grid = new Grid(
+            this.renderer,
+            this.viewport.camera,
+            this.layers.by_name(LayerNames.grid)!,
+            this.board.setup?.grid_origin ?? new Vec2(0, 0),
+        );
+
         // Position the camera and draw the scene.
         this.look_at_sheet();
         this.draw();
 
         // Mark the viewer as loaded and notify event listeners
         this.set_loaded(true);
+    }
+
+    protected override on_viewport_change(): void {
+        super.on_viewport_change();
+        this.#grid?.update();
     }
 
     protected override on_pick(
