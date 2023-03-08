@@ -4,13 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Vec2 } from "../math/vec2";
-import { Matrix3 } from "../math/matrix3";
-import { Camera2 } from "../math/camera2";
-import { PanAndZoom } from "../dom/pan-and-zoom";
 import { CanvasSizeObserver } from "../dom/canvas-size-observer";
+import { PanAndZoom } from "../dom/pan-and-zoom";
 import { Renderer } from "../gfx/renderer";
 import { Angle } from "../math/angle";
+import { BBox } from "../math/bbox";
+import { Camera2 } from "../math/camera2";
+import { Matrix3 } from "../math/matrix3";
+import { Vec2 } from "../math/vec2";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view
@@ -18,6 +19,7 @@ import { Angle } from "../math/angle";
  */
 export class Viewport {
     #observer: CanvasSizeObserver;
+    #pan_and_zoom: PanAndZoom;
     width: number;
     height: number;
     camera: Camera2;
@@ -64,7 +66,7 @@ export class Viewport {
     }
 
     enable_pan_and_zoom(min_zoom?: number, max_zoom?: number) {
-        new PanAndZoom(
+        this.#pan_and_zoom = new PanAndZoom(
             this.renderer.canvas,
             this.camera,
             () => {
@@ -81,5 +83,12 @@ export class Viewport {
      */
     get view_matrix(): Matrix3 {
         return this.camera.matrix;
+    }
+
+    /**
+     * Limit the camera's center within the given bounds.
+     */
+    set bounds(bb: BBox) {
+        this.#pan_and_zoom.bounds = bb;
     }
 }
