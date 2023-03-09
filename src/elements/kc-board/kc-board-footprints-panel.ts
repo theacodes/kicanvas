@@ -10,8 +10,10 @@ import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
 import { KCUIFilteredListElement } from "../kc-ui/kc-ui-filtered-list";
+import { KCUITextFilterInputElement } from "../kc-ui/kc-ui-text-filter-input";
 
 import "../kc-ui/kc-ui-filtered-list";
+import "../kc-ui/kc-ui-text-filter-input";
 
 export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -70,8 +72,8 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
         });
     }
 
-    private get search_input_elm(): HTMLInputElement {
-        return this.renderRoot.querySelector("input[name='search']")!;
+    private get search_input_elm(): KCUITextFilterInputElement {
+        return this.renderRoot.querySelector("kc-ui-text-filter-input")!;
     }
 
     private get item_filter_elem(): KCUIFilteredListElement {
@@ -101,7 +103,7 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
                     </kc-ui-panel-header-text>
                 </kc-ui-panel-header>
                 <kc-ui-panel-body class="no-padding">
-                    <input type="text" placeholder="search" name="search" />
+                    <kc-ui-text-filter-input></kc-ui-text-filter-input>
                     <kc-ui-filtered-list>
                         <ul class="item-list outline">
                             ${this.render_list()}
