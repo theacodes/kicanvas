@@ -12,6 +12,8 @@ import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
+import "../kc-ui/kc-ui-floating-toolbar";
+import "../kc-viewer-bottom-toolbar";
 import "./kc-board-footprints-panel";
 import "./kc-board-info-panel";
 import "./kc-board-layers-panel";
@@ -86,7 +88,10 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
         return html` <kc-ui-split-view vertical>
-            <kc-ui-view class="grow"> ${this.board_elm} </kc-ui-view>
+            <kc-ui-view class="grow is-relative">
+                ${this.board_elm}
+                <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
+            </kc-ui-view>
             <kc-ui-view-resizer></kc-ui-view-resizer>
             ${this.activity_bar_elm}
         </kc-ui-split-view>`;
