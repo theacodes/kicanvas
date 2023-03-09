@@ -80,10 +80,7 @@ export class SchematicViewer extends Viewer {
         this.viewport.bounds = this.drawing_sheet.page_bbox.grow(20);
 
         // Position the camera and draw the scene.
-        const bb = this.layers.bbox;
-        this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
-
-        this.draw();
+        this.zoom_to_page();
 
         // Mark the viewer as loaded and notify event listeners
         this.set_loaded(true);
@@ -92,6 +89,12 @@ export class SchematicViewer extends Viewer {
     protected override on_viewport_change(): void {
         super.on_viewport_change();
         this.#grid?.update();
+    }
+
+    public override zoom_to_page(): void {
+        const bb = this.layers.bbox;
+        this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
+        this.draw();
     }
 
     public override select(

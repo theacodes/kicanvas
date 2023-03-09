@@ -73,8 +73,7 @@ export class BoardViewer extends Viewer {
         this.viewport.bounds = this.drawing_sheet.page_bbox.grow(20);
 
         // Position the camera and draw the scene.
-        this.look_at_sheet();
-        this.draw();
+        this.zoom_to_page();
 
         // Mark the viewer as loaded and notify event listeners
         this.set_loaded(true);
@@ -172,11 +171,12 @@ export class BoardViewer extends Viewer {
         this.draw();
     }
 
-    look_at_sheet() {
+    override zoom_to_page() {
         this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
+        this.draw();
     }
 
-    look_at_board() {
+    zoom_to_board() {
         const edge_cuts = this.layers.by_name(LayerNames.edge_cuts)!;
         const board_bbox = edge_cuts.bbox;
         this.viewport.camera.bbox = board_bbox.grow(board_bbox.w * 0.1);
