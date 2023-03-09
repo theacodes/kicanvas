@@ -8,6 +8,11 @@ import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
 import { SchematicViewer } from "../../schematic/viewer";
+import { KCUIFilteredListElement } from "../kc-ui/kc-ui-filtered-list";
+import { KCUITextFilterInputElement } from "../kc-ui/kc-ui-text-filter-input";
+
+import "../kc-ui/kc-ui-filtered-list";
+import "../kc-ui/kc-ui-text-filter-input";
 
 export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -42,6 +47,20 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
         this.viewer.addEventListener(KiCanvasSelectEvent.type, () => {
             this.mark_selected_item();
         });
+
+        // Wire up search to filter the list
+        this.search_input_elm.addEventListener("input", (e) => {
+            this.item_filter_elem.filter_text =
+                this.search_input_elm.value ?? null;
+        });
+    }
+
+    private get search_input_elm(): KCUITextFilterInputElement {
+        return this.renderRoot.querySelector("kc-ui-text-filter-input")!;
+    }
+
+    private get item_filter_elem(): KCUIFilteredListElement {
+        return this.renderRoot.querySelector("kc-ui-filtered-list")!;
     }
 
     private get items() {
@@ -68,7 +87,11 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
         symbols.sort((a, b) => collator.compare(a.reference, b.reference));
 
         for (const sym of symbols) {
-            const entry = html`<li data-uuid="${sym.uuid}" aria-role="button">
+            const match_text = `${sym.reference} ${sym.value} ${sym.id} ${sym.lib_symbol.name}`;
+            const entry = html` <li
+                data-uuid="${sym.uuid}"
+                data-match-text="${match_text}"
+                aria-role="button">
                 <span class="narrow">${sym.reference}</span
                 ><span>${sym.value}</span>
             </li>` as HTMLElement;
@@ -85,11 +108,14 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
                     <kc-ui-panel-header-text>Symbols</kc-ui-panel-header-text>
                 </kc-ui-panel-header>
                 <kc-ui-panel-body class="no-padding">
-                    <ul class="item-list outline">
-                        ${symbol_elms}
-                        <li class="header">Power symbols</dt>
-                        ${power_symbol_elms}
-                    </ul>
+                    <kc-ui-text-filter-input></kc-ui-text-filter-input>
+                    <kc-ui-filtered-list>
+                        <ul class="item-list outline">
+                            ${symbol_elms}
+                            <li class="header">Power symbols</dt>
+                            ${power_symbol_elms}
+                        </ul>
+                    </kc-ui-filtered-list>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
