@@ -32,12 +32,6 @@
 
     --title-bar-bg: #131218;
     --title-bar-fg: #f8f8f0;
-    --title-bar-button-bg: transparent;
-    --title-bar-button-fg: inherit;
-    --title-bar-button-hover-bg: #8864cb;
-    --title-bar-button-hover-fg: inherit;
-    --title-bar-button-disabled-bg: inherit;
-    --title-bar-button-disabled-fg: #888;
 
     --activity-bar-bg: #282634;
     --activity-bar-fg: #f8f8f0;
@@ -65,6 +59,13 @@
     --panel-title-button-hover-fg: inherit;
     --panel-title-button-disabled-bg: inherit;
     --panel-title-button-disabled-fg: #888;
+
+    --toolbar-button-bg: #282634;
+    --toolbar-button-fg: #f8f8f0;
+    --toolbar-button-hover-bg: #282634;
+    --toolbar-button-hover-fg: #81eeff;
+    --toolbar-button-disabled-bg: #131218;
+    --toolbar-button-disabled-fg: #888;
 
     --tab-bar-bg: #131218;
     --tab-bg: #131218;
@@ -122,6 +123,34 @@
     --list-item-disabled-fg: #888;
 
     --grid-outline: #433e56;
+}
+
+/*
+    Helpers
+*/
+
+.is-block {
+    display: block;
+}
+
+.is-inline {
+    display: inline;
+}
+
+.is-flex {
+    display: flex;
+}
+
+.is-hidden {
+    display: none;
+}
+
+.is-relative {
+    position: relative;
+}
+
+.is-unselectable {
+    user-select: none;
 }
 
 /*
@@ -344,6 +373,66 @@ kc-ui-app ::part(icon) {
     font-feature-settings: "liga";
     -webkit-font-smoothing: antialiased;
     user-select: none;
+}
+
+/*
+    Toolbar buttons and groups
+*/
+
+button.toolbar,
+output.toolbar {
+    width: unset;
+    margin: unset;
+    padding: 0.5rem;
+    color: var(--toolbar-button-fg);
+    background: var(--toolbar-button-bg);
+    border: 1xxxwpx solid (var(--toolbar-button-bg));
+    border-radius: 0.25rem;
+    font-weight: 300;
+    font-size: 0.9rem;
+    box-shadow: var(--input-hover-shadow);
+    user-select: none;
+}
+
+button.toolbar:hover {
+    color: var(--toolbar-button-hover-fg);
+    background: var(--toolbar-button-hover-bg);
+}
+
+button.toolbar:disabled {
+    color: var(--toolbar-button-disabled-fg);
+    background: var(--toolbar-button-disabled-bg);
+}
+
+button.toolbar kc-ui-icon,
+button.toolbar ::part(icon),
+output.toolbar kc-ui-icon,
+output.toolbar ::part(icon) {
+    font-size: 1rem;
+}
+
+.button-group {
+    display: flex;
+    box-shadow: var(--input-hover-shadow);
+}
+
+.button-group.margin-left {
+    margin-left: 0.5rem;
+}
+
+.button-group button {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.button-group button:first-child {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.button-group button:last-child {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
 }
 
 /*
