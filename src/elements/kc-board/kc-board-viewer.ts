@@ -12,7 +12,6 @@ import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
-import "../kc-ui/kc-ui-floating-toolbar";
 import "../kc-viewer-bottom-toolbar";
 import "./kc-board-footprints-panel";
 import "./kc-board-info-panel";
