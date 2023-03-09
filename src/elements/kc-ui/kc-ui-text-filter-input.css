@@ -1,0 +1,53 @@
+:host {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    position: relative;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+kc-ui-icon.before {
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0.25em;
+}
+
+input {
+    all: unset;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    padding: 0.4rem;
+    padding-left: 1.5em;
+    text-align: left;
+    font: inherit;
+    background: var(--input-bg);
+    color: var(--input-fg);
+}
+
+input:placeholder-shown + button {
+    display: none;
+}
+
+button {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    color: var(--input-fg);
+    padding: 0.25em;
+}
+
+button:hover {
+    cursor: pointer;
+    color: var(--input-accent);
+}
