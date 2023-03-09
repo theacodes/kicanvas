@@ -12,6 +12,7 @@ import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
+import "../kc-viewer-bottom-toolbar";
 import "./kc-schematic-symbols-panel";
 import "./kc-schematic-properties-panel";
 import "./kc-schematic-info-panel";
@@ -68,7 +69,10 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
         return html` <kc-ui-split-view vertical>
-            <kc-ui-view class="grow"> ${this.schematic_elm} </kc-ui-view>
+            <kc-ui-view class="grow is-relative">
+                ${this.schematic_elm}
+                <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
+            </kc-ui-view>
             <kc-ui-view-resizer></kc-ui-view-resizer>
             ${this.activity_bar_elm}
         </kc-ui-split-view>`;
