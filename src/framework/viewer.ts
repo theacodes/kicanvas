@@ -22,6 +22,8 @@ export abstract class Viewer extends EventTarget {
     renderer: Renderer;
     viewport: Viewport;
     layers: ViewLayerSet;
+    mouse_position: Vec2 = new Vec2(0, 0);
+
     #selected: BBox | null;
     #loaded_promise: Promise<boolean>;
     #loaded_promise_resolve_reject: [
@@ -75,14 +77,16 @@ export abstract class Viewer extends EventTarget {
 
         this.viewport.enable_pan_and_zoom(0.5, 190);
 
-        this.canvas.addEventListener("click", (e) => {
+        this.canvas.addEventListener("mousemove", (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const mouse = this.viewport.camera.screen_to_world(
+            this.mouse_position = this.viewport.camera.screen_to_world(
                 new Vec2(e.clientX - rect.left, e.clientY - rect.top),
             );
+        });
 
-            const items = this.layers.query_point(mouse);
-            this.on_pick(mouse, items);
+        this.canvas.addEventListener("click", (e) => {
+            const items = this.layers.query_point(this.mouse_position);
+            this.on_pick(this.mouse_position, items);
         });
     }
 
@@ -202,6 +206,16 @@ export abstract class Viewer extends EventTarget {
             layer.graphics.composite_operation = "overlay";
         }
 
+        this.draw();
+    }
+
+    abstract zoom_to_page(): void;
+
+    zoom_to_selection() {
+        if (!this.selected) {
+            return;
+        }
+        this.viewport.camera.bbox = this.selected.grow(10);
         this.draw();
     }
 }
