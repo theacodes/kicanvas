@@ -16,7 +16,7 @@ export class KCUIFilteredListElement extends CustomElement {
     #filter_text: string | null;
 
     set filter_text(v) {
-        this.#filter_text = v;
+        this.#filter_text = v?.toLowerCase() ?? null;
         this.apply_filter();
     }
 
