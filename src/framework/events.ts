@@ -18,16 +18,29 @@ export class KiCanvasLoadEvent extends KiCanvasEvent<null> {
     }
 }
 
-interface SelectEventDetails {
+interface SelectDetails {
     item: unknown;
     previous: unknown;
 }
 
-export class KiCanvasSelectEvent extends KiCanvasEvent<SelectEventDetails> {
+export class KiCanvasSelectEvent extends KiCanvasEvent<SelectDetails> {
     static readonly type = "kicanvas:select";
 
-    constructor(detail: SelectEventDetails) {
+    constructor(detail: SelectDetails) {
         super(KiCanvasSelectEvent.type, detail, true);
+    }
+}
+
+interface MouseMoveDetails {
+    x: number;
+    y: number;
+}
+
+export class KiCanvasMouseMoveEvent extends KiCanvasEvent<MouseMoveDetails> {
+    static readonly type = "kicanvas:mousemove";
+
+    constructor(detail: MouseMoveDetails) {
+        super(KiCanvasMouseMoveEvent.type, detail, true);
     }
 }
 
@@ -36,6 +49,7 @@ export class KiCanvasSelectEvent extends KiCanvasEvent<SelectEventDetails> {
 export interface KiCanvasEventMap {
     [KiCanvasLoadEvent.type]: KiCanvasLoadEvent;
     [KiCanvasSelectEvent.type]: KiCanvasSelectEvent;
+    [KiCanvasMouseMoveEvent.type]: KiCanvasMouseMoveEvent;
 }
 
 declare global {

@@ -15,6 +15,7 @@ import {
     type KiCanvasEventMap,
     KiCanvasSelectEvent,
     KiCanvasLoadEvent,
+    KiCanvasMouseMoveEvent,
 } from "./events";
 
 export abstract class Viewer extends EventTarget {
@@ -78,10 +79,11 @@ export abstract class Viewer extends EventTarget {
         this.viewport.enable_pan_and_zoom(0.5, 190);
 
         this.canvas.addEventListener("mousemove", (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouse_position = this.viewport.camera.screen_to_world(
-                new Vec2(e.clientX - rect.left, e.clientY - rect.top),
-            );
+            this.on_mouse_change(e);
+        });
+
+        this.canvas.addEventListener("panzoom", (e) => {
+            this.on_mouse_change(e as MouseEvent);
         });
 
         this.canvas.addEventListener("click", (e) => {
@@ -92,6 +94,21 @@ export abstract class Viewer extends EventTarget {
 
     protected on_viewport_change() {
         this.draw();
+    }
+
+    protected on_mouse_change(e: MouseEvent) {
+        const rect = this.canvas.getBoundingClientRect();
+        const new_position = this.viewport.camera.screen_to_world(
+            new Vec2(e.clientX - rect.left, e.clientY - rect.top),
+        );
+
+        if (
+            this.mouse_position.x != new_position.x ||
+            this.mouse_position.y != new_position.y
+        ) {
+            this.mouse_position.set(new_position);
+            this.dispatchEvent(new KiCanvasMouseMoveEvent(this.mouse_position));
+        }
     }
 
     public abstract load(url: string | URL | File): Promise<void>;
