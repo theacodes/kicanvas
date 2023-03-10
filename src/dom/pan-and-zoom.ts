@@ -77,6 +77,13 @@ export class PanAndZoom {
         else {
             this.#handle_pan(dx, dy);
         }
+
+        this.target.dispatchEvent(
+            new MouseEvent("panzoom", {
+                clientX: e.clientX,
+                clientY: e.clientY,
+            }),
+        );
     }
 
     #relative_mouse_pos(e: MouseEvent) {
