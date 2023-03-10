@@ -20,6 +20,8 @@ import { Grid } from "../framework/grid";
 export class BoardViewer extends Viewer {
     board: board_items.KicadPCB;
     drawing_sheet: DrawingSheet;
+    declare layers: LayerSet;
+
     #grid: Grid;
     #painter: BoardPainter;
 
