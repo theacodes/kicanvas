@@ -6,7 +6,10 @@
 
 import { WithContext } from "../dom/context";
 import { CustomElement, html } from "../dom/custom-elements";
-import { KiCanvasSelectEvent } from "../framework/events";
+import {
+    KiCanvasMouseMoveEvent,
+    KiCanvasSelectEvent,
+} from "../framework/events";
 import type { Viewer } from "../framework/viewer";
 
 import "./kc-ui/kc-ui";
@@ -26,7 +29,7 @@ export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {
 
             super.connectedCallback();
 
-            this.viewer.canvas.addEventListener("mousemove", () => {
+            this.viewer.addEventListener(KiCanvasMouseMoveEvent.type, () => {
                 this.update_position();
             });
 
