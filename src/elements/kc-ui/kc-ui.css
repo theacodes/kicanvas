@@ -9,11 +9,6 @@
     --bg: #131218;
     --fg: #f8f8f0;
 
-    --elevation-shadow-color: rgba(0, 0, 0, 0.2);
-    --elevation-shadow: -0.2rem -0.2rem 0.4rem rgba(180, 180, 180, 0.2),
-        0.1rem 0.15rem 0.15rem var(--elevation-shadow-color),
-        0.2rem 0.3rem 0.2rem var(--elevation-shadow-color);
-
     --tooltip-bg: #8864cb;
     --tooltip-fg: #f8f8f0;
     --tooltip-border: 1px solid #131218;
@@ -230,13 +225,15 @@
 */
 
 ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    margin-left: -6px;
     background: var(--scrollbar-bg);
-    box-shadow: var(--elevation-shadow);
 }
 
 ::-webkit-scrollbar-thumb {
+    position: absolute;
     background: var(--scrollbar-fg);
 }
 
@@ -628,6 +625,8 @@ kc-ui-panel-header-actions {
     flex: 0 1;
     display: flex;
     flex-direction: row;
+    /* cheeky hack to work around scrollbar causing placement to be off. */
+    padding-right: 6px;
 }
 
 kc-ui-panel-body {
