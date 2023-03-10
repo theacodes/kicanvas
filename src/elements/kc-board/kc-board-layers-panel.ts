@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { LayerSet } from "../../board/layers";
+import { LayerNames, LayerSet } from "../../board/layers";
 import { BoardViewer } from "../../board/viewer";
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
@@ -15,13 +15,13 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override styles = styles;
     viewer: BoardViewer;
 
-    get panel_body() {
+    private get panel_body() {
         return this.renderRoot.querySelector("kc-ui-panel-body")!;
     }
 
-    get items(): KCBoardLayerControlElement[] {
+    private get items(): KCBoardLayerControlElement[] {
         return Array.from(
-            this.panel_body?.querySelectorAll("kc-board-layer-control") ?? [],
+            this.panel_body.querySelectorAll("kc-board-layer-control") ?? [],
         );
     }
 
@@ -85,24 +85,104 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
             .querySelector("button")
             ?.addEventListener("click", (e) => {
                 e.stopPropagation();
+
+                const ui_layers = this.viewer.layers.in_ui_order();
+
                 if (this.items.some((n) => n.layer_visible)) {
                     // hide all layers.
-                    for (const item of this.items) {
-                        item.layer_visible = false;
-                        item.layer_highlighted = false;
-                        this.viewer.layers.by_name(item.layer_name!)!.visible =
-                            false;
+                    for (const l of ui_layers) {
+                        l.visible = false;
                     }
                 } else {
                     // show all layers
-                    for (const item of this.items) {
-                        item.layer_visible = true;
-                        this.viewer.layers.by_name(item.layer_name!)!.visible =
-                            true;
+                    for (const l of ui_layers) {
+                        l.visible = true;
                     }
                 }
+
                 this.viewer.draw();
+                this.update_item_states();
             });
+
+        // Presets
+        this.panel_body.addEventListener("click", (e) => {
+            const item = (e.target as HTMLElement).closest(
+                "[data-preset]",
+            ) as HTMLElement | null;
+
+            if (!item) {
+                return;
+            }
+
+            const ui_layers = this.viewer.layers.in_ui_order();
+
+            switch (item.dataset["preset"]) {
+                case "all":
+                    for (const l of ui_layers) {
+                        l.visible = true;
+                    }
+                    break;
+                case "front":
+                    for (const l of ui_layers) {
+                        l.visible =
+                            l.name.startsWith("F.") ||
+                            l.name == LayerNames.edge_cuts;
+                    }
+                    break;
+                case "back":
+                    for (const l of ui_layers) {
+                        l.visible =
+                            l.name.startsWith("B.") ||
+                            l.name == LayerNames.edge_cuts;
+                    }
+                    break;
+                case "copper":
+                    for (const l of ui_layers) {
+                        l.visible =
+                            l.name.includes(".Cu") ||
+                            l.name == LayerNames.edge_cuts;
+                    }
+                    break;
+                case "outer-copper":
+                    for (const l of ui_layers) {
+                        l.visible =
+                            l.name == LayerNames.f_cu ||
+                            l.name == LayerNames.b_cu ||
+                            l.name == LayerNames.edge_cuts;
+                    }
+                    break;
+                case "inner-copper":
+                    for (const l of ui_layers) {
+                        l.visible =
+                            (l.name.includes(".Cu") &&
+                                !(
+                                    l.name == LayerNames.f_cu ||
+                                    l.name == LayerNames.b_cu
+                                )) ||
+                            l.name == LayerNames.edge_cuts;
+                    }
+                    break;
+                case "drawings":
+                    for (const l of ui_layers) {
+                        l.visible =
+                            !l.name.includes(".Cu") &&
+                            !l.name.includes(".Mask") &&
+                            !l.name.includes(".Paste") &&
+                            !l.name.includes(".Adhes");
+                    }
+            }
+
+            this.viewer.draw();
+            this.update_item_states();
+        });
+    }
+
+    private update_item_states() {
+        for (const item of this.items) {
+            const layer = this.viewer.layers.by_name(item.layer_name!);
+            item.layer_visible = layer?.visible ?? false;
+            item.layer_highlighted = layer?.highlighted ?? false;
+        }
     }
 
     override render() {
@@ -130,7 +210,25 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
                         </button>
                     </kc-ui-panel-header-actions>
                 </kc-ui-panel-header>
-                <kc-ui-panel-body> ${items} </kc-ui-panel-body>
+                <kc-ui-panel-body>
+                    ${items}
+                    <ul class="item-list outline">
+                        <li class="header">Presets</li>
+                        <li data-preset="all" aria-role="button">All</li>
+                        <li data-preset="front" aria-role="button">Front</li>
+                        <li data-preset="back" aria-role="button">Back</li>
+                        <li data-preset="copper" aria-role="button">Copper</li>
+                        <li data-preset="outer-copper" aria-role="button">
+                            Outer copper
+                        </li>
+                        <li data-preset="inner-copper" aria-role="button">
+                            Inner copper
+                        </li>
+                        <li data-preset="drawings" aria-role="button">
+                            Drawings
+                        </li>
+                    </ul>
+                </kc-ui-panel-body>
             </kc-ui-panel>
         `;
     }
