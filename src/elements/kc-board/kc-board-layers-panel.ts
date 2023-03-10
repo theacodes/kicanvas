@@ -208,7 +208,7 @@ class KCBoardLayerControlElement extends CustomElement {
     override render() {
         return html`<span
                 class="color"
-                style="background-color: ${this.layer_color};"></span>
+                style="background: ${this.layer_color};"></span>
             <span class="name">${this.layer_name}</span>
             <button type="button" name="${this.layer_name}">
                 <kc-ui-icon class="icon for-visible">visibility</kc-ui-icon>

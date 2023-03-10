@@ -38,15 +38,6 @@
     --activity-bar-active-bg: #131218;
     --activity-bar-active-fg: #f8f8f0;
 
-    --status-bar-bg: #8864cb;
-    --status-bar-fg: #f8f8f0;
-    --status-bar-button-bg: transparent;
-    --status-bar-button-fg: inherit;
-    --status-bar-button-hover-bg: #ae81ff;
-    --status-bar-button-hover-fg: inherit;
-    --status-bar-button-disabled-bg: inherit;
-    --status-bar-button-disabled-fg: #888;
-
     --panel-bg: #131218;
     --panel-fg: #f8f8f0;
     --panel-border: 2px solid #282634;
@@ -59,6 +50,8 @@
     --panel-title-button-hover-fg: inherit;
     --panel-title-button-disabled-bg: inherit;
     --panel-title-button-disabled-fg: #888;
+    --panel-subtitle-bg: #634e89;
+    --panel-subtitle-fg: var(--panel-fg);
 
     --toolbar-button-bg: #282634;
     --toolbar-button-fg: #f8f8f0;
@@ -126,6 +119,79 @@
 }
 
 /*
+    Gradient theme
+*/
+:host {
+    --gradient-purple-green-light: linear-gradient(
+            190deg,
+            hsl(261deg 27% 42%) 0%,
+            hsl(243deg 27% 42%) 17%,
+            hsl(224deg 27% 42%) 33%,
+            hsl(205deg 27% 42%) 50%,
+            hsl(187deg 27% 42%) 67%,
+            hsl(168deg 27% 42%) 83%,
+            hsl(149deg 27% 42%) 100%
+        )
+        0 0 fixed;
+    --gradient-purple-blue-medium: linear-gradient(
+            190deg,
+            hsl(261deg 28% 30%) 0%,
+            hsl(248deg 30% 31%) 17%,
+            hsl(235deg 32% 32%) 33%,
+            hsl(222deg 34% 33%) 50%,
+            hsl(209deg 35% 34%) 67%,
+            hsl(197deg 37% 35%) 83%,
+            hsl(183deg 38% 36%) 100%
+        )
+        0 0 fixed;
+    --gradient-purple-blue-dark: linear-gradient(10deg, #111928, #1d162a) 0 0
+        fixed;
+    --gradient-cyan-blue-light: linear-gradient(
+            190deg,
+            hsl(183deg 63% 33%) 0%,
+            hsl(189deg 69% 30%) 17%,
+            hsl(194deg 74% 27%) 33%,
+            hsl(199deg 79% 24%) 50%,
+            hsl(203deg 85% 21%) 67%,
+            hsl(209deg 89% 18%) 83%,
+            hsl(214deg 95% 15%) 100%
+        )
+        0 0 fixed;
+    --gradient-purple-green-highlight: linear-gradient(
+            190deg,
+            hsl(261deg 27% 53%) 0%,
+            hsl(243deg 27% 52%) 17%,
+            hsl(224deg 27% 52%) 33%,
+            hsl(205deg 27% 51%) 50%,
+            hsl(186deg 27% 51%) 67%,
+            hsl(168deg 27% 50%) 83%,
+            hsl(149deg 27% 50%) 100%
+        )
+        0 0 fixed;
+
+    --scrollbar-bg: var(--gradient-purple-blue-dark);
+    --scrollbar-fg: var(--gradient-purple-green-light);
+    --scrollbar-hover-fg: var(--scrollbar-fg);
+    --scrollbar-active-fg: var(--scrollbar-fg);
+
+    --activity-bar-bg: var(--gradient-purple-green-light);
+
+    --panel-bg: var(--gradient-purple-blue-dark);
+    --panel-title-bg: var(--gradient-purple-green-light);
+    --panel-subtitle-bg: var(--gradient-purple-blue-medium);
+
+    --toolbar-button-bg: var(--gradient-purple-blue-dark);
+    --toolbar-button-hover-bg: var(--gradient-purple-green-light);
+    --toolbar-button-hover-fg: #f8f8f0;
+    --toolbar-button-disabled-bg: var(--gradient-purple-blue-dark);
+
+    --input-range-bg: var(--gradient-purple-green-light);
+
+    --list-item-hover-bg: var(--gradient-purple-green-highlight);
+    --list-item-active-bg: var(--gradient-cyan-blue-light);
+}
+
+/*
     Helpers
 */
 
@@ -160,7 +226,7 @@
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
-    background-color: var(--scrollbar-bg);
+    background: var(--scrollbar-bg);
     box-shadow: var(--elevation-shadow);
 }
 
@@ -288,7 +354,7 @@ input[type="range"]:focus::-webkit-slider-runnable-track {
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    background-color: var(--input-fg);
+    background: var(--input-fg);
     height: 1rem;
     width: 1rem;
     border-radius: 0.5rem;
@@ -499,17 +565,17 @@ kc-ui-view-resizer {
     width: 6px;
     margin-left: -6px;
     cursor: col-resize;
-    background-color: transparent;
+    background: transparent;
     transition: background-color var(--transition-time-medium) ease;
 }
 
 kc-ui-view-resizer:hover {
-    background-color: var(--scrollbar-hover-bg);
+    background: var(--scrollbar-hover-bg);
     transition: background-color var(--transition-time-short) ease;
 }
 kc-ui-view-resizer:hover.active,
 kc-ui-view-resizer.active {
-    background-color: var(--scrollbar-active-fg);
+    background: var(--scrollbar-active-fg);
 }
 
 /*
@@ -577,13 +643,13 @@ dl.property-list {
     display: grid;
     gap: 1px;
     grid-template-columns: fit-content(50%) 1fr;
-    background-color: var(--grid-outline);
+    background: var(--grid-outline);
     border-bottom: 1px solid var(--grid-outline);
 }
 
 dl.property-list > * {
     padding: 0.2rem;
-    background-color: var(--bg);
+    background: var(--bg);
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -593,7 +659,8 @@ dl.property-list > * {
 dl.property-list dt.header {
     user-select: none;
     grid-column-end: span 2;
-    background-color: var(--grid-outline);
+    background: var(--panel-subtitle-bg);
+    color: var(--panel-subtitle-fg);
 }
 
 dl.property-list kc-ui-icon {
@@ -610,7 +677,7 @@ ul.item-list {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    background-color: var(--list-item-bg);
+    background: var(--list-item-bg);
     color: var(--list-item-fg);
 }
 
@@ -621,7 +688,7 @@ ul.item-list li {
     flex-wrap: nowrap;
     padding: 0.2rem;
     user-select: none;
-    background-color: transparent;
+    background: transparent;
     transition: color var(--transition-time-short) ease,
         background-color var(--transition-time-short) ease;
 }
@@ -631,7 +698,7 @@ ul.item-list.outline li {
 }
 
 ul.item-list li:hover {
-    background-color: var(--list-item-hover-bg);
+    background: var(--list-item-hover-bg);
     color: var(--list-item-hover-fg);
 }
 
@@ -654,8 +721,8 @@ ul.item-list li span.narrow {
 ul.item-list li.header,
 ul.item-list li.header:hover {
     user-select: none;
-    background-color: var(--grid-outline);
-    color: var(--list-item-fg);
+    background: var(--panel-subtitle-bg);
+    color: var(--panel-subtitle-fg);
 }
 
 ul.item-list li[aria-role="button"] {
@@ -664,13 +731,13 @@ ul.item-list li[aria-role="button"] {
 
 ul.item-list li[aria-current="true"] {
     cursor: pointer;
-    background-color: var(--list-item-active-bg);
+    background: var(--list-item-active-bg);
     color: var(--list-item-active-fg);
 }
 
 ul.item-list li[aria-disabled="true"] {
     cursor: pointer;
-    background-color: var(--list-item-disabled-bg);
+    background: var(--list-item-disabled-bg);
     color: var(--list-item-disabled-fg);
 }
 
@@ -684,7 +751,7 @@ ul.control-list {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    background-color: var(--list-item-bg);
+    background: var(--list-item-bg);
     color: var(--list-item-fg);
 }
 

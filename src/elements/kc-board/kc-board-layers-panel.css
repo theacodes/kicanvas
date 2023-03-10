@@ -35,7 +35,7 @@ kc-board-layer-control {
 }
 
 kc-board-layer-control:hover {
-    background-color: var(--list-item-hover-bg);
+    background: var(--list-item-hover-bg);
     color: var(--list-item-hover-fg);
 }
 
@@ -50,7 +50,7 @@ kc-board-layer-control:hover button:hover {
 }
 
 kc-board-layer-control[layer-highlighted] {
-    background-color: var(--list-item-active-bg);
+    background: var(--list-item-active-bg);
     color: var(--list-item-active-fg);
 }
 
@@ -59,7 +59,7 @@ kc-board-layer-control[layer-highlighted]:hover button {
 }
 
 kc-board-layer-control[layer-visibility="hidden"] {
-    background-color: var(--list-item-disabled-bg);
+    background: var(--list-item-disabled-bg);
     color: var(--list-item-disabled-fg);
 }
 
