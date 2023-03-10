@@ -38,6 +38,9 @@
     --activity-bar-active-bg: #131218;
     --activity-bar-active-fg: #f8f8f0;
 
+    --resizer-bg: #ae81ff;
+    --resizer-active-bg: #ae81ffbb;
+
     --panel-bg: #131218;
     --panel-fg: #f8f8f0;
     --panel-border: 2px solid #282634;
@@ -175,6 +178,9 @@
     --scrollbar-active-fg: var(--scrollbar-fg);
 
     --activity-bar-bg: var(--gradient-purple-green-light);
+
+    --resizer-bg: var(--gradient-purple-blue-medium);
+    --resizer-active-bg: var(--gradient-purple-green-highlight);
 
     --panel-bg: var(--gradient-purple-blue-dark);
     --panel-title-bg: var(--gradient-purple-green-light);
@@ -561,21 +567,25 @@ kc-ui-split-view.fixed {
 */
 
 kc-ui-view-resizer {
+    z-index: 999;
+    user-select: none;
     display: block;
     width: 6px;
     margin-left: -6px;
     cursor: col-resize;
     background: transparent;
-    transition: background-color var(--transition-time-medium) ease;
+    opacity: 0;
+    transition: opacity var(--transition-time-medium) ease;
 }
 
 kc-ui-view-resizer:hover {
-    background: var(--scrollbar-hover-bg);
-    transition: background-color var(--transition-time-short) ease;
+    background: var(--resizer-bg);
+    opacity: 1;
+    transition: opacity var(--transition-time-short) ease;
 }
 kc-ui-view-resizer:hover.active,
 kc-ui-view-resizer.active {
-    background: var(--scrollbar-active-fg);
+    background: var(--resizer-active-bg);
 }
 
 /*
