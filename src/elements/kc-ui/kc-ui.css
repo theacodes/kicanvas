@@ -186,6 +186,11 @@
     --toolbar-button-hover-fg: #f8f8f0;
     --toolbar-button-disabled-bg: var(--gradient-purple-blue-dark);
 
+    --toolbar-button-highlight-bg: var(--gradient-purple-green-light);
+    --toolbar-button-highlight-fg: #f8f8f0;
+    --toolbar-button-highlight-hover-bg: var(--gradient-purple-green-highlight);
+    --toolbar-button-highlight-hover-fg: #f8f8f0;
+
     --input-range-bg: var(--gradient-purple-green-light);
 
     --list-item-hover-bg: var(--gradient-purple-green-highlight);
@@ -455,7 +460,7 @@ output.toolbar {
     padding: 0.5rem;
     color: var(--toolbar-button-fg);
     background: var(--toolbar-button-bg);
-    border: 1xxxwpx solid (var(--toolbar-button-bg));
+    border: 1px solid var(--toolbar-button-bg);
     border-radius: 0.25rem;
     font-weight: 300;
     font-size: 0.9rem;
@@ -478,6 +483,16 @@ button.toolbar ::part(icon),
 output.toolbar kc-ui-icon,
 output.toolbar ::part(icon) {
     font-size: 1rem;
+}
+
+button.toolbar.highlight {
+    color: var(--toolbar-button-highlight-fg);
+    background: var(--toolbar-button-highlight-bg);
+}
+
+button.toolbar.highlight:hover {
+    color: var(--toolbar-button-highlight-hover-fg);
+    background: var(--toolbar-button-highlight-hover-bg);
 }
 
 .button-group {
@@ -645,6 +660,72 @@ kc-ui-panel-body.no-padding {
 }
 
 /*
+    Floating toggle panels
+*/
+
+kc-ui-floating-panel {
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: var(--activity-bar-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+kc-ui-floating-panel-header button {
+    background: transparent;
+    color: var(--toolbar-button-fg);
+    margin-top: 0;
+    margin-right: 0;
+    border-radius: 0;
+    border: none;
+    /* padding: 0.5rem 0.6rem; */
+    padding: 0;
+    justify-content: left;
+    box-shadow: none;
+}
+
+kc-ui-floating-panel-header button:hover,
+kc-ui-floating-panel-header button:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+kc-ui-floating-panel[closed] kc-ui-floating-panel-header button:hover {
+    background: var(--toolbar-button-highlight-hover-bg);
+    color: var(--toolbar-button-highlight-hover-fg);
+}
+
+kc-ui-floating-panel kc-ui-floating-panel-header button:hover {
+    background: transparent;
+    color: var(--toolbar-button-fg);
+}
+
+kc-ui-floating-panel-header button kc-ui-icon {
+    padding: 0.4rem 0.5rem;
+}
+
+kc-ui-floating-panel-header button span {
+}
+
+kc-ui-floating-panel-body {
+    width: 100%;
+    min-height: 0;
+    padding: 0.1rem 0.8rem 0.1rem 0.4rem;
+    flex: 1 0;
+    font-weight: 300;
+    font-size: 1rem;
+}
+
+kc-ui-floating-panel[closed] kc-ui-floating-panel-header button span {
+    display: none;
+}
+
+kc-ui-floating-panel[closed] kc-ui-floating-panel-body {
+    display: none;
+}
+
+/*
     Property list (grid style) dl elements
 */
 
@@ -727,6 +808,11 @@ ul.item-list li span.narrow {
     max-width: 100px;
 }
 
+ul.item-list li > kc-ui-icon:first-child {
+    margin-right: 0.5rem;
+    margin-left: -0.1rem;
+}
+
 ul.item-list li.header,
 ul.item-list li.header:hover {
     user-select: none;
@@ -748,6 +834,14 @@ ul.item-list li[aria-disabled="true"] {
     cursor: pointer;
     background: var(--list-item-disabled-bg);
     color: var(--list-item-disabled-fg);
+}
+
+ul.item-list.no-bg {
+    background: transparent;
+}
+
+ul.item-list.no-bg li {
+    background: transparent;
 }
 
 /*
