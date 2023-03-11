@@ -20,15 +20,22 @@ import { Vec2 } from "../math/vec2";
 export class Viewport {
     #observer: CanvasSizeObserver;
     #pan_and_zoom: PanAndZoom;
+    #resolve_ready: () => void;
+
     width: number;
     height: number;
     camera: Camera2;
+    ready: Promise<void>;
 
     /**
      * Create a Scene
      * @param callback - a callback used to re-draw the viewport when it changes.
      */
     constructor(public renderer: Renderer, public callback: () => void) {
+        this.ready = new Promise((resolve) => {
+            this.#resolve_ready = resolve;
+        });
+
         this.camera = new Camera2(
             new Vec2(0, 0),
             new Vec2(0, 0),
@@ -39,6 +46,11 @@ export class Viewport {
         this.#observer = new CanvasSizeObserver(
             this.renderer.canvas,
             (canvas) => {
+                console.log(
+                    "canvas size changed",
+                    canvas.clientWidth,
+                    canvas.clientHeight,
+                );
                 this.#update_camera(canvas);
                 this.callback();
             },
@@ -62,6 +74,10 @@ export class Viewport {
             this.width = canvas.clientWidth;
             this.height = canvas.clientHeight;
             this.camera.viewport_size = new Vec2(this.width, this.height);
+
+            if (this.width && this.height) {
+                this.#resolve_ready();
+            }
         }
     }
 
