@@ -30,6 +30,10 @@ module.exports = {
                 varsIgnorePattern: "([Ii]gnored)|([Uu]nused)|(_)",
             },
         ],
+        "@typescript-eslint/no-inferrable-types": [
+            "warn",
+            { ignoreProperties: true },
+        ],
         "mocha/max-top-level-suites": "off",
     },
 };

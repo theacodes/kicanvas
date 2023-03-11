@@ -26,6 +26,7 @@ export default {
                 ".kicad_pcb": "text",
                 ".kicad_sch": "text",
                 ".kicad_wks": "text",
+                ".kicad_pro": "text",
             },
         }),
     ],
