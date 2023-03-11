@@ -33,7 +33,8 @@ export class KiCanvasBoardElement extends CustomElement {
 
         const src = this.getAttribute("src");
         if (src) {
-            this.load(src);
+            // Don't block the main thread
+            window.setTimeout(() => this.load(src), 0);
         }
     }
 
