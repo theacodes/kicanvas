@@ -1,3 +1,9 @@
+/*
+    Copyright (c) 2023 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
+
 import { listify, type List } from "./tokenizer.ts";
 import { Vec2 } from "../math/vec2.ts";
 import { Color } from "../gfx/color.ts";
