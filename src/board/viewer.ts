@@ -49,6 +49,9 @@ export class BoardViewer extends Viewer {
         this.drawing_sheet.document = this.board;
 
         // Setup graphical layers
+        if (this.layers) {
+            this.layers.dispose();
+        }
         this.layers = new LayerSet(this.board, this.renderer.theme);
 
         // Paint the board
