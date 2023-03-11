@@ -7,7 +7,6 @@
 import { CustomElement, html } from "../dom/custom-elements";
 import { DropTarget } from "../dom/drag-drop";
 import * as theme from "../kicad/theme";
-import { GitHubUserContent } from "../services/github";
 import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
 import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
@@ -16,6 +15,7 @@ import "./kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
 import "./kc-schematic/kc-schematic-viewer";
 import "./kc-project-panel";
+import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = kicanvas_app_styles;
@@ -30,21 +30,23 @@ class KiCanvasAppElement extends CustomElement {
     override initialContentCallback() {
         const src = this.getAttribute("src");
         if (src) {
-            this.load(src);
+            this.load(new FetchFileSystem([src]));
         }
 
         const url_params = new URLSearchParams(document.location.search);
         const github_path = url_params.get("github");
 
         if (github_path) {
-            const gh = new GitHubUserContent();
-            const gh_url = gh.convert_url(github_path);
-            (async () => {
-                this.load(await gh.get(gh_url));
-            })();
+            // TODO: Use VFS
+            console.log("Github loading disabled");
+            // const gh = new GitHubUserContent();
+            // const gh_url = gh.convert_url(github_path);
+            // (async () => {
+            //     this.load(await gh.get(gh_url));
+            // })();
         } else {
-            new DropTarget(this, ["kicad_sch", "kicad_pcb"], (files) => {
-                this.load(files[0]!);
+            new DropTarget(this, ["kicad_sch", "kicad_pcb"], (fs) => {
+                this.load(fs);
             });
         }
     }
@@ -69,12 +71,21 @@ class KiCanvasAppElement extends CustomElement {
         return this.getBooleanAttribute("loaded");
     }
 
-    async load(src: File | string) {
-        if (typeof src == "string") {
-            src = new File([await (await window.fetch(src)).blob()], src);
+    async load(fs: VirtualFileSystem) {
+        this.loading = true;
+
+        const files = [
+            ...fs.list_ext("kicad_sch"),
+            ...fs.list_ext("kicad_pcb"),
+        ];
+
+        if (!files) {
+            this.loading = false;
+            return;
         }
 
-        this.loading = true;
+        // for right now, src is the first file in the list.
+        const src = await fs.get(files[0]!);
 
         const extension = src.name.split(".").at(-1);
 

@@ -4,11 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { DragAndDropFileSystem, VirtualFileSystem } from "../services/vfs";
+
 export class DropTarget {
     constructor(
         elm: HTMLElement,
         exts: string[],
-        callback: (files: File[]) => void,
+        callback: (fs: VirtualFileSystem) => void,
     ) {
         elm.addEventListener(
             "dragenter",
@@ -41,17 +43,9 @@ export class DropTarget {
                     return;
                 }
 
-                const files = Array.from(dt.files).filter((file) => {
-                    for (const ext of exts) {
-                        if (file.name.endsWith(`.${ext}`)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-                if (files.length > 0) {
-                    callback(files);
-                }
+                const fs = await DragAndDropFileSystem.fromDataTransfer(dt);
+
+                callback(fs);
             },
             false,
         );
