@@ -32,15 +32,4 @@ export class CanvasSizeObserver {
     dispose() {
         this.#observer.disconnect();
     }
-
-    /** Resizes the canvas
-     *
-     * Typically not called directly, it's invoked automatically through
-     * event listeners.
-     */
-    resize() {
-        const c = this.canvas;
-        c.width = c.clientWidth * window.devicePixelRatio;
-        c.height = c.clientHeight * window.devicePixelRatio;
-    }
 }
