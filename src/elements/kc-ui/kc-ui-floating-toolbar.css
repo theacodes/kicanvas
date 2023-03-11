@@ -1,4 +1,5 @@
 :host {
+    z-index: 10;
     user-select: none;
     pointer-events: none;
     position: absolute;
@@ -26,7 +27,9 @@
 
 div.left {
     flex-grow: 999;
+    display: flex;
 }
 
 div.right {
+    display: flex;
 }
