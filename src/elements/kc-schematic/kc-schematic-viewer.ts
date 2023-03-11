@@ -7,15 +7,16 @@
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
 import { KiCanvasSelectEvent } from "../../framework/events";
-import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
+import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
 import "../kc-ui/kc-ui-activity-side-bar";
 import "../kc-viewer-bottom-toolbar";
-import "./kc-schematic-symbols-panel";
-import "./kc-schematic-properties-panel";
+import "../kicanvas-schematic";
 import "./kc-schematic-info-panel";
+import "./kc-schematic-properties-panel";
+import "./kc-schematic-symbols-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
