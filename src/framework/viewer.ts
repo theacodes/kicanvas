@@ -90,6 +90,9 @@ export abstract class Viewer extends EventTarget {
             const items = this.layers.query_point(this.mouse_position);
             this.on_pick(this.mouse_position, items);
         });
+
+        // Wait for a valid viewport size
+        await this.viewport.ready;
     }
 
     protected on_viewport_change() {
@@ -127,11 +130,11 @@ export abstract class Viewer extends EventTarget {
     }
 
     protected on_draw() {
+        this.renderer.clear_canvas();
+
         if (!this.layers) {
             return;
         }
-
-        this.renderer.clear_canvas();
 
         // Render all layers in display order (back to front)
         let depth = 0.01;
