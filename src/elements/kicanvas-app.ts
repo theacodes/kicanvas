@@ -15,9 +15,13 @@ import kicanvas_app_styles from "./kicanvas-app.css";
 import "./kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
 import "./kc-schematic/kc-schematic-viewer";
+import "./kc-project-panel";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = kicanvas_app_styles;
+
+    #kc_schematic_viewer: KCSchematicViewerElement;
+    #kc_board_viewer: KCBoardViewerElement;
 
     constructor() {
         super();
@@ -45,59 +49,80 @@ class KiCanvasAppElement extends CustomElement {
         }
     }
 
+    set loading(val: boolean) {
+        this.setBooleanAttribute("loading", val);
+        if (val) {
+            this.loaded = false;
+        }
+    }
+
+    get loading() {
+        return this.getBooleanAttribute("loading");
+    }
+
+    set loaded(val: boolean) {
+        this.setBooleanAttribute("loaded", val);
+        this.loading = false;
+    }
+
+    get loaded() {
+        return this.getBooleanAttribute("loaded");
+    }
+
     async load(src: File | string) {
         if (typeof src == "string") {
             src = new File([await (await window.fetch(src)).blob()], src);
         }
 
-        this.setBooleanAttribute("loading", true);
-
-        this.renderRoot.querySelector("main")?.remove();
+        this.loading = true;
 
         const extension = src.name.split(".").at(-1);
 
         let view_elem: KCSchematicViewerElement | KCBoardViewerElement;
-        let content;
 
         switch (extension) {
             case "kicad_sch":
-                view_elem =
-                    html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
-                content = html`<kc-ui-app>${view_elem}</kc-ui-app>`;
+                view_elem = this.#kc_schematic_viewer;
                 break;
 
             case "kicad_pcb":
-                {
-                    view_elem =
-                        html`<kc-board-viewer></kc-board-viewer>` as KCBoardViewerElement;
-
-                    content = html`
-                        <kc-ui-app>
-                            ${view_elem}
-                        </ki-ui-app>`;
-                }
+                view_elem = this.#kc_board_viewer;
                 break;
             default:
                 throw new Error(`Unable to display file ${src.name}`);
         }
 
-        this.renderRoot.appendChild(content);
+        view_elem.classList.remove("is-hidden");
 
         await view_elem.load(src);
 
-        this.setBooleanAttribute("loaded", true);
-        this.setBooleanAttribute("loading", false);
+        this.loaded = true;
     }
 
     override render() {
         this.style.backgroundColor = theme.schematic.background.to_css();
         this.style.color = theme.schematic.note.to_css();
 
+        this.#kc_schematic_viewer = html`<kc-schematic-viewer
+            class="is-hidden"></kc-schematic-viewer>` as KCSchematicViewerElement;
+        this.#kc_board_viewer = html`<kc-board-viewer
+            class="is-hidden"></kc-board-viewer>` as KCBoardViewerElement;
+
         return html`
-            <section class="overlay">
-                <img src="kicanvas.png" />
-                <p>Drag & drop your kicad schematic or board file here.</p>
-            </section>
+            <kc-ui-app>
+                <section class="overlay">
+                    <img src="kicanvas.png" />
+                    <p>Drag & drop your kicad schematic or board file here.</p>
+                </section>
+                <main>
+                    <kc-ui-floating-toolbar location="top">
+                        <div slot="left">
+                            <kc-project-panel></kc-project-panel>
+                        </div>
+                    </kc-ui-floating-toolbar>
+                    ${this.#kc_schematic_viewer} ${this.#kc_board_viewer}
+                </main>
+            </kc-ui-app>
         `;
     }
 }

@@ -22,6 +22,15 @@
     display: none;
 }
 
+:host main {
+    display: none;
+}
+
+:host([loaded]) main,
+:host([loading]) main {
+    display: contents;
+}
+
 section.overlay {
     position: absolute;
     top: 0;
