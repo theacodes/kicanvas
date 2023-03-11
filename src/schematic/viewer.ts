@@ -49,11 +49,10 @@ export class SchematicViewer extends Viewer {
         this.drawing_sheet = DrawingSheet.default();
         this.drawing_sheet.document = this.schematic;
 
+        // Setup graphical layers
         if (this.layers) {
             this.layers.dispose();
         }
-
-        // Setup graphical layers
         this.layers = new LayerSet(this.renderer.theme);
 
         // Paint the schematic
@@ -92,8 +91,7 @@ export class SchematicViewer extends Viewer {
     }
 
     public override zoom_to_page(): void {
-        const bb = this.layers.bbox;
-        this.viewport.camera.bbox = bb.grow(bb.w * 0.1);
+        this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
         this.draw();
     }
 
