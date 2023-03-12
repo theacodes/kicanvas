@@ -93,7 +93,9 @@ export class ViewLayer {
 
     clear() {
         this.graphics?.dispose();
-        this.items = [];
+        this.graphics = undefined!;
+        this.items = undefined!;
+        this.bboxes = undefined!;
     }
 
     get visible(): boolean {
