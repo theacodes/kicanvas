@@ -55,6 +55,14 @@ export class Grid {
         this.origin_color = this.gfx.theme["grid_axes"] as Color;
     }
 
+    dispose() {
+        this.gfx = undefined!;
+        if (this.layer) {
+            this.layer.dispose();
+        }
+        this.layer = undefined!;
+    }
+
     update() {
         let lod;
         for (const l of this.lods) {
