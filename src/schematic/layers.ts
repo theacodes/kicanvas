@@ -51,6 +51,7 @@ export class LayerSet extends BaseLayerSet {
         }
 
         this.by_name(LayerNames.interactive)!.visible = false;
+        this.by_name(LayerNames.interactive)!.interactive = true;
         this.by_name(LayerNames.drawing_sheet)!.color =
             (this.theme["worksheet"] as Color) ?? Color.white;
     }
