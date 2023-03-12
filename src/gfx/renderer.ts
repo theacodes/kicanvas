@@ -116,6 +116,11 @@ export abstract class Renderer {
     abstract get layers(): Iterable<RenderLayer>;
 
     /**
+     * Remove a layer, called automatically by layer.dispose
+     */
+    abstract remove_layer(layer: RenderLayer): void;
+
+    /**
      * Draw a filled circle
      */
     abstract circle(circle: Circle): void;
@@ -306,7 +311,9 @@ export abstract class RenderLayer {
         public readonly name: string,
     ) {}
 
-    abstract dispose(): void;
+    dispose() {
+        this.renderer.remove_layer(this);
+    }
 
     abstract clear(): void;
 

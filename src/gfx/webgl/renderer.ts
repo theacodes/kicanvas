@@ -195,6 +195,14 @@ export class WebGL2Renderer extends Renderer {
             },
         };
     }
+
+    override remove_layer(layer: WebGL2RenderLayer) {
+        const idx = this.#layers.indexOf(layer);
+        if (idx == -1) {
+            return;
+        }
+        this.#layers.splice(idx, 1);
+    }
 }
 
 class WebGL2RenderLayer extends RenderLayer {
@@ -206,7 +214,7 @@ class WebGL2RenderLayer extends RenderLayer {
         super(renderer, name);
     }
 
-    dispose(): void {
+    override dispose(): void {
         this.clear();
     }
 

@@ -91,4 +91,6 @@ export class NullRenderer extends Renderer {
             super.prep_polygon(polygon_or_points, color),
         );
     }
+
+    override remove_layer(layer: RenderLayer) {}
 }

@@ -218,6 +218,14 @@ export class Canvas2DRenderer extends Renderer {
             },
         };
     }
+
+    override remove_layer(layer: Canvas2dRenderLayer) {
+        const idx = this.#layers.indexOf(layer);
+        if (idx == -1) {
+            return;
+        }
+        this.#layers.splice(idx, 1);
+    }
 }
 
 class DrawCommand {
@@ -252,7 +260,7 @@ class Canvas2dRenderLayer extends RenderLayer {
         super(renderer, name);
     }
 
-    dispose(): void {
+    override dispose(): void {
         this.clear();
     }
 
