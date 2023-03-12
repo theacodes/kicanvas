@@ -205,18 +205,22 @@ export class LayerSet extends BaseLayerSet {
             }
 
             let visible: VisibilityType = true;
+            let interactive = false;
 
             // These virtual layers require at least one visible copper layer to be shown.
             if (HoleLayerNames.includes(layer_name)) {
                 visible = () => this.is_any_copper_layer_visible();
+                interactive = true;
             }
 
             // Pad layers require that the front or back layer is visible.
             if (layer_name == LayerNames.pads_front) {
                 visible = () => this.by_name(LayerNames.f_cu)!.visible;
+                interactive = true;
             }
             if (layer_name == LayerNames.pads_back) {
                 visible = () => this.by_name(LayerNames.b_cu)!.visible;
+                interactive = true;
             }
 
             // Copper layers require additional virual layers for zones and
@@ -224,6 +228,8 @@ export class LayerSet extends BaseLayerSet {
             // Zone virtual layers for copper layers require that the referenced
             // copper layer is visible.
             if (is_copper(layer_name)) {
+                interactive = true;
+
                 this.add(
                     new ViewLayer(
                         this,
@@ -232,6 +238,7 @@ export class LayerSet extends BaseLayerSet {
                             CopperVirtualLayerNames.bb_via_holes,
                         ),
                         () => this.by_name(layer_name)!.visible,
+                        false,
                         this.color_for(LayerNames.via_holes),
                     ),
                 );
@@ -243,6 +250,7 @@ export class LayerSet extends BaseLayerSet {
                             CopperVirtualLayerNames.bb_via_hole_walls,
                         ),
                         () => this.by_name(layer_name)!.visible,
+                        false,
                         this.color_for(LayerNames.via_holewalls),
                     ),
                 );
@@ -254,6 +262,7 @@ export class LayerSet extends BaseLayerSet {
                             CopperVirtualLayerNames.zones,
                         ),
                         () => this.by_name(layer_name)!.visible,
+                        false,
                         this.color_for(layer_name),
                     ),
                 );
@@ -264,6 +273,7 @@ export class LayerSet extends BaseLayerSet {
                     this,
                     layer_name,
                     visible,
+                    interactive,
                     this.color_for(layer_name),
                 ),
             );
