@@ -81,3 +81,11 @@ kc-schematic-viewer {
     height: 100%;
     flex: 1;
 }
+
+:host kc-project-panel {
+    display: none;
+}
+
+:host([loaded]) kc-project-panel {
+    display: block;
+}
