@@ -17,6 +17,7 @@ import "../kicanvas-schematic";
 import "./kc-schematic-info-panel";
 import "./kc-schematic-properties-panel";
 import "./kc-schematic-symbols-panel";
+import type { KicadSch } from "../../schematic/items";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -49,7 +50,7 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
 
     override disconnectedCallback() {}
 
-    async load(src: File | string) {
+    async load(src: KicadSch) {
         this.schematic_elm.load(src);
     }
 

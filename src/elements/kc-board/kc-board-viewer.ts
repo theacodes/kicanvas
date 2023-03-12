@@ -20,6 +20,7 @@ import "./kc-board-layers-panel";
 import "./kc-board-nets-panel";
 import "./kc-board-objects-panel";
 import "./kc-board-properties-panel";
+import type { KicadPCB } from "../../board/items";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -52,7 +53,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
 
     override disconnectedCallback() {}
 
-    async load(src: File | string) {
+    async load(src: KicadPCB) {
         this.board_elm.load(src);
     }
 
