@@ -4,56 +4,36 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { KicadPCB } from "../board/items";
+import { WithContext } from "../dom/context";
 import { CustomElement, html } from "../dom/custom-elements";
 import { DropTarget } from "../dom/drag-drop";
 import * as theme from "../kicad/theme";
+import { Project } from "../project";
+import { KicadSch } from "../schematic/items";
+import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
 import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
+import type { KCProjectPanelElement } from "./kc-project-panel";
 import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
 
-import "./kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
-import "./kc-schematic/kc-schematic-viewer";
 import "./kc-project-panel";
-import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
-import { Project } from "../project";
-import { KicadSch } from "../schematic/items";
-import { KicadPCB } from "../board/items";
+import "./kc-schematic/kc-schematic-viewer";
+import "./kc-ui/kc-ui";
 
-class KiCanvasAppElement extends CustomElement {
+class KiCanvasAppElement extends WithContext(CustomElement) {
     static override styles = kicanvas_app_styles;
 
     project: Project = new Project();
 
     #kc_schematic_viewer: KCSchematicViewerElement;
     #kc_board_viewer: KCBoardViewerElement;
+    #project_panel: KCProjectPanelElement;
 
     constructor() {
         super();
-    }
-
-    override initialContentCallback() {
-        const src = this.getAttribute("src");
-        if (src) {
-            this.load(new FetchFileSystem([src]));
-        }
-
-        const url_params = new URLSearchParams(document.location.search);
-        const github_path = url_params.get("github");
-
-        if (github_path) {
-            // TODO: Use VFS
-            console.log("Github loading disabled");
-            // const gh = new GitHubUserContent();
-            // const gh_url = gh.convert_url(github_path);
-            // (async () => {
-            //     this.load(await gh.get(gh_url));
-            // })();
-        } else {
-            new DropTarget(this, ["kicad_sch", "kicad_pcb"], (fs) => {
-                this.load(fs);
-            });
-        }
+        this.provideContext("project", this.project);
     }
 
     set loading(val: boolean) {
@@ -76,36 +56,80 @@ class KiCanvasAppElement extends CustomElement {
         return this.getBooleanAttribute("loaded");
     }
 
-    async load(fs: VirtualFileSystem) {
+    override initialContentCallback() {
+        const src = this.getAttribute("src");
+        const url_params = new URLSearchParams(document.location.search);
+        const github_path = url_params.get("github");
+
+        (async () => {
+            if (src) {
+                await this.setup_project(new FetchFileSystem([src]));
+                await this.load_default_file();
+                return;
+            }
+
+            if (github_path) {
+                // TODO: Use VFS
+                console.log("Github loading disabled");
+                // const gh = new GitHubUserContent();
+                // const gh_url = gh.convert_url(github_path);
+                // (async () => {
+                //     this.load(await gh.get(gh_url));
+                // })();
+                return;
+            }
+
+            new DropTarget(this, async (fs) => {
+                await this.setup_project(fs);
+                this.load_default_file();
+            });
+        })();
+
+        this.addEventListener("file:select", (e) => {
+            const detail = (e as CustomEvent).detail;
+            console.log(detail);
+            this.load_file(detail.filename);
+        });
+    }
+
+    private async setup_project(vfs: VirtualFileSystem) {
         this.loading = true;
+        await this.project.setup(vfs);
+        this.#project_panel.update();
+    }
 
-        await this.project.setup(fs);
-
-        let doc: KicadSch | KicadPCB | null = null;
-
+    private async load_default_file() {
         // for right now just load the first schematic or board file
         if (this.project.has_boards()) {
-            doc = await this.project.load_board(
+            return await this.load_file(
                 this.project.list_boards().next().value!,
             );
         } else if (this.project.has_schematics()) {
-            doc = await this.project.load_schematic(
-                this.project.list_schematics().next().value!,
+            return await this.load_file(
+                this.project.list_boards().next().value!,
             );
-        }
-
-        if (!doc) {
+        } else {
             console.log("No valid KiCAD files found");
             this.loading = false;
             return;
         }
+    }
+
+    private async load_file(filename: string) {
+        this.loading = true;
+
+        const doc = await this.project.load_file(filename);
 
         if (doc instanceof KicadPCB) {
             this.#kc_board_viewer.classList.remove("is-hidden");
+            this.#kc_schematic_viewer.classList.add("is-hidden");
             await this.#kc_board_viewer.load(doc);
         } else if (doc instanceof KicadSch) {
+            this.#kc_board_viewer.classList.add("is-hidden");
             this.#kc_schematic_viewer.classList.remove("is-hidden");
             await this.#kc_schematic_viewer.load(doc);
+        } else {
+            throw new Error(`Unable to load ${filename}`);
         }
 
         this.loaded = true;
@@ -119,6 +143,8 @@ class KiCanvasAppElement extends CustomElement {
             class="is-hidden"></kc-schematic-viewer>` as KCSchematicViewerElement;
         this.#kc_board_viewer = html`<kc-board-viewer
             class="is-hidden"></kc-board-viewer>` as KCBoardViewerElement;
+        this.#project_panel =
+            html`<kc-project-panel></kc-project-panel>` as KCProjectPanelElement;
 
         return html`
             <kc-ui-app>
@@ -128,9 +154,7 @@ class KiCanvasAppElement extends CustomElement {
                 </section>
                 <main>
                     <kc-ui-floating-toolbar location="top">
-                        <div slot="left">
-                            <kc-project-panel></kc-project-panel>
-                        </div>
+                        <div slot="left">${this.#project_panel}</div>
                     </kc-ui-floating-toolbar>
                     ${this.#kc_schematic_viewer} ${this.#kc_board_viewer}
                 </main>
