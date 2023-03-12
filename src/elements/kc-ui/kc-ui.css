@@ -711,10 +711,21 @@ kc-ui-floating-panel-header button span {
 kc-ui-floating-panel-body {
     width: 100%;
     min-height: 0;
-    padding: 0.1rem 0.8rem 0.1rem 0.4rem;
     flex: 1 0;
     font-weight: 300;
     font-size: 1rem;
+}
+
+kc-ui-floating-panel-body ul.item-list li {
+    padding: 0.3rem 1rem 0.3rem 0.6rem;
+}
+
+kc-ui-floating-panel-body ul.item-list li[aria-role="button"]:hover {
+    background: var(--toolbar-button-highlight-hover-bg);
+}
+
+kc-ui-floating-panel-body ul.item-list li[aria-selected="true"] {
+    background: var(--toolbar-button-bg);
 }
 
 kc-ui-floating-panel[closed] kc-ui-floating-panel-header button span {
