@@ -106,7 +106,7 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
             );
         } else if (this.project.has_schematics()) {
             return await this.load_file(
-                this.project.list_boards().next().value!,
+                this.project.list_schematics().next().value!,
             );
         } else {
             throw new Error("No valid KiCAD files found");
