@@ -139,6 +139,10 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
     override render() {
         const file_btn_elms = [];
 
+        if (!this.project) {
+            return html``;
+        }
+
         for (const board of this.project.list_boards()) {
             file_btn_elms.push(
                 html`<li
