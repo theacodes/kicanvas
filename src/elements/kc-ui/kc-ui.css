@@ -787,7 +787,7 @@ ul.item-list li {
     box-sizing: border-box;
     display: flex;
     flex-wrap: nowrap;
-    padding: 0.2rem;
+    padding: 0.2rem 0.3rem;
     user-select: none;
     background: transparent;
     transition: color var(--transition-time-short) ease,
