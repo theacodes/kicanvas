@@ -112,7 +112,7 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
                     <kc-ui-filtered-list>
                         <ul class="item-list outline">
                             ${symbol_elms}
-                            <li class="header">Power symbols</dt>
+                            <li class="header">Power symbols</li>
                             ${power_symbol_elms}
                         </ul>
                     </kc-ui-filtered-list>
