@@ -115,6 +115,7 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
 
     private async load_file(filename: string) {
         const doc = await this.project.load_file(filename);
+        this.#project_panel.selected = doc?.filename ?? null;
 
         if (doc instanceof KicadPCB) {
             this.#kc_board_viewer.classList.remove("is-hidden");
