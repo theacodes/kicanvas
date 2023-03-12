@@ -7,6 +7,7 @@
 import { html, CustomElement } from "../dom/custom-elements";
 import { KiCanvasLoadEvent } from "../framework/events";
 import { BoardViewer } from "../board/viewer";
+import type { KicadPCB } from "../board/items";
 
 export class KiCanvasBoardElement extends CustomElement {
     #canvas: HTMLCanvasElement;
@@ -30,12 +31,6 @@ export class KiCanvasBoardElement extends CustomElement {
         this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
             this.loaded = true;
         });
-
-        const src = this.getAttribute("src");
-        if (src) {
-            // Don't block the main thread
-            window.setTimeout(() => this.load(src), 0);
-        }
     }
 
     override disconnectedCallback() {
@@ -43,7 +38,7 @@ export class KiCanvasBoardElement extends CustomElement {
         this.selected = [];
     }
 
-    async load(src: File | string) {
+    async load(src: KicadPCB) {
         await this.viewer.setup();
         await this.viewer.load(src);
 

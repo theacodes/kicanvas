@@ -6,6 +6,7 @@
 
 import { CustomElement, html } from "../dom/custom-elements";
 import { KiCanvasLoadEvent } from "../framework/events";
+import type { KicadSch } from "../schematic/items";
 import { SchematicViewer } from "../schematic/viewer";
 
 export class KiCanvasSchematicElement extends CustomElement {
@@ -30,12 +31,6 @@ export class KiCanvasSchematicElement extends CustomElement {
         this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
             this.loaded = true;
         });
-
-        const src = this.getAttribute("src");
-        if (src) {
-            // don't block the main thread
-            window.setTimeout(() => this.load(src), 0);
-        }
     }
 
     override disconnectedCallback() {
@@ -43,7 +38,7 @@ export class KiCanvasSchematicElement extends CustomElement {
         this.selected = [];
     }
 
-    async load(src: File | string) {
+    async load(src: KicadSch) {
         await this.viewer.setup();
         await this.viewer.load(src);
 
