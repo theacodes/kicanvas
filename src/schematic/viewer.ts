@@ -33,9 +33,13 @@ export class SchematicViewer extends Viewer {
     }
 
     override async load(src: KicadSch) {
-        // Load the default drawing sheet
+        if (this.schematic == src) {
+            return;
+        }
+
         this.schematic = src;
 
+        // Load the default drawing sheet
         this.drawing_sheet = DrawingSheet.default();
         this.drawing_sheet.document = this.schematic;
 
@@ -58,6 +62,10 @@ export class SchematicViewer extends Viewer {
         );
 
         // Create the grid
+        if (this.#grid) {
+            this.#grid.dispose();
+        }
+
         this.#grid = new Grid(
             this.renderer,
             this.viewport.camera,
@@ -65,8 +73,8 @@ export class SchematicViewer extends Viewer {
             new Vec2(0, 0),
         );
 
-        // Set the camera's bounds
-        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(20);
+        // Wait for a valid viewport size
+        await this.viewport.ready;
 
         // Position the camera and draw the scene.
         this.zoom_to_page();

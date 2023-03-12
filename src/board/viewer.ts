@@ -32,6 +32,10 @@ export class BoardViewer extends Viewer {
     }
 
     override async load(src: board_items.KicadPCB) {
+        if (this.board == src) {
+            return;
+        }
+
         this.board = src;
 
         // Load the default drawing sheet.
@@ -57,6 +61,10 @@ export class BoardViewer extends Viewer {
         );
 
         // Create the grid
+        if (this.#grid) {
+            this.#grid.dispose();
+        }
+
         this.#grid = new Grid(
             this.renderer,
             this.viewport.camera,
@@ -64,8 +72,8 @@ export class BoardViewer extends Viewer {
             this.board.setup?.grid_origin ?? new Vec2(0, 0),
         );
 
-        // Set the camera's bounds
-        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(20);
+        // Wait for a valid viewport size
+        await this.viewport.ready;
 
         // Position the camera and draw the scene.
         this.zoom_to_page();

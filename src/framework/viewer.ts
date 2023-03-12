@@ -90,9 +90,6 @@ export abstract class Viewer extends EventTarget {
             const items = this.layers.query_point(this.mouse_position);
             this.on_pick(this.mouse_position, items);
         });
-
-        // Wait for a valid viewport size
-        await this.viewport.ready;
     }
 
     protected on_viewport_change() {
