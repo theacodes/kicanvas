@@ -32,7 +32,15 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         });
 
         this.renderRoot.addEventListener("click", (e) => {
-            this.on_select(e.target as HTMLElement);
+            const li = (e.target as HTMLElement)?.closest(
+                "li[data-filename]",
+            ) as HTMLLIElement;
+
+            if (!li) {
+                return;
+            }
+
+            this.selected = li.dataset["filename"] ?? null;
         });
 
         this.setup_leave_event();
@@ -84,17 +92,43 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         return !this.#panel_elm.hasAttribute("closed");
     }
 
-    private on_select(target: HTMLElement) {
-        const li = target.closest("li[data-filename]") as HTMLLIElement;
-        if (!li) {
+    get selected() {
+        return (
+            (
+                this.#panel_elm.querySelector(
+                    `li[aria-selected="true"]`,
+                ) as HTMLElement
+            )?.dataset["filename"] ?? null
+        );
+    }
+
+    set selected(filename: string | null) {
+        if (filename == this.selected) {
+            return;
+        }
+
+        let selected_elm;
+
+        for (const elm of this.#panel_elm.querySelectorAll(
+            `li[aria-role="button"]`,
+        )) {
+            if ((elm as HTMLElement).dataset["filename"] == filename) {
+                selected_elm = elm as HTMLElement;
+                elm.ariaSelected = "true";
+            } else {
+                elm.ariaSelected = "false";
+            }
+        }
+
+        if (!selected_elm) {
             return;
         }
 
         this.dispatchEvent(
             new CustomEvent("file:select", {
                 detail: {
-                    filename: li.dataset["filename"],
-                    type: li.dataset["type"],
+                    filename: selected_elm.dataset["filename"],
+                    type: selected_elm.dataset["type"],
                 },
                 bubbles: true,
                 composed: true,
