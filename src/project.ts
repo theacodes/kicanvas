@@ -71,41 +71,46 @@ export class Project {
         this.settings = ProjectSettings.load(data);
     }
 
-    public async load_schematic(filename: string) {
-        if (!this.#schematics.has(filename)) {
-            throw new Error(`Schematic file ${filename} not found`);
+    private async load_doc<T>(
+        document_class: DocumentConstructor<T>,
+        document_map: Map<string, T>,
+        filename: string,
+    ) {
+        if (!document_map.has(filename)) {
+            throw new Error(`File ${filename} not found`);
         }
 
-        let schematic = this.#schematics.get(filename);
+        let doc = document_map.get(filename);
 
-        if (schematic) {
-            return schematic;
+        if (doc != undefined) {
+            return doc;
         }
 
         const text = await this.get_file_text(filename);
-        schematic = new KicadSch(filename, text);
+        doc = new document_class(filename, text);
 
-        this.#schematics.set(schematic.filename, schematic);
+        document_map.set(filename, doc);
 
-        return schematic;
+        return doc;
+    }
+
+    public async load_schematic(filename: string) {
+        return this.load_doc(KicadSch, this.#schematics, filename);
     }
 
     public async load_board(filename: string) {
-        if (!this.#boards.has(filename)) {
-            throw new Error(`Board file ${filename} not found`);
+        return this.load_doc(KicadPCB, this.#boards, filename);
+    }
+
+    public async load_file(filename: string) {
+        if (this.#boards.has(filename)) {
+            return await this.load_board(filename);
+        } else if (this.#schematics.has(filename)) {
+            return await this.load_schematic(filename);
         }
 
-        let board = this.#boards.get(filename);
-
-        if (board) {
-            return board;
-        }
-
-        const text = await this.get_file_text(filename);
-        board = new KicadPCB(filename, text);
-
-        this.#boards.set(board.filename, board);
-
-        return board;
+        throw new Error(`File ${filename} not found`);
     }
 }
+
+type DocumentConstructor<T = unknown> = new (...args: any[]) => T;
