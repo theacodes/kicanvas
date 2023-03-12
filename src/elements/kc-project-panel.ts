@@ -32,24 +32,42 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         });
 
         this.renderRoot.addEventListener("click", (e) => {
-            const li = (e.target as HTMLElement).closest(
-                "li[data-filename]",
-            ) as HTMLElement;
-            if (!li) {
+            this.on_select(e.target as HTMLElement);
+        });
+
+        this.setup_leave_event();
+    }
+
+    // Handles closing the panel when the mouse is well outside of the bounding
+    // box.
+    private setup_leave_event() {
+        this.addEventListener("mouseleave", (e) => {
+            if (!this.open) {
                 return;
             }
 
-            e.stopPropagation();
+            const padding = 50;
+            const rect = this.getBoundingClientRect();
+            const aborter = new AbortController();
 
-            this.dispatchEvent(
-                new CustomEvent("file:select", {
-                    detail: {
-                        filename: li.dataset["filename"],
-                        type: li.dataset["type"],
-                    },
-                    bubbles: true,
-                    composed: true,
-                }),
+            window.addEventListener(
+                "mousemove",
+                (e) => {
+                    if (!this.open) {
+                        aborter.abort();
+                    }
+
+                    const in_box =
+                        e.clientX > rect.left - padding &&
+                        e.clientX < rect.right + padding &&
+                        e.clientY > rect.top - padding &&
+                        e.clientY < rect.bottom + padding;
+                    if (!in_box) {
+                        this.open = false;
+                        aborter.abort();
+                    }
+                },
+                { signal: aborter.signal },
             );
         });
     }
@@ -64,6 +82,24 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
 
     get open() {
         return !this.#panel_elm.hasAttribute("closed");
+    }
+
+    private on_select(target: HTMLElement) {
+        const li = target.closest("li[data-filename]") as HTMLLIElement;
+        if (!li) {
+            return;
+        }
+
+        this.dispatchEvent(
+            new CustomEvent("file:select", {
+                detail: {
+                    filename: li.dataset["filename"],
+                    type: li.dataset["type"],
+                },
+                bubbles: true,
+                composed: true,
+            }),
+        );
     }
 
     override render() {
