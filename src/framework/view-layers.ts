@@ -60,7 +60,13 @@ export class ViewLayer {
     /**
      * This stores all of the graphics created by painters for items on this layer.
      * */
-    graphics: RenderLayer;
+    graphics?: RenderLayer;
+
+    /**
+     * True is this layer contains interactive items that are findable via
+     * ViewLayerSet.query_point
+     */
+    interactive: boolean = false;
 
     /** A map of board items to bounding boxes
      * A board item can have graphics on multiple layers, the bounding box provided
@@ -78,12 +84,14 @@ export class ViewLayer {
         layer_set: ViewLayerSet,
         name: string,
         visible: VisibilityType = true,
+        interactive = false,
         color: Color = Color.white,
     ) {
+        this.#visible = visible;
         this.layer_set = layer_set;
         this.name = name;
         this.color = color;
-        this.#visible = visible;
+        this.interactive = interactive;
         this.items = [];
     }
 
@@ -93,9 +101,9 @@ export class ViewLayer {
 
     clear() {
         this.graphics?.dispose();
-        this.graphics = undefined!;
-        this.items = undefined!;
-        this.bboxes = undefined!;
+        this.graphics = undefined;
+        this.items = [];
+        this.bboxes.clear();
     }
 
     get visible(): boolean {
@@ -141,6 +149,7 @@ export class ViewLayerSet {
             this,
             ViewLayerNames.overlay,
             true,
+            false,
             Color.white,
         );
     }
@@ -280,7 +289,7 @@ export class ViewLayerSet {
      */
     *interactive_layers() {
         for (const layer of this.in_order()) {
-            if (layer.visible) {
+            if (layer.interactive && layer.visible) {
                 yield layer;
             }
         }
