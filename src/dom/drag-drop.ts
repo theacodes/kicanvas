@@ -7,11 +7,7 @@
 import { DragAndDropFileSystem, VirtualFileSystem } from "../services/vfs";
 
 export class DropTarget {
-    constructor(
-        elm: HTMLElement,
-        exts: string[],
-        callback: (fs: VirtualFileSystem) => void,
-    ) {
+    constructor(elm: HTMLElement, callback: (fs: VirtualFileSystem) => void) {
         elm.addEventListener(
             "dragenter",
             (e) => {
