@@ -87,7 +87,6 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
 
         this.addEventListener("file:select", (e) => {
             const detail = (e as CustomEvent).detail;
-            console.log(detail);
             this.load_file(detail.filename);
         });
     }
@@ -96,6 +95,7 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
         this.loading = true;
         await this.project.setup(vfs);
         this.#project_panel.update();
+        this.loaded = true;
     }
 
     private async load_default_file() {
@@ -109,15 +109,11 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
                 this.project.list_boards().next().value!,
             );
         } else {
-            console.log("No valid KiCAD files found");
-            this.loading = false;
-            return;
+            throw new Error("No valid KiCAD files found");
         }
     }
 
     private async load_file(filename: string) {
-        this.loading = true;
-
         const doc = await this.project.load_file(filename);
 
         if (doc instanceof KicadPCB) {
@@ -131,8 +127,6 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
         } else {
             throw new Error(`Unable to load ${filename}`);
         }
-
-        this.loaded = true;
     }
 
     override render() {

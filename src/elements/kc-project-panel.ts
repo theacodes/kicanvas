@@ -28,7 +28,6 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         super.initialContentCallback();
 
         this.#toggle_btn.addEventListener("click", () => {
-            console.log("clicked");
             this.open = !this.open;
         });
 
@@ -69,8 +68,6 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
 
     override render() {
         const file_btn_elms = [];
-
-        console.log("rendering", this.project);
 
         for (const board of this.project.list_boards()) {
             file_btn_elms.push(
