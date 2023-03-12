@@ -16,9 +16,14 @@ import "./kc-board/kc-board-viewer";
 import "./kc-schematic/kc-schematic-viewer";
 import "./kc-project-panel";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
+import { Project } from "../project";
+import { KicadSch } from "../schematic/items";
+import { KicadPCB } from "../board/items";
 
 class KiCanvasAppElement extends CustomElement {
     static override styles = kicanvas_app_styles;
+
+    project: Project = new Project();
 
     #kc_schematic_viewer: KCSchematicViewerElement;
     #kc_board_viewer: KCBoardViewerElement;
@@ -74,38 +79,34 @@ class KiCanvasAppElement extends CustomElement {
     async load(fs: VirtualFileSystem) {
         this.loading = true;
 
-        const files = [
-            ...fs.list_ext("kicad_sch"),
-            ...fs.list_ext("kicad_pcb"),
-        ];
+        await this.project.setup(fs);
 
-        if (!files) {
+        let doc: KicadSch | KicadPCB | null = null;
+
+        // for right now just load the first schematic or board file
+        if (this.project.has_boards()) {
+            doc = await this.project.load_board(
+                this.project.list_boards().next().value!,
+            );
+        } else if (this.project.has_schematics()) {
+            doc = await this.project.load_schematic(
+                this.project.list_schematics().next().value!,
+            );
+        }
+
+        if (!doc) {
+            console.log("No valid KiCAD files found");
             this.loading = false;
             return;
         }
 
-        // for right now, src is the first file in the list.
-        const src = await fs.get(files[0]!);
-
-        const extension = src.name.split(".").at(-1);
-
-        let view_elem: KCSchematicViewerElement | KCBoardViewerElement;
-
-        switch (extension) {
-            case "kicad_sch":
-                view_elem = this.#kc_schematic_viewer;
-                break;
-
-            case "kicad_pcb":
-                view_elem = this.#kc_board_viewer;
-                break;
-            default:
-                throw new Error(`Unable to display file ${src.name}`);
+        if (doc instanceof KicadPCB) {
+            this.#kc_board_viewer.classList.remove("is-hidden");
+            await this.#kc_board_viewer.load(doc);
+        } else if (doc instanceof KicadSch) {
+            this.#kc_schematic_viewer.classList.remove("is-hidden");
+            await this.#kc_schematic_viewer.load(doc);
         }
-
-        view_elem.classList.remove("is-hidden");
-
-        await view_elem.load(src);
 
         this.loaded = true;
     }
