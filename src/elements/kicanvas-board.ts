@@ -27,10 +27,14 @@ export class KiCanvasBoardElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        this.viewer = new BoardViewer(this.#canvas);
-        this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
-            this.loaded = true;
-        });
+        (async () => {
+            this.viewer = new BoardViewer(this.#canvas);
+            await this.viewer.setup();
+
+            this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+                this.loaded = true;
+            });
+        })();
     }
 
     override disconnectedCallback() {
@@ -39,11 +43,8 @@ export class KiCanvasBoardElement extends CustomElement {
     }
 
     async load(src: KicadPCB) {
-        await this.viewer.setup();
+        this.loaded = false;
         await this.viewer.load(src);
-
-        this.loaded = true;
-
         this.viewer.draw();
     }
 

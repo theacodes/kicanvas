@@ -27,10 +27,14 @@ export class KiCanvasSchematicElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        this.viewer = new SchematicViewer(this.#canvas);
-        this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
-            this.loaded = true;
-        });
+        (async () => {
+            this.viewer = new SchematicViewer(this.#canvas);
+            await this.viewer.setup();
+
+            this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+                this.loaded = true;
+            });
+        })();
     }
 
     override disconnectedCallback() {
@@ -39,11 +43,8 @@ export class KiCanvasSchematicElement extends CustomElement {
     }
 
     async load(src: KicadSch) {
-        await this.viewer.setup();
+        this.loaded = false;
         await this.viewer.load(src);
-
-        this.loaded = true;
-
         this.viewer.draw();
     }
 
