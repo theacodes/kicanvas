@@ -114,7 +114,7 @@ export abstract class Viewer extends EventTarget {
         }
     }
 
-    public abstract load(url: string | URL | File): Promise<void>;
+    public abstract load(src: any): Promise<void>;
 
     public get loaded() {
         return this.#loaded_promise;
