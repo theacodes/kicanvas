@@ -11,16 +11,16 @@ import {
     BoardDesignSettings,
     BoardDesignSettingsDefaults,
     BoardSettings,
-    Project,
-} from "../../src/kicad/project";
+    ProjectSettings,
+} from "../../src/kicad/project-settings";
 
 const empty_project_data = JSON.parse(empty_project_src);
 
 suite("kicad.project", function () {
     test("basic", function () {
-        const project = Project.load(empty_project_data);
+        const project = ProjectSettings.load(empty_project_data);
 
-        assert.instanceOf(project, Project);
+        assert.instanceOf(project, ProjectSettings);
         assert.instanceOf(project.board, BoardSettings);
         assert.instanceOf(project.board.design_settings, BoardDesignSettings);
         assert.instanceOf(

@@ -9,7 +9,7 @@
  *
  * See KiCAD's PROJECT_FILE class
  */
-export class Project {
+export class ProjectSettings {
     public board: BoardSettings = new BoardSettings();
     public boards: [string, string][] = [];
     public cvpcb?: unknown;
@@ -33,7 +33,7 @@ export class Project {
     [s: string]: unknown;
 
     static load(src: any) {
-        const project = new Project();
+        const project = new ProjectSettings();
         recursive_merge(project, src);
         return project;
     }
