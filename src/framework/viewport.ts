@@ -46,11 +46,6 @@ export class Viewport {
         this.#observer = new CanvasSizeObserver(
             this.renderer.canvas,
             (canvas) => {
-                console.log(
-                    "canvas size changed",
-                    canvas.clientWidth,
-                    canvas.clientHeight,
-                );
                 this.#update_camera(canvas);
                 this.callback();
             },
