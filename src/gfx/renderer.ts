@@ -11,6 +11,7 @@ import { Color } from "./color";
 import { Circle, Polyline, Polygon, Arc } from "./shapes";
 import { Arc as MathArc } from "../math/arc";
 import { Angle } from "../math/angle";
+import type { IDisposable } from "../base/disposable";
 
 /**
  * KiCanvas' abstraction over various graphics backends.
@@ -29,7 +30,7 @@ import { Angle } from "../math/angle";
  * everything.
  *
  */
-export abstract class Renderer {
+export abstract class Renderer implements IDisposable {
     #current_bbox: BBox | null;
 
     canvas: HTMLCanvasElement;
@@ -303,7 +304,7 @@ export abstract class Renderer {
     }
 }
 
-export abstract class RenderLayer {
+export abstract class RenderLayer implements IDisposable {
     composite_operation: GlobalCompositeOperation = "source-over";
 
     constructor(

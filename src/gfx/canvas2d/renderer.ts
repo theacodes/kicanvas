@@ -65,6 +65,9 @@ export class Canvas2DRenderer extends Renderer {
 
     override dispose() {
         this.ctx2d = undefined;
+        for (const layer of this.#layers) {
+            layer.dispose();
+        }
     }
 
     override update_canvas_size() {

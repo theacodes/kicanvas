@@ -31,6 +31,7 @@ import polygon_frag_shader_src from "./polygon.frag.glsl";
 import polygon_vert_shader_src from "./polygon.vert.glsl";
 import polyline_frag_shader_src from "./polyline.frag.glsl";
 import polyline_vert_shader_src from "./polyline.vert.glsl";
+import type { IDisposable } from "../../base/disposable";
 
 /**
  * Tesselator handles converting abstract primitives into triangles that
@@ -255,7 +256,7 @@ class Tesselator {
 /**
  * A set of filled circles.
  */
-export class CircleSet {
+export class CircleSet implements IDisposable {
     static shader: ShaderProgram;
     shader: ShaderProgram;
     vao: VertexArray;
@@ -325,7 +326,7 @@ export class CircleSet {
 /**
  * A set of stroked polylines
  */
-export class PolylineSet {
+export class PolylineSet implements IDisposable {
     static shader: ShaderProgram;
     shader: ShaderProgram;
     vao: VertexArray;
@@ -423,7 +424,7 @@ export class PolylineSet {
 /**
  * A set of filled polygons
  */
-export class PolygonSet {
+export class PolygonSet implements IDisposable {
     static shader: ShaderProgram;
     shader: ShaderProgram;
     vao: VertexArray;
@@ -552,7 +553,7 @@ export class PolygonSet {
  * and create a new one.
  *
  */
-export class PrimitiveSet {
+export class PrimitiveSet implements IDisposable {
     #polygons: Polygon[] = [];
     #circles: Circle[] = [];
     #lines: Polyline[] = [];
@@ -589,6 +590,23 @@ export class PrimitiveSet {
     }
 
     /**
+     * Clear committed geometry
+     */
+    clear() {
+        this.#polygon_set?.dispose();
+        this.#circle_set?.dispose();
+        this.#polyline_set?.dispose();
+
+        this.#polygon_set = undefined;
+        this.#circle_set = undefined;
+        this.#polyline_set = undefined;
+
+        this.#polygons = [];
+        this.#circles = [];
+        this.#lines = [];
+    }
+
+    /**
      * Collect a new filled circle
      */
     add_circle(circle: Circle) {
@@ -616,17 +634,17 @@ export class PrimitiveSet {
         if (this.#polygons.length) {
             this.#polygon_set = new PolygonSet(this.gl);
             this.#polygon_set.set(this.#polygons);
-            this.#polygons = [];
+            this.#polygons = undefined!;
         }
         if (this.#lines.length) {
             this.#polyline_set = new PolylineSet(this.gl);
             this.#polyline_set.set(this.#lines);
-            this.#lines = [];
+            this.#lines = undefined!;
         }
         if (this.#circles.length) {
             this.#circle_set = new CircleSet(this.gl);
             this.#circle_set.set(this.#circles);
-            this.#circles = [];
+            this.#circles = undefined!;
         }
     }
 

@@ -72,9 +72,7 @@ export class WebGL2Renderer extends Renderer {
         for (const layer of this.layers) {
             layer.dispose();
         }
-        if (this.gl) {
-            this.gl = undefined;
-        }
+        this.gl = undefined;
     }
 
     override update_canvas_size() {

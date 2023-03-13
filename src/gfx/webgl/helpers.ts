@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import type { IDisposable } from "../../base/disposable";
+
 /**
  * Basic helpers for interacting with WebGL2
  */
@@ -280,7 +282,7 @@ export class ShaderProgram {
 /**
  * Manages vertex array objects (VAOs) and associated buffers.
  */
-export class VertexArray {
+export class VertexArray implements IDisposable {
     vao?: WebGLVertexArrayObject;
     buffers: Buffer[] = [];
 
@@ -380,7 +382,7 @@ export type TypedArrayLike =
 /**
  * Manages a buffer of GPU data like vertices or colors
  */
-export class Buffer {
+export class Buffer implements IDisposable {
     #buf?: WebGLBuffer;
     target: GLenum;
 
@@ -402,7 +404,9 @@ export class Buffer {
     }
 
     dispose() {
-        this.gl.deleteBuffer(this.#buf ?? null);
+        if (this.#buf) {
+            this.gl.deleteBuffer(this.#buf);
+        }
         this.#buf = undefined;
     }
 
