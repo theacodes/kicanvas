@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { is_string } from "../base/types";
 import { DrawingSheet } from "../drawing_sheet/items";
 import { DrawingSheetPainter } from "../drawing_sheet/painter";
 import { Grid } from "../framework/grid";
@@ -93,7 +94,7 @@ export class SchematicViewer extends Viewer {
         let item = value;
 
         // If item is a string, find the symbol by uuid or reference.
-        if (typeof item == "string") {
+        if (is_string(item)) {
             item = this.schematic.find_symbol(item);
         }
 

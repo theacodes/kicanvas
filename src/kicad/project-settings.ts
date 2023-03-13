@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { merge } from "../base/object";
+
 /**
  * Holds configuration and settings from a .kicad_pro file.
  *
@@ -34,7 +36,7 @@ export class ProjectSettings {
 
     static load(src: any) {
         const project = new ProjectSettings();
-        recursive_merge(project, src);
+        merge(project, src);
         return project;
     }
 }
@@ -102,18 +104,4 @@ export class SchematicDrawingSettings {
     text_offset_ratio: number = 0.15;
 
     [s: string]: unknown;
-}
-
-function recursive_merge(dst: any, src?: any) {
-    if (src == null || src == undefined) {
-        return;
-    }
-
-    for (const key of Object.keys(src)) {
-        if (typeof dst[key] == "object") {
-            recursive_merge(dst[key], src[key]);
-        } else {
-            dst[key] = src[key];
-        }
-    }
 }

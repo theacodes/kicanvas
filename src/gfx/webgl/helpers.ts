@@ -5,6 +5,7 @@
 */
 
 import type { IDisposable } from "../../base/disposable";
+import { is_string } from "../../base/types";
 
 /**
  * Basic helpers for interacting with WebGL2
@@ -99,12 +100,12 @@ export class ShaderProgram {
         public vertex: WebGLShader,
         public fragment: WebGLShader,
     ) {
-        if (typeof vertex === "string") {
+        if (is_string(vertex)) {
             vertex = ShaderProgram.compile(gl, gl.VERTEX_SHADER, vertex);
         }
         this.vertex = vertex;
 
-        if (typeof fragment === "string") {
+        if (is_string(fragment)) {
             fragment = ShaderProgram.compile(gl, gl.FRAGMENT_SHADER, fragment);
         }
         this.fragment = fragment;

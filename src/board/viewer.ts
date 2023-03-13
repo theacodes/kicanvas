@@ -16,6 +16,7 @@ import * as board_items from "./items";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import { BoardPainter } from "./painter";
 import { Grid } from "../framework/grid";
+import { is_string } from "../base/types";
 
 export class BoardViewer extends Viewer {
     board: board_items.KicadPCB;
@@ -103,7 +104,7 @@ export class BoardViewer extends Viewer {
         let item = value;
 
         // If item is a string, find the footprint by uuid or reference.
-        if (typeof item == "string") {
+        if (is_string(item)) {
             item = this.board.find_footprint(item);
         }
 

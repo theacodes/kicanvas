@@ -12,6 +12,7 @@ import {
     ViewLayerNames as BaseLayerNames,
 } from "../framework/view-layers";
 import { KicadPCB } from "./items";
+import { is_string } from "../base/types";
 export { ViewLayer };
 
 /** Board view layer names
@@ -440,7 +441,7 @@ export class LayerSet extends BaseLayerSet {
         let layer_name = "";
         if (layer instanceof ViewLayer) {
             layer_name = layer.name;
-        } else if (typeof layer == "string") {
+        } else if (is_string(layer)) {
             layer_name = layer;
         }
 

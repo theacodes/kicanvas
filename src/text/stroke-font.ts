@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { is_number, is_string } from "../base/types";
 import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
 import { Vec2 } from "../math/vec2";
@@ -59,9 +60,9 @@ export class StrokeFont extends Font {
 
     #load_glyph(idx: number) {
         const data: number | string | undefined = newstroke.glyph_data[idx];
-        if (typeof data == "string") {
+        if (is_string(data)) {
             this.#glyphs.set(idx, decode_glyph(data));
-        } else if (typeof data == "number") {
+        } else if (is_number(data)) {
             const glyph = this.#shared_glyphs[data]!;
             this.#glyphs.set(idx, glyph);
         } else {

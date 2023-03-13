@@ -7,6 +7,7 @@
 import { listify, type List } from "./tokenizer.ts";
 import { Vec2 } from "../math/vec2.ts";
 import { Color } from "../gfx/color.ts";
+import { is_number, is_string } from "../base/types.ts";
 
 enum Kind {
     // the first token in the expr (kind ...)
@@ -60,14 +61,14 @@ export const T = {
         }
     },
     string(obj: Obj, name: string, e: ListOrAtom): string | undefined {
-        if (typeof e == "string") {
+        if (is_string(e)) {
             return e;
         } else {
             return undefined;
         }
     },
     number(obj: Obj, name: string, e: ListOrAtom): number | undefined {
-        if (typeof e == "number") {
+        if (is_number(e)) {
             return e;
         } else {
             return undefined;
@@ -296,7 +297,7 @@ export const P = {
 export type Parseable = string | List;
 
 export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
-    if (typeof expr == "string") {
+    if (is_string(expr)) {
         expr = listify(expr);
         if (expr.length == 1 && Array.isArray(expr[0])) {
             expr = expr[0];
@@ -323,7 +324,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
 
     if (start_def) {
         let acceptable_start_strings: string[];
-        if (typeof start_def.name == "string") {
+        if (is_string(start_def.name)) {
             acceptable_start_strings = [start_def.name];
         } else {
             acceptable_start_strings = start_def.name;
@@ -347,15 +348,12 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
         let def: PropertyDefinition | null = null;
 
         // bare string value can be an atom
-        if (typeof element == "string") {
+        if (is_string(element)) {
             def = defs_map.get(element);
         }
 
         // If not an atom, a bare string or number can be a positional
-        if (
-            !def &&
-            (typeof element == "string" || typeof element == "number")
-        ) {
+        if (!def && (is_string(element) || is_number(element))) {
             def = defs_map.get(n);
 
             if (!def) {

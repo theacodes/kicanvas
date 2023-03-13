@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { is_iterable, is_primitive } from "../base/types";
+
 export type ElementOrFragment = HTMLElement | DocumentFragment;
 
 /**
@@ -110,15 +112,6 @@ function apply_values_to_tree(tree: DocumentFragment, values: unknown[]) {
         }
     }
 }
-
-type Primitive = null | undefined | boolean | number | string | symbol | bigint;
-
-const is_primitive = (value: unknown): value is Primitive =>
-    value === null || (typeof value != "object" && typeof value != "function");
-
-const is_iterable = (value: unknown): value is Iterable<unknown> =>
-    Array.isArray(value) ||
-    typeof (value as any)?.[Symbol.iterator] === "function";
 
 /**
  * Apply template values to a node's text content.

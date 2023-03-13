@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { is_number } from "../base/types.ts";
 import { Angle, type AngleLike } from "./angle.ts";
 import { Matrix3 } from "./matrix3.ts";
 
@@ -42,7 +43,7 @@ export class Vec2 {
     set(x: Vec2Like, y?: number) {
         let x_prime: number | null = null;
 
-        if (typeof x == "number" && typeof y == "number") {
+        if (is_number(x) && is_number(y)) {
             x_prime = x;
         } else if (x instanceof Vec2) {
             x_prime = x.x;
@@ -122,7 +123,7 @@ export class Vec2 {
     }
 
     multiply(s: Vec2 | number) {
-        if (typeof s == "number") {
+        if (is_number(s)) {
             return new Vec2(this.x * s, this.y * s);
         } else {
             return new Vec2(this.x * s.x, this.y * s.y);

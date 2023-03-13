@@ -5,6 +5,7 @@
 */
 
 import type { IDisposable } from "../base/disposable";
+import { is_string } from "../base/types";
 import { Color } from "../gfx/color";
 import { RenderLayer } from "../gfx/renderer";
 import { BBox } from "../math/bbox";
@@ -253,7 +254,7 @@ export class ViewLayerSet implements IDisposable {
 
         if (layer_or_layers instanceof ViewLayer) {
             layer_names = [layer_or_layers.name];
-        } else if (typeof layer_or_layers == "string") {
+        } else if (is_string(layer_or_layers)) {
             layer_names = [layer_or_layers];
         } else if (!layer_or_layers) {
             layer_names = [];

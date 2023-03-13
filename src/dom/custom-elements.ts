@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { is_string } from "../base/types";
 import { html, literal } from "./templates";
 export { html, literal };
 
@@ -124,7 +125,7 @@ export class CustomElement extends HTMLElement {
         }
 
         if (static_this.styles) {
-            if (typeof static_this.styles == "string") {
+            if (is_string(static_this.styles)) {
                 static_this.styles = [static_this.styles];
             }
 
