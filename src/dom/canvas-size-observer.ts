@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import type { IDisposable } from "../base/disposable";
+
 type ResizeObserverCallback = (canvas: HTMLCanvasElement) => void;
 
 /**
@@ -13,7 +15,7 @@ type ResizeObserverCallback = (canvas: HTMLCanvasElement) => void;
  * and handling any subsequent resize events by adjusting the canvas size
  * appropriately
  */
-export class CanvasSizeObserver {
+export class CanvasSizeObserver implements IDisposable {
     #observer: ResizeObserver;
 
     /**
@@ -30,6 +32,7 @@ export class CanvasSizeObserver {
     }
 
     dispose() {
-        this.#observer.disconnect();
+        this.#observer?.disconnect();
+        this.#observer = undefined!;
     }
 }
