@@ -43,10 +43,10 @@ export class BoardViewer extends Viewer {
         this.drawing_sheet.document = this.board;
 
         // Setup graphical layers
-        if (this.layers) {
-            this.layers.dispose();
-        }
-        this.layers = new LayerSet(this.board, this.renderer.theme);
+        this.disposables.disposeAndRemove(this.layers);
+        this.layers = this.disposables.add(
+            new LayerSet(this.board, this.renderer.theme),
+        );
 
         // Paint the board
         this.#painter = new BoardPainter(
@@ -61,10 +61,6 @@ export class BoardViewer extends Viewer {
         );
 
         // Create the grid
-        if (this.#grid) {
-            this.#grid.dispose();
-        }
-
         this.#grid = new Grid(
             this.renderer,
             this.viewport.camera,

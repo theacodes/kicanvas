@@ -44,10 +44,8 @@ export class SchematicViewer extends Viewer {
         this.drawing_sheet.document = this.schematic;
 
         // Setup graphical layers
-        if (this.layers) {
-            this.layers.dispose();
-        }
-        this.layers = new LayerSet(this.renderer.theme);
+        this.disposables.disposeAndRemove(this.layers);
+        this.layers = this.disposables.add(new LayerSet(this.renderer.theme));
 
         // Paint the schematic
         this.#painter = new SchematicPainter(
@@ -62,10 +60,6 @@ export class SchematicViewer extends Viewer {
         );
 
         // Create the grid
-        if (this.#grid) {
-            this.#grid.dispose();
-        }
-
         this.#grid = new Grid(
             this.renderer,
             this.viewport.camera,
