@@ -12,6 +12,7 @@
  *
  */
 
+import { disposable_listener } from "../../base/events";
 import { CustomElement } from "../../dom/custom-elements";
 import kc_ui_styles from "./kc-ui.css";
 
@@ -64,7 +65,9 @@ export class KCUIViewResizerElement extends CustomElement {
                 next.style.width = `${new_width}%`;
             };
 
-            window.addEventListener("mousemove", mouse_move);
+            const mouse_move_listener = this.addDisposable(
+                disposable_listener(window, "mousemove", mouse_move),
+            );
 
             const mouse_up = (e: MouseEvent) => {
                 document.body.style.cursor = "";
@@ -73,7 +76,7 @@ export class KCUIViewResizerElement extends CustomElement {
                 next.style.pointerEvents = "";
                 next.style.userSelect = "";
                 this.classList.remove("active");
-                window.removeEventListener("mousemove", mouse_move);
+                mouse_move_listener.dispose();
             };
 
             window.addEventListener("mouseup", mouse_up, { once: true });

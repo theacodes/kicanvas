@@ -27,10 +27,12 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
     }
 
     private setup_events() {
-        this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
-            this.selected_item = e.detail.item as SchematicSymbol;
-            this.update();
-        });
+        this.addDisposable(
+            this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+                this.selected_item = e.detail.item as SchematicSymbol;
+                this.update();
+            }),
+        );
     }
 
     override render() {

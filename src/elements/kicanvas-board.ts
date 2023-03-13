@@ -28,17 +28,19 @@ export class KiCanvasBoardElement extends CustomElement {
 
     override initialContentCallback() {
         (async () => {
-            this.viewer = new BoardViewer(this.#canvas);
+            this.viewer = this.addDisposable(new BoardViewer(this.#canvas));
             await this.viewer.setup();
 
-            this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
-                this.loaded = true;
-            });
+            this.addDisposable(
+                this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+                    this.loaded = true;
+                }),
+            );
         })();
     }
 
     override disconnectedCallback() {
-        this.viewer?.dispose();
+        super.disconnectedCallback();
         this.selected = [];
     }
 

@@ -28,17 +28,19 @@ export class KiCanvasSchematicElement extends CustomElement {
 
     override initialContentCallback() {
         (async () => {
-            this.viewer = new SchematicViewer(this.#canvas);
+            this.viewer = this.addDisposable(new SchematicViewer(this.#canvas));
             await this.viewer.setup();
 
-            this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
-                this.loaded = true;
-            });
+            this.addDisposable(
+                this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+                    this.loaded = true;
+                }),
+            );
         })();
     }
 
     override disconnectedCallback() {
-        this.viewer?.dispose();
+        super.disconnectedCallback();
         this.selected = [];
     }
 

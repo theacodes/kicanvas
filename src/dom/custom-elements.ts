@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Disposables, type IDisposable } from "../base/disposable";
+import { disposable_listener } from "../base/events";
 import { is_string } from "../base/types";
 import { html, literal } from "./templates";
 export { html, literal };
@@ -28,6 +30,8 @@ export class CustomElement extends HTMLElement {
      */
     static exportparts: string[] = [];
 
+    private disposables = new Disposables();
+
     constructor() {
         super();
 
@@ -35,6 +39,10 @@ export class CustomElement extends HTMLElement {
         if (static_this.exportparts) {
             this.setAttribute("exportparts", static_this.exportparts.join(","));
         }
+    }
+
+    addDisposable<T extends IDisposable>(item: T): T {
+        return this.disposables.add(item);
     }
 
     /**
@@ -90,7 +98,26 @@ export class CustomElement extends HTMLElement {
         this.#renderInitialContent();
     }
 
-    disconnectedCallback(): void | undefined {}
+    disconnectedCallback(): void | undefined {
+        this.disposables.dispose();
+    }
+
+    /**
+     * Registers an event listener that will be automatically disconnected
+     * when this element is removed.
+     */
+    addDisposableListener<K extends keyof HTMLElementEventMap>(
+        type: string,
+        handler: (event: HTMLElementEventMap[K]) => void,
+        options?: AddEventListenerOptions,
+    ): void;
+    addDisposableListener(
+        type: string,
+        handler: (event: Event) => void,
+        options?: AddEventListenerOptions,
+    ): void {
+        this.addDisposable(disposable_listener(this, type, handler, options));
+    }
 
     /**
      * Called after the initial content is added to the renderRoot, perfect

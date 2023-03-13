@@ -17,7 +17,8 @@ import {
     KiCanvasLoadEvent,
     KiCanvasMouseMoveEvent,
 } from "./events";
-import { Disposables } from "../base/disposable";
+import { Disposables, type IDisposable } from "../base/disposable";
+import { disposable_listener } from "../base/events";
 
 export abstract class Viewer extends EventTarget {
     public canvas: HTMLCanvasElement;
@@ -55,13 +56,18 @@ export abstract class Viewer extends EventTarget {
             | { handleEvent: (ev: KiCanvasEventMap[K]) => void }
             | null,
         options?: boolean | AddEventListenerOptions,
-    ): void;
+    ): IDisposable;
     override addEventListener(
         type: string,
         listener: EventListener | null,
         options?: boolean | AddEventListenerOptions,
-    ): void {
+    ): IDisposable {
         super.addEventListener(type, listener, options);
+        return {
+            dispose: () => {
+                this.removeEventListener(type, listener, options);
+            },
+        };
     }
 
     abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
@@ -77,18 +83,24 @@ export abstract class Viewer extends EventTarget {
 
         this.viewport.enable_pan_and_zoom(0.5, 190);
 
-        this.canvas.addEventListener("mousemove", (e) => {
-            this.on_mouse_change(e);
-        });
+        this.disposables.add(
+            disposable_listener(this.canvas, "mousemove", (e) => {
+                this.on_mouse_change(e);
+            }),
+        );
 
-        this.canvas.addEventListener("panzoom", (e) => {
-            this.on_mouse_change(e as MouseEvent);
-        });
+        this.disposables.add(
+            disposable_listener(this.canvas, "panzoom", (e) => {
+                this.on_mouse_change(e as MouseEvent);
+            }),
+        );
 
-        this.canvas.addEventListener("click", (e) => {
-            const items = this.layers.query_point(this.mouse_position);
-            this.on_pick(this.mouse_position, items);
-        });
+        this.disposables.add(
+            disposable_listener(this.canvas, "click", (e) => {
+                const items = this.layers.query_point(this.mouse_position);
+                this.on_pick(this.mouse_position, items);
+            }),
+        );
     }
 
     protected on_viewport_change() {

@@ -61,9 +61,11 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
 
         // Update the selected item in the list whenever the viewer's
         // selection changes.
-        this.viewer.addEventListener(KiCanvasSelectEvent.type, () => {
-            this.mark_selected_item();
-        });
+        this.addDisposable(
+            this.viewer.addEventListener(KiCanvasSelectEvent.type, () => {
+                this.mark_selected_item();
+            }),
+        );
 
         // Wire up search to filter the list
         this.search_input_elm.addEventListener("input", (e) => {

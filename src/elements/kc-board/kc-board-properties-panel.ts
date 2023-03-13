@@ -25,10 +25,12 @@ export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
     }
 
     private setup_events() {
-        this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
-            this.selected_item = e.detail.item as Footprint;
-            this.update();
-        });
+        this.addDisposable(
+            this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+                this.selected_item = e.detail.item as Footprint;
+                this.update();
+            }),
+        );
     }
 
     override render() {

@@ -43,15 +43,15 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
     }
 
     override initialContentCallback() {
-        this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
-            // Selecting the same item twice should show the properties panel.
-            if (e.detail.item && e.detail.item == e.detail.previous) {
-                this.activity_bar_elm.change_activity("properties");
-            }
-        });
+        this.addDisposable(
+            this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+                // Selecting the same item twice should show the properties panel.
+                if (e.detail.item && e.detail.item == e.detail.previous) {
+                    this.activity_bar_elm.change_activity("properties");
+                }
+            }),
+        );
     }
-
-    override disconnectedCallback() {}
 
     async load(src: KicadPCB) {
         this.board_elm.load(src);
