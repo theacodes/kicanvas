@@ -4,23 +4,20 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { type IDisposable } from "./base/disposable";
 import { KicadPCB } from "./board/items";
 import { ProjectSettings } from "./kicad/project-settings";
 import { KicadSch } from "./schematic/items";
 import type { VirtualFileSystem } from "./services/vfs";
 
-export class Project {
+export class Project implements IDisposable {
     #fs: VirtualFileSystem;
     #schematics: Map<string, KicadSch | null> = new Map();
     #boards: Map<string, KicadPCB | null> = new Map();
 
     public settings: ProjectSettings = new ProjectSettings();
 
-    constructor() {}
-
     public dispose() {
-        this.#fs = undefined!;
-        this.settings = undefined!;
         this.#schematics.clear();
         this.#boards.clear();
     }
