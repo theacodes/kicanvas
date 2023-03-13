@@ -6,7 +6,7 @@
 
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
-import { KiCanvasSelectEvent } from "../../framework/events";
+import { KiCanvasLoadEvent, KiCanvasSelectEvent } from "../../framework/events";
 import { SchematicViewer } from "../../schematic/viewer";
 import { KCUIFilteredListElement } from "../kc-ui/kc-ui-filtered-list";
 import { KCUITextFilterInputElement } from "../kc-ui/kc-ui-text-filter-input";
@@ -23,11 +23,11 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
             this.viewer = await this.requestLazyContext("viewer");
             await this.viewer.loaded;
             super.connectedCallback();
-            this.setup_events();
+            this.setup_initial_events();
         })();
     }
 
-    private setup_events() {
+    private setup_initial_events() {
         this.addEventListener("click", (e) => {
             const li = (e.target as HTMLElement).closest(
                 "li[data-uuid]",
@@ -50,6 +50,15 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
             }),
         );
 
+        // Re-render the entire component if a different schematic gets loaded.
+        this.addDisposable(
+            this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
+                this.update();
+            }),
+        );
+    }
+
+    override renderedCallback() {
         // Wire up search to filter the list
         this.search_input_elm.addEventListener("input", (e) => {
             this.item_filter_elem.filter_text =

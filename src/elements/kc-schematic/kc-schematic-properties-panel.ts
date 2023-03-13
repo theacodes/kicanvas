@@ -6,7 +6,7 @@
 
 import { WithContext } from "../../dom/context";
 import { CustomElement, html } from "../../dom/custom-elements";
-import { KiCanvasSelectEvent } from "../../framework/events";
+import { KiCanvasLoadEvent, KiCanvasSelectEvent } from "../../framework/events";
 import { SchematicSymbol } from "../../schematic/items";
 import { SchematicViewer } from "../../schematic/viewer";
 
@@ -30,6 +30,14 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
         this.addDisposable(
             this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
                 this.selected_item = e.detail.item as SchematicSymbol;
+                this.update();
+            }),
+        );
+
+        // If a new schematic is loaded, clear the selected item.
+        this.addDisposable(
+            this.viewer.addEventListener(KiCanvasLoadEvent.type, (e) => {
+                this.selected_item = undefined;
                 this.update();
             }),
         );

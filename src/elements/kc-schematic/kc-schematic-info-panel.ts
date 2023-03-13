@@ -7,6 +7,7 @@
 import { SchematicViewer } from "../../schematic/viewer";
 import { WithContext } from "../../dom/context";
 import { html, CustomElement } from "../../dom/custom-elements";
+import { KiCanvasLoadEvent } from "../../framework/events";
 
 export class KCSchematicInfoPanel extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -17,6 +18,13 @@ export class KCSchematicInfoPanel extends WithContext(CustomElement) {
             this.viewer = await this.requestLazyContext("viewer");
             await this.viewer.loaded;
             super.connectedCallback();
+
+            // If a new schematic is loaded, re-render
+            this.addDisposable(
+                this.viewer.addEventListener(KiCanvasLoadEvent.type, (e) => {
+                    this.update();
+                }),
+            );
         })();
     }
 
