@@ -17,13 +17,16 @@ import {
     KiCanvasLoadEvent,
     KiCanvasMouseMoveEvent,
 } from "./events";
+import { Disposables } from "../base/disposable";
 
 export abstract class Viewer extends EventTarget {
-    canvas: HTMLCanvasElement;
-    renderer: Renderer;
-    viewport: Viewport;
-    layers: ViewLayerSet;
-    mouse_position: Vec2 = new Vec2(0, 0);
+    public canvas: HTMLCanvasElement;
+    public renderer: Renderer;
+    public viewport: Viewport;
+    public layers: ViewLayerSet;
+    public mouse_position: Vec2 = new Vec2(0, 0);
+
+    protected disposables = new Disposables();
 
     #selected: BBox | null;
     #loaded_promise: Promise<boolean>;
@@ -35,20 +38,14 @@ export abstract class Viewer extends EventTarget {
     constructor(canvas: HTMLCanvasElement) {
         super();
         this.canvas = canvas;
-        this.renderer = this.create_renderer(canvas);
+        this.renderer = this.disposables.add(this.create_renderer(canvas));
         this.#loaded_promise = new Promise((resolve, reject) => {
             this.#loaded_promise_resolve_reject = [resolve, reject];
         });
     }
 
     dispose() {
-        this.#selected = null;
-        this.viewport.dispose();
-        this.viewport = undefined!;
-        this.layers.dispose();
-        this.layers = undefined!;
-        this.renderer.dispose();
-        this.renderer = undefined!;
+        this.disposables.dispose();
     }
 
     override addEventListener<K extends keyof KiCanvasEventMap>(
@@ -72,9 +69,11 @@ export abstract class Viewer extends EventTarget {
     async setup() {
         await this.renderer.setup();
 
-        this.viewport = new Viewport(this.renderer, () => {
-            this.on_viewport_change();
-        });
+        this.viewport = this.disposables.add(
+            new Viewport(this.renderer, () => {
+                this.on_viewport_change();
+            }),
+        );
 
         this.viewport.enable_pan_and_zoom(0.5, 190);
 

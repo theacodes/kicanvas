@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import type { IDisposable } from "../base/disposable";
 import { Color } from "../gfx/color";
 import { RenderLayer } from "../gfx/renderer";
 import { BBox } from "../math/bbox";
@@ -35,7 +36,7 @@ export type VisibilityType = boolean | (() => boolean);
 /**
  * A view layer
  */
-export class ViewLayer {
+export class ViewLayer implements IDisposable {
     layer_set: ViewLayerSet;
     name: string;
     highlighted = false;
@@ -136,7 +137,7 @@ export class ViewLayer {
 /**
  * Represents the complete set of view layers.
  */
-export class ViewLayerSet {
+export class ViewLayerSet implements IDisposable {
     #layer_list: ViewLayer[] = [];
     #layer_map: Map<string, ViewLayer> = new Map();
     #overlay: ViewLayer;
@@ -162,8 +163,8 @@ export class ViewLayerSet {
         for (const layer of this.#layer_list) {
             layer.dispose();
         }
-        this.#layer_list = undefined!;
-        this.#layer_map = undefined!;
+        this.#layer_list.length = 0;
+        this.#layer_map.clear();
     }
 
     /**
