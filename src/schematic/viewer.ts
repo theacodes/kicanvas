@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { first } from "../base/iterator";
 import { is_string } from "../base/types";
 import { DrawingSheet } from "../drawing_sheet/items";
 import { DrawingSheetPainter } from "../drawing_sheet/painter";
@@ -101,7 +102,7 @@ export class SchematicViewer extends Viewer {
         // If it's a symbol, find the bounding box for it.
         if (item instanceof SchematicSymbol) {
             const bboxes = this.layers.query_item_bboxes(item);
-            item = bboxes.next().value ?? null;
+            item = first(bboxes) ?? null;
         }
 
         // If value wasn't explicitly null and none of the above found a suitable

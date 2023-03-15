@@ -21,6 +21,7 @@ import "./kc-board/kc-board-viewer";
 import "./kc-project-panel";
 import "./kc-schematic/kc-schematic-viewer";
 import "./kc-ui/kc-ui";
+import { first } from "../base/iterator";
 
 class KiCanvasAppElement extends WithContext(CustomElement) {
     static override styles = kicanvas_app_styles;
@@ -101,13 +102,9 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
     private async load_default_file() {
         // for right now just load the first schematic or board file
         if (this.project.has_boards()) {
-            return await this.load_file(
-                this.project.list_boards().next().value!,
-            );
+            return await this.load_file(first(this.project.list_boards())!);
         } else if (this.project.has_schematics()) {
-            return await this.load_file(
-                this.project.list_schematics().next().value!,
-            );
+            return await this.load_file(first(this.project.list_schematics())!);
         } else {
             throw new Error("No valid KiCAD files found");
         }

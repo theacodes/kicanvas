@@ -19,6 +19,7 @@ import {
 } from "./events";
 import { Disposables, type IDisposable } from "../base/disposable";
 import { listen } from "../base/events";
+import { later } from "../base/async";
 
 export abstract class Viewer extends EventTarget {
     public canvas: HTMLCanvasElement;
@@ -207,7 +208,7 @@ export abstract class Viewer extends EventTarget {
             }),
         );
 
-        setTimeout(() => this.paint_selected());
+        later(() => this.paint_selected());
     }
 
     public get selection_color() {
