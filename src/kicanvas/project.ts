@@ -5,6 +5,7 @@
 */
 
 import { type IDisposable } from "../base/disposable";
+import type { Constructor } from "../base/types";
 import { KicadPCB } from "../kicad/board";
 import { ProjectSettings } from "../kicad/project-settings";
 import { KicadSch } from "../kicad/schematic";
@@ -69,7 +70,7 @@ export class Project implements IDisposable {
     }
 
     private async load_doc<T>(
-        document_class: DocumentConstructor<T>,
+        document_class: Constructor<T>,
         document_map: Map<string, T>,
         filename: string,
     ) {
@@ -109,5 +110,3 @@ export class Project implements IDisposable {
         throw new Error(`File ${filename} not found`);
     }
 }
-
-type DocumentConstructor<T = unknown> = new (...args: any[]) => T;

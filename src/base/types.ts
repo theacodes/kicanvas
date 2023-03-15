@@ -45,3 +45,5 @@ export function is_object(value: unknown): value is Object {
         !(value instanceof Date)
     );
 }
+
+export type Constructor<T = unknown> = new (...args: any[]) => T;

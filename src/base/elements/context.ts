@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import type { Constructor } from "../types";
+
 /**
  * CustomElement context, used to manage shared state.
  *
@@ -105,8 +107,6 @@ export async function provideLazyContext<T = unknown>(
 ) {
     provideContext(target, context_name, context);
 }
-
-type Constructor<T = unknown> = new (...args: any[]) => T;
 
 /**
  * Mixin used to add provideContext and requestContext methods.
