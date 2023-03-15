@@ -58,14 +58,6 @@
     --toolbar-button-disabled-bg: #131218;
     --toolbar-button-disabled-fg: #888;
 
-    --tab-bar-bg: #131218;
-    --tab-bg: #131218;
-    --tab-fg: #f8f8f0;
-    --tab-active-bg: #8864cb;
-    --tab-active-fg: #f8f8f0;
-    --tab-hover-bg: #634e89;
-    --tab-border: 1px solid #131218;
-
     --badge-bg: #81eeff;
     --badge-fg: #131218;
 
@@ -190,6 +182,13 @@
     --toolbar-button-highlight-fg: #f8f8f0;
     --toolbar-button-highlight-hover-bg: var(--gradient-purple-green-highlight);
     --toolbar-button-highlight-hover-fg: #f8f8f0;
+
+    --dropdown-bg: var(--gradient-purple-green-light);
+    --dropdown-fg: #f8f8f0;
+    --dropdown-hover-bg: var(--gradient-purple-green-highlight);
+    --dropdown-hover-fg: #f8f8f0;
+    --dropdown-active-bg: var(--gradient-purple-blue-dark);
+    --dropdown-active-fg: #f8f8f0;
 
     --input-range-bg: var(--gradient-purple-green-light);
 
@@ -660,80 +659,94 @@ kc-ui-panel-body.no-padding {
 }
 
 /*
-    Floating toggle panels
+    Drop-downs
 */
 
-kc-ui-floating-panel {
-    border-radius: 5px;
-    border: 1px solid transparent;
-    background: var(--activity-bar-bg);
+kc-ui-dropdown {
+    background: var(--dropdown-bg);
+    color: var(--dropdown-fg);
+    font-weight: 300;
+}
+
+kc-ui-dropdown ul {
+    all: unset;
+    box-sizing: border-box;
+}
+
+kc-ui-dropdown li {
+    padding: 0.3rem 1rem 0.3rem 0.6rem;
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    background: var(--dropdown-bg);
+    color: var(--dropdown-fg);
 }
 
-kc-ui-floating-panel-header button {
-    background: transparent;
-    color: var(--toolbar-button-fg);
-    margin-top: 0;
-    margin-right: 0;
-    border-radius: 0;
-    border: none;
-    /* padding: 0.5rem 0.6rem; */
-    padding: 0;
+kc-ui-dropdown li:hover {
+    background: var(--toolbar-button-highlight-hover-bg);
+    cursor: pointer;
+    background: var(--dropdown-hover-bg);
+    color: var(--dropdown-hover-fg);
+}
+
+kc-ui-dropdown li[aria-selected="true"] {
+    background: var(--dropdown-active-bg);
+    color: var(--dropdown-active-fg);
+}
+
+kc-ui-dropdown li kc-ui-icon {
+    margin-right: 0.5rem;
+    margin-left: -0.1rem;
+}
+
+/*
+    Toggle menus
+*/
+
+kc-ui-toggle-menu > button {
+    user-select: none;
+    width: 100%;
+    margin: unset;
+    padding: 0.3rem 0.6rem 0.3rem 0.6rem;
+    display: flex;
     justify-content: left;
-    box-shadow: none;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    font-weight: 300;
+    font-size: 1rem;
+    background: var(--dropdown-bg);
+    color: var(--dropdown-fg);
 }
 
-kc-ui-floating-panel-header button:hover,
-kc-ui-floating-panel-header button:focus {
+kc-ui-toggle-menu > button:hover,
+kc-ui-toggle-menu > button:focus {
+    background: var(--dropdown-hover-bg);
+    color: var(--dropdown-hover-fg);
     box-shadow: none;
     outline: none;
 }
 
-kc-ui-floating-panel[closed] kc-ui-floating-panel-header button:hover {
-    background: var(--toolbar-button-highlight-hover-bg);
-    color: var(--toolbar-button-highlight-hover-fg);
-}
-
-kc-ui-floating-panel kc-ui-floating-panel-header button:hover {
-    background: transparent;
-    color: var(--toolbar-button-fg);
-}
-
-kc-ui-floating-panel-header button kc-ui-icon {
-    padding: 0.4rem 0.5rem;
-}
-
-kc-ui-floating-panel-header button span {
-}
-
-kc-ui-floating-panel-body {
-    width: 100%;
-    min-height: 0;
-    flex: 1 0;
-    font-weight: 300;
+kc-ui-toggle-menu > button kc-ui-icon {
     font-size: 1rem;
+    margin-top: 0.1rem;
+    margin-bottom: 0.1rem;
 }
 
-kc-ui-floating-panel-body ul.item-list li {
-    padding: 0.3rem 1rem 0.3rem 0.6rem;
-}
-
-kc-ui-floating-panel-body ul.item-list li[aria-role="button"]:hover {
-    background: var(--toolbar-button-highlight-hover-bg);
-}
-
-kc-ui-floating-panel-body ul.item-list li[aria-selected="true"] {
-    background: var(--toolbar-button-bg);
-}
-
-kc-ui-floating-panel[closed] kc-ui-floating-panel-header button span {
+kc-ui-toggle-menu > button span {
     display: none;
+    margin-left: 0.5rem;
 }
 
-kc-ui-floating-panel[closed] kc-ui-floating-panel-body {
-    display: none;
+kc-ui-toggle-menu[open] > button {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+kc-ui-toggle-menu[open] > button span {
+    display: revert;
+}
+
+kc-ui-toggle-menu kc-ui-dropdown {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 /*
