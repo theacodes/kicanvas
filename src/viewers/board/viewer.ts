@@ -71,6 +71,7 @@ export class BoardViewer extends Viewer {
 
         // Wait for a valid viewport size
         await this.viewport.ready;
+        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
 
         // Position the camera and draw the scene.
         this.zoom_to_page();
