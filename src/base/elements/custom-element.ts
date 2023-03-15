@@ -10,7 +10,7 @@ import { html, literal } from "./templates";
 export { html, literal };
 
 /**
- * "Just enough" CustomElement helper.
+ * Base CustomElement class, provides common helpers and behavior.
  */
 export class CustomElement extends HTMLElement {
     /**
@@ -151,5 +151,30 @@ export class CustomElement extends HTMLElement {
         this.renderRoot.appendChild(content);
         this.renderedCallback();
         this.initialContentCallback();
+    }
+
+    protected $<T extends Element = HTMLElement>(selector: string) {
+        return this.renderRoot.querySelector<T>(selector);
+    }
+
+    protected $$<T extends Element = HTMLElement>(selector: string) {
+        return this.renderRoot.querySelectorAll<T>(selector);
+    }
+
+    protected queryAssignedElements<T extends Element = HTMLElement>(
+        slot_name?: string,
+        selector?: string,
+    ) {
+        const slot_element = this.$(
+            `slot${slot_name ? `[name=${slot_name}]` : ":not([name])"}`,
+        ) as HTMLSlotElement;
+
+        const elements = (slot_element?.assignedElements() ?? []) as T[];
+
+        if (selector) {
+            return elements.filter((elm) => elm.matches(selector));
+        } else {
+            return elements;
+        }
     }
 }

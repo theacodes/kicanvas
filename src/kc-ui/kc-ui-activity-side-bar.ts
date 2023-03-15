@@ -20,20 +20,22 @@ export class KCUIActivitySideBarElement extends CustomElement {
     #activity: string | null | undefined;
 
     private get activities() {
-        return this.querySelectorAll("kc-ui-activity");
+        // Slightly hacky: using querySelectorAll on light DOM instead of slots
+        // so this can be accessed before initial render.
+        return this.querySelectorAll<HTMLElement>("kc-ui-activity");
     }
 
     private get activities_container() {
-        return this.renderRoot.querySelector(".activities")! as HTMLElement;
+        return this.$(".activities")!;
     }
 
     private get buttons() {
-        return this.renderRoot.querySelectorAll(`button`);
+        return this.$$<HTMLButtonElement>(`button`);
     }
 
     override render() {
-        const top_buttons: Element[] = [];
-        const bottom_buttons: Element[] = [];
+        const top_buttons: HTMLElement[] = [];
+        const bottom_buttons: HTMLElement[] = [];
 
         for (const activity of this.activities) {
             const name = activity.getAttribute("name");
@@ -48,7 +50,7 @@ export class KCUIActivitySideBarElement extends CustomElement {
                         title="${name}">
                         <kc-ui-icon part="icon">${icon}</kc-ui-icon>
                     </button>
-                ` as Element,
+                ` as HTMLElement,
             );
         }
 

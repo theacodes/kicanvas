@@ -22,7 +22,7 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
     }
 
     private get controls() {
-        return this.renderRoot.querySelectorAll("input");
+        return this.$$<HTMLInputElement>("input");
     }
 
     private setup_events() {

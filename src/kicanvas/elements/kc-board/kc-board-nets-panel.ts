@@ -46,18 +46,16 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
         });
     }
 
-    private get search_input_elm(): KCUITextFilterInputElement {
-        return this.renderRoot.querySelector("kc-ui-text-filter-input")!;
+    private get search_input_elm() {
+        return this.$<KCUITextFilterInputElement>("kc-ui-text-filter-input")!;
     }
 
-    private get item_filter_elem(): KCUIFilteredListElement {
-        return this.renderRoot.querySelector("kc-ui-filtered-list")!;
+    private get item_filter_elem() {
+        return this.$<KCUIFilteredListElement>("kc-ui-filtered-list")!;
     }
 
     private get items() {
-        return this.renderRoot.querySelectorAll(
-            "li[data-number]",
-        ) as NodeListOf<HTMLLIElement>;
+        return this.$$<HTMLLIElement>("li[data-number]");
     }
 
     private mark_selected_item(number: number) {

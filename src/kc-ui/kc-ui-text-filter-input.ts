@@ -12,7 +12,7 @@ export class KCUITextFilterInputElement extends CustomElement {
     static override styles = styles;
 
     get input() {
-        return this.renderRoot.querySelector("input")!;
+        return this.$<HTMLInputElement>("input")!;
     }
 
     get value() {
@@ -29,13 +29,11 @@ export class KCUITextFilterInputElement extends CustomElement {
     override initialContentCallback(): void | undefined {
         super.initialContentCallback();
 
-        this.renderRoot
-            .querySelector("button")!
-            .addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.value = "";
-            });
+        this.$("button")!.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.value = "";
+        });
     }
 
     override render() {

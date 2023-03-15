@@ -28,14 +28,16 @@ export class KCUIFilteredListElement extends CustomElement {
         return this.getAttribute("item-selector") ?? "[data-match-text]";
     }
 
-    private get items(): NodeListOf<HTMLElement> {
-        return this.querySelectorAll(this.item_selector);
+    private *items() {
+        for (const parent of this.queryAssignedElements()) {
+            yield* parent.querySelectorAll<HTMLElement>(this.item_selector);
+        }
     }
 
     private apply_filter() {
         // don't block the main thread
         window.requestAnimationFrame(() => {
-            for (const el of this.items) {
+            for (const el of this.items()) {
                 if (
                     this.#filter_text == null ||
                     el.dataset["matchText"]
