@@ -1,0 +1,16 @@
+* {
+    box-sizing: border-box;
+}
+
+:host {
+    border-radius: 5px;
+    border: 1px solid transparent;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+}
+
+:host([open]) {
+    display: flex;
+}
