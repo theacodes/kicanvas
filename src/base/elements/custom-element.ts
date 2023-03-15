@@ -117,7 +117,7 @@ export class CustomElement extends HTMLElement {
     renderedCallback(): void | undefined {}
 
     update(): void | undefined {
-        for (const child of this.renderRoot.children) {
+        for (const child of Array.from(this.renderRoot.children)) {
             if (child.tagName != "STYLE") {
                 child.remove();
             }
