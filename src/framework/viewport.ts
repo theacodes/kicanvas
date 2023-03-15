@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CanvasSizeObserver } from "../dom/canvas-size-observer";
-import { PanAndZoom } from "../dom/pan-and-zoom";
+import { SizeObserver } from "../base/dom/size-observer";
+import { PanAndZoom } from "../base/dom/pan-and-zoom";
 import { Renderer } from "../gfx/renderer";
 import { Angle } from "../math/angle";
 import { BBox } from "../math/bbox";
@@ -18,7 +18,7 @@ import { Vec2 } from "../math/vec2";
  * into a scene.
  */
 export class Viewport {
-    #observer: CanvasSizeObserver;
+    #observer: SizeObserver;
     #pan_and_zoom: PanAndZoom;
     #resolve_ready: () => void;
 
@@ -43,13 +43,10 @@ export class Viewport {
             new Angle(0),
         );
 
-        this.#observer = new CanvasSizeObserver(
-            this.renderer.canvas,
-            (canvas) => {
-                this.#update_camera();
-                this.callback();
-            },
-        );
+        this.#observer = new SizeObserver(this.renderer.canvas, () => {
+            this.#update_camera();
+            this.callback();
+        });
 
         this.#update_camera();
     }

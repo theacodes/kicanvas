@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../dom/context";
-import { CustomElement, html } from "../../dom/custom-elements";
+import { WithContext } from "../../base/elements/context";
+import { CustomElement, html } from "../../base/elements/custom-element";
 import { KiCanvasSelectEvent } from "../../framework/events";
 import { KCUIActivitySideBarElement } from "../kc-ui/kc-ui-activity-side-bar";
 import { KiCanvasBoardElement } from "../kicanvas-board";

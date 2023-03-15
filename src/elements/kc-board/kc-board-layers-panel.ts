@@ -7,8 +7,8 @@
 import { delegate } from "../../base/events";
 import { LayerNames, LayerSet } from "../../board/layers";
 import { BoardViewer } from "../../board/viewer";
-import { WithContext } from "../../dom/context";
-import { CustomElement, html } from "../../dom/custom-elements";
+import { WithContext } from "../../base/elements/context";
+import { CustomElement, html } from "../../base/elements/custom-element";
 import styles from "./kc-board-layers-panel.css";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {

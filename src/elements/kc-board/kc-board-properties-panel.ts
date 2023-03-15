@@ -6,8 +6,8 @@
 
 import { Footprint } from "../../board/items";
 import { BoardViewer } from "../../board/viewer";
-import { WithContext } from "../../dom/context";
-import { CustomElement, html } from "../../dom/custom-elements";
+import { WithContext } from "../../base/elements/context";
+import { CustomElement, html } from "../../base/elements/custom-element";
 import { KiCanvasSelectEvent } from "../../framework/events";
 
 export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {

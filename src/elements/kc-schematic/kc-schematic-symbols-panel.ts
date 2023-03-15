@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../dom/context";
-import { CustomElement, html } from "../../dom/custom-elements";
+import { WithContext } from "../../base/elements/context";
+import { CustomElement, html } from "../../base/elements/custom-element";
 import { KiCanvasLoadEvent, KiCanvasSelectEvent } from "../../framework/events";
 import { SchematicViewer } from "../../schematic/viewer";
 import { KCUIFilteredListElement } from "../kc-ui/kc-ui-filtered-list";

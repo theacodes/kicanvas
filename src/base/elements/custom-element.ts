@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Disposables, type IDisposable } from "../base/disposable";
-import { is_string } from "../base/types";
+import { Disposables, type IDisposable } from "../disposable";
+import { is_string } from "../types";
 import { html, literal } from "./templates";
 export { html, literal };
 

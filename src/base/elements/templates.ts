@@ -4,9 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { is_iterable, is_primitive } from "../base/types";
+import { is_iterable, is_primitive } from "../types";
 
 export type ElementOrFragment = HTMLElement | DocumentFragment;
+
+export function is_HTMLElement(v: any): v is HTMLElement {
+    return typeof HTMLElement === "object" && v instanceof HTMLElement;
+}
 
 /**
  * A tagged template literal that generates HTML
@@ -127,10 +131,7 @@ function apply_content_value(node: Node | null, text: Text, values: unknown[]) {
         return;
     }
 
-    if (
-        node instanceof HTMLElement &&
-        ["script", "style"].includes(node.localName)
-    ) {
+    if (is_HTMLElement(node) && ["script", "style"].includes(node.localName)) {
         throw new Error(
             `Cannot bind values inside of <script> or <style> tags`,
         );

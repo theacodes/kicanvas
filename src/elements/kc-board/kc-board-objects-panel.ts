@@ -5,8 +5,8 @@
 */
 
 import { BoardViewer } from "../../board/viewer";
-import { WithContext } from "../../dom/context";
-import { html, CustomElement } from "../../dom/custom-elements";
+import { WithContext } from "../../base/elements/context";
+import { html, CustomElement } from "../../base/elements/custom-element";
 
 export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;

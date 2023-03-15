@@ -5,8 +5,8 @@
 */
 
 import { delegate, listen } from "../base/events";
-import { WithContext } from "../dom/context";
-import { CustomElement, html } from "../dom/custom-elements";
+import { WithContext } from "../base/elements/context";
+import { CustomElement, html } from "../base/elements/custom-element";
 import type { Project } from "../project";
 
 import "./kc-ui/kc-ui";
