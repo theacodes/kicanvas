@@ -5,7 +5,7 @@
 */
 
 import { assert } from "@esm-bundle/chai";
-import * as drawing_sheet from "../../src/drawing_sheet/items";
+import * as drawing_sheet from "../../src/kicad/drawing-sheet";
 import { assert_deep_partial } from "../utilities";
 
 suite("kicad.drawing_sheet.DrawingSheet(): drawing sheet parsing", function () {

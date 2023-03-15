@@ -5,8 +5,8 @@
 */
 
 import { listify, type List } from "./tokenizer.ts";
-import { Vec2 } from "../math/vec2.ts";
-import { Color } from "../gfx/color.ts";
+import { Vec2 } from "../base/math/vec2.ts";
+import { Color } from "../graphics/color.ts";
 import { is_number, is_string } from "../base/types.ts";
 
 enum Kind {

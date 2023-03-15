@@ -6,8 +6,8 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { SchText } from "../../src/text/sch-text";
-import { Angle } from "../../src/math/angle";
+import { SchText } from "../../src/kicad/text/sch-text";
+import { Angle } from "../../src/base/math/angle";
 
 suite("text.sch_text.SchText()", function () {
     test(".set_spin_style_from_angle()", function () {

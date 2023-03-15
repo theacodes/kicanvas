@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import "./elements/kc-board/kc-board-viewer";
-import "./elements/kicanvas-app";
-import "./elements/kicanvas-board";
-import "./elements/kicanvas-schematic";
+import "./kicanvas/elements/kc-board/kc-board-viewer";
+import "./kicanvas/elements/kicanvas-app";
+import "./kicanvas/elements/kicanvas-board";
+import "./kicanvas/elements/kicanvas-schematic";

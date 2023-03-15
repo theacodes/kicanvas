@@ -8,7 +8,7 @@ import { assert } from "@esm-bundle/chai";
 
 import { type List, listify } from "../../src/kicad/tokenizer";
 import { T, P, parse_expr } from "../../src/kicad/parser";
-import { Vec2 } from "../../src/math/vec2";
+import { Vec2 } from "../../src/base/math/vec2";
 
 suite("kicad.parser.parse_expr(): s-expression parser", function () {
     test(".start()", function () {

@@ -4,7 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { DragAndDropFileSystem, VirtualFileSystem } from "../../services/vfs";
+import {
+    DragAndDropFileSystem,
+    VirtualFileSystem,
+} from "../../kicanvas/services/vfs";
 
 export class DropTarget {
     constructor(elm: HTMLElement, callback: (fs: VirtualFileSystem) => void) {

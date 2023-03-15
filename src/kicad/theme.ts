@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../gfx/color";
+import { Color } from "../graphics/color";
 
 export const board = {
     anchor: Color.from_css("rgb(100, 203, 150)"),

@@ -10,8 +10,8 @@ import {
     PinPainter,
     PinShapeInternals,
     type PinInfo,
-} from "../../../src/schematic/painters/pin";
-import { Vec2 } from "../../../src/math/vec2";
+} from "../../../src/viewers/schematic/painters/pin";
+import { Vec2 } from "../../../src/base/math/vec2";
 
 suite("sch.painters.pin.PinPainter", function () {
     test(".apply_symbol_transformations() - position only", function () {

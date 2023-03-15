@@ -5,8 +5,8 @@
 */
 
 import { parse_expr, P, T, type Parseable } from "./parser.ts";
-import { Vec2 } from "../math/vec2.ts";
-import { Color } from "../gfx/color.ts";
+import { Vec2 } from "../base/math/vec2.ts";
+import { Color } from "../graphics/color.ts";
 
 export function expand_text_vars(
     text: string,
