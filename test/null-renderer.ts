@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../src/graphics/color";
+import { Color } from "../src/base/color";
 import { RenderLayer, Renderer } from "../src/graphics/renderer";
 import {
     Circle,

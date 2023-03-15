@@ -28,7 +28,7 @@ import { Circle, Polygon, Polyline } from "../../graphics/shapes";
 import { ItemPainter, DocumentPainter } from "../base/painter";
 import { EDAText } from "../../kicad/text/eda-text";
 import { StrokeFont } from "../../kicad/text/stroke-font";
-import { Color } from "../../graphics/color";
+import { Color } from "../../base/color";
 import { ViewLayerNames } from "../base/view-layers";
 
 abstract class BoardItemPainter extends ItemPainter {

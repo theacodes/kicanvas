@@ -9,7 +9,7 @@ import { Angle } from "../../../base/math/angle";
 import { Vec2 } from "../../../base/math/vec2";
 import { ItemPainter } from "../../base/painter";
 import { LayerNames, ViewLayer } from "../layers";
-import { Color } from "../../../graphics/color";
+import { Color } from "../../../base/color";
 import { SchText } from "../../../kicad/text/sch-text";
 import { StrokeFont } from "../../../kicad/text/stroke-font";
 

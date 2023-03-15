@@ -6,7 +6,7 @@
 
 import type { IDisposable } from "../../base/disposable";
 import { is_string } from "../../base/types";
-import { Color } from "../../graphics/color";
+import { Color } from "../../base/color";
 import { RenderLayer } from "../../graphics/renderer";
 import { BBox } from "../../base/math/bbox";
 import { Vec2 } from "../../base/math/vec2";

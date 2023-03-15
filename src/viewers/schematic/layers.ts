@@ -9,7 +9,7 @@ import {
     ViewLayerSet as BaseLayerSet,
     ViewLayer,
 } from "../base/view-layers";
-import { Color } from "../../graphics/color";
+import { Color } from "../../base/color";
 export { ViewLayer };
 
 export enum LayerNames {

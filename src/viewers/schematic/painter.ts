@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../../graphics/color";
+import { Color } from "../../base/color";
 import { Polygon, Polyline, Arc, Circle } from "../../graphics/shapes";
 import { Renderer } from "../../graphics/renderer";
 import * as schematic_items from "../../kicad/schematic";

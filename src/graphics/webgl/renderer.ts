@@ -10,7 +10,7 @@ import { Matrix3 } from "../../base/math/matrix3";
 import { Arc, Circle, Polygon, Polyline } from "../shapes";
 import { Vec2 } from "../../base/math/vec2";
 import { Angle } from "../../base/math/angle";
-import { Color } from "../color";
+import { Color } from "../../base/color";
 
 /**
  * WebGL2-based renderer

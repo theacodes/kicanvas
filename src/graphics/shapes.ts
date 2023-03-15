@@ -12,7 +12,7 @@
 
 import { Angle } from "../base/math/angle.js";
 import { Vec2 } from "../base/math/vec2.js";
-import { Color } from "./color.js";
+import { Color } from "../base/color.js";
 import { BBox } from "../base/math/bbox.js";
 
 type OptionalDefaultColor = Color | false | null;

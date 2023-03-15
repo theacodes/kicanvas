@@ -8,7 +8,7 @@ import { Viewport } from "./viewport";
 import { Renderer } from "../../graphics/renderer";
 import { Vec2 } from "../../base/math/vec2";
 import { BBox } from "../../base/math/bbox";
-import { Color } from "../../graphics/color";
+import { Color } from "../../base/color";
 import { ViewLayerSet } from "./view-layers";
 import { Polygon, Polyline } from "../../graphics/shapes";
 import {

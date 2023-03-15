@@ -9,7 +9,7 @@ import { Vec2 } from "../../../base/math/vec2";
 import { Renderer } from "../../../graphics/renderer";
 import type { HAlign, VAlign } from "../../../kicad/text/font";
 import { Effects } from "../../../kicad/common";
-import { Color } from "../../../graphics/color";
+import { Color } from "../../../base/color";
 import { EDAText } from "../../../kicad/text/eda-text";
 import { StrokeFont } from "../../../kicad/text/stroke-font";
 import { ItemPainter } from "../../base/painter";

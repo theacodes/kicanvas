@@ -25,7 +25,7 @@ import earcut from "../../../third_party/earcut/earcut";
 import { VertexArray, ShaderProgram, Buffer } from "./helpers";
 import { Vec2 } from "../../base/math/vec2";
 import { Matrix3 } from "../../base/math/matrix3";
-import { Color } from "../color";
+import { Color } from "../../base/color";
 import { Circle, Polyline, Polygon } from "../shapes";
 import polygon_frag_shader_src from "./polygon.frag.glsl";
 import polygon_vert_shader_src from "./polygon.vert.glsl";

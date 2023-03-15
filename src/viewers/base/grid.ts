@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../../graphics/color";
+import { Color } from "../../base/color";
 import { Renderer } from "../../graphics/renderer";
 import { Angle } from "../../base/math/angle";
 import { BBox } from "../../base/math/bbox";
