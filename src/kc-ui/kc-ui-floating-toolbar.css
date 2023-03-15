@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 :host {
     z-index: 10;
     user-select: none;
