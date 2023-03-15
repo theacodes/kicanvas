@@ -4,85 +4,42 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { DrawingSheet } from "../../kicad/drawing-sheet";
-import { DrawingSheetPainter } from "../drawing-sheet/painter";
-import { Viewer } from "../base/viewer";
-import { Renderer } from "../../graphics/renderer";
-import { WebGL2Renderer } from "../../graphics/webgl/renderer";
-import * as theme from "../../kicad/theme";
 import { BBox } from "../../base/math/bbox";
 import { Vec2 } from "../../base/math/vec2";
+import { is_string } from "../../base/types";
+import { Renderer } from "../../graphics/renderer";
+import { WebGL2Renderer } from "../../graphics/webgl/renderer";
 import * as board_items from "../../kicad/board";
+import * as theme from "../../kicad/theme";
+import { DocumentViewer } from "../base/document-viewer";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import { BoardPainter } from "./painter";
-import { Grid } from "../base/grid";
-import { is_string } from "../../base/types";
 
-export class BoardViewer extends Viewer {
-    board: board_items.KicadPCB;
-    drawing_sheet: DrawingSheet;
-    declare layers: LayerSet;
+export class BoardViewer extends DocumentViewer<
+    board_items.KicadPCB,
+    BoardPainter,
+    LayerSet
+> {
+    get board(): board_items.KicadPCB {
+        return this.document;
+    }
 
-    #grid: Grid;
-    #painter: BoardPainter;
-
-    override create_renderer(canvas: HTMLCanvasElement): Renderer {
+    protected override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new WebGL2Renderer(canvas);
         renderer.theme = theme.board;
         return renderer;
     }
 
-    override async load(src: board_items.KicadPCB) {
-        if (this.board == src) {
-            return;
-        }
-
-        this.board = src;
-
-        // Load the default drawing sheet.
-        this.drawing_sheet = DrawingSheet.default();
-        this.drawing_sheet.document = this.board;
-
-        // Setup graphical layers
-        this.disposables.disposeAndRemove(this.layers);
-        this.layers = this.disposables.add(
-            new LayerSet(this.board, this.renderer.theme),
-        );
-
-        // Paint the board
-        this.#painter = new BoardPainter(
-            this.renderer,
-            this.layers as LayerSet,
-        );
-        this.#painter.paint(this.board);
-
-        // Paint the drawing sheet
-        new DrawingSheetPainter(this.renderer, this.layers as LayerSet).paint(
-            this.drawing_sheet,
-        );
-
-        // Create the grid
-        this.#grid = new Grid(
-            this.renderer,
-            this.viewport.camera,
-            this.layers.by_name(LayerNames.grid)!,
-            this.board.setup?.grid_origin ?? new Vec2(0, 0),
-        );
-
-        // Wait for a valid viewport size
-        await this.viewport.ready;
-        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
-
-        // Position the camera and draw the scene.
-        this.zoom_to_page();
-
-        // Mark the viewer as loaded and notify event listeners
-        this.set_loaded(true);
+    protected override create_painter() {
+        return new BoardPainter(this.renderer, this.layers);
     }
 
-    protected override on_viewport_change(): void {
-        super.on_viewport_change();
-        this.#grid?.update();
+    protected override create_layer_set() {
+        return new LayerSet(this.board, this.renderer.theme);
+    }
+
+    protected override get grid_origin() {
+        return this.board.setup?.grid_origin ?? new Vec2(0, 0);
     }
 
     protected override on_pick(
@@ -101,9 +58,7 @@ export class BoardViewer extends Viewer {
         this.select(selected);
     }
 
-    override select(value: board_items.Footprint | string | BBox | null) {
-        let item = value;
-
+    override select(item: board_items.Footprint | string | BBox | null) {
         // If item is a string, find the footprint by uuid or reference.
         if (is_string(item)) {
             item = this.board.find_footprint(item);
@@ -114,19 +69,11 @@ export class BoardViewer extends Viewer {
             item = item.bbox;
         }
 
-        // If value wasn't explicitly null and none of the above found a suitable
-        // selection, give up.
-        if (value != null && !(item instanceof BBox)) {
-            throw new Error(
-                `Unable to select item ${value}, could not find an object that matched.`,
-            );
-        }
-
-        this.selected = item ?? null;
+        super.select(item);
     }
 
     highlight_net(net: number) {
-        this.#painter.paint_net(this.board, net);
+        this.painter.paint_net(this.board, net);
         this.draw();
     }
 
@@ -169,11 +116,6 @@ export class BoardViewer extends Viewer {
 
     set page_opacity(value: number) {
         this.layers.by_name(LayerNames.drawing_sheet)!.opacity = value;
-        this.draw();
-    }
-
-    override zoom_to_page() {
-        this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
         this.draw();
     }
 

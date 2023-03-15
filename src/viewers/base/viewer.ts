@@ -71,7 +71,7 @@ export abstract class Viewer extends EventTarget {
         };
     }
 
-    abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
+    protected abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
 
     async setup() {
         await this.renderer.setup();
