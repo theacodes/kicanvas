@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { delegate, listen } from "../base/events";
 import { WithContext } from "../dom/context";
 import { CustomElement, html } from "../dom/custom-elements";
 import type { Project } from "../project";
@@ -31,16 +32,8 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
             this.open = !this.open;
         });
 
-        this.renderRoot.addEventListener("click", (e) => {
-            const li = (e.target as HTMLElement)?.closest(
-                "li[data-filename]",
-            ) as HTMLLIElement;
-
-            if (!li) {
-                return;
-            }
-
-            this.selected = li.dataset["filename"] ?? null;
+        delegate(this.renderRoot, "li[data-filename]", "click", (e, source) => {
+            this.selected = source.dataset["filename"] ?? null;
         });
 
         this.setup_leave_event();
@@ -56,27 +49,22 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
 
             const padding = 50;
             const rect = this.getBoundingClientRect();
-            const aborter = new AbortController();
 
-            window.addEventListener(
-                "mousemove",
-                (e) => {
-                    if (!this.open) {
-                        aborter.abort();
-                    }
+            const move_listener = listen(window, "mousemove", (e) => {
+                if (!this.open) {
+                    move_listener.dispose();
+                }
 
-                    const in_box =
-                        e.clientX > rect.left - padding &&
-                        e.clientX < rect.right + padding &&
-                        e.clientY > rect.top - padding &&
-                        e.clientY < rect.bottom + padding;
-                    if (!in_box) {
-                        this.open = false;
-                        aborter.abort();
-                    }
-                },
-                { signal: aborter.signal },
-            );
+                const in_box =
+                    e.clientX > rect.left - padding &&
+                    e.clientX < rect.right + padding &&
+                    e.clientY > rect.top - padding &&
+                    e.clientY < rect.bottom + padding;
+                if (!in_box) {
+                    this.open = false;
+                    move_listener.dispose();
+                }
+            });
         });
     }
 

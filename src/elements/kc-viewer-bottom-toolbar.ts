@@ -29,15 +29,21 @@ export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {
 
             super.connectedCallback();
 
-            this.viewer.addEventListener(KiCanvasMouseMoveEvent.type, () => {
-                this.update_position();
-            });
-
-            this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
-                this.#zoom_to_selection_btn.disabled = e.detail.item
-                    ? false
-                    : true;
-            });
+            this.addDisposable(
+                this.viewer.addEventListener(
+                    KiCanvasMouseMoveEvent.type,
+                    () => {
+                        this.update_position();
+                    },
+                ),
+            );
+            this.addDisposable(
+                this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+                    this.#zoom_to_selection_btn.disabled = e.detail.item
+                        ? false
+                        : true;
+                }),
+            );
 
             this.#zoom_to_page_btn.addEventListener("click", (e) => {
                 e.preventDefault();

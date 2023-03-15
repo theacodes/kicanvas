@@ -13,6 +13,7 @@ import { KCUITextFilterInputElement } from "../kc-ui/kc-ui-text-filter-input";
 
 import "../kc-ui/kc-ui-filtered-list";
 import "../kc-ui/kc-ui-text-filter-input";
+import { delegate } from "../../base/events";
 
 export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -28,12 +29,8 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     }
 
     private setup_initial_events() {
-        this.addEventListener("click", (e) => {
-            const li = (e.target as HTMLElement).closest(
-                "li[data-uuid]",
-            ) as HTMLLIElement | null;
-
-            const uuid = li?.dataset["uuid"] as string;
+        delegate(this, "li[data-uuid]", "click", (e, source) => {
+            const uuid = source.dataset["uuid"] as string;
 
             if (!uuid) {
                 return;

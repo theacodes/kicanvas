@@ -12,6 +12,7 @@ import { KCUITextFilterInputElement } from "../kc-ui/kc-ui-text-filter-input";
 
 import "../kc-ui/kc-ui-filtered-list";
 import "../kc-ui/kc-ui-text-filter-input";
+import { delegate } from "../../base/events";
 
 export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -27,12 +28,8 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
     }
 
     private setup_events() {
-        this.addEventListener("click", (e) => {
-            const li = (e.target as HTMLElement).closest(
-                "li[data-number]",
-            ) as HTMLLIElement | null;
-
-            const number = parseInt(li?.dataset["number"] as string, 10);
+        delegate(this, "li[data-number]", "click", (e, source) => {
+            const number = parseInt(source?.dataset["number"] as string, 10);
 
             if (!number) {
                 return;

@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { delegate } from "../../base/events";
 import { LayerNames, LayerSet } from "../../board/layers";
 import { BoardViewer } from "../../board/viewer";
 import { WithContext } from "../../dom/context";
@@ -105,18 +106,10 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
             });
 
         // Presets
-        this.panel_body.addEventListener("click", (e) => {
-            const item = (e.target as HTMLElement).closest(
-                "[data-preset]",
-            ) as HTMLElement | null;
-
-            if (!item) {
-                return;
-            }
-
+        delegate(this.panel_body, "[data-preset]", "click", (e, source) => {
             const ui_layers = this.viewer.layers.in_ui_order();
 
-            switch (item.dataset["preset"]) {
+            switch (source.dataset["preset"]) {
                 case "all":
                     for (const l of ui_layers) {
                         l.visible = true;

@@ -12,7 +12,7 @@
  *
  */
 
-import { disposable_listener } from "../../base/events";
+import { listen } from "../../base/events";
 import { CustomElement } from "../../dom/custom-elements";
 import kc_ui_styles from "./kc-ui.css";
 
@@ -66,7 +66,7 @@ export class KCUIViewResizerElement extends CustomElement {
             };
 
             const mouse_move_listener = this.addDisposable(
-                disposable_listener(window, "mousemove", mouse_move),
+                listen(window, "mousemove", mouse_move),
             );
 
             const mouse_up = (e: MouseEvent) => {

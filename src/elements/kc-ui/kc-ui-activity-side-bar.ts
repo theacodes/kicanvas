@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { delegate } from "../../base/events";
 import { CustomElement, html } from "../../dom/custom-elements";
 import kc_ui_activity_side_bar_styles from "./kc-ui-activity-side-bar.css";
 
@@ -67,14 +68,8 @@ export class KCUIActivitySideBarElement extends CustomElement {
             this.change_activity(default_activity);
         }
 
-        this.renderRoot.addEventListener("click", (e) => {
-            const active_btn = (e.target as HTMLElement).closest("button");
-
-            if (!active_btn) {
-                return;
-            }
-
-            this.change_activity(active_btn.name, true);
+        delegate(this.renderRoot, "button", "click", (e, source) => {
+            this.change_activity((source as HTMLButtonElement).name, true);
         });
     }
 

@@ -18,7 +18,7 @@ import {
     KiCanvasMouseMoveEvent,
 } from "./events";
 import { Disposables, type IDisposable } from "../base/disposable";
-import { disposable_listener } from "../base/events";
+import { listen } from "../base/events";
 
 export abstract class Viewer extends EventTarget {
     public canvas: HTMLCanvasElement;
@@ -84,19 +84,19 @@ export abstract class Viewer extends EventTarget {
         this.viewport.enable_pan_and_zoom(0.5, 190);
 
         this.disposables.add(
-            disposable_listener(this.canvas, "mousemove", (e) => {
+            listen(this.canvas, "mousemove", (e) => {
                 this.on_mouse_change(e);
             }),
         );
 
         this.disposables.add(
-            disposable_listener(this.canvas, "panzoom", (e) => {
+            listen(this.canvas, "panzoom", (e) => {
                 this.on_mouse_change(e as MouseEvent);
             }),
         );
 
         this.disposables.add(
-            disposable_listener(this.canvas, "click", (e) => {
+            listen(this.canvas, "click", (e) => {
                 const items = this.layers.query_point(this.mouse_position);
                 this.on_pick(this.mouse_position, items);
             }),
