@@ -5,7 +5,7 @@
 */
 
 import { delegate } from "../base/events";
-import { CustomElement, html } from "../base/elements/custom-element";
+import { CustomElement, html } from "../base/dom/custom-element";
 import kc_ui_activity_side_bar_styles from "./kc-ui-activity-side-bar.css";
 
 /**

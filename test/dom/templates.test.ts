@@ -5,7 +5,7 @@
 */
 import { chaiDomDiff } from "@open-wc/semantic-dom-diff";
 import { use, assert } from "@esm-bundle/chai";
-import { html, literal } from "../../src/base/elements/templates";
+import { html, literal } from "../../src/base/dom/templates";
 
 use(chaiDomDiff);
 

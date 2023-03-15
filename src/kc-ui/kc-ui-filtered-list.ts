@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, CustomElement } from "../base/elements/custom-element";
+import { html, CustomElement } from "../base/dom/custom-element";
 
 export class KCUIFilteredListElement extends CustomElement {
     static override styles = `:host { display: contents; }`;

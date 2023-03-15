@@ -5,8 +5,8 @@
 */
 
 import { KicadPCB } from "../../kicad/board";
-import { WithContext } from "../../base/elements/context";
-import { CustomElement, html } from "../../base/elements/custom-element";
+import { WithContext } from "../../base/dom/context";
+import { CustomElement, html } from "../../base/dom/custom-element";
 import { DropTarget } from "../../base/dom/drag-drop";
 import * as theme from "../../kicad/theme";
 import { Project } from "../project";

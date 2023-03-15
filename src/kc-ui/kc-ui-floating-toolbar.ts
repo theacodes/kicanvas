@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CustomElement, html } from "../base/elements/custom-element";
+import { CustomElement, html } from "../base/dom/custom-element";
 import styles from "./kc-ui-floating-toolbar.css";
 
 /**

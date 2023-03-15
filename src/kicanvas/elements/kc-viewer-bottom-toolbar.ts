@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../base/elements/context";
-import { CustomElement, html } from "../../base/elements/custom-element";
+import { WithContext } from "../../base/dom/context";
+import { CustomElement, html } from "../../base/dom/custom-element";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,

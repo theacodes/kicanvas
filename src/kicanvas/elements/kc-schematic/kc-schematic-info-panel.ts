@@ -5,8 +5,8 @@
 */
 
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
-import { WithContext } from "../../../base/elements/context";
-import { html, CustomElement } from "../../../base/elements/custom-element";
+import { WithContext } from "../../../base/dom/context";
+import { html, CustomElement } from "../../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
 
 export class KCSchematicInfoPanel extends WithContext(CustomElement) {

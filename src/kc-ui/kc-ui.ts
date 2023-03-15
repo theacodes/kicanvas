@@ -13,7 +13,7 @@
  */
 
 import { listen } from "../base/events";
-import { CustomElement } from "../base/elements/custom-element";
+import { CustomElement } from "../base/dom/custom-element";
 import kc_ui_styles from "./kc-ui.css";
 
 /**

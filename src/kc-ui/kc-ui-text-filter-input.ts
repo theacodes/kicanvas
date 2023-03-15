@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, CustomElement } from "../base/elements/custom-element";
+import { html, CustomElement } from "../base/dom/custom-element";
 import styles from "./kc-ui-text-filter-input.css";
 
 export class KCUITextFilterInputElement extends CustomElement {

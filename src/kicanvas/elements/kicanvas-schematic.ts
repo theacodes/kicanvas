@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CustomElement, html } from "../../base/elements/custom-element";
+import { CustomElement, html } from "../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import type { KicadSch } from "../../kicad/schematic";
 import { SchematicViewer } from "../../viewers/schematic/viewer";

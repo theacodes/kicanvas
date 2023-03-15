@@ -5,8 +5,8 @@
 */
 
 import { BoardViewer } from "../../../viewers/board/viewer";
-import { WithContext } from "../../../base/elements/context";
-import { CustomElement, html } from "../../../base/elements/custom-element";
+import { WithContext } from "../../../base/dom/context";
+import { CustomElement, html } from "../../../base/dom/custom-element";
 import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
 import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 
