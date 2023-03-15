@@ -26,7 +26,7 @@ export abstract class ItemPainter {
     abstract paint(layer: ViewLayer, item: unknown): void;
 }
 
-interface PaintableDocument {
+export interface PaintableDocument {
     items(): Generator<unknown, void, void>;
 }
 
