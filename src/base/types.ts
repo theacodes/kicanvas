@@ -35,6 +35,10 @@ export function is_iterable<T>(value: unknown): value is Iterable<T> {
     );
 }
 
+export function is_array<T = unknown>(value: unknown): value is T[] {
+    return Array.isArray(value);
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function is_object(value: unknown): value is Object {
     return (
