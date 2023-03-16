@@ -39,7 +39,8 @@ export class CustomElement extends HTMLElement {
         super();
 
         const static_this = this.constructor as typeof CustomElement;
-        if (static_this.exportparts) {
+
+        if (static_this.exportparts.length) {
             this.setAttribute("exportparts", static_this.exportparts.join(","));
         }
     }
