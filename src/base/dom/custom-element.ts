@@ -4,8 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { as_array } from "../array";
 import { Disposables, type IDisposable } from "../disposable";
-import { is_string } from "../types";
+import { adopt_styles, type CSS } from "./css";
 import { html, literal } from "./templates";
 export { html, literal };
 
@@ -16,7 +17,10 @@ export class CustomElement extends HTMLElement {
     /**
      * Styles added to the shadowRoot, can be a string or list of strings.
      */
-    static styles: string | string[];
+    static styles: (CSS | CSSStyleSheet) | (CSS | CSSStyleSheet)[];
+
+    // Constructed stylesheets shared among instances.
+    static _constructed_styles: CSSStyleSheet[];
 
     /**
      * If true, a shadowRoot is created for this element.
@@ -117,10 +121,8 @@ export class CustomElement extends HTMLElement {
     renderedCallback(): void | undefined {}
 
     update(): void | undefined {
-        for (const child of Array.from(this.renderRoot.children)) {
-            if (child.tagName != "STYLE") {
-                child.remove();
-            }
+        while (this.renderRoot.firstChild) {
+            this.renderRoot.firstChild.remove();
         }
         this.renderRoot.appendChild(this.render());
         this.renderedCallback();
@@ -134,17 +136,10 @@ export class CustomElement extends HTMLElement {
         }
 
         if (static_this.styles) {
-            if (is_string(static_this.styles)) {
-                static_this.styles = [static_this.styles];
-            }
-
-            for (const style of static_this.styles) {
-                this.renderRoot.appendChild(
-                    html`<style>
-                        ${literal`${style}`}
-                    </style>`,
-                );
-            }
+            adopt_styles(
+                this.shadowRoot ?? document,
+                as_array(static_this.styles),
+            );
         }
 
         const content = this.render();
