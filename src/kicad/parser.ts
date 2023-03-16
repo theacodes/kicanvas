@@ -8,6 +8,7 @@ import { listify, type List } from "./tokenizer.ts";
 import { Vec2 } from "../base/math/vec2.ts";
 import { Color } from "../base/color.ts";
 import { is_number, is_string } from "../base/types.ts";
+import { as_array } from "../base/array.ts";
 
 enum Kind {
     // the first token in the expr (kind ...)
@@ -323,13 +324,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
     }
 
     if (start_def) {
-        let acceptable_start_strings: string[];
-        if (is_string(start_def.name)) {
-            acceptable_start_strings = [start_def.name];
-        } else {
-            acceptable_start_strings = start_def.name;
-        }
-
+        const acceptable_start_strings = as_array(start_def.name);
         const first = expr.at(0) as string;
 
         if (!acceptable_start_strings.includes(first)) {

@@ -5,11 +5,11 @@
 */
 
 import type { IDisposable } from "../../base/disposable";
-import { is_string } from "../../base/types";
 import { Color } from "../../base/color";
 import { RenderLayer } from "../../graphics/renderer";
 import { BBox } from "../../base/math/bbox";
 import { Vec2 } from "../../base/math/vec2";
+import { iterable_as_array } from "../../base/array";
 
 /**
  * Common view layer names across all viewers.
@@ -250,16 +250,9 @@ export class ViewLayerSet implements IDisposable {
             | null
             | Iterable<string | ViewLayer>,
     ) {
-        let layer_names: string[];
-
-        if (layer_or_layers instanceof ViewLayer) {
-            layer_names = [layer_or_layers.name];
-        } else if (is_string(layer_or_layers)) {
-            layer_names = [layer_or_layers];
-        } else if (!layer_or_layers) {
-            layer_names = [];
-        } else {
-            layer_names = Array.from(layer_or_layers).map((v) =>
+        let layer_names: string[] = [];
+        if (layer_or_layers) {
+            layer_names = iterable_as_array(layer_or_layers).map((v) =>
                 v instanceof ViewLayer ? v.name : v,
             );
         }
