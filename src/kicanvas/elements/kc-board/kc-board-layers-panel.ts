@@ -5,16 +5,13 @@
 */
 
 import { WithContext } from "../../../base/dom/context";
-import { CSS } from "../../../base/dom/css";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { delegate } from "../../../base/events";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
-import styles from "./kc-board-layers-panel.css";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
-    static override styles = new CSS(styles);
     viewer: BoardViewer;
 
     private get panel_body() {

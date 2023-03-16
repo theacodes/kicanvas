@@ -19,6 +19,7 @@ import type { KCProjectPanelElement } from "./kc-project-panel";
 import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
+import kc_board_layers_panel_styles from "./kc-board/kc-board-layers-panel.css";
 
 import "../../kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
@@ -27,8 +28,9 @@ import "./kc-schematic/kc-schematic-viewer";
 
 class KiCanvasAppElement extends WithContext(CustomElement) {
     static override styles = [
-        // TODO: Figure out a better way to handle this.
+        // TODO: Figure out a better way to handle these two styles.
         new CSS(kc_ui_styles),
+        new CSS(kc_board_layers_panel_styles),
         new CSS(kicanvas_app_styles),
     ];
 
