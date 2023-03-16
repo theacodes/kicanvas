@@ -6,18 +6,19 @@
 
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KCUIActivitySideBarElement } from "../../../kc-ui/kc-ui-activity-side-bar";
+import type { KicadSch } from "../../../kicad/schematic";
+import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
 import "../../../kc-ui/kc-ui-activity-side-bar";
+import "../../../kc-ui/kc-ui-resizer";
 import "../kc-viewer-bottom-toolbar";
 import "../kicanvas-schematic";
 import "./kc-schematic-info-panel";
 import "./kc-schematic-properties-panel";
 import "./kc-schematic-symbols-panel";
-import type { KicadSch } from "../../../kicad/schematic";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -75,7 +76,7 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
                 ${this.schematic_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>
-            <kc-ui-view-resizer></kc-ui-view-resizer>
+            <kc-ui-resizer></kc-ui-resizer>
             ${this.activity_bar_elm}
         </kc-ui-split-view>`;
     }

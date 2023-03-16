@@ -574,32 +574,6 @@ kc-ui-split-view.fixed {
 }
 
 /*
-    Resizer
-*/
-
-kc-ui-view-resizer {
-    z-index: 999;
-    user-select: none;
-    display: block;
-    width: 6px;
-    margin-left: -6px;
-    cursor: col-resize;
-    background: transparent;
-    opacity: 0;
-    transition: opacity var(--transition-time-medium) ease;
-}
-
-kc-ui-view-resizer:hover {
-    background: var(--resizer-bg);
-    opacity: 1;
-    transition: opacity var(--transition-time-short) ease;
-}
-kc-ui-view-resizer:hover.active,
-kc-ui-view-resizer.active {
-    background: var(--resizer-active-bg);
-}
-
-/*
     Panels
 */
 

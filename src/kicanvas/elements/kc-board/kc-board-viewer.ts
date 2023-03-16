@@ -6,12 +6,14 @@
 
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KCUIActivitySideBarElement } from "../../../kc-ui/kc-ui-activity-side-bar";
+import type { KicadPCB } from "../../../kicad/board";
+import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
 import "../../../kc-ui/kc-ui-activity-side-bar";
+import "../../../kc-ui/kc-ui-resizer";
 import "../kc-viewer-bottom-toolbar";
 import "../kicanvas-board";
 import "./kc-board-footprints-panel";
@@ -20,7 +22,6 @@ import "./kc-board-layers-panel";
 import "./kc-board-nets-panel";
 import "./kc-board-objects-panel";
 import "./kc-board-properties-panel";
-import type { KicadPCB } from "../../../kicad/board";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
@@ -93,7 +94,7 @@ export class KCBoardViewerElement extends WithContext(CustomElement) {
                 ${this.board_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>
-            <kc-ui-view-resizer></kc-ui-view-resizer>
+            <kc-ui-resizer></kc-ui-resizer>
             ${this.activity_bar_elm}
         </kc-ui-split-view>`;
     }
