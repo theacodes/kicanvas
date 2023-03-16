@@ -15,7 +15,6 @@ import { CSS } from "../base/dom/css";
  */
 export class KCUIActivitySideBarElement extends CustomElement {
     static override styles = new CSS(kc_ui_activity_side_bar_styles);
-    static override exportparts = ["icon"];
 
     #activity: string | null | undefined;
 
@@ -48,7 +47,7 @@ export class KCUIActivitySideBarElement extends CustomElement {
                         tooltip-left="${name}"
                         name="${name?.toLowerCase()}"
                         title="${name}">
-                        <kc-ui-icon part="icon">${icon}</kc-ui-icon>
+                        <kc-ui-icon>${icon}</kc-ui-icon>
                     </button>
                 ` as HTMLElement,
             );

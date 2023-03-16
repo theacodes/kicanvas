@@ -80,12 +80,12 @@ kc-board-layer-control .icon.for-hidden {
     color: #888;
 }
 
-kc-board-layer-control[layer-visibility="hidden"] .icon.for-visible,
-kc-board-layer-control[layer-visibility="visible"] .icon.for-hidden {
+kc-board-layer-control[layer-visibility="hidden"] kc-ui-icon.for-visible,
+kc-board-layer-control[layer-visibility="visible"] kc-ui-icon.for-hidden {
     display: none;
 }
 
-kc-board-layer-control[layer-visibility="hidden"] .icon.for-hidden,
-kc-board-layer-control[layer-visibility="visible"] .icon.for-visible {
+kc-board-layer-control[layer-visibility="hidden"] kc-ui-icon.for-hidden,
+kc-board-layer-control[layer-visibility="visible"] kc-ui-icon.for-visible {
     display: revert;
 }

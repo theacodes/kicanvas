@@ -9,7 +9,6 @@ import { html, CustomElement } from "../base/dom/custom-element";
 import styles from "./kc-ui-text-filter-input.css";
 
 export class KCUITextFilterInputElement extends CustomElement {
-    static override exportparts = ["icon"];
     static override styles = new CSS(styles);
 
     get input() {
@@ -38,12 +37,10 @@ export class KCUITextFilterInputElement extends CustomElement {
     }
 
     override render() {
-        return html`<kc-ui-icon class="flex before" part="icon"
-                >search</kc-ui-icon
-            >
+        return html`<kc-ui-icon class="flex before">search</kc-ui-icon>
             <input style="" type="text" placeholder="search" name="search" />
             <button type="button">
-                <kc-ui-icon part="icon">close</kc-ui-icon>
+                <kc-ui-icon>close</kc-ui-icon>
             </button>`;
     }
 }

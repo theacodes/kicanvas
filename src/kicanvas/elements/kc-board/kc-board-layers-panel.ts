@@ -300,8 +300,8 @@ class KCBoardLayerControlElement extends CustomElement {
                 style="background: ${this.layer_color};"></span>
             <span class="name">${this.layer_name}</span>
             <button type="button" name="${this.layer_name}">
-                <kc-ui-icon class="icon for-visible">visibility</kc-ui-icon>
-                <kc-ui-icon class="icon for-hidden">visibility_off</kc-ui-icon>
+                <kc-ui-icon class="for-visible">visibility</kc-ui-icon>
+                <kc-ui-icon class="for-hidden">visibility_off</kc-ui-icon>
             </button>`;
     }
 }
