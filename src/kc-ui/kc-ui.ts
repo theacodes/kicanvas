@@ -14,6 +14,8 @@
 
 import { CustomElement } from "../base/dom/custom-element";
 
+import "./kc-ui-icon";
+
 /**
  * kc-ui-app is the parent container for all kc-ui-* elements.
  */
