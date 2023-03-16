@@ -97,15 +97,15 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
             );
         }
 
-        this.#dropdown = html`<kc-ui-dropdown slot="dropdown"
-            ><ul>
+        this.#dropdown = html`<kc-ui-dropdown slot="dropdown">
+            <ul>
                 ${file_btn_elms}
                 <li aria-role="button">
                     <kc-ui-icon>receipt</kc-ui-icon>
                     Bill of materials
                 </li>
-            </ul></kc-ui-dropdown
-        >` as KCUIDropdownElement;
+            </ul>
+        </kc-ui-dropdown>` as KCUIDropdownElement;
 
         return html`<kc-ui-toggle-menu icon="folder" title="Project">
             ${this.#dropdown}

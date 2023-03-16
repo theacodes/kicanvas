@@ -48,3 +48,47 @@ export function when_idle(
         },
     };
 }
+
+/**
+ * A promise representing work that has not yet completed.
+ */
+export class Deferred<T> {
+    readonly promise: Promise<T>;
+    #resolve: (value: T) => void;
+    #reject: (error: Error) => void;
+    settled = false;
+
+    constructor() {
+        this.promise = new Promise<T>((resolve, reject) => {
+            this.#resolve = resolve;
+            this.#reject = reject;
+        });
+    }
+
+    async wait() {
+        return await this.promise;
+    }
+
+    then<TResult1 = T, TResult2 = never>(
+        onfulfilled?:
+            | ((value: T) => TResult1 | PromiseLike<TResult1>)
+            | undefined
+            | null,
+        onrejected?:
+            | ((reason: any) => TResult2 | PromiseLike<TResult2>)
+            | undefined
+            | null,
+    ): Promise<TResult1 | TResult2> {
+        return this.promise.then(onfulfilled, onrejected);
+    }
+
+    resolve(value: T) {
+        this.settled = true;
+        this.#resolve(value);
+    }
+
+    reject(error: Error) {
+        this.settled = true;
+        this.#reject(error);
+    }
+}

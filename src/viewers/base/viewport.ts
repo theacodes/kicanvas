@@ -12,6 +12,7 @@ import { BBox } from "../../base/math/bbox";
 import { Camera2 } from "../../base/math/camera2";
 import { Matrix3 } from "../../base/math/matrix3";
 import { Vec2 } from "../../base/math/vec2";
+import { Deferred } from "../../base/async";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view
@@ -20,22 +21,17 @@ import { Vec2 } from "../../base/math/vec2";
 export class Viewport {
     #observer: SizeObserver;
     #pan_and_zoom: PanAndZoom;
-    #resolve_ready: () => void;
 
     width: number;
     height: number;
     camera: Camera2;
-    ready: Promise<void>;
+    ready = new Deferred<void>();
 
     /**
      * Create a Scene
      * @param callback - a callback used to re-draw the viewport when it changes.
      */
     constructor(public renderer: Renderer, public callback: () => void) {
-        this.ready = new Promise((resolve) => {
-            this.#resolve_ready = resolve;
-        });
-
         this.camera = new Camera2(
             new Vec2(0, 0),
             new Vec2(0, 0),
@@ -72,7 +68,7 @@ export class Viewport {
             this.camera.viewport_size = new Vec2(this.width, this.height);
 
             if (this.width && this.height) {
-                this.#resolve_ready();
+                this.ready.resolve();
             }
         }
     }

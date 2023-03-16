@@ -19,7 +19,7 @@ import {
 } from "./events";
 import { Disposables, type IDisposable } from "../../base/disposable";
 import { listen } from "../../base/events";
-import { later } from "../../base/async";
+import { Deferred, later } from "../../base/async";
 
 export abstract class Viewer extends EventTarget {
     public canvas: HTMLCanvasElement;
@@ -31,19 +31,13 @@ export abstract class Viewer extends EventTarget {
     protected disposables = new Disposables();
 
     #selected: BBox | null;
-    #loaded_promise: Promise<boolean>;
-    #loaded_promise_resolve_reject: [
-        (result: boolean) => void,
-        (result: boolean) => void,
-    ];
+
+    #loaded_deferred = new Deferred<boolean>();
 
     constructor(canvas: HTMLCanvasElement) {
         super();
         this.canvas = canvas;
         this.renderer = this.disposables.add(this.create_renderer(canvas));
-        this.#loaded_promise = new Promise((resolve, reject) => {
-            this.#loaded_promise_resolve_reject = [resolve, reject];
-        });
     }
 
     dispose() {
@@ -126,15 +120,13 @@ export abstract class Viewer extends EventTarget {
     public abstract load(src: any): Promise<void>;
 
     public get loaded() {
-        return this.#loaded_promise;
+        return this.#loaded_deferred.promise;
     }
 
-    protected set_loaded(value: boolean) {
+    protected resolve_loaded(value: boolean) {
         if (value) {
-            this.#loaded_promise_resolve_reject[0](true);
+            this.#loaded_deferred.resolve(true);
             this.dispatchEvent(new KiCanvasLoadEvent());
-        } else {
-            this.#loaded_promise_resolve_reject[1](false);
         }
     }
 

@@ -76,7 +76,7 @@ export abstract class DocumentViewer<
         this.zoom_to_page();
 
         // Mark the viewer as loaded and notify event listeners
-        this.set_loaded(true);
+        this.resolve_loaded(true);
     }
 
     protected override on_viewport_change(): void {
