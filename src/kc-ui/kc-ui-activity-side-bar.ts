@@ -7,14 +7,14 @@
 import { delegate } from "../base/events";
 import { CustomElement, html } from "../base/dom/custom-element";
 import kc_ui_activity_side_bar_styles from "./kc-ui-activity-side-bar.css";
+import { CSS } from "../base/dom/css";
 
 /**
  * kc-ui-activity-bar is a vscode-style side bar with an action bar with icons
  * and a panel with various activities.
  */
 export class KCUIActivitySideBarElement extends CustomElement {
-    static override useShadowRoot = true;
-    static override styles = kc_ui_activity_side_bar_styles;
+    static override styles = new CSS(kc_ui_activity_side_bar_styles);
     static override exportparts = ["icon"];
 
     #activity: string | null | undefined;

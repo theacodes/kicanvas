@@ -4,10 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { css } from "../base/dom/css";
 import { html, CustomElement } from "../base/dom/custom-element";
 
 export class KCUIFilteredListElement extends CustomElement {
-    static override styles = `:host { display: contents; }`;
+    static override styles = css`
+        :host {
+            display: contents;
+        }
+    `;
 
     override render(): Element | DocumentFragment {
         return html`<slot></slot>`;

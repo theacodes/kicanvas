@@ -7,6 +7,7 @@
 import { listen } from "../base/events";
 import { CustomElement } from "../base/dom/custom-element";
 import styles from "./kc-ui-resizer.css";
+import { CSS } from "../base/dom/css";
 
 /**
  * kc-ui-resizer allow re-sizing a kc-ui-view with the mouse.
@@ -14,7 +15,7 @@ import styles from "./kc-ui-resizer.css";
  * Presently it's only able to resize the element to its immediate right.
  */
 export class KCUIResizerElement extends CustomElement {
-    static override styles = styles;
+    static override styles = new CSS(styles);
 
     override initialContentCallback() {
         const prev = this.previousElementSibling! as HTMLElement;

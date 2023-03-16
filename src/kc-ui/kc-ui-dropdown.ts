@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { CSS } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
 import { delegate, listen } from "../base/events";
 import { is_string } from "../base/types";
@@ -18,7 +19,7 @@ import styles from "./kc-ui-dropdown.css";
  * out, instead relying on a buffer zone.
  */
 export class KCUIDropdownElement extends CustomElement {
-    static override styles = styles;
+    static override styles = new CSS(styles);
 
     public is_open() {
         return this.getBooleanAttribute("open");

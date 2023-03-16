@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { CSS } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
 import styles from "./kc-ui-floating-toolbar.css";
 
@@ -14,7 +15,7 @@ import styles from "./kc-ui-floating-toolbar.css";
  * element belong.
  */
 export class KCUIFloatingToolbarElement extends CustomElement {
-    static override styles = styles;
+    static override styles = new CSS(styles);
 
     override render() {
         return html` <div class="left">

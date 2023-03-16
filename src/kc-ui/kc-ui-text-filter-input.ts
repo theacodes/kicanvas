@@ -4,12 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { CSS } from "../base/dom/css";
 import { html, CustomElement } from "../base/dom/custom-element";
 import styles from "./kc-ui-text-filter-input.css";
 
 export class KCUITextFilterInputElement extends CustomElement {
     static override exportparts = ["icon"];
-    static override styles = styles;
+    static override styles = new CSS(styles);
 
     get input() {
         return this.$<HTMLInputElement>("input")!;

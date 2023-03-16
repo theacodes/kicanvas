@@ -13,15 +13,11 @@
  */
 
 import { CustomElement } from "../base/dom/custom-element";
-import kc_ui_styles from "./kc-ui.css";
 
 /**
  * kc-ui-app is the parent container for all kc-ui-* elements.
- *
- * It provides an open child DOM and the associated kc-ui.css stylesheet.
  */
 export class KCUIAppElement extends CustomElement {
-    static override styles = kc_ui_styles;
     static override useShadowRoot = false;
 }
 

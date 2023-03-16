@@ -10,6 +10,7 @@ import styles from "./kc-ui-toggle-menu.css";
 import "./kc-ui-dropdown";
 import { KCUIDropdownElement } from "./kc-ui-dropdown";
 import { delegate } from "../base/events";
+import { CSS } from "../base/dom/css";
 
 /**
  * A toggle menu combines a button and a dropdown into a single element.
@@ -18,7 +19,7 @@ import { delegate } from "../base/events";
  * toggle the dropdown.
  */
 export class KCUIToggleMenuElement extends CustomElement {
-    static override styles = styles;
+    static override styles = new CSS(styles);
 
     get dropdown() {
         return this.queryAssignedElements<KCUIDropdownElement>(

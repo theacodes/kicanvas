@@ -4,27 +4,33 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { KicadPCB } from "../../kicad/board";
 import { WithContext } from "../../base/dom/context";
+import { CSS } from "../../base/dom/css";
 import { CustomElement, html } from "../../base/dom/custom-element";
 import { DropTarget } from "../../base/dom/drag-drop";
+import { first } from "../../base/iterator";
+import { KicadPCB } from "../../kicad/board";
+import { KicadSch } from "../../kicad/schematic";
 import * as theme from "../../kicad/theme";
 import { Project } from "../project";
-import { KicadSch } from "../../kicad/schematic";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
 import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
 import type { KCProjectPanelElement } from "./kc-project-panel";
 import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
+import kc_ui_styles from "../../kc-ui/kc-ui.css";
 
+import "../../kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
 import "./kc-project-panel";
 import "./kc-schematic/kc-schematic-viewer";
-import "../../kc-ui/kc-ui";
-import { first } from "../../base/iterator";
 
 class KiCanvasAppElement extends WithContext(CustomElement) {
-    static override styles = kicanvas_app_styles;
+    static override styles = [
+        // TODO: Figure out a better way to handle this.
+        new CSS(kc_ui_styles),
+        new CSS(kicanvas_app_styles),
+    ];
 
     project: Project = new Project();
 
