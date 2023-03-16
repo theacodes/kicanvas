@@ -649,58 +649,6 @@ kc-ui-dropdown li kc-ui-icon {
 }
 
 /*
-    Toggle menus
-*/
-
-kc-ui-toggle-menu > button {
-    user-select: none;
-    width: 100%;
-    margin: unset;
-    padding: 0.3rem 0.6rem 0.3rem 0.6rem;
-    display: flex;
-    justify-content: left;
-    border: 1px solid transparent;
-    border-radius: 0.25rem;
-    font-weight: 300;
-    font-size: 1rem;
-    background: var(--dropdown-bg);
-    color: var(--dropdown-fg);
-}
-
-kc-ui-toggle-menu > button:hover,
-kc-ui-toggle-menu > button:focus {
-    background: var(--dropdown-hover-bg);
-    color: var(--dropdown-hover-fg);
-    box-shadow: none;
-    outline: none;
-}
-
-kc-ui-toggle-menu > button kc-ui-icon {
-    font-size: 1rem;
-    margin-top: 0.1rem;
-    margin-bottom: 0.1rem;
-}
-
-kc-ui-toggle-menu > button span {
-    display: none;
-    margin-left: 0.5rem;
-}
-
-kc-ui-toggle-menu[open] > button {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-kc-ui-toggle-menu[open] > button span {
-    display: revert;
-}
-
-kc-ui-toggle-menu kc-ui-dropdown {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-
-/*
     Property list (grid style) dl elements
 */
 
