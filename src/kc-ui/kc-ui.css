@@ -355,44 +355,6 @@ kc-ui-panel-body.no-padding {
 }
 
 /*
-    Drop-downs
-*/
-
-kc-ui-dropdown {
-    background: var(--dropdown-bg);
-    color: var(--dropdown-fg);
-    font-weight: 300;
-}
-
-kc-ui-dropdown ul {
-    all: unset;
-    box-sizing: border-box;
-}
-
-kc-ui-dropdown li {
-    padding: 0.3rem 1rem 0.3rem 0.6rem;
-    display: flex;
-    background: var(--dropdown-bg);
-    color: var(--dropdown-fg);
-}
-
-kc-ui-dropdown li:hover {
-    cursor: pointer;
-    background: var(--dropdown-hover-bg);
-    color: var(--dropdown-hover-fg);
-}
-
-kc-ui-dropdown li[aria-selected="true"] {
-    background: var(--dropdown-active-bg);
-    color: var(--dropdown-active-fg);
-}
-
-kc-ui-dropdown li kc-ui-icon {
-    margin-right: 0.5rem;
-    margin-left: -0.1rem;
-}
-
-/*
     Property list (grid style) dl elements
 */
 
