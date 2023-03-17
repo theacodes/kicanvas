@@ -90,8 +90,8 @@ export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
                         )}
                         ${entry(
                             "Grid origin",
-                            `${board.setup?.grid_origin.x ?? 0}, ${
-                                board.setup?.grid_origin.y ?? 0
+                            `${board.setup?.grid_origin?.x ?? 0}, ${
+                                board.setup?.grid_origin?.y ?? 0
                             }`,
                         )}
                     </dl>
