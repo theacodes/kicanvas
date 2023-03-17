@@ -6,7 +6,10 @@
 
 import { WithContext } from "../../base/dom/context";
 import { CustomElement, html } from "../../base/dom/custom-element";
-import type { KCUIDropdownElement } from "../../kc-ui/kc-ui-dropdown";
+import type {
+    KCUIDropdownElement,
+    KCUIDropdownItemElement,
+} from "../../kc-ui/kc-ui-dropdown";
 import type { Project } from "../project";
 
 import "../../kc-ui/kc-ui";
@@ -14,7 +17,6 @@ import "../../kc-ui/kc-ui-dropdown";
 import "../../kc-ui/kc-ui-toggle-menu";
 
 export class KCProjectPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
     #dropdown: KCUIDropdownElement;
     #selected: string | null;
 
@@ -31,8 +33,8 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         super.initialContentCallback();
 
         this.addEventListener("kc-ui-dropdown:select", (e) => {
-            const source = (e as CustomEvent).detail as HTMLElement;
-            this.selected = source?.dataset["filename"] ?? null;
+            const source = (e as CustomEvent).detail as KCUIDropdownItemElement;
+            this.selected = source?.name ?? null;
         });
     }
 
@@ -46,7 +48,7 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         }
 
         this.#selected = filename;
-        this.#dropdown.selected = `[data-filename="${filename}"]`;
+        this.#dropdown.selected = `[name="${filename}"]`;
 
         const selected_elm = this.#dropdown.selected;
 
@@ -57,8 +59,7 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         this.dispatchEvent(
             new CustomEvent("file:select", {
                 detail: {
-                    filename: selected_elm.dataset["filename"],
-                    type: selected_elm.dataset["type"],
+                    filename: selected_elm.name,
                 },
                 bubbles: true,
                 composed: true,
@@ -75,36 +76,27 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
 
         for (const board of this.project.list_boards()) {
             file_btn_elms.push(
-                html`<li
-                    aria-role="button"
-                    data-filename="${board}"
-                    data-type="board">
-                    <kc-ui-icon>plagiarism</kc-ui-icon>
+                html`<kc-ui-dropdown-item icon="plagiarism" name="${board}">
                     ${board}
-                </li>`,
+                </kc-ui-dropdown-item>`,
             );
         }
 
         for (const schematic of this.project.list_schematics()) {
             file_btn_elms.push(
-                html`<li
-                    aria-role="button"
-                    data-filename="${schematic}"
-                    data-type="schematic">
-                    <kc-ui-icon>description</kc-ui-icon>
+                html`<kc-ui-dropdown-item
+                    icon="description"
+                    name="${schematic}">
                     ${schematic}
-                </li>`,
+                </kc-ui-dropdown-item>`,
             );
         }
 
         this.#dropdown = html`<kc-ui-dropdown slot="dropdown">
-            <ul>
-                ${file_btn_elms}
-                <li aria-role="button">
-                    <kc-ui-icon>receipt</kc-ui-icon>
-                    Bill of materials
-                </li>
-            </ul>
+            ${file_btn_elms}
+            <kc-ui-dropdown-item icon="receipt">
+                Bill of materials
+            </kc-ui-dropdown-item>
         </kc-ui-dropdown>` as KCUIDropdownElement;
 
         return html`<kc-ui-toggle-menu icon="folder" title="Project">
