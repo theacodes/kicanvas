@@ -12,7 +12,6 @@ import "../../../kc-ui/kc-ui-panel";
 import "../../../kc-ui/kc-ui-property-list";
 
 export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
     viewer: BoardViewer;
 
     override connectedCallback() {
