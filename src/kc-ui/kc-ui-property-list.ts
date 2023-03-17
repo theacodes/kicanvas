@@ -56,6 +56,10 @@ export class KCUIPropertyListItemElement extends CustomElement {
             :host(.label) span:last-child {
                 display: none;
             }
+
+            ::slotted(*) {
+                vertical-align: middle;
+            }
         `,
     ];
 

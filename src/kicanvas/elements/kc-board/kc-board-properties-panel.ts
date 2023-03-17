@@ -11,9 +11,9 @@ import { CustomElement, html } from "../../../base/dom/custom-element";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 
 import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-property-list";
 
 export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
     viewer: BoardViewer;
     selected_item?: Footprint;
 
@@ -36,11 +36,14 @@ export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
     }
 
     override render() {
-        const header = (name: string) => html`<dt class="header">${name}</dt>`;
+        const header = (name: string) =>
+            html`<kc-ui-property-list-item class="label" name="${name}">
+            </kc-ui-property-list-item>`;
 
         const entry = (name: string, desc?: any, suffix = "") =>
-            html`<dt>${name}</dt>
-                <dd>${desc ?? ""} ${suffix}</dd>`;
+            html`<kc-ui-property-list-item name="${name}">
+                ${desc ?? ""} ${suffix}
+            </kc-ui-property-list-item>`;
 
         const checkbox = (value?: boolean) =>
             value
@@ -111,7 +114,7 @@ export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
             <kc-ui-panel>
                 <kc-ui-panel-title title="Properties"></kc-ui-panel-title>
                 <kc-ui-panel-body>
-                    <dl class="property-list">${entries}</dl>
+                    <kc-ui-property-list> ${entries} </kc-ui-property-list>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
