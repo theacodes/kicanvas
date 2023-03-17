@@ -6,17 +6,19 @@
 
 import { WithContext } from "../../base/dom/context";
 import { CustomElement, html } from "../../base/dom/custom-element";
-import type {
-    KCUIDropdownElement,
-    KCUIDropdownItemElement,
-} from "../../kc-ui/kc-ui-dropdown";
+import common_styles from "../../kc-ui/common-styles";
+import type { KCUIDropdownElement } from "../../kc-ui/kc-ui-dropdown";
+import type { KCUIMenuItemElement } from "../../kc-ui/kc-ui-menu";
 import type { Project } from "../project";
 
 import "../../kc-ui/kc-ui";
 import "../../kc-ui/kc-ui-dropdown";
+import "../../kc-ui/kc-ui-menu";
 import "../../kc-ui/kc-ui-toggle-menu";
 
 export class KCProjectPanelElement extends WithContext(CustomElement) {
+    static override styles = [common_styles];
+
     #dropdown: KCUIDropdownElement;
     #selected: string | null;
 
@@ -32,8 +34,8 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
     override initialContentCallback() {
         super.initialContentCallback();
 
-        this.addEventListener("kc-ui-dropdown:select", (e) => {
-            const source = (e as CustomEvent).detail as KCUIDropdownItemElement;
+        this.addEventListener("kc-ui-menu:select", (e) => {
+            const source = (e as CustomEvent).detail as KCUIMenuItemElement;
             this.selected = source?.name ?? null;
         });
     }
@@ -48,9 +50,9 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
         }
 
         this.#selected = filename;
-        this.#dropdown.selected = `[name="${filename}"]`;
+        this.#dropdown.menu.selected = filename;
 
-        const selected_elm = this.#dropdown.selected;
+        const selected_elm = this.#dropdown.menu.selected;
 
         if (!selected_elm) {
             return;
@@ -76,27 +78,27 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
 
         for (const board of this.project.list_boards()) {
             file_btn_elms.push(
-                html`<kc-ui-dropdown-item icon="plagiarism" name="${board}">
+                html`<kc-ui-menu-item icon="plagiarism" name="${board}">
                     ${board}
-                </kc-ui-dropdown-item>`,
+                </kc-ui-menu-item>`,
             );
         }
 
         for (const schematic of this.project.list_schematics()) {
             file_btn_elms.push(
-                html`<kc-ui-dropdown-item
-                    icon="description"
-                    name="${schematic}">
+                html`<kc-ui-menu-item icon="description" name="${schematic}">
                     ${schematic}
-                </kc-ui-dropdown-item>`,
+                </kc-ui-menu-item>`,
             );
         }
 
         this.#dropdown = html`<kc-ui-dropdown slot="dropdown">
-            ${file_btn_elms}
-            <kc-ui-dropdown-item icon="receipt">
-                Bill of materials
-            </kc-ui-dropdown-item>
+            <kc-ui-menu class="dropdown">
+                ${file_btn_elms}
+                <kc-ui-menu-item icon="receipt">
+                    Bill of materials
+                </kc-ui-menu-item>
+            </kc-ui-menu>
         </kc-ui-dropdown>` as KCUIDropdownElement;
 
         return html`<kc-ui-toggle-menu icon="folder" title="Project">

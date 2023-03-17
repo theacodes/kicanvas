@@ -6,9 +6,9 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
-import { delegate, listen } from "../base/events";
-import { is_string } from "../base/types";
+import { listen } from "../base/events";
 import common_styles from "./common-styles";
+import { KCUIMenuElement } from "./kc-ui-menu";
 
 /**
  * kc-ui-dropdown is a basic dropdown menu.
@@ -39,11 +39,6 @@ export class KCUIDropdownElement extends CustomElement {
             }
         `,
     ];
-
-    constructor() {
-        super();
-        this.role = "menu";
-    }
 
     public is_open() {
         return this.getBooleanAttribute("open");
@@ -85,66 +80,12 @@ export class KCUIDropdownElement extends CustomElement {
         return parseInt(this.getAttribute("mouseout-padding") ?? "50", 10);
     }
 
-    public items() {
-        return this.querySelectorAll<KCUIDropdownItemElement>(
-            `kc-ui-dropdown-item`,
-        );
-    }
-
-    public get selected(): KCUIDropdownItemElement | null {
-        for (const elm of this.items()) {
-            if (elm.selected) {
-                return elm;
-            }
-        }
-        return null;
-    }
-
-    set selected(element_or_selector: KCUIDropdownItemElement | string | null) {
-        let new_selected: KCUIDropdownItemElement | null;
-
-        if (is_string(element_or_selector)) {
-            new_selected =
-                this.querySelector<KCUIDropdownItemElement>(
-                    element_or_selector,
-                );
-        } else {
-            new_selected = element_or_selector;
-        }
-
-        if (new_selected == this.selected) {
-            return;
-        }
-
-        for (const elm of this.items()) {
-            elm.selected = false;
-        }
-
-        if (
-            !new_selected ||
-            !(new_selected instanceof KCUIDropdownItemElement)
-        ) {
-            return;
-        }
-
-        new_selected.selected = true;
-
-        this.dispatchEvent(
-            new CustomEvent("kc-ui-dropdown:select", {
-                detail: new_selected,
-                bubbles: true,
-                composed: true,
-            }),
-        );
+    public get menu() {
+        return this.querySelector<KCUIMenuElement>("kc-ui-menu")!;
     }
 
     override initialContentCallback() {
         super.initialContentCallback();
-
-        delegate(this, `kc-ui-dropdown-item`, "click", (e, source) => {
-            this.selected = source as KCUIDropdownItemElement;
-        });
-
         if (this.hasAttribute("auto-close")) {
             this.setup_leave_event();
         }
@@ -185,78 +126,3 @@ export class KCUIDropdownElement extends CustomElement {
 }
 
 window.customElements.define("kc-ui-dropdown", KCUIDropdownElement);
-
-export class KCUIDropdownItemElement extends CustomElement {
-    static override styles = [
-        common_styles,
-        css`
-            :host {
-                padding: 0.3rem 1rem 0.3rem 0.6rem;
-                display: flex;
-                background: var(--dropdown-bg);
-                color: var(--dropdown-fg);
-            }
-
-            :host(:hover) {
-                cursor: pointer;
-                background: var(--dropdown-hover-bg);
-                color: var(--dropdown-hover-fg);
-            }
-
-            :host([aria-selected="yes"]) {
-                background: var(--dropdown-active-bg);
-                color: var(--dropdown-active-fg);
-            }
-
-            kc-ui-icon {
-                margin-right: 0.5rem;
-                margin-left: -0.1rem;
-            }
-        `,
-    ];
-
-    constructor() {
-        super();
-        this.role = "menuitem";
-    }
-
-    public get name(): string {
-        return this.getAttribute("name") ?? "";
-    }
-
-    public set name(string) {
-        this.setAttribute("name", string);
-    }
-
-    public get icon() {
-        return this.getAttribute("icon");
-    }
-
-    public set icon(val) {
-        if (val) {
-            this.setAttribute("icon", val);
-        } else {
-            this.removeAttribute("icon");
-        }
-    }
-
-    public get selected() {
-        return this.getBooleanAttribute("aria-selected");
-    }
-
-    public set selected(val: boolean) {
-        this.setBooleanAttribute("aria-selected", val);
-    }
-
-    override render() {
-        const icon = this.icon
-            ? html`<kc-ui-icon>${this.icon}</kc-ui-icon>`
-            : undefined;
-        return html`
-            ${icon}
-            <slot></slot>
-        `;
-    }
-}
-
-window.customElements.define("kc-ui-dropdown-item", KCUIDropdownItemElement);

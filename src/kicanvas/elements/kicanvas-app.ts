@@ -24,6 +24,7 @@ import "../../kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
 import "./kc-project-panel";
 import "./kc-schematic/kc-schematic-viewer";
+import { later } from "../../base/async";
 
 class KiCanvasAppElement extends WithContext(CustomElement) {
     static override styles = [
@@ -68,7 +69,7 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
         const url_params = new URLSearchParams(document.location.search);
         const github_path = url_params.get("github");
 
-        (async () => {
+        later(async () => {
             if (src) {
                 await this.setup_project(new FetchFileSystem([src]));
                 await this.load_default_file();
@@ -90,7 +91,7 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
                 await this.setup_project(fs);
                 this.load_default_file();
             });
-        })();
+        });
 
         this.addEventListener("file:select", (e) => {
             const detail = (e as CustomEvent).detail;

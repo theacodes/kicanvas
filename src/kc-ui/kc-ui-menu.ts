@@ -30,6 +30,16 @@ export class KCUIMenuElement extends CustomElement {
             :host(.outline) ::slotted(kc-ui-menu-item) {
                 border-bottom: 1px solid var(--grid-outline);
             }
+
+            :host(.dropdown) {
+                --list-item-padding: 0.3rem 1rem 0.3rem 0.6rem;
+                --list-item-bg: var(--dropdown-bg);
+                --list-item-fg: var(--dropdown-fg);
+                --list-item-hover-bg: var(--dropdown-hover-bg);
+                --list-item-hover-fg: var(--dropdown-hover-fg);
+                --list-item-active-bg: var(--dropdown-active-bg);
+                --list-item-active-fg: var(--dropdown-active-fg);
+            }
         `,
     ];
 
@@ -119,7 +129,7 @@ export class KCUIMenuItemElement extends CustomElement {
             :host {
                 display: flex;
                 flex-wrap: nowrap;
-                padding: 0.2rem 0.3rem;
+                padding: var(--list-item-padding, 0.2rem 0.3rem);
                 user-select: none;
                 background: transparent;
                 transition: color var(--transition-time-short) ease,
@@ -157,6 +167,11 @@ export class KCUIMenuItemElement extends CustomElement {
             ::slotted(.very-narrow) {
                 max-width: 50px;
             }
+
+            kc-ui-icon {
+                margin-right: 0.5rem;
+                margin-left: -0.1rem;
+            }
         `,
     ];
 
@@ -189,8 +204,23 @@ export class KCUIMenuItemElement extends CustomElement {
         this.setBooleanAttribute("disabled", val);
     }
 
+    public get icon() {
+        return this.getAttribute("icon");
+    }
+
+    public set icon(val) {
+        if (val) {
+            this.setAttribute("icon", val);
+        } else {
+            this.removeAttribute("icon");
+        }
+    }
+
     override render() {
-        return html`<slot></slot>`;
+        const icon = this.icon
+            ? html`<kc-ui-icon>${this.icon}</kc-ui-icon>`
+            : undefined;
+        return html`${icon}<slot></slot>`;
     }
 }
 
