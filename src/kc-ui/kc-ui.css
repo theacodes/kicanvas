@@ -13,20 +13,10 @@
     --tooltip-fg: #f8f8f0;
     --tooltip-border: 1px solid #131218;
 
-    --workspace-bg: #282634;
-    --workspace-fg: #f8f8f0;
-
     --scrollbar-bg: #131218;
     --scrollbar-fg: #ae81ff66;
     --scrollbar-active-fg: #ae81ff;
     --scrollbar-hover-bg: #ae81ffbb;
-
-    --link-fg: #c990a5;
-    --link-active-fg: #dba6ba;
-    --highlight-bg: #131218;
-
-    --title-bar-bg: #131218;
-    --title-bar-fg: #f8f8f0;
 
     --activity-bar-bg: #282634;
     --activity-bar-fg: #f8f8f0;
@@ -50,9 +40,6 @@
     --panel-title-button-disabled-fg: #888;
     --panel-subtitle-bg: #634e89;
     --panel-subtitle-fg: var(--panel-fg);
-
-    --badge-bg: #81eeff;
-    --badge-fg: #131218;
 
     --dropdown-bg: #464258;
     --dropdown-fg: #f8f8f0;
@@ -95,9 +82,6 @@
     --input-placeholder: #8077a8;
     --input-disabled-bg: #131218;
     --input-disabled-fg: #888;
-    --input-error-fg: #f8f8f0;
-    --input-error-bg: #cb6488;
-    --input-error-border: #cb6488;
 
     --input-range-bg: #8077a8;
     --input-range-fg: #f8f8f0;
