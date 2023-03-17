@@ -19,34 +19,6 @@ export class KCUIControlListElement extends CustomElement {
                 background: var(--list-item-bg);
                 color: var(--list-item-fg);
             }
-
-            ul.control-list li {
-                all: unset;
-                box-sizing: border-box;
-                margin-top: 0.2rem;
-                display: flex;
-                flex-direction: column;
-                flex-wrap: nowrap;
-                user-select: none;
-                background-color: transparent;
-                transition: color var(--transition-time-short) ease,
-                    background-color var(--transition-time-short) ease;
-            }
-
-            ul.control-list li label {
-                flex: 1 1 100%;
-                display: block;
-                margin: 0;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-            }
-
-            ul.control-list li input {
-                margin: 0;
-                padding-left: 0;
-                padding-right: 0;
-            }
         `,
     ];
 
