@@ -241,35 +241,6 @@
 }
 
 /*
-    Button groups
-    TODO: Move to custom element
-*/
-
-.button-group {
-    display: flex;
-    box-shadow: var(--input-hover-shadow);
-}
-
-.button-group.margin-left {
-    margin-left: 0.5rem;
-}
-
-.button-group button {
-    border-radius: 0;
-    box-shadow: none;
-}
-
-.button-group button:first-child {
-    border-top-left-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-}
-
-.button-group button:last-child {
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-}
-
-/*
     Layout
 */
 
