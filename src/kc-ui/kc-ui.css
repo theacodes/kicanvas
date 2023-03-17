@@ -188,34 +188,6 @@
 }
 
 /*
-    Helpers
-*/
-
-.is-block {
-    display: block;
-}
-
-.is-inline {
-    display: inline;
-}
-
-.is-flex {
-    display: flex;
-}
-
-.is-hidden {
-    display: none;
-}
-
-.is-relative {
-    position: relative;
-}
-
-.is-unselectable {
-    user-select: none;
-}
-
-/*
     Scrollbar
 */
 
@@ -274,6 +246,7 @@ kc-ui-view {
     display: flex;
     overflow: hidden;
     flex-direction: column;
+    position: relative;
 }
 
 kc-ui-view.grow,
@@ -293,65 +266,6 @@ kc-ui-view.fixed,
 kc-ui-split-view.fixed {
     flex-grow: 0;
     flex-shrink: 0;
-}
-
-/*
-    Panels
-*/
-
-kc-ui-panel {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: var(--panel-bg);
-    color: var(--panel-fg);
-    --bg: var(--panel-bg);
-}
-
-kc-ui-panel:last-child {
-    flex-grow: 1;
-}
-
-kc-ui-panel-header {
-    flex: 0;
-    width: 100%;
-    text-align: left;
-    padding: 0.2rem 0.8rem 0.2rem 0.4rem;
-    display: flex;
-    align-items: center;
-    background: var(--panel-title-bg);
-    color: var(--panel-title-fg);
-    border-top: var(--panel-title-border);
-    user-select: none;
-}
-
-kc-ui-panel-header-text {
-    flex: 1;
-}
-
-kc-ui-panel-header-actions {
-    flex: 0 1;
-    display: flex;
-    flex-direction: row;
-    /* cheeky hack to work around scrollbar causing placement to be off. */
-    padding-right: 6px;
-}
-
-kc-ui-panel-body {
-    width: 100%;
-    min-height: 0;
-    padding: 0.1rem 0.8rem 0.1rem 0.4rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex: 1 0;
-    font-weight: 300;
-    font-size: 1rem;
-}
-
-kc-ui-panel-body.no-padding {
-    padding: 0;
 }
 
 /*
