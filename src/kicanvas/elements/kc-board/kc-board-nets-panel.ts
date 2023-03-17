@@ -4,15 +4,16 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BoardViewer } from "../../../viewers/board/viewer";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
+import { delegate } from "../../../base/events";
 import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
 import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
+import { BoardViewer } from "../../../viewers/board/viewer";
 
 import "../../../kc-ui/kc-ui-filtered-list";
+import "../../../kc-ui/kc-ui-panel";
 import "../../../kc-ui/kc-ui-text-filter-input";
-import { delegate } from "../../../base/events";
 
 export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -84,10 +85,8 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
 
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>Nets</kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body class="no-padding">
+                <kc-ui-panel-title title="Nets"></kc-ui-panel-title>
+                <kc-ui-panel-body>
                     <kc-ui-text-filter-input></kc-ui-text-filter-input>
                     <kc-ui-filtered-list>
                         <ul class="item-list outline">

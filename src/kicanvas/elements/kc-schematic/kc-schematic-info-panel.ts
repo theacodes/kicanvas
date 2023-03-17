@@ -9,6 +9,8 @@ import { WithContext } from "../../../base/dom/context";
 import { html, CustomElement } from "../../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
 
+import "../../../kc-ui/kc-ui-panel";
+
 export class KCSchematicInfoPanel extends WithContext(CustomElement) {
     static override useShadowRoot = false;
     viewer: SchematicViewer;
@@ -44,10 +46,8 @@ export class KCSchematicInfoPanel extends WithContext(CustomElement) {
 
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>Info</kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body class="no-padding">
+                <kc-ui-panel-title title="Info"></kc-ui-panel-title>
+                <kc-ui-panel-body>
                     <dl class="property-list">
                         ${header("Page properties")}
                         ${entry("Size", ds.paper?.size)}

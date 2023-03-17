@@ -10,6 +10,8 @@ import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 
+import "../../../kc-ui/kc-ui-panel";
+
 export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
     viewer: BoardViewer;
@@ -107,12 +109,8 @@ export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
 
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>
-                        Properties
-                    </kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body class="no-padding">
+                <kc-ui-panel-title title="Properties"></kc-ui-panel-title>
+                <kc-ui-panel-body>
                     <dl class="property-list">${entries}</dl>
                 </kc-ui-panel-body>
             </kc-ui-panel>

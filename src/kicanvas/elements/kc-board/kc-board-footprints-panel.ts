@@ -14,6 +14,7 @@ import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-inp
 
 import "../../../kc-ui/kc-ui-filtered-list";
 import "../../../kc-ui/kc-ui-text-filter-input";
+import "../../../kc-ui/kc-ui-panel";
 
 export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -97,12 +98,8 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     override render() {
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>
-                        Footprints
-                    </kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body class="no-padding">
+                <kc-ui-panel-title title="Footprints"></kc-ui-panel-title>
+                <kc-ui-panel-body>
                     <kc-ui-text-filter-input></kc-ui-text-filter-input>
                     <kc-ui-filtered-list>
                         <ul class="item-list outline">

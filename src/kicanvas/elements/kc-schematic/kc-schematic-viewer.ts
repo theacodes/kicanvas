@@ -72,7 +72,7 @@ export class KCSchematicViewerElement extends WithContext(CustomElement) {
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
         return html` <kc-ui-split-view vertical>
-            <kc-ui-view class="grow is-relative">
+            <kc-ui-view class="grow">
                 ${this.schematic_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>

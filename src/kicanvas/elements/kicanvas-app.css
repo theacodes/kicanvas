@@ -82,6 +82,10 @@ kc-schematic-viewer {
     flex: 1;
 }
 
+.is-hidden {
+    display: none;
+}
+
 :host kc-project-panel {
     display: none;
 }

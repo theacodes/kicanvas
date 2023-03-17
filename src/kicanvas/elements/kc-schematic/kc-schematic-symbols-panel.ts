@@ -6,17 +6,18 @@
 
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
+import { delegate } from "../../../base/events";
+import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
+import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 import {
     KiCanvasLoadEvent,
     KiCanvasSelectEvent,
 } from "../../../viewers/base/events";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
-import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
-import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 
 import "../../../kc-ui/kc-ui-filtered-list";
+import "../../../kc-ui/kc-ui-panel";
 import "../../../kc-ui/kc-ui-text-filter-input";
-import { delegate } from "../../../base/events";
 
 export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -113,10 +114,8 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
 
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>Symbols</kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body class="no-padding">
+                <kc-ui-panel-title title="Symbols"></kc-ui-panel-title>
+                <kc-ui-panel-body>
                     <kc-ui-text-filter-input></kc-ui-text-filter-input>
                     <kc-ui-filtered-list>
                         <ul class="item-list outline">

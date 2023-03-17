@@ -12,6 +12,7 @@ import { BoardViewer } from "../../../viewers/board/viewer";
 import { css } from "../../../base/dom/css";
 
 import "../../../kc-ui/kc-ui-icon";
+import "../../../kc-ui/kc-ui-panel";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -196,15 +197,12 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
 
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>Layers</kc-ui-panel-header-text>
-                    <kc-ui-panel-header-actions>
-                        <button type="button">
-                            <kc-ui-icon>visibility</kc-ui-icon>
-                        </button>
-                    </kc-ui-panel-header-actions>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body>
+                <kc-ui-panel-title title="Layers">
+                    <button slot="actions" type="button">
+                        <kc-ui-icon>visibility</kc-ui-icon>
+                    </button>
+                </kc-ui-panel-title>
+                <kc-ui-panel-body padded>
                     ${items}
                     <ul class="item-list outline">
                         <li class="header">Presets</li>

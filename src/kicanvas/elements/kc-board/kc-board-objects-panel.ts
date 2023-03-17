@@ -11,6 +11,7 @@ import type { KCUIRangeElement } from "../../../kc-ui/kc-ui-range";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
 import "../../../kc-ui/kc-ui-range";
+import "../../../kc-ui/kc-ui-panel";
 
 export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -60,10 +61,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
     override render() {
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>Objects</kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body>
+                <kc-ui-panel-title title="Objects"></kc-ui-panel-title>
+                <kc-ui-panel-body padded>
                     <ul class="control-list">
                         <li>
                             <label>Tracks</label>

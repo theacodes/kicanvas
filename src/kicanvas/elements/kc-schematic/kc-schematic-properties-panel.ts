@@ -13,6 +13,8 @@ import {
 import { SchematicSymbol } from "../../../kicad/schematic";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
+import "../../../kc-ui/kc-ui-panel";
+
 export class KCSchematicPropertiesPanelElement extends WithContext(
     CustomElement,
 ) {
@@ -117,12 +119,8 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
 
         return html`
             <kc-ui-panel>
-                <kc-ui-panel-header>
-                    <kc-ui-panel-header-text>
-                        Properties
-                    </kc-ui-panel-header-text>
-                </kc-ui-panel-header>
-                <kc-ui-panel-body class="no-padding">
+                <kc-ui-panel-title title="Properties"></kc-ui-panel-title>
+                <kc-ui-panel-body>
                     <dl class="property-list">${entries}</dl>
                 </kc-ui-panel-body>
             </kc-ui-panel>
