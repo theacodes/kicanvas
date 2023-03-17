@@ -6,6 +6,8 @@
 
 import { WithContext } from "../../base/dom/context";
 import { CustomElement, html } from "../../base/dom/custom-element";
+import common_styles from "../../kc-ui/common-styles";
+import type { KCUIButtonElement } from "../../kc-ui/kc-ui-button";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
@@ -13,14 +15,34 @@ import {
 import type { Viewer } from "../../viewers/base/viewer";
 
 import "../../kc-ui/kc-ui";
+import "../../kc-ui/kc-ui-button";
 import "../../kc-ui/kc-ui-floating-toolbar";
+import { css } from "../../base/dom/css";
 
 export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
+    static override styles = [
+        common_styles,
+        css`
+            output {
+                width: unset;
+                margin: unset;
+                padding: 0.5rem;
+                color: var(--button-toolbar-fg);
+                background: var(--button-toolbar-bg);
+                border: 1px solid var(--button-toolbar-bg);
+                border-radius: 0.25rem;
+                font-weight: 300;
+                font-size: 0.9rem;
+                box-shadow: var(--input-hover-shadow);
+                user-select: none;
+            }
+        `,
+    ];
+
     viewer: Viewer;
     #position_elm: HTMLOutputElement;
-    #zoom_to_page_btn: HTMLButtonElement;
-    #zoom_to_selection_btn: HTMLButtonElement;
+    #zoom_to_page_btn: KCUIButtonElement;
+    #zoom_to_selection_btn: KCUIButtonElement;
 
     override connectedCallback() {
         (async () => {
@@ -67,26 +89,24 @@ export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {
         this.#position_elm = html`<output
             class="toolbar"></output>` as HTMLOutputElement;
 
-        this.#zoom_to_page_btn = html`<button
+        this.#zoom_to_page_btn = html`<kc-ui-button
+            variant="toolbar"
+            icon="document_scanner"
             name="zoom_to_page"
-            type="button"
-            class="toolbar"
             title="zoom to page">
-            <kc-ui-icon>document_scanner</kc-ui-icon>
-        </button>` as HTMLButtonElement;
+        </kc-ui-button>` as KCUIButtonElement;
 
-        this.#zoom_to_selection_btn = html` <button
+        this.#zoom_to_selection_btn = html` <kc-ui-button
+            variant="toolbar"
             name="zoom_to_selection"
-            type="button"
-            class="toolbar"
             title="zoom to selection"
+            icon="jump_to_element"
             disabled>
-            <kc-ui-icon>jump_to_element</kc-ui-icon>
-        </button>` as HTMLButtonElement;
+        </kc-ui-button>` as KCUIButtonElement;
 
         this.update_position();
 
-        return html` <kc-ui-floating-toolbar location="bottom">
+        return html`<kc-ui-floating-toolbar location="bottom">
             <div slot="left">${this.#position_elm}</div>
             <div slot="right" class="button-group margin-left">
                 ${this.#zoom_to_selection_btn} ${this.#zoom_to_page_btn}

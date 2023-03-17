@@ -53,6 +53,14 @@ export class KCUIFloatingToolbarElement extends CustomElement {
             div.right {
                 display: flex;
             }
+
+            div.left kc-ui-button {
+                margin-right: 0.5rem;
+            }
+
+            div.right kc-ui-button {
+                margin-left: 0.5rem;
+            }
         `,
     ];
 

@@ -51,13 +51,6 @@
     --panel-subtitle-bg: #634e89;
     --panel-subtitle-fg: var(--panel-fg);
 
-    --toolbar-button-bg: #282634;
-    --toolbar-button-fg: #f8f8f0;
-    --toolbar-button-hover-bg: #282634;
-    --toolbar-button-hover-fg: #81eeff;
-    --toolbar-button-disabled-bg: #131218;
-    --toolbar-button-disabled-fg: #888;
-
     --badge-bg: #81eeff;
     --badge-fg: #131218;
 
@@ -87,6 +80,12 @@
     --button-outline-hover-fg: #81eeff;
     --button-outline-disabled-bg: #131218;
     --button-outline-disabled-fg: #888;
+    --button-toolbar-bg: #282634;
+    --button-toolbar-fg: #f8f8f0;
+    --button-toolbar-hover-bg: #282634;
+    --button-toolbar-hover-fg: #81eeff;
+    --button-toolbar-disabled-bg: #131218;
+    --button-toolbar-disabled-fg: #888;
 
     --input-bg: #131218;
     --input-fg: #f8f8f0;
@@ -181,15 +180,10 @@
     --panel-title-bg: var(--gradient-purple-green-light);
     --panel-subtitle-bg: var(--gradient-purple-blue-medium);
 
-    --toolbar-button-bg: var(--gradient-purple-blue-dark);
-    --toolbar-button-hover-bg: var(--gradient-purple-green-light);
-    --toolbar-button-hover-fg: #f8f8f0;
-    --toolbar-button-disabled-bg: var(--gradient-purple-blue-dark);
-
-    --toolbar-button-highlight-bg: var(--gradient-purple-green-light);
-    --toolbar-button-highlight-fg: #f8f8f0;
-    --toolbar-button-highlight-hover-bg: var(--gradient-purple-green-highlight);
-    --toolbar-button-highlight-hover-fg: #f8f8f0;
+    --button-toolbar-bg: var(--gradient-purple-blue-dark);
+    --button-toolbar-hover-bg: var(--gradient-purple-green-light);
+    --button-toolbar-hover-fg: #f8f8f0;
+    --button-toolbar-disabled-bg: var(--gradient-purple-blue-dark);
 
     --dropdown-bg: var(--gradient-purple-green-light);
     --dropdown-fg: #f8f8f0;
@@ -381,50 +375,9 @@ textarea {
 }
 
 /*
-    Toolbar buttons and groups
+    Button groups
+    TODO: Move to custom element
 */
-
-button.toolbar,
-output.toolbar {
-    width: unset;
-    margin: unset;
-    padding: 0.5rem;
-    color: var(--toolbar-button-fg);
-    background: var(--toolbar-button-bg);
-    border: 1px solid var(--toolbar-button-bg);
-    border-radius: 0.25rem;
-    font-weight: 300;
-    font-size: 0.9rem;
-    box-shadow: var(--input-hover-shadow);
-    user-select: none;
-}
-
-button.toolbar:hover {
-    color: var(--toolbar-button-hover-fg);
-    background: var(--toolbar-button-hover-bg);
-}
-
-button.toolbar:disabled {
-    color: var(--toolbar-button-disabled-fg);
-    background: var(--toolbar-button-disabled-bg);
-}
-
-button.toolbar kc-ui-icon,
-button.toolbar ::part(icon),
-output.toolbar kc-ui-icon,
-output.toolbar ::part(icon) {
-    font-size: 1rem;
-}
-
-button.toolbar.highlight {
-    color: var(--toolbar-button-highlight-fg);
-    background: var(--toolbar-button-highlight-bg);
-}
-
-button.toolbar.highlight:hover {
-    color: var(--toolbar-button-highlight-hover-fg);
-    background: var(--toolbar-button-highlight-hover-bg);
-}
 
 .button-group {
     display: flex;
@@ -587,7 +540,6 @@ kc-ui-dropdown li {
 }
 
 kc-ui-dropdown li:hover {
-    background: var(--toolbar-button-highlight-hover-bg);
     cursor: pointer;
     background: var(--dropdown-hover-bg);
     color: var(--dropdown-hover-fg);
