@@ -95,7 +95,7 @@ export class KCUIActivitySideBarElement extends CustomElement {
     }
 
     private get buttons() {
-        return this.$$<HTMLButtonElement>(`button`);
+        return this.$$<KCUIButtonElement>(`kc-ui-button`);
     }
 
     override render() {
@@ -188,11 +188,7 @@ export class KCUIActivitySideBarElement extends CustomElement {
         // Mark the selected activity icon button as selected, clearing
         // the others.
         for (const btn of this.buttons) {
-            if (btn.name == this.#activity) {
-                btn.ariaSelected = "true";
-            } else {
-                btn.ariaSelected = "false";
-            }
+            btn.selected = btn.name == this.#activity;
         }
 
         // Mark the selected activity element active, clearing the others.

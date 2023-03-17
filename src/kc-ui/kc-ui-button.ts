@@ -56,8 +56,8 @@ export class KCUIButtonElement extends CustomElement {
         }
 
         :host([selected]) button {
-            background: var(--button-disabled-bg);
-            color: var(--button-disabled-fg);
+            background: var(--button-selected-bg);
+            color: var(--button-selected-fg);
         }
 
         /* variants */
