@@ -9,6 +9,7 @@ import { CustomElement, html } from "../../../base/dom/custom-element";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
 import { css } from "../../../base/dom/css";
+import common_styles from "../../../kc-ui/common-styles";
 
 import "../../../kc-ui/kc-ui-icon";
 import "../../../kc-ui/kc-ui-panel";
@@ -19,11 +20,36 @@ import {
 } from "../../../kc-ui/kc-ui-menu";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
+    static override styles = [
+        common_styles,
+        css`
+            :host {
+                display: block;
+                height: 100%;
+                overflow-y: auto;
+                overflow-x: hidden;
+                user-select: none;
+            }
+
+            kc-ui-panel-title button {
+                all: unset;
+                flex-shrink: 0;
+                margin-left: 1rem;
+                color: white;
+                border: 0 none;
+                background: transparent;
+                padding: 0 0.25rem 0 0.25rem;
+                margin-right: -0.25rem;
+                display: flex;
+                align-items: center;
+            }
+        `,
+    ];
+
     viewer: BoardViewer;
 
     private get panel_body() {
-        return this.querySelector("kc-ui-panel-body")!;
+        return this.$("kc-ui-panel-body")!;
     }
 
     private get items(): KCBoardLayerControlElement[] {
@@ -218,7 +244,7 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
                         <kc-ui-icon>visibility</kc-ui-icon>
                     </button>
                 </kc-ui-panel-title>
-                <kc-ui-panel-body padded>
+                <kc-ui-panel-body>
                     ${items}
                     <kc-ui-panel-label>Presets</kc-ui-panel-label>
                     <kc-ui-menu id="presets" class="outline">

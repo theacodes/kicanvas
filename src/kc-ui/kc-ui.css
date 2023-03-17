@@ -94,8 +94,6 @@
     --list-item-fg: var(--panel-fg);
     --list-item-active-bg: #634e89;
     --list-item-active-fg: var(--list-item-fg);
-    --list-item-focus-bg: #ae81ff;
-    --list-item-focus-fg: #634e89;
     --list-item-hover-bg: #64cb96;
     --list-item-hover-fg: var(--list-item-bg);
     --list-item-disabled-bg: var(--list-item-bg);
@@ -304,7 +302,7 @@ dl.property-list kc-ui-icon {
     item-lists
 */
 
-ul.item-list {
+/* ul.item-list {
     all: unset;
     box-sizing: border-box;
     display: flex;
@@ -385,7 +383,7 @@ ul.item-list.no-bg {
 
 ul.item-list.no-bg li {
     background: transparent;
-}
+} */
 
 /*
     Control lists
