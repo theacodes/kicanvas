@@ -141,6 +141,22 @@ export class KCUIMenuItemElement extends CustomElement {
                 background: var(--list-item-disabled-bg);
                 color: var(--list-item-disabled-fg);
             }
+
+            ::slotted(*) {
+                flex: 1 1 100%;
+                display: block;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            ::slotted(.narrow) {
+                max-width: 100px;
+            }
+
+            ::slotted(.very-narrow) {
+                max-width: 50px;
+            }
         `,
     ];
 
@@ -179,3 +195,25 @@ export class KCUIMenuItemElement extends CustomElement {
 }
 
 window.customElements.define("kc-ui-menu-item", KCUIMenuItemElement);
+
+export class KCUIMenuLabelElement extends CustomElement {
+    static override styles = [
+        common_styles,
+        css`
+            :host {
+                width: 100%;
+                display: flex;
+                flex-wrap: nowrap;
+                padding: 0.2rem 0.3rem;
+                background: var(--panel-subtitle-bg);
+                color: var(--panel-subtitle-fg);
+            }
+        `,
+    ];
+
+    override render() {
+        return html`<slot></slot>`;
+    }
+}
+
+window.customElements.define("kc-ui-menu-label", KCUIMenuLabelElement);

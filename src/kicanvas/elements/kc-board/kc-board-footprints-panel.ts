@@ -11,13 +11,20 @@ import { CustomElement, html } from "../../../base/dom/custom-element";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
 import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
+import common_styles from "../../../kc-ui/common-styles";
 
 import "../../../kc-ui/kc-ui-filtered-list";
 import "../../../kc-ui/kc-ui-text-filter-input";
 import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-menu";
+import {
+    KCUIMenuElement,
+    type KCUIMenuItemElement,
+} from "../../../kc-ui/kc-ui-menu";
 
 export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
+    static override styles = [common_styles];
+
     viewer: BoardViewer;
 
     override connectedCallback() {
@@ -28,6 +35,10 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
             super.connectedCallback();
             this.setup_events();
         })();
+    }
+
+    private get menu() {
+        return this.$<KCUIMenuElement>("kc-ui-menu")!;
     }
 
     private sorted_footprints: Footprint[];
@@ -45,26 +56,21 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     }
 
     private setup_events() {
-        // Wire up click to select items in the viewer
-        this.addEventListener("click", (e) => {
-            const li = (e.target as HTMLElement).closest(
-                "li[data-uuid]",
-            ) as HTMLLIElement | null;
+        this.addEventListener("kc-ui-menu:select", (e) => {
+            const item = (e as CustomEvent).detail as KCUIMenuItemElement;
 
-            const uuid = li?.dataset["uuid"] as string;
-
-            if (!uuid) {
+            if (!item.name) {
                 return;
             }
 
-            this.viewer.select(uuid);
+            this.viewer.select(item.name);
         });
 
         // Update the selected item in the list whenever the viewer's
         // selection changes.
         this.addDisposable(
             this.viewer.addEventListener(KiCanvasSelectEvent.type, () => {
-                this.mark_selected_item();
+                this.menu.selected = this.viewer.selected?.context.uuid ?? null;
             }),
         );
 
@@ -83,18 +89,6 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
         return this.$<KCUIFilteredListElement>("kc-ui-filtered-list")!;
     }
 
-    private get item_elms() {
-        return this.$$<HTMLLIElement>("li[data-uuid]");
-    }
-
-    private mark_selected_item() {
-        for (const el of this.item_elms) {
-            const current =
-                el.dataset["uuid"] == this.viewer.selected?.context.uuid;
-            el.ariaCurrent = current ? "true" : "false";
-        }
-    }
-
     override render() {
         return html`
             <kc-ui-panel>
@@ -102,9 +96,9 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
                 <kc-ui-panel-body>
                     <kc-ui-text-filter-input></kc-ui-text-filter-input>
                     <kc-ui-filtered-list>
-                        <ul class="item-list outline">
+                        <kc-ui-menu class="outline">
                             ${this.render_list()}
-                        </ul>
+                        </kc-ui-menu>
                     </kc-ui-filtered-list>
                 </kc-ui-panel-body>
             </kc-ui-panel>
@@ -120,12 +114,11 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
             const val = fp.value || "VAL";
             const match_text = `${fp.library_link} ${fp.descr} ${fp.layer} ${ref} ${val} ${fp.tags}`;
 
-            const entry = html`<li
-                data-uuid="${fp.uuid}"
-                data-match-text="${match_text}"
-                aria-role="button">
+            const entry = html`<kc-ui-menu-item
+                name="${fp.uuid}"
+                data-match-text="${match_text}">
                 <span class="narrow">${ref}</span><span>${val}</span>
-            </li>`;
+            </kc-ui-menu-item>`;
 
             if (fp.layer == "F.Cu") {
                 front_footprints.push(entry);
@@ -134,9 +127,9 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
             }
         }
 
-        return html`<li class="header">Front</li>
+        return html`<kc-ui-menu-label>Front</kc-ui-menu-label>
             ${front_footprints}
-            <li class="header">Back</li>
+            <kc-ui-menu-label>Back</kc-ui-menu-label>
             ${back_footprints}`;
     }
 }
