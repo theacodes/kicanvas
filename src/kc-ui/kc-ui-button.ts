@@ -81,6 +81,26 @@ export class KCUIButtonElement extends CustomElement {
             background: var(--button-outline-disabled-bg);
             color: var(--button--outline-disabled-fg);
         }
+
+        button.toolbar {
+            background: var(--button-toolbar-bg);
+            color: var(--button-toolbar-fg);
+        }
+
+        button.toolbar:hover {
+            background: var(--button-toolbar-hover-bg);
+            color: var(--button-toolbar-hover-fg);
+        }
+
+        button.toolbar:disabled {
+            background: var(--button-toolbar-disabled-bg);
+            color: var(--button-toolbar-disabled-fg);
+        }
+
+        :host([selected]) button.toolbar {
+            background: var(--button-toolbar-disabled-bg);
+            color: var(--button--toolbar-disabled-fg);
+        }
     `;
 
     private get button() {
@@ -135,7 +155,14 @@ export class KCUIButtonElement extends CustomElement {
         return ["disabled"];
     }
 
-    attributeChangedCallback(name: string, old: string, value: string | null) {
+    attributeChangedCallback(
+        name: string,
+        old: string | null,
+        value: string | null,
+    ) {
+        if (!this.button) {
+            return;
+        }
         switch (name) {
             case "disabled":
                 this.button.disabled = value == null ? false : true;
@@ -147,8 +174,16 @@ export class KCUIButtonElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        if (this.hasAttribute("outline")) {
-            this.button.classList.add("outline");
+        if (this.hasAttribute("variant")) {
+            this.button.classList.add(this.getAttribute("variant") ?? "");
+        }
+
+        if (this.hasAttribute("disabled")) {
+            this.attributeChangedCallback(
+                "disabled",
+                null,
+                this.getAttribute("disabled"),
+            );
         }
     }
 
