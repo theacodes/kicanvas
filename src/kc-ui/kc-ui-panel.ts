@@ -108,3 +108,25 @@ export class KCUIPanelBodyElement extends CustomElement {
 }
 
 window.customElements.define("kc-ui-panel-body", KCUIPanelBodyElement);
+
+export class KCUIPanelLabelElement extends CustomElement {
+    static override styles = [
+        common_styles,
+        css`
+            :host {
+                width: 100%;
+                display: flex;
+                flex-wrap: nowrap;
+                padding: 0.2rem 0.3rem;
+                background: var(--panel-subtitle-bg);
+                color: var(--panel-subtitle-fg);
+            }
+        `,
+    ];
+
+    override render() {
+        return html`<slot></slot>`;
+    }
+}
+
+window.customElements.define("kc-ui-panel-label", KCUIPanelLabelElement);
