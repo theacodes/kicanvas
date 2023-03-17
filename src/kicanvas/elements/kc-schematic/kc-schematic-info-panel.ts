@@ -10,9 +10,9 @@ import { html, CustomElement } from "../../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
 
 import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-property-list";
 
 export class KCSchematicInfoPanel extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
     viewer: SchematicViewer;
 
     override connectedCallback() {
@@ -34,11 +34,15 @@ export class KCSchematicInfoPanel extends WithContext(CustomElement) {
         const ds = this.viewer.drawing_sheet;
         const schematic = this.viewer.schematic;
 
-        const header = (name: string) => html`<dt class="header">${name}</dt>`;
+        const header = (name: string) =>
+            html`<kc-ui-property-list-item
+                class="label"
+                name="${name}"></kc-ui-property-list-item>`;
 
         const entry = (name: string, desc?: any, suffix = "") =>
-            html`<dt>${name}</dt>
-                <dd>${desc} ${suffix}</dd>`;
+            html`<kc-ui-property-list-item name="${name}">
+                ${desc} ${suffix}
+            </kc-ui-property-list-item>`;
 
         const comments = Object.entries(
             schematic.title_block?.comment || {},
@@ -48,7 +52,7 @@ export class KCSchematicInfoPanel extends WithContext(CustomElement) {
             <kc-ui-panel>
                 <kc-ui-panel-title title="Info"></kc-ui-panel-title>
                 <kc-ui-panel-body>
-                    <dl class="property-list">
+                    <kc-ui-property-list>
                         ${header("Page properties")}
                         ${entry("Size", ds.paper?.size)}
                         ${entry("Width", ds.width, "mm")}
@@ -80,7 +84,7 @@ export class KCSchematicInfoPanel extends WithContext(CustomElement) {
                         )}
                         ${entry("No connects", schematic.no_connects.length)}
                     </dl>
-                </kc-ui-panel-body>
+                </kc-ui-property-list>
             </kc-ui-panel>
         `;
     }
