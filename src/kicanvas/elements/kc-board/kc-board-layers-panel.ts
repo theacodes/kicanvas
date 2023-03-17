@@ -6,26 +6,34 @@
 
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { delegate } from "../../../base/events";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
 import { css } from "../../../base/dom/css";
 
 import "../../../kc-ui/kc-ui-icon";
 import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-menu";
+import {
+    KCUIMenuElement,
+    type KCUIMenuItemElement,
+} from "../../../kc-ui/kc-ui-menu";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
     viewer: BoardViewer;
 
     private get panel_body() {
-        return this.renderRoot.querySelector("kc-ui-panel-body")!;
+        return this.querySelector("kc-ui-panel-body")!;
     }
 
     private get items(): KCBoardLayerControlElement[] {
         return Array.from(
             this.panel_body.querySelectorAll("kc-board-layer-control") ?? [],
         );
+    }
+
+    private get presets_menu() {
+        return this.$<KCUIMenuElement>("#presets")!;
     }
 
     override connectedCallback() {
@@ -79,6 +87,9 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
                 layer.visible = !layer.visible;
                 item.layer_visible = layer.visible;
 
+                // Deselect any presets, as we're no longer showing preset layers.
+                this.presets_menu.deselect();
+
                 this.viewer.draw();
             },
         );
@@ -104,14 +115,19 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
                 }
 
                 this.viewer.draw();
+
+                // Deselect any presets, as we're no longer showing preset layers.
+                this.presets_menu.deselect();
+
                 this.update_item_states();
             });
 
         // Presets
-        delegate(this.panel_body, "[data-preset]", "click", (e, source) => {
+        this.presets_menu.addEventListener("kc-ui-menu:select", (e) => {
+            const item = (e as CustomEvent).detail as KCUIMenuItemElement;
             const ui_layers = this.viewer.layers.in_ui_order();
 
-            switch (source.dataset["preset"]) {
+            switch (item.name) {
                 case "all":
                     for (const l of ui_layers) {
                         l.visible = true;
@@ -204,22 +220,22 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
                 </kc-ui-panel-title>
                 <kc-ui-panel-body padded>
                     ${items}
-                    <ul class="item-list outline">
-                        <li class="header">Presets</li>
-                        <li data-preset="all" aria-role="button">All</li>
-                        <li data-preset="front" aria-role="button">Front</li>
-                        <li data-preset="back" aria-role="button">Back</li>
-                        <li data-preset="copper" aria-role="button">Copper</li>
-                        <li data-preset="outer-copper" aria-role="button">
+                    <kc-ui-panel-label>Presets</kc-ui-panel-label>
+                    <kc-ui-menu id="presets" class="outline">
+                        <kc-ui-menu-item name="all">All</kc-ui-menu-item>
+                        <kc-ui-menu-item name="front">Front</kc-ui-menu-item>
+                        <kc-ui-menu-item name="back">Back</kc-ui-menu-item>
+                        <kc-ui-menu-item name="copper">Copper</kc-ui-menu-item>
+                        <kc-ui-menu-item name="outer-copper">
                             Outer copper
-                        </li>
-                        <li data-preset="inner-copper" aria-role="button">
+                        </kc-ui-menu-item>
+                        <kc-ui-menu-item name="inner-copper">
                             Inner copper
-                        </li>
-                        <li data-preset="drawings" aria-role="button">
+                        </kc-ui-menu-item>
+                        <kc-ui-menu-item name="drawings">
                             Drawings
-                        </li>
-                    </ul>
+                        </kc-ui-menu-item>
+                    </kc-ui-menu>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
