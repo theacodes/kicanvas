@@ -4,23 +4,23 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import type { Footprint } from "../../../kicad/board";
-import { BoardViewer } from "../../../viewers/board/viewer";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { KiCanvasSelectEvent } from "../../../viewers/base/events";
-import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
-import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 import common_styles from "../../../kc-ui/common-styles";
-
-import "../../../kc-ui/kc-ui-filtered-list";
-import "../../../kc-ui/kc-ui-text-filter-input";
-import "../../../kc-ui/kc-ui-panel";
-import "../../../kc-ui/kc-ui-menu";
+import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
 import {
     KCUIMenuElement,
     type KCUIMenuItemElement,
 } from "../../../kc-ui/kc-ui-menu";
+import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
+import type { Footprint } from "../../../kicad/board";
+import { KiCanvasSelectEvent } from "../../../viewers/base/events";
+import { BoardViewer } from "../../../viewers/board/viewer";
+
+import "../../../kc-ui/kc-ui-filtered-list";
+import "../../../kc-ui/kc-ui-menu";
+import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-text-filter-input";
 
 export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
     static override styles = [common_styles];

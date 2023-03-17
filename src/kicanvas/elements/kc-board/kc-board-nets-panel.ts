@@ -6,17 +6,20 @@
 
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { delegate } from "../../../base/events";
+import common_styles from "../../../kc-ui/common-styles";
 import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
+import type { KCUIMenuItemElement } from "../../../kc-ui/kc-ui-menu";
 import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
 import "../../../kc-ui/kc-ui-filtered-list";
+import "../../../kc-ui/kc-ui-menu";
 import "../../../kc-ui/kc-ui-panel";
 import "../../../kc-ui/kc-ui-text-filter-input";
 
 export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
+    static override styles = [common_styles];
+
     viewer: BoardViewer;
 
     override connectedCallback() {
@@ -29,15 +32,16 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
     }
 
     private setup_events() {
-        delegate(this, "li[data-number]", "click", (e, source) => {
-            const number = parseInt(source?.dataset["number"] as string, 10);
+        this.addEventListener("kc-ui-menu:select", (e) => {
+            const item = (e as CustomEvent).detail as KCUIMenuItemElement;
+
+            const number = parseInt(item?.name, 10);
 
             if (!number) {
                 return;
             }
 
             this.viewer.highlight_net(number);
-            this.mark_selected_item(number);
         });
 
         // Wire up search to filter the list
@@ -55,17 +59,6 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
         return this.$<KCUIFilteredListElement>("kc-ui-filtered-list")!;
     }
 
-    private get items() {
-        return this.$$<HTMLLIElement>("li[data-number]");
-    }
-
-    private mark_selected_item(number: number) {
-        for (const el of this.items) {
-            const current = el.dataset["number"] == `${number}`;
-            el.ariaCurrent = current ? "true" : "false";
-        }
-    }
-
     override render() {
         const board = this.viewer.board;
 
@@ -73,13 +66,12 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
 
         for (const net of board.nets) {
             nets.push(
-                html` <li
-                    data-number="${net.number}"
-                    aria-role="button"
+                html`<kc-ui-menu-item
+                    name="${net.number}"
                     data-match-text="${net.number} ${net.name}">
                     <span class="very-narrow"> ${net.number} </span>
                     <span>${net.name}</span>
-                </li>`,
+                </kc-ui-menu-item>`,
             );
         }
 
@@ -89,9 +81,7 @@ export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
                 <kc-ui-panel-body>
                     <kc-ui-text-filter-input></kc-ui-text-filter-input>
                     <kc-ui-filtered-list>
-                        <ul class="item-list outline">
-                            ${nets}
-                        </ul>
+                        <kc-ui-menu class="outline">${nets}</kc-ui-menu>
                     </kc-ui-filtered-list>
                 </kc-ui-panel-body>
             </kc-ui-panel>
