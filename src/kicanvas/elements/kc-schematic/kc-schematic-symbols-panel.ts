@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { sorted_by_numeric_strings } from "../../../base/array";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import common_styles from "../../../kc-ui/common-styles";
@@ -86,13 +87,14 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     }
 
     override render() {
-        const collator = new Intl.Collator(undefined, { numeric: true });
         const schematic = this.viewer.schematic;
-        const symbols = schematic.symbols.slice();
         const symbol_elms: HTMLElement[] = [];
         const power_symbol_elms: HTMLElement[] = [];
 
-        symbols.sort((a, b) => collator.compare(a.reference, b.reference));
+        const symbols = sorted_by_numeric_strings(
+            schematic.symbols,
+            (sym) => sym.reference,
+        );
 
         for (const sym of symbols) {
             const match_text = `${sym.reference} ${sym.value} ${sym.id} ${sym.lib_symbol.name}`;

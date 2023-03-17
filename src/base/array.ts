@@ -24,3 +24,12 @@ export function iterable_as_array<T>(x: T | T[] | Iterable<T>): T[] {
     }
     return [x];
 }
+
+const collator = new Intl.Collator(undefined, { numeric: true });
+
+export function sorted_by_numeric_strings<T>(
+    array: T[],
+    getter: (item: T) => string,
+) {
+    return array.slice().sort((a, b) => collator.compare(getter(a), getter(b)));
+}

@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { sorted_by_numeric_strings } from "../../../base/array";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import common_styles from "../../../kc-ui/common-styles";
@@ -43,16 +44,10 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
 
     private sorted_footprints: Footprint[];
     private sort_footprints() {
-        this.sorted_footprints = this.viewer.board.footprints.slice();
-        this.sorted_footprints.sort((a, b) => {
-            if (a.reference < b.reference) {
-                return -1;
-            }
-            if (a.reference > b.reference) {
-                return 1;
-            }
-            return 0;
-        });
+        this.sorted_footprints = sorted_by_numeric_strings(
+            this.viewer.board.footprints,
+            (fp) => fp.reference || "REF",
+        );
     }
 
     private setup_events() {

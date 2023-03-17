@@ -4,13 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { sorted_by_numeric_strings } from "../../../base/array";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
+import { SchematicSymbol } from "../../../kicad/schematic";
 import {
     KiCanvasLoadEvent,
     KiCanvasSelectEvent,
 } from "../../../viewers/base/events";
-import { SchematicSymbol } from "../../../kicad/schematic";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
 import "../../../kc-ui/kc-ui-panel";
@@ -49,7 +50,6 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
     }
 
     override render() {
-        const collator = new Intl.Collator(undefined, { numeric: true });
         const header = (name: string) =>
             html`<kc-ui-property-list-item
                 class="label"
@@ -77,11 +77,12 @@ export class KCSchematicPropertiesPanelElement extends WithContext(
                 return entry(v.name, v.text);
             });
 
-            const pins = itm.unit_pins
-                .sort((a, b) => collator.compare(a.number, b.number))
-                .map((p) => {
-                    return entry(p.number, p.definition.name.text);
-                });
+            const pins = sorted_by_numeric_strings(
+                itm.unit_pins,
+                (pin) => pin.number,
+            ).map((p) => {
+                return entry(p.number, p.definition.name.text);
+            });
 
             entries = html`
                 ${header("Basic properties")}
