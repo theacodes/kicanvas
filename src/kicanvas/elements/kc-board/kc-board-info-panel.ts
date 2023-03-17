@@ -9,6 +9,7 @@ import { WithContext } from "../../../base/dom/context";
 import { html, CustomElement } from "../../../base/dom/custom-element";
 
 import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-property-list";
 
 export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
     static override useShadowRoot = false;
@@ -27,11 +28,15 @@ export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
         const board = this.viewer.board;
         const board_bbox = board.edge_cuts_bbox;
 
-        const header = (name: string) => html`<dt class="header">${name}</dt>`;
+        const header = (name: string) =>
+            html`<kc-ui-property-list-item
+                name="${name}"
+                class="label"></kc-ui-property-list-item>`;
 
         const entry = (name: string, desc?: any, suffix = "") =>
-            html`<dt>${name}</dt>
-                <dd>${desc} ${suffix}</dd>`;
+            html` <kc-ui-property-list-item name="${name}">
+                ${desc} ${suffix}
+            </kc-ui-property-list-item>`;
 
         const comments = Object.entries(board.title_block?.comment || {}).map(
             ([k, v]) => entry(`Comment ${k}`, v),
@@ -41,7 +46,7 @@ export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
             <kc-ui-panel>
                 <kc-ui-panel-title title="Info"></kc-ui-panel-title>
                 <kc-ui-panel-body>
-                    <dl class="property-list">
+                    <kc-ui-property-list>
                         ${header("Page properties")}
                         ${entry("Size", ds.paper?.size)}
                         ${entry("Width", ds.width, "mm")}
@@ -94,7 +99,7 @@ export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
                                 board.setup?.grid_origin?.y ?? 0
                             }`,
                         )}
-                    </dl>
+                    </kc-ui-property-list>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
