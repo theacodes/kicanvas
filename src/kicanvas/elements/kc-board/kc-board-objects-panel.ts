@@ -12,9 +12,9 @@ import { BoardViewer } from "../../../viewers/board/viewer";
 
 import "../../../kc-ui/kc-ui-range";
 import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/kc-ui-control-list";
 
 export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
-    static override useShadowRoot = false;
     viewer: BoardViewer;
 
     override connectedCallback() {
@@ -63,8 +63,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
             <kc-ui-panel>
                 <kc-ui-panel-title title="Objects"></kc-ui-panel-title>
                 <kc-ui-panel-body padded>
-                    <ul class="control-list">
-                        <li>
+                    <kc-ui-control-list>
+                        <kc-ui-control>
                             <label>Tracks</label>
                             <kc-ui-range
                                 min="0"
@@ -72,8 +72,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="tracks"></kc-ui-range>
-                        </li>
-                        <li>
+                        </kc-ui-control>
+                        <kc-ui-control>
                             <label>Vias</label>
                             <kc-ui-range
                                 min="0"
@@ -81,8 +81,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="vias"></kc-ui-range>
-                        </li>
-                        <li>
+                        </kc-ui-control>
+                        <kc-ui-control>
                             <label>Pads</label>
                             <kc-ui-range
                                 min="0"
@@ -90,8 +90,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="pads"></kc-ui-range>
-                        </li>
-                        <li>
+                        </kc-ui-control>
+                        <kc-ui-control>
                             <label>Through holes</label>
                             <kc-ui-range
                                 min="0"
@@ -99,8 +99,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="holes"></kc-ui-range>
-                        </li>
-                        <li>
+                        </kc-ui-control>
+                        <kc-ui-control>
                             <label>Zones</label>
                             <kc-ui-range
                                 min="0"
@@ -108,8 +108,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="zones"></kc-ui-range>
-                        </li>
-                        <li>
+                        </kc-ui-control>
+                        <kc-ui-control>
                             <label>Grid</label>
                             <kc-ui-range
                                 min="0"
@@ -117,8 +117,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="grid"></kc-ui-range>
-                        </li>
-                        <li>
+                        </kc-ui-control>
+                        <kc-ui-control>
                             <label>Page</label>
                             <kc-ui-range
                                 min="0"
@@ -126,8 +126,8 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
                                 step="0.01"
                                 value="1"
                                 name="page"></kc-ui-range>
-                        </li>
-                    </ul>
+                        </kc-ui-control>
+                    </kc-ui-control-list>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
