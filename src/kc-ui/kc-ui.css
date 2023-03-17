@@ -69,6 +69,8 @@
     --button-hover-bg: #a3f3ff;
     --button-hover-fg: #131218;
     --button-focus-outline: 1px solid #ae81ff;
+    --button-selected-bg: #ae81ff;
+    --button-selected-fg: #131218;
     --button-disabled-bg: #131218;
     --button-disabled-fg: #888;
     --button-success-bg: #64cb96;
@@ -79,6 +81,12 @@
     --button-danger-fg: #131218;
     --button-danger-hover-bg: #ff81ad;
     --button-danger-hover-fg: #131218;
+    --button-outline-bg: #282634;
+    --button-outline-fg: #f8f8f0;
+    --button-outline-hover-bg: #282634;
+    --button-outline-hover-fg: #81eeff;
+    --button-outline-disabled-bg: #131218;
+    --button-outline-disabled-fg: #888;
 
     --input-bg: #131218;
     --input-fg: #f8f8f0;
@@ -262,8 +270,7 @@ label {
 
 input,
 select,
-textarea,
-button {
+textarea {
     all: unset;
     box-sizing: border-box;
     display: block;
@@ -285,16 +292,14 @@ button {
 
 input:hover,
 select:hover,
-textarea:hover,
-button:hover {
+textarea:hover {
     z-index: 10;
     box-shadow: var(--input-hover-shadow);
 }
 
 input:focus,
 select:focus,
-textarea:focus,
-button:focus {
+textarea:focus {
     z-index: 10;
     box-shadow: none;
     outline: var(--input-focus-outline);
@@ -302,16 +307,14 @@ button:focus {
 
 input:disabled,
 select:disabled,
-textarea:disabled,
-button:disabled {
+textarea:disabled {
     background: var(--input-disabled-bg);
     color: var(--input-disabled-fg);
 }
 
 input:disabled:hover,
 select:disabled:hover,
-textarea:disabled:hover,
-button:disabled:hover {
+textarea:disabled:hover {
     z-index: 10;
     cursor: unset;
 }
@@ -375,54 +378,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
 textarea {
     text-align: left;
     padding: 0.5rem;
-}
-
-button {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-    margin-right: 0.2rem;
-    border-radius: 0.25rem;
-    border: 2px solid transparent;
-    background: var(--button-bg);
-    color: var(--button-fg);
-}
-
-button:hover {
-    background: var(--button-hover-bg);
-    color: var(--button-hover-fg);
-    cursor: pointer;
-}
-
-button:disabled {
-    background: var(--button-disabled-bg);
-    color: var(--button-disabled-fg);
-}
-
-button:focus {
-    outline: var(--button-focus-outline);
-}
-
-button.success {
-    background: var(--button-success-bg);
-    color: var(--button-success-fg);
-}
-
-button.success:hover {
-    background: var(--button-success-hover-bg);
-    color: var(--button-success-hover-fg);
-}
-
-button.danger {
-    background: var(--button-danger-bg);
-    color: var(--button-danger-fg);
-}
-
-button.danger:hover {
-    background: var(--button-danger-hover-bg);
-    color: var(--button-danger-hover-fg);
 }
 
 /*

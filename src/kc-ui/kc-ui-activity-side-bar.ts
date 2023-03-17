@@ -9,6 +9,9 @@ import { CustomElement, html } from "../base/dom/custom-element";
 import { delegate } from "../base/events";
 import common_styles from "./common-styles";
 
+import "./kc-ui-button";
+import type { KCUIButtonElement } from "./kc-ui-button";
+
 /**
  * kc-ui-activity-bar is a vscode-style side bar with an action bar with icons
  * and a panel with various activities.
@@ -53,39 +56,19 @@ export class KCUIActivitySideBarElement extends CustomElement {
                 flex-grow: 1;
             }
 
-            button {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 0.2rem;
-                margin: unset;
-                padding: 0.5rem;
+            kc-ui-button {
+                --button-bg: transparent;
+                --button-fg: var(--activity-bar-fg);
+                --button-hover-bg: var(--activity-bar-active-bg);
+                --button-hover-fg: var(--activity-bar-active-fg);
+                --button-selected-bg: var(--activity-bar-active-bg);
+                --button-selected-fg: var(--activity-bar-active-fg);
+                --button-focus-outline: none;
                 margin-bottom: 0.25rem;
-                background: transparent;
-                border: 2px solid transparent;
-                border-radius: 15%;
-                color: var(--activity-bar-fg);
-                box-shadow: none;
-                transition: color var(--transition-time-short) ease,
-                    border var(--transition-time-short) ease,
-                    background var(--transition-time-short) ease;
             }
 
-            button[aria-selected="true"] {
-                background: var(--activity-bar-active-bg);
-                color: var(--activity-bar-active-fg);
-            }
-
-            button:hover {
-                cursor: pointer;
-                box-shadow: none;
-                color: var(--activity-bar-active-fg);
-                background: var(--activity-bar-active-bg);
-            }
-
-            button:focus {
-                outline: none;
+            kc-ui-button:last-child {
+                margin-bottom: 0;
             }
 
             ::slotted(kc-ui-activity) {
@@ -125,13 +108,13 @@ export class KCUIActivitySideBarElement extends CustomElement {
             const button_location = activity.getAttribute("button-location");
             (button_location == "bottom" ? bottom_buttons : top_buttons).push(
                 html`
-                    <button
+                    <kc-ui-button
                         type="button"
                         tooltip-left="${name}"
                         name="${name?.toLowerCase()}"
-                        title="${name}">
-                        <kc-ui-icon>${icon}</kc-ui-icon>
-                    </button>
+                        title="${name}"
+                        icon=${icon}>
+                    </kc-ui-button>
                 ` as HTMLElement,
             );
         }
@@ -152,8 +135,8 @@ export class KCUIActivitySideBarElement extends CustomElement {
             this.change_activity(default_activity);
         }
 
-        delegate(this.renderRoot, "button", "click", (e, source) => {
-            this.change_activity((source as HTMLButtonElement).name, true);
+        delegate(this.renderRoot, "kc-ui-button", "click", (e, source) => {
+            this.change_activity((source as KCUIButtonElement).name, true);
         });
     }
 
