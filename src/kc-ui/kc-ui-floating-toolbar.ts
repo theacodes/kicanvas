@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CSS } from "../base/dom/css";
+import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
-import styles from "./kc-ui-floating-toolbar.css";
+import common_styles from "./common-styles";
 
 /**
  * kc-ui-floating-toolbar is a toolbar that presents its elements on top of
@@ -15,7 +15,46 @@ import styles from "./kc-ui-floating-toolbar.css";
  * element belong.
  */
 export class KCUIFloatingToolbarElement extends CustomElement {
-    static override styles = new CSS(styles);
+    static override styles = [
+        common_styles,
+        css`
+            :host {
+                z-index: 10;
+                user-select: none;
+                pointer-events: none;
+                position: absolute;
+                left: 0;
+                width: 100%;
+                padding: 0.5rem;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+            }
+
+            :host([location="top"]) {
+                top: 0;
+            }
+
+            :host([location="bottom"]) {
+                bottom: 0;
+            }
+
+            ::slotted(*) {
+                user-select: initial;
+                pointer-events: initial;
+            }
+
+            div.left {
+                flex-grow: 999;
+                display: flex;
+            }
+
+            div.right {
+                display: flex;
+            }
+        `,
+    ];
 
     override render() {
         return html` <div class="left">

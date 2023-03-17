@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { listen } from "../base/events";
+import { css } from "../base/dom/css";
 import { CustomElement } from "../base/dom/custom-element";
-import styles from "./kc-ui-resizer.css";
-import { CSS } from "../base/dom/css";
+import { listen } from "../base/events";
+import common_styles from "./common-styles";
 
 /**
  * kc-ui-resizer allow re-sizing a kc-ui-view with the mouse.
@@ -15,7 +15,33 @@ import { CSS } from "../base/dom/css";
  * Presently it's only able to resize the element to its immediate right.
  */
 export class KCUIResizerElement extends CustomElement {
-    static override styles = new CSS(styles);
+    static override styles = [
+        common_styles,
+        css`
+            :host {
+                z-index: 999;
+                user-select: none;
+                display: block;
+                width: 6px;
+                margin-left: -6px;
+                cursor: col-resize;
+                background: transparent;
+                opacity: 0;
+                transition: opacity var(--transition-time-medium, 500) ease;
+            }
+
+            :host(:hover) {
+                background: var(--resizer-bg, rebeccapurple);
+                opacity: 1;
+                transition: opacity var(--transition-time-short) ease;
+            }
+
+            :host(:hover.active),
+            :host(.active) {
+                background: var(--resizer-active-bg, rebeccapurple);
+            }
+        `,
+    ];
 
     override initialContentCallback() {
         const prev = this.previousElementSibling! as HTMLElement;

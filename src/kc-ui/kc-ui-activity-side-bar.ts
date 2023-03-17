@@ -4,17 +4,100 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { delegate } from "../base/events";
+import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
-import kc_ui_activity_side_bar_styles from "./kc-ui-activity-side-bar.css";
-import { CSS } from "../base/dom/css";
+import { delegate } from "../base/events";
+import common_styles from "./common-styles";
 
 /**
  * kc-ui-activity-bar is a vscode-style side bar with an action bar with icons
  * and a panel with various activities.
  */
 export class KCUIActivitySideBarElement extends CustomElement {
-    static override styles = new CSS(kc_ui_activity_side_bar_styles);
+    static override styles = [
+        common_styles,
+        css`
+            :host {
+                display: flex;
+                flex-direction: row;
+                height: 100%;
+                overflow: hidden;
+                min-width: calc(max(20%, 200px));
+                max-width: calc(max(20%, 200px));
+            }
+
+            div {
+                display: flex;
+                overflow: hidden;
+                flex-direction: column;
+            }
+
+            div.bar {
+                flex-grow: 0;
+                flex-shrink: 0;
+                height: 100%;
+                z-index: 1;
+                display: flex;
+                flex-direction: column;
+                background: var(--activity-bar-bg);
+                color: var(--activity-bar-fg);
+                padding: 0.2rem;
+                user-select: none;
+            }
+
+            div.start {
+                flex: 1;
+            }
+
+            div.activities {
+                flex-grow: 1;
+            }
+
+            button {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 0.2rem;
+                margin: unset;
+                padding: 0.5rem;
+                margin-bottom: 0.25rem;
+                background: transparent;
+                border: 2px solid transparent;
+                border-radius: 15%;
+                color: var(--activity-bar-fg);
+                box-shadow: none;
+                transition: color var(--transition-time-short) ease,
+                    border var(--transition-time-short) ease,
+                    background var(--transition-time-short) ease;
+            }
+
+            button[aria-selected="true"] {
+                background: var(--activity-bar-active-bg);
+                color: var(--activity-bar-active-fg);
+            }
+
+            button:hover {
+                cursor: pointer;
+                box-shadow: none;
+                color: var(--activity-bar-active-fg);
+                background: var(--activity-bar-active-bg);
+            }
+
+            button:focus {
+                outline: none;
+            }
+
+            ::slotted(kc-ui-activity) {
+                display: none;
+                height: 100%;
+            }
+
+            ::slotted(kc-ui-activity[active]) {
+                display: block;
+            }
+        `,
+    ];
 
     #activity: string | null | undefined;
 

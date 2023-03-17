@@ -13,6 +13,7 @@ import { CustomElement, html } from "../base/dom/custom-element";
 export class KCUIIconElement extends CustomElement {
     static override styles = css`
         :host {
+            box-sizing: border-box;
             font-family: "Material Symbols Outlined";
             font-weight: normal;
             font-style: normal;

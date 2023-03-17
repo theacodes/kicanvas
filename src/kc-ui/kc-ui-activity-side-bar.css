@@ -1,7 +1,3 @@
-* {
-    box-sizing: border-box;
-}
-
 :host {
     display: flex;
     flex-direction: row;
