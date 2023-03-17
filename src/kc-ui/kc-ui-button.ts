@@ -10,7 +10,7 @@ import common_styles from "./common-styles";
 import { KCUIIconElement } from "./kc-ui-icon";
 
 /**
- * kc-ui-icon is a material symbol
+ * kc-ui-button wraps the <button> element with common styles and behaviors
  */
 export class KCUIButtonElement extends CustomElement {
     static override styles = css`
