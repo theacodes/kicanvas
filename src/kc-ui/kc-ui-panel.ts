@@ -73,7 +73,6 @@ export class KCUIPanelTitleElement extends CustomElement {
     ];
 
     override render() {
-        console.log(this.getAttribute("title"));
         return html`<div class="title">${this.getAttribute("title")}</div>
             <div class="actions">
                 <slot name="actions"></slot>
