@@ -265,35 +265,3 @@ kc-ui-split-view.fixed {
     flex-grow: 0;
     flex-shrink: 0;
 }
-
-/*
-    Property list (grid style) dl elements
-*/
-
-dl.property-list {
-    display: grid;
-    gap: 1px;
-    grid-template-columns: fit-content(50%) 1fr;
-    background: var(--grid-outline);
-    border-bottom: 1px solid var(--grid-outline);
-}
-
-dl.property-list > * {
-    padding: 0.2rem;
-    background: var(--bg);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    user-select: all;
-}
-
-dl.property-list dt.header {
-    user-select: none;
-    grid-column-end: span 2;
-    background: var(--panel-subtitle-bg);
-    color: var(--panel-subtitle-fg);
-}
-
-dl.property-list kc-ui-icon {
-    vertical-align: middle;
-}
