@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { later } from "../base/async";
 import { css } from "../base/dom/css";
 import { html, CustomElement } from "../base/dom/custom-element";
 
@@ -40,8 +41,7 @@ export class KCUIFilteredListElement extends CustomElement {
     }
 
     private apply_filter() {
-        // don't block the main thread
-        window.requestAnimationFrame(() => {
+        later(() => {
             for (const el of this.items()) {
                 if (
                     this.#filter_text == null ||
