@@ -5,19 +5,17 @@
 */
 
 import { WithContext } from "../../base/dom/context";
+import { css } from "../../base/dom/css";
 import { CustomElement, html } from "../../base/dom/custom-element";
+import type { KCUIButtonElement } from "../../kc-ui";
 import common_styles from "../../kc-ui/common-styles";
-import type { KCUIButtonElement } from "../../kc-ui/button";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
 } from "../../viewers/base/events";
 import type { Viewer } from "../../viewers/base/viewer";
 
-import "../../kc-ui/kc-ui";
-import "../../kc-ui/button";
-import "../../kc-ui/floating-toolbar";
-import { css } from "../../base/dom/css";
+import "../../kc-ui";
 
 export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {
     static override styles = [

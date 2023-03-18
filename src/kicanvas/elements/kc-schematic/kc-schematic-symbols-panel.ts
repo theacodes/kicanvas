@@ -8,20 +8,20 @@ import { sorted_by_numeric_strings } from "../../../base/array";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { query } from "../../../base/dom/decorators";
+import {
+    KCUIFilteredListElement,
+    KCUITextFilterInputElement,
+    type KCUIMenuElement,
+    type KCUIMenuItemElement,
+} from "../../../kc-ui";
 import common_styles from "../../../kc-ui/common-styles";
-import { KCUIFilteredListElement } from "../../../kc-ui/filtered-list";
-import type { KCUIMenuElement, KCUIMenuItemElement } from "../../../kc-ui/menu";
-import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 import {
     KiCanvasLoadEvent,
     KiCanvasSelectEvent,
 } from "../../../viewers/base/events";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
-import "../../../kc-ui/filtered-list";
-import "../../../kc-ui/menu";
-import "../../../kc-ui/panel";
-import "../../../kc-ui/kc-ui-text-filter-input";
+import "../../../kc-ui";
 
 export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
     static override styles = [common_styles];

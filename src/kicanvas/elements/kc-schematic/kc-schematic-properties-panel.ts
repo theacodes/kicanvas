@@ -14,8 +14,7 @@ import {
 } from "../../../viewers/base/events";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
-import "../../../kc-ui/panel";
-import "../../../kc-ui/property-list";
+import "../../../kc-ui";
 
 export class KCSchematicPropertiesPanelElement extends WithContext(
     CustomElement,

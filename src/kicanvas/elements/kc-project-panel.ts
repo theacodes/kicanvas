@@ -6,15 +6,11 @@
 
 import { WithContext } from "../../base/dom/context";
 import { CustomElement, html } from "../../base/dom/custom-element";
+import type { KCUIDropdownElement, KCUIMenuItemElement } from "../../kc-ui";
 import common_styles from "../../kc-ui/common-styles";
-import type { KCUIDropdownElement } from "../../kc-ui/dropdown";
-import type { KCUIMenuItemElement } from "../../kc-ui/menu";
 import type { Project } from "../project";
 
-import "../../kc-ui/kc-ui";
-import "../../kc-ui/dropdown";
-import "../../kc-ui/menu";
-import "../../kc-ui/kc-ui-toggle-menu";
+import "../../kc-ui";
 
 export class KCProjectPanelElement extends WithContext(CustomElement) {
     static override styles = [common_styles];

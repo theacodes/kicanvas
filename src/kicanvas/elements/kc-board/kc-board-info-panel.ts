@@ -8,8 +8,7 @@ import { BoardViewer } from "../../../viewers/board/viewer";
 import { WithContext } from "../../../base/dom/context";
 import { html, CustomElement } from "../../../base/dom/custom-element";
 
-import "../../../kc-ui/panel";
-import "../../../kc-ui/property-list";
+import "../../../kc-ui";
 
 export class KCBoardInfoPanelElement extends WithContext(CustomElement) {
     viewer: BoardViewer;

@@ -22,7 +22,7 @@ import type { KCProjectPanelElement } from "./kc-project-panel";
 import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
 
-import "../../kc-ui/kc-ui";
+import "../../kc-ui";
 import "./kc-board/kc-board-viewer";
 import "./kc-project-panel";
 import "./kc-schematic/kc-schematic-viewer";

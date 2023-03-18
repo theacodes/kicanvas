@@ -7,12 +7,10 @@
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { delegate } from "../../../base/events";
-import type { KCUIRangeElement } from "../../../kc-ui/range";
+import type { KCUIRangeElement } from "../../../kc-ui";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui/range";
-import "../../../kc-ui/panel";
-import "../../../kc-ui/control-list";
+import "../../../kc-ui";
 
 export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
     viewer: BoardViewer;

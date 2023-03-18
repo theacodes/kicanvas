@@ -6,14 +6,13 @@
 
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { KCUIActivitySideBarElement } from "../../../kc-ui/activity-side-bar";
+import { KCUIActivitySideBarElement } from "../../../kc-ui";
 import type { KicadSch } from "../../../kicad/schematic";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
-import "../../../kc-ui/activity-side-bar";
-import "../../../kc-ui/resizer";
+import "../../../kc-ui";
 import "../kc-viewer-bottom-toolbar";
 import "../kicanvas-schematic";
 import "./kc-schematic-info-panel";
