@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
-import { Vec2 } from "../base/math/vec2.ts";
-import { Color } from "../base/color.ts";
+import { Color } from "../base/color";
+import { Vec2 } from "../base/math";
+import { P, T, parse_expr, type Parseable } from "./parser";
 
 export function expand_text_vars(
     text: string,

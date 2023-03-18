@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
-import { Vec2 } from "../base/math/vec2.ts";
-import { At, Effects, Paper, TitleBlock, Stroke } from "./common.ts";
-import { Color } from "../base/color.ts";
+import { Color } from "../base/color";
+import { Vec2 } from "../base/math";
+import { At, Effects, Paper, Stroke, TitleBlock } from "./common";
+import { P, T, parse_expr, type Parseable } from "./parser";
 
 /* Default values for various things found in schematics
  * From EESchema's default_values.h, converted from mils to mm. */

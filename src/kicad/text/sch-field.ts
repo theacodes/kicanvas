@@ -4,10 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Vec2 } from "../../base/math/vec2";
+import { Angle, BBox, Matrix3, Vec2 } from "../../base/math";
 import { EDAText } from "./eda-text";
 
 type Parent = {

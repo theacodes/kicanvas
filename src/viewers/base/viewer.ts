@@ -4,22 +4,21 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Viewport } from "./viewport";
-import { Renderer } from "../../graphics/renderer";
-import { Vec2 } from "../../base/math/vec2";
-import { BBox } from "../../base/math/bbox";
+import { Deferred, later } from "../../base/async";
 import { Color } from "../../base/color";
-import { ViewLayerSet } from "./view-layers";
-import { Polygon, Polyline } from "../../graphics/shapes";
-import {
-    type KiCanvasEventMap,
-    KiCanvasSelectEvent,
-    KiCanvasLoadEvent,
-    KiCanvasMouseMoveEvent,
-} from "./events";
 import { Disposables, type IDisposable } from "../../base/disposable";
 import { listen } from "../../base/events";
-import { Deferred, later } from "../../base/async";
+import { BBox, Vec2 } from "../../base/math";
+import { Renderer } from "../../graphics/renderer";
+import { Polygon, Polyline } from "../../graphics/shapes";
+import {
+    KiCanvasLoadEvent,
+    KiCanvasMouseMoveEvent,
+    KiCanvasSelectEvent,
+    type KiCanvasEventMap,
+} from "./events";
+import { ViewLayerSet } from "./view-layers";
+import { Viewport } from "./viewport";
 
 export abstract class Viewer extends EventTarget {
     public canvas: HTMLCanvasElement;

@@ -10,26 +10,23 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import * as board_items from "../../kicad/board";
-import { Arc } from "../../base/math/arc";
-import { Vec2 } from "../../base/math/vec2";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Angle } from "../../base/math/angle";
+import { Color } from "../../base/color";
+import { Angle, Arc, Matrix3, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
-import {
-    ViewLayer,
-    LayerNames,
-    LayerSet,
-    virtual_layer_for,
-    CopperVirtualLayerNames,
-    copper_layers_between,
-} from "./layers";
 import { Circle, Polygon, Polyline } from "../../graphics/shapes";
-import { ItemPainter, DocumentPainter } from "../base/painter";
+import * as board_items from "../../kicad/board";
 import { EDAText } from "../../kicad/text/eda-text";
 import { StrokeFont } from "../../kicad/text/stroke-font";
-import { Color } from "../../base/color";
+import { DocumentPainter, ItemPainter } from "../base/painter";
 import { ViewLayerNames } from "../base/view-layers";
+import {
+    CopperVirtualLayerNames,
+    LayerNames,
+    LayerSet,
+    ViewLayer,
+    copper_layers_between,
+    virtual_layer_for,
+} from "./layers";
 
 abstract class BoardItemPainter extends ItemPainter {
     /** Alias for BoardPainter.filter_net */

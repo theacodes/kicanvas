@@ -4,14 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BBox } from "../base/math/bbox";
-import { Matrix3 } from "../base/math/matrix3";
-import { Vec2 } from "../base/math/vec2";
 import { Color } from "../base/color";
-import { Circle, Polyline, Polygon, Arc } from "./shapes";
-import { Arc as MathArc } from "../base/math/arc";
-import { Angle } from "../base/math/angle";
 import type { IDisposable } from "../base/disposable";
+import { Angle, BBox, Arc as MathArc, Matrix3, Vec2 } from "../base/math";
+import { Arc, Circle, Polygon, Polyline } from "./shapes";
 
 /**
  * KiCanvas' abstraction over various graphics backends.

@@ -4,12 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
-import { Vec2 } from "../base/math/vec2.ts";
-import { Color } from "../base/color.ts";
+import { Color } from "../base/color";
+import { BBox, Vec2 } from "../base/math";
+import { Paper, expand_text_vars } from "./common";
 import default_sheet from "./default_drawing_sheet.kicad_wks";
-import { Paper, expand_text_vars } from "./common.ts";
-import { BBox } from "../base/math/bbox.ts";
+import { P, T, parse_expr, type Parseable } from "./parser";
 
 export type DrawingSheetDocument = {
     paper?: Paper;

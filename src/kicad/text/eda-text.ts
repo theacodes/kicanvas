@@ -4,10 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Angle, BBox, Vec2 } from "../../base/math";
 import { At, Effects } from "../common";
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Vec2 } from "../../base/math/vec2";
 import { Font, TextAttributes } from "./font";
 import { StrokeFont } from "./stroke-font";
 

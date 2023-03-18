@@ -22,16 +22,15 @@
  */
 
 import earcut from "../../../third_party/earcut/earcut";
-import { VertexArray, ShaderProgram, Buffer } from "./helpers";
-import { Vec2 } from "../../base/math/vec2";
-import { Matrix3 } from "../../base/math/matrix3";
 import { Color } from "../../base/color";
-import { Circle, Polyline, Polygon } from "../shapes";
+import type { IDisposable } from "../../base/disposable";
+import { Matrix3, Vec2 } from "../../base/math";
+import { Circle, Polygon, Polyline } from "../shapes";
+import { Buffer, ShaderProgram, VertexArray } from "./helpers";
 import polygon_frag_shader_src from "./polygon.frag.glsl";
 import polygon_vert_shader_src from "./polygon.vert.glsl";
 import polyline_frag_shader_src from "./polyline.frag.glsl";
 import polyline_vert_shader_src from "./polyline.vert.glsl";
-import type { IDisposable } from "../../base/disposable";
 
 /**
  * Tesselator handles converting abstract primitives into triangles that

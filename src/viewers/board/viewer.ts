@@ -4,8 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BBox } from "../../base/math/bbox";
-import { Vec2 } from "../../base/math/vec2";
+import { BBox, Vec2 } from "../../base/math";
 import { is_string } from "../../base/types";
 import { Renderer } from "../../graphics/renderer";
 import { WebGL2Renderer } from "../../graphics/webgl/renderer";

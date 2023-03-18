@@ -5,7 +5,7 @@
 */
 
 import { first } from "../../base/iterator";
-import { BBox } from "../../base/math/bbox";
+import { BBox } from "../../base/math";
 import { is_string } from "../../base/types";
 import { Canvas2DRenderer } from "../../graphics/canvas2d/renderer";
 import { Renderer } from "../../graphics/renderer";

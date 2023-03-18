@@ -4,11 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { listify, type List } from "./tokenizer.ts";
-import { Vec2 } from "../base/math/vec2.ts";
-import { Color } from "../base/color.ts";
-import { is_number, is_string } from "../base/types.ts";
-import { as_array } from "../base/array.ts";
+import { as_array } from "../base/array";
+import { Color } from "../base/color";
+import { Vec2 } from "../base/math";
+import { is_number, is_string } from "../base/types";
+import { listify, type List } from "./tokenizer";
 
 enum Kind {
     // the first token in the expr (kind ...)

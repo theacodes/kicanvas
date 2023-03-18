@@ -4,15 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { SizeObserver } from "../../base/dom/size-observer";
-import { PanAndZoom } from "../../base/dom/pan-and-zoom";
-import { Renderer } from "../../graphics/renderer";
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Camera2 } from "../../base/math/camera2";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Vec2 } from "../../base/math/vec2";
 import { Deferred } from "../../base/async";
+import { PanAndZoom } from "../../base/dom/pan-and-zoom";
+import { SizeObserver } from "../../base/dom/size-observer";
+import { Angle, BBox, Camera2, Matrix3, Vec2 } from "../../base/math";
+import { Renderer } from "../../graphics/renderer";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view

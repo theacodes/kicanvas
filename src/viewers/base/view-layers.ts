@@ -4,12 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import type { IDisposable } from "../../base/disposable";
-import { Color } from "../../base/color";
-import { RenderLayer } from "../../graphics/renderer";
-import { BBox } from "../../base/math/bbox";
-import { Vec2 } from "../../base/math/vec2";
 import { iterable_as_array } from "../../base/array";
+import { Color } from "../../base/color";
+import type { IDisposable } from "../../base/disposable";
+import { BBox, Vec2 } from "../../base/math";
+import { RenderLayer } from "../../graphics/renderer";
 
 /**
  * Common view layer names across all viewers.

@@ -4,10 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Angle, BBox, Vec2 } from "../../base/math";
 import { is_number, is_string } from "../../base/types";
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Vec2 } from "../../base/math/vec2";
 import { Font, TextStyle } from "./font";
 import { Glyph, StrokeGlyph } from "./glyph";
 import * as newstroke from "./newstroke-glyphs";

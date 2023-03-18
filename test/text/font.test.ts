@@ -6,9 +6,9 @@
 
 import { assert } from "@esm-bundle/chai";
 
-import { StrokeFont } from "../../src/kicad/text/stroke-font";
-import { Vec2 } from "../../src/base/math/vec2";
+import { Vec2 } from "../../src/base/math";
 import { TextStyle } from "../../src/kicad/text/font";
+import { StrokeFont } from "../../src/kicad/text/stroke-font";
 
 // Note: using StrokeFont as a concrete class to test base class methods.
 const font = StrokeFont.default();

@@ -5,6 +5,9 @@
 */
 
 import { assert } from "@esm-bundle/chai";
+import { Angle, Vec2 } from "../../../src/base/math";
+import { GlobalLabel, HierarchicalLabel } from "../../../src/kicad/schematic";
+import { SchText } from "../../../src/kicad/text/sch-text";
 import { DocumentPainter } from "../../../src/viewers/base/painter";
 import { ViewLayerSet } from "../../../src/viewers/base/view-layers";
 import {
@@ -13,10 +16,6 @@ import {
     LabelPainter,
 } from "../../../src/viewers/schematic/painters/label";
 import { NullRenderer } from "../../null-renderer";
-import { SchText } from "../../../src/kicad/text/sch-text";
-import { Angle } from "../../../src/base/math/angle";
-import { Vec2 } from "../../../src/base/math/vec2";
-import { GlobalLabel, HierarchicalLabel } from "../../../src/kicad/schematic";
 
 const renderer = new NullRenderer();
 const layer_set = new ViewLayerSet();

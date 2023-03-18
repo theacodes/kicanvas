@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { Angle } from "../../base/math";
 import { At } from "../common";
-import { Angle } from "../../base/math/angle";
 import { EDAText } from "./eda-text";
 
 /**

@@ -5,17 +5,15 @@
 */
 
 import { Color } from "../src/base/color";
+import { Angle, Matrix3, Vec2 } from "../src/base/math";
 import { RenderLayer, Renderer } from "../src/graphics/renderer";
 import {
-    Circle,
     Arc,
-    Polyline,
+    Circle,
     Polygon,
+    Polyline,
     type Shape,
 } from "../src/graphics/shapes";
-import { Angle } from "../src/base/math/angle";
-import { Matrix3 } from "../src/base/math/matrix3";
-import { Vec2 } from "../src/base/math/vec2";
 
 export class NullRenderLayer extends RenderLayer {
     shapes: Shape[] = [];

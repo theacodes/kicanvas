@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Vec2 } from "../../base/math/vec2";
+import { Angle, BBox, Vec2 } from "../../base/math";
 
 /**
  * Glyph abstract base class

@@ -4,13 +4,11 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { PrimitiveSet } from "./vector";
-import { RenderLayer, Renderer } from "../renderer";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Arc, Circle, Polygon, Polyline } from "../shapes";
-import { Vec2 } from "../../base/math/vec2";
-import { Angle } from "../../base/math/angle";
 import { Color } from "../../base/color";
+import { Angle, Matrix3, Vec2 } from "../../base/math";
+import { RenderLayer, Renderer } from "../renderer";
+import { Arc, Circle, Polygon, Polyline } from "../shapes";
+import { PrimitiveSet } from "./vector";
 
 /**
  * WebGL2-based renderer

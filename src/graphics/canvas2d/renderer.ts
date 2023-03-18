@@ -4,12 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Renderer, RenderLayer, RenderStateStack } from "../renderer";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Arc, Circle, Polygon, Polyline } from "../shapes";
 import { Color } from "../../base/color";
-import { Vec2 } from "../../base/math/vec2";
-import { Angle } from "../../base/math/angle";
+import { Angle, Matrix3, Vec2 } from "../../base/math";
+import { Renderer, RenderLayer, RenderStateStack } from "../renderer";
+import { Arc, Circle, Polygon, Polyline } from "../shapes";
 
 /**
  * Canvas2d-based renderer.

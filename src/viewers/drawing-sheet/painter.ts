@@ -10,16 +10,14 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import * as drawing_sheet from "../../kicad/drawing-sheet";
-import { Vec2 } from "../../base/math/vec2";
+import { Angle, BBox, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
 import { Polyline } from "../../graphics/shapes";
-import { ItemPainter, DocumentPainter } from "../base/painter";
-import { ViewLayer, ViewLayerSet, ViewLayerNames } from "../base/view-layers";
-import { StrokeFont } from "../../kicad/text/stroke-font";
+import * as drawing_sheet from "../../kicad/drawing-sheet";
 import { EDAText } from "../../kicad/text/eda-text";
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
+import { StrokeFont } from "../../kicad/text/stroke-font";
+import { DocumentPainter, ItemPainter } from "../base/painter";
+import { ViewLayer, ViewLayerNames, ViewLayerSet } from "../base/view-layers";
 
 function offset_point(
     sheet: drawing_sheet.DrawingSheet,

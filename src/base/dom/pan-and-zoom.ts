@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { BBox } from "../math/bbox";
-import { Camera2 } from "../math/camera2";
-import { Vec2 } from "../math/vec2";
+import { BBox, Camera2, Vec2 } from "../math";
 
 const line_delta_multiplier = 8;
 const page_delta_multiplier = 24;

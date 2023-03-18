@@ -5,26 +5,22 @@
 */
 
 import { Color } from "../../base/color";
-import { Polygon, Polyline, Arc, Circle } from "../../graphics/shapes";
+import { Angle, BBox, Arc as MathArc, Matrix3, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
+import { Arc, Circle, Polygon, Polyline } from "../../graphics/shapes";
 import * as schematic_items from "../../kicad/schematic";
-import { Angle } from "../../base/math/angle";
-import { Arc as MathArc } from "../../base/math/arc";
-import { BBox } from "../../base/math/bbox";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Vec2 } from "../../base/math/vec2";
-import { ViewLayer, LayerNames, LayerSet } from "./layers";
-import { ItemPainter, DocumentPainter } from "../base/painter";
-import { SchField } from "../../kicad/text/sch-field";
-import { StrokeFont } from "../../kicad/text/stroke-font";
-import { SchText } from "../../kicad/text/sch-text";
 import { LibText } from "../../kicad/text/lib-text";
-import { PinPainter } from "./painters/pin";
+import { SchField } from "../../kicad/text/sch-field";
+import { SchText } from "../../kicad/text/sch-text";
+import { StrokeFont } from "../../kicad/text/stroke-font";
+import { DocumentPainter, ItemPainter } from "../base/painter";
+import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import {
     GlobalLabelPainter,
     HierarchicalLabelPainter,
     NetLabelPainter,
 } from "./painters/label";
+import { PinPainter } from "./painters/pin";
 
 function color_maybe(
     color?: Color,

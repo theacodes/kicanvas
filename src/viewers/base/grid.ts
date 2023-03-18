@@ -5,11 +5,8 @@
 */
 
 import { Color } from "../../base/color";
+import { Angle, BBox, Camera2, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Camera2 } from "../../base/math/camera2";
-import { Vec2 } from "../../base/math/vec2";
 import { ViewLayer } from "./view-layers";
 
 /**

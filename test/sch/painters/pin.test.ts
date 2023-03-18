@@ -5,13 +5,13 @@
 */
 
 import { assert } from "@esm-bundle/chai";
+import { Vec2 } from "../../../src/base/math";
 import {
     PinLabelInternals,
     PinPainter,
     PinShapeInternals,
     type PinInfo,
 } from "../../../src/viewers/schematic/painters/pin";
-import { Vec2 } from "../../../src/base/math/vec2";
 
 suite("sch.painters.pin.PinPainter", function () {
     test(".apply_symbol_transformations() - position only", function () {

@@ -4,14 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as schematic_items from "../../../kicad/schematic";
-import { Angle } from "../../../base/math/angle";
-import { Vec2 } from "../../../base/math/vec2";
-import { ItemPainter } from "../../base/painter";
-import { LayerNames, ViewLayer } from "../layers";
 import { Color } from "../../../base/color";
+import { Angle, Vec2 } from "../../../base/math";
+import * as schematic_items from "../../../kicad/schematic";
 import { SchText } from "../../../kicad/text/sch-text";
 import { StrokeFont } from "../../../kicad/text/stroke-font";
+import { ItemPainter } from "../../base/painter";
+import { LayerNames, ViewLayer } from "../layers";
 
 /**
  * Implements KiCAD rendering logic for net, global, and hierarchical labels.

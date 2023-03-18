@@ -4,19 +4,17 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle } from "../../../base/math/angle";
-import { Vec2 } from "../../../base/math/vec2";
-import { Renderer } from "../../../graphics/renderer";
-import type { HAlign, VAlign } from "../../../kicad/text/font";
-import { Effects } from "../../../kicad/common";
 import { Color } from "../../../base/color";
+import { Angle, Matrix3, Vec2 } from "../../../base/math";
+import { Renderer } from "../../../graphics/renderer";
+import { Effects } from "../../../kicad/common";
+import * as schematic_items from "../../../kicad/schematic";
 import { EDAText } from "../../../kicad/text/eda-text";
+import type { HAlign, VAlign } from "../../../kicad/text/font";
 import { StrokeFont } from "../../../kicad/text/stroke-font";
 import { ItemPainter } from "../../base/painter";
-import * as schematic_items from "../../../kicad/schematic";
 import { LayerNames, ViewLayer } from "../layers";
 import { SchematicPainter } from "../painter";
-import { Matrix3 } from "../../../base/math/matrix3";
 
 /**
  * Implements KiCAD rendering logic for symbol pins.

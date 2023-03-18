@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { parse_expr, P, T, type Parseable } from "./parser.ts";
-import { Vec2 } from "../base/math/vec2.ts";
-import type { List } from "./tokenizer.ts";
+import { Angle, BBox, Arc as MathArc, Matrix3, Vec2 } from "../base/math";
 import {
     At,
     Effects,
@@ -14,11 +12,9 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
-} from "./common.ts";
-import { BBox } from "../base/math/bbox.ts";
-import { Arc as MathArc } from "../base/math/arc.ts";
-import { Matrix3 } from "../base/math/matrix3.ts";
-import { Angle } from "../base/math/angle.ts";
+} from "./common";
+import { P, T, parse_expr, type Parseable } from "./parser";
+import type { List } from "./tokenizer";
 
 export type Drawing =
     | GrLine

@@ -5,12 +5,9 @@
 */
 
 import { Color } from "../../base/color";
+import { Angle, BBox, Matrix3, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
 import { Polyline } from "../../graphics/shapes";
-import { Angle } from "../../base/math/angle";
-import { BBox } from "../../base/math/bbox";
-import { Matrix3 } from "../../base/math/matrix3";
-import { Vec2 } from "../../base/math/vec2";
 import { Glyph, StrokeGlyph } from "./glyph";
 import { Markup, MarkupNode } from "./markup";
 
