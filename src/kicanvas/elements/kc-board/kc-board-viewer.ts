@@ -4,15 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
-import { KCUIActivitySideBarElement } from "../../../kc-ui";
+import { html } from "../../../base/dom/custom-element";
+import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
 import type { KicadPCB } from "../../../kicad/board";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
-import "../../../kc-ui";
 import "../kc-viewer-bottom-toolbar";
 import "../kicanvas-board";
 import "./kc-board-footprints-panel";
@@ -27,7 +25,7 @@ import "./kc-board-properties-panel";
  * up the actual board viewer as well as interface controls. It's basically
  * KiCanvas's version of PCBNew.
  */
-export class KCBoardViewerElement extends WithContext(CustomElement) {
+export class KCBoardViewerElement extends KCUIElement {
     static override useShadowRoot = false;
 
     board_elm: KiCanvasBoardElement;

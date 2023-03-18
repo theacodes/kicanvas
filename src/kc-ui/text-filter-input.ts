@@ -5,13 +5,13 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { query } from "../base/dom/decorators";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 
-export class KCUITextFilterInputElement extends CustomElement {
+export class KCUITextFilterInputElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: flex;

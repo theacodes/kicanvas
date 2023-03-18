@@ -4,21 +4,21 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../../base/dom/context";
 import { css } from "../../../base/dom/css";
-import { CustomElement, html } from "../../../base/dom/custom-element";
+import { html } from "../../../base/dom/custom-element";
 import { attribute, query } from "../../../base/dom/decorators";
-import type { KCUIPanelBodyElement } from "../../../kc-ui";
-import { KCUIMenuElement, type KCUIMenuItemElement } from "../../../kc-ui";
-import common_styles from "../../../kc-ui/common-styles";
+import {
+    KCUIElement,
+    KCUIMenuElement,
+    type KCUIMenuItemElement,
+    type KCUIPanelBodyElement,
+} from "../../../kc-ui";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui";
-
-export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
+export class KCBoardLayersPanelElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: block;
@@ -263,99 +263,98 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     }
 }
 
-class KCBoardLayerControlElement extends CustomElement {
-    static override styles = css`
-        :host {
-            box-sizing: border-box;
-            padding: 0.1rem 0.8rem 0.1rem 0.4rem;
-            color: white;
-            text-align: left;
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            align-items: center;
-        }
+class KCBoardLayerControlElement extends KCUIElement {
+    static override styles = [
+        ...KCUIElement.styles,
+        css`
+            :host {
+                box-sizing: border-box;
+                padding: 0.1rem 0.8rem 0.1rem 0.4rem;
+                color: white;
+                text-align: left;
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                align-items: center;
+            }
 
-        button {
-            all: unset;
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-left: 1rem;
-            color: white;
-            border: 0 none;
-            background: transparent;
-            padding: 0 0.25rem 0 0.25rem;
-            margin-right: -0.25rem;
-            display: flex;
-            align-items: center;
-        }
+            button {
+                all: unset;
+                cursor: pointer;
+                flex-shrink: 0;
+                margin-left: 1rem;
+                color: white;
+                border: 0 none;
+                background: transparent;
+                padding: 0 0.25rem 0 0.25rem;
+                margin-right: -0.25rem;
+                display: flex;
+                align-items: center;
+            }
 
-        .color {
-            flex-shrink: 0;
-            display: block;
-            width: 1rem;
-            height: 1rem;
-            margin-right: 0.5rem;
-        }
+            .color {
+                flex-shrink: 0;
+                display: block;
+                width: 1rem;
+                height: 1rem;
+                margin-right: 0.5rem;
+            }
 
-        .name {
-            display: block;
-            flex-grow: 1;
-        }
+            .name {
+                display: block;
+                flex-grow: 1;
+            }
 
-        .for-hidden {
-            color: #888;
-        }
+            .for-hidden {
+                color: #888;
+            }
 
-        :host {
-            background: var(--list-item-disabled-bg);
-            color: var(--list-item-disabled-fg);
-        }
+            :host {
+                background: var(--list-item-disabled-bg);
+                color: var(--list-item-disabled-fg);
+            }
 
-        :host(:hover) {
-            background: var(--list-item-hover-bg);
-            color: var(--list-item-hover-fg);
-        }
+            :host(:hover) {
+                background: var(--list-item-hover-bg);
+                color: var(--list-item-hover-fg);
+            }
 
-        :host(:hover) button {
-            color: var(--list-item-bg);
-        }
+            :host(:hover) button {
+                color: var(--list-item-bg);
+            }
 
-        :host(:hover) button:hover {
-            color: var(--list-item-fg);
-        }
+            :host(:hover) button:hover {
+                color: var(--list-item-fg);
+            }
 
-        :host([layer-visible]) {
-            background: var(--list-item-bg);
-            color: var(--list-item-fg);
-        }
+            :host([layer-visible]) {
+                background: var(--list-item-bg);
+                color: var(--list-item-fg);
+            }
 
-        :host([layer-highlighted]) {
-            background: var(--list-item-active-bg);
-            color: var(--list-item-active-fg);
-        }
+            :host([layer-highlighted]) {
+                background: var(--list-item-active-bg);
+                color: var(--list-item-active-fg);
+            }
 
-        :host([layer-highlighted]:hover) button {
-            color: var(--list-item-fg);
-        }
+            :host([layer-highlighted]:hover) button {
+                color: var(--list-item-fg);
+            }
 
-        :host kc-ui-icon.for-visible,
-        :host([layer-visible]) kc-ui-icon.for-hidden {
-            display: none;
-        }
+            :host kc-ui-icon.for-visible,
+            :host([layer-visible]) kc-ui-icon.for-hidden {
+                display: none;
+            }
 
-        :host kc-ui-icon.for-hidden,
-        :host([layer-visible]) kc-ui-icon.for-visible {
-            display: revert;
-        }
-    `;
+            :host kc-ui-icon.for-hidden,
+            :host([layer-visible]) kc-ui-icon.for-visible {
+                display: revert;
+            }
+        `,
+    ];
 
     static select_event = "kicanvas:layer-control:select";
     static visibility_event = "kicanvas:layer-control:visibility";
-
-    constructor() {
-        super();
-    }
 
     override initialContentCallback() {
         super.initialContentCallback();

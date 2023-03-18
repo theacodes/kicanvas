@@ -5,88 +5,89 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { attribute, query } from "../base/dom/decorators";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-range is a wrapper around <input type="range">
  */
-export class KCUIRangeElement extends CustomElement {
-    static override styles = css`
-        ${common_styles}
+export class KCUIRangeElement extends KCUIElement {
+    static override styles = [
+        ...KCUIElement.styles,
+        css`
+            :host {
+                display: block;
+                width: 100%;
+                user-select: none;
+            }
 
-        :host {
-            display: block;
-            width: 100%;
-            user-select: none;
-        }
+            input[type="range"] {
+                all: unset;
+                box-sizing: border-box;
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                -webkit-appearance: none;
+                appearance: none;
+                font: inherit;
+                cursor: grab;
+                background: transparent;
+                transition: color var(--transition-time-medium) ease,
+                    box-shadow var(--transition-time-medium) ease,
+                    outline var(--transition-time-medium) ease,
+                    background var(--transition-time-medium) ease,
+                    border var(--transition-time-medium) ease;
+            }
 
-        input[type="range"] {
-            all: unset;
-            box-sizing: border-box;
-            display: block;
-            width: 100%;
-            max-width: 100%;
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-            -webkit-appearance: none;
-            appearance: none;
-            font: inherit;
-            cursor: grab;
-            background: transparent;
-            transition: color var(--transition-time-medium) ease,
-                box-shadow var(--transition-time-medium) ease,
-                outline var(--transition-time-medium) ease,
-                background var(--transition-time-medium) ease,
-                border var(--transition-time-medium) ease;
-        }
+            input[type="range"]:hover {
+                z-index: 10;
+                box-shadow: var(--input-range-hover-shadow);
+            }
 
-        input[type="range"]:hover {
-            z-index: 10;
-            box-shadow: var(--input-range-hover-shadow);
-        }
+            input[type="range"]:focus {
+                box-shadow: none;
+                outline: none;
+            }
 
-        input[type="range"]:focus {
-            box-shadow: none;
-            outline: none;
-        }
+            input[type="range"]:disabled:hover {
+                cursor: unset;
+            }
 
-        input[type="range"]:disabled:hover {
-            cursor: unset;
-        }
+            input[type="range"]::-webkit-slider-runnable-track {
+                box-sizing: border-box;
+                height: 0.5rem;
+                border: 1px solid transparent;
+                border-radius: 0.5rem;
+                background: var(--input-range-bg);
+            }
 
-        input[type="range"]::-webkit-slider-runnable-track {
-            box-sizing: border-box;
-            height: 0.5rem;
-            border: 1px solid transparent;
-            border-radius: 0.5rem;
-            background: var(--input-range-bg);
-        }
+            input[type="range"]:hover::-webkit-slider-runnable-track,
+            input[type="range"]:focus::-webkit-slider-runnable-track {
+                border: 1px solid var(--input-range-hover-bg);
+            }
 
-        input[type="range"]:hover::-webkit-slider-runnable-track,
-        input[type="range"]:focus::-webkit-slider-runnable-track {
-            border: 1px solid var(--input-range-hover-bg);
-        }
+            input[type="range"]:disabled::-webkit-slider-runnable-track {
+                background: var(--input-range-disabled-bg);
+            }
 
-        input[type="range"]:disabled::-webkit-slider-runnable-track {
-            background: var(--input-range-disabled-bg);
-        }
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                height: 1rem;
+                width: 1rem;
+                border-radius: 0.5rem;
+                margin-top: -0.3rem;
+                background: var(--input-range-fg);
+            }
 
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 1rem;
-            width: 1rem;
-            border-radius: 0.5rem;
-            margin-top: -0.3rem;
-            background: var(--input-range-fg);
-        }
-
-        input[type="range"]:focus::-webkit-slider-thumb {
-            box-shadow: var(--input-range-handle-shadow);
-        }
-    `;
+            input[type="range"]:focus::-webkit-slider-thumb {
+                box-shadow: var(--input-range-handle-shadow);
+            }
+        `,
+    ];
 
     @attribute({ type: String })
     name: string;

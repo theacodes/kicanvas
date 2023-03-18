@@ -5,104 +5,105 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { attribute, query } from "../base/dom/decorators";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 import { KCUIIconElement } from "./icon";
 
 /**
  * kc-ui-button wraps the <button> element with common styles and behaviors
  */
-export class KCUIButtonElement extends CustomElement {
-    static override styles = css`
-        ${common_styles}
+export class KCUIButtonElement extends KCUIElement {
+    static override styles = [
+        ...KCUIElement.styles,
+        css`
+            :host {
+                display: inline-block;
+                position: relative;
+                width: auto;
+                cursor: pointer;
+                user-select: none;
+            }
 
-        :host {
-            display: inline-block;
-            position: relative;
-            width: auto;
-            cursor: pointer;
-            user-select: none;
-        }
+            button {
+                all: unset;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem;
+                border: 1px solid transparent;
+                border-radius: 0.25rem;
+                font-weight: medium;
+                font-size: 1rem;
+                background: var(--button-bg);
+                color: var(--button-fg);
+                transition: color var(--transition-time-short) ease,
+                    border var(--transition-time-short) ease,
+                    background var(--transition-time-short) ease;
+            }
 
-        button {
-            all: unset;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            border: 1px solid transparent;
-            border-radius: 0.25rem;
-            font-weight: medium;
-            font-size: 1rem;
-            background: var(--button-bg);
-            color: var(--button-fg);
-            transition: color var(--transition-time-short) ease,
-                border var(--transition-time-short) ease,
-                background var(--transition-time-short) ease;
-        }
+            button:hover {
+                background: var(--button-hover-bg);
+                color: var(--button-hover-fg);
+            }
 
-        button:hover {
-            background: var(--button-hover-bg);
-            color: var(--button-hover-fg);
-        }
+            button:disabled {
+                background: var(--button-disabled-bg);
+                color: var(--button-disabled-fg);
+            }
 
-        button:disabled {
-            background: var(--button-disabled-bg);
-            color: var(--button-disabled-fg);
-        }
+            button:focus {
+                outline: var(--button-focus-outline);
+            }
 
-        button:focus {
-            outline: var(--button-focus-outline);
-        }
+            :host([selected]) button {
+                background: var(--button-selected-bg);
+                color: var(--button-selected-fg);
+            }
 
-        :host([selected]) button {
-            background: var(--button-selected-bg);
-            color: var(--button-selected-fg);
-        }
+            /* variants */
 
-        /* variants */
+            button.outline {
+                background: var(--button-outline-bg);
+                color: var(--button-outline-fg);
+            }
 
-        button.outline {
-            background: var(--button-outline-bg);
-            color: var(--button-outline-fg);
-        }
+            button.outline:hover {
+                background: var(--button-outline-hover-bg);
+                color: var(--button-outline-hover-fg);
+            }
 
-        button.outline:hover {
-            background: var(--button-outline-hover-bg);
-            color: var(--button-outline-hover-fg);
-        }
+            button.outline:disabled {
+                background: var(--button-outline-disabled-bg);
+                color: var(--button-outline-disabled-fg);
+            }
 
-        button.outline:disabled {
-            background: var(--button-outline-disabled-bg);
-            color: var(--button-outline-disabled-fg);
-        }
+            :host([selected]) button.outline {
+                background: var(--button-outline-disabled-bg);
+                color: var(--button--outline-disabled-fg);
+            }
 
-        :host([selected]) button.outline {
-            background: var(--button-outline-disabled-bg);
-            color: var(--button--outline-disabled-fg);
-        }
+            button.toolbar {
+                background: var(--button-toolbar-bg);
+                color: var(--button-toolbar-fg);
+            }
 
-        button.toolbar {
-            background: var(--button-toolbar-bg);
-            color: var(--button-toolbar-fg);
-        }
+            button.toolbar:hover {
+                background: var(--button-toolbar-hover-bg);
+                color: var(--button-toolbar-hover-fg);
+            }
 
-        button.toolbar:hover {
-            background: var(--button-toolbar-hover-bg);
-            color: var(--button-toolbar-hover-fg);
-        }
+            button.toolbar:disabled {
+                background: var(--button-toolbar-disabled-bg);
+                color: var(--button-toolbar-disabled-fg);
+            }
 
-        button.toolbar:disabled {
-            background: var(--button-toolbar-disabled-bg);
-            color: var(--button-toolbar-disabled-fg);
-        }
-
-        :host([selected]) button.toolbar {
-            background: var(--button-toolbar-disabled-bg);
-            color: var(--button--toolbar-disabled-fg);
-        }
-    `;
+            :host([selected]) button.toolbar {
+                background: var(--button-toolbar-disabled-bg);
+                color: var(--button--toolbar-disabled-fg);
+            }
+        `,
+    ];
 
     @query("button", true)
     private button!: HTMLButtonElement;

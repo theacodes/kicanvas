@@ -4,13 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { CustomElement, html } from "../../base/dom/custom-element";
-import { KiCanvasLoadEvent } from "../../viewers/base/events";
-import type { KicadSch } from "../../kicad/schematic";
-import { SchematicViewer } from "../../viewers/schematic/viewer";
+import { html } from "../../base/dom/custom-element";
 import { attribute } from "../../base/dom/decorators";
+import { KCUIElement } from "../../kc-ui";
+import type { KicadSch } from "../../kicad/schematic";
+import { KiCanvasLoadEvent } from "../../viewers/base/events";
+import { SchematicViewer } from "../../viewers/schematic/viewer";
 
-export class KiCanvasSchematicElement extends CustomElement {
+export class KiCanvasSchematicElement extends KCUIElement {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
     selected: any[] = [];

@@ -5,10 +5,10 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { attribute } from "../base/dom/decorators";
-import common_styles from "./common-styles";
 import { KCUIDropdownElement } from "./dropdown";
+import { KCUIElement } from "./element";
 
 /**
  * A toggle menu combines a button and a dropdown into a single element.
@@ -16,9 +16,9 @@ import { KCUIDropdownElement } from "./dropdown";
  * This element holds a button and a kc-ui-dropdown, the button is used to
  * toggle the dropdown.
  */
-export class KCUIToggleMenuElement extends CustomElement {
+export class KCUIToggleMenuElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             * {
                 box-sizing: border-box;

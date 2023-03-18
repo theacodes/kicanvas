@@ -4,15 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
-import { KCUIActivitySideBarElement } from "../../../kc-ui";
+import { html } from "../../../base/dom/custom-element";
+import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
 import type { KicadSch } from "../../../kicad/schematic";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
-import "../../../kc-ui";
 import "../kc-viewer-bottom-toolbar";
 import "../kicanvas-schematic";
 import "./kc-schematic-info-panel";
@@ -24,7 +22,7 @@ import "./kc-schematic-symbols-panel";
  * up the actual board viewer as well as interface controls. It's basically
  * KiCanvas's version of PCBNew.
  */
-export class KCSchematicViewerElement extends WithContext(CustomElement) {
+export class KCSchematicViewerElement extends KCUIElement {
     static override useShadowRoot = false;
 
     schematic_elm: KiCanvasSchematicElement;

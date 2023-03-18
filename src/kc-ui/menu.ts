@@ -5,19 +5,19 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { attribute } from "../base/dom/decorators";
 import { delegate } from "../base/events";
 import { is_string } from "../base/types";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-menu and kc-ui-menu-item encompass a simple menu with selectable items.
  */
 
-export class KCUIMenuElement extends CustomElement {
+export class KCUIMenuElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 width 100%;
@@ -123,9 +123,9 @@ export class KCUIMenuElement extends CustomElement {
 
 window.customElements.define("kc-ui-menu", KCUIMenuElement);
 
-export class KCUIMenuItemElement extends CustomElement {
+export class KCUIMenuItemElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: flex;
@@ -203,9 +203,9 @@ export class KCUIMenuItemElement extends CustomElement {
 
 window.customElements.define("kc-ui-menu-item", KCUIMenuItemElement);
 
-export class KCUIMenuLabelElement extends CustomElement {
+export class KCUIMenuLabelElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 width: 100%;

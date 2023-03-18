@@ -4,17 +4,17 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../base/dom/context";
-import { CustomElement, html } from "../../base/dom/custom-element";
-import type { KCUIDropdownElement, KCUIMenuItemElement } from "../../kc-ui";
-import common_styles from "../../kc-ui/common-styles";
+import { html } from "../../base/dom/custom-element";
+import {
+    KCUIElement,
+    type KCUIDropdownElement,
+    type KCUIMenuItemElement,
+} from "../../kc-ui";
 import type { Project } from "../project";
 
 import "../../kc-ui";
 
-export class KCProjectPanelElement extends WithContext(CustomElement) {
-    static override styles = [common_styles];
-
+export class KCProjectPanelElement extends KCUIElement {
     #dropdown: KCUIDropdownElement;
     #selected: string | null;
 

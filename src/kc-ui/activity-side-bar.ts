@@ -5,21 +5,19 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { query, query_all } from "../base/dom/decorators";
 import { delegate } from "../base/events";
-import common_styles from "./common-styles";
-
-import "./button";
-import type { KCUIButtonElement } from "./button";
+import { KCUIButtonElement } from "./button";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-activity-bar is a vscode-style side bar with an action bar with icons
  * and a panel with various activities.
  */
-export class KCUIActivitySideBarElement extends CustomElement {
+export class KCUIActivitySideBarElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: flex;

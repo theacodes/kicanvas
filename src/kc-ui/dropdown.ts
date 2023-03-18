@@ -5,10 +5,10 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { attribute } from "../base/dom/decorators";
 import { listen } from "../base/events";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 import { KCUIMenuElement } from "./menu";
 
 /**
@@ -19,9 +19,9 @@ import { KCUIMenuElement } from "./menu";
  * It also makes sure not to immediately close the menu when the user mouses
  * out, instead relying on a buffer zone.
  */
-export class KCUIDropdownElement extends CustomElement {
+export class KCUIDropdownElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 border-radius: 5px;

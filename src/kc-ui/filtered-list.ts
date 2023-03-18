@@ -6,14 +6,18 @@
 
 import { later } from "../base/async";
 import { css } from "../base/dom/css";
-import { html, CustomElement } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
+import { KCUIElement } from "./element";
 
-export class KCUIFilteredListElement extends CustomElement {
-    static override styles = css`
-        :host {
-            display: contents;
-        }
-    `;
+export class KCUIFilteredListElement extends KCUIElement {
+    static override styles = [
+        ...KCUIElement.styles,
+        css`
+            :host {
+                display: contents;
+            }
+        `,
+    ];
 
     override render(): Element | DocumentFragment {
         return html`<slot></slot>`;

@@ -4,22 +4,18 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../base/dom/context";
 import { css } from "../../base/dom/css";
-import { CustomElement, html } from "../../base/dom/custom-element";
-import type { KCUIButtonElement } from "../../kc-ui";
-import common_styles from "../../kc-ui/common-styles";
+import { html } from "../../base/dom/custom-element";
+import { KCUIElement, type KCUIButtonElement } from "../../kc-ui";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
 } from "../../viewers/base/events";
 import type { Viewer } from "../../viewers/base/viewer";
 
-import "../../kc-ui";
-
-export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {
+export class KCViewerBottomToolbarElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             output {
                 width: unset;

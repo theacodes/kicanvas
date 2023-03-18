@@ -5,17 +5,17 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
-import common_styles from "./common-styles";
+import { html } from "../base/dom/custom-element";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-panel and kc-ui-panel-body encompass basic
  * scrollable panels
  */
 
-export class KCUIPanelElement extends CustomElement {
+export class KCUIPanelElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 width: 100%;
@@ -41,9 +41,9 @@ export class KCUIPanelElement extends CustomElement {
 
 window.customElements.define("kc-ui-panel", KCUIPanelElement);
 
-export class KCUIPanelTitleElement extends CustomElement {
+export class KCUIPanelTitleElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 flex: 0;
@@ -82,9 +82,9 @@ export class KCUIPanelTitleElement extends CustomElement {
 
 window.customElements.define("kc-ui-panel-title", KCUIPanelTitleElement);
 
-export class KCUIPanelBodyElement extends CustomElement {
+export class KCUIPanelBodyElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 width: 100%;
@@ -109,9 +109,9 @@ export class KCUIPanelBodyElement extends CustomElement {
 
 window.customElements.define("kc-ui-panel-body", KCUIPanelBodyElement);
 
-export class KCUIPanelLabelElement extends CustomElement {
+export class KCUIPanelLabelElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 width: 100%;

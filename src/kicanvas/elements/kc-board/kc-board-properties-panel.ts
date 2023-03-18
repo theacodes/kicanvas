@@ -4,15 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { html } from "../../../base/dom/custom-element";
+import { KCUIElement } from "../../../kc-ui";
 import { Footprint } from "../../../kicad/board";
-import { BoardViewer } from "../../../viewers/board/viewer";
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
+import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui";
-
-export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
+export class KCBoardPropertiesPanelElement extends KCUIElement {
     viewer: BoardViewer;
     selected_item?: Footprint;
 

@@ -5,8 +5,8 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
-import common_styles from "./common-styles";
+import { html } from "../base/dom/custom-element";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-floating-toolbar is a toolbar that presents its elements on top of
@@ -14,9 +14,9 @@ import common_styles from "./common-styles";
  * in the UI since unused areas of the toolbar are transparent and open to the
  * element belong.
  */
-export class KCUIFloatingToolbarElement extends CustomElement {
+export class KCUIFloatingToolbarElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 z-index: 10;

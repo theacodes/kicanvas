@@ -5,23 +5,20 @@
 */
 
 import { sorted_by_numeric_strings } from "../../../base/array";
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
+import { html } from "../../../base/dom/custom-element";
 import { query } from "../../../base/dom/decorators";
 import {
+    KCUIElement,
     KCUIFilteredListElement,
     KCUIMenuElement,
     KCUITextFilterInputElement,
     type KCUIMenuItemElement,
 } from "../../../kc-ui";
-import common_styles from "../../../kc-ui/common-styles";
 import type { Footprint } from "../../../kicad/board";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
-    static override styles = [common_styles];
-
+export class KCBoardFootprintsPanelElement extends KCUIElement {
     viewer: BoardViewer;
 
     override connectedCallback() {

@@ -4,15 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
+import { html } from "../../../base/dom/custom-element";
 import { delegate } from "../../../base/events";
-import type { KCUIRangeElement } from "../../../kc-ui";
+import { KCUIElement, type KCUIRangeElement } from "../../../kc-ui";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui";
-
-export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
+export class KCBoardObjectsPanelElement extends KCUIElement {
     viewer: BoardViewer;
 
     override connectedCallback() {

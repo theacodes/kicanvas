@@ -4,14 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { SchematicViewer } from "../../../viewers/schematic/viewer";
-import { WithContext } from "../../../base/dom/context";
-import { html, CustomElement } from "../../../base/dom/custom-element";
+import { html } from "../../../base/dom/custom-element";
+import { KCUIElement } from "../../../kc-ui";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
+import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
-import "../../../kc-ui";
-
-export class KCSchematicInfoPanel extends WithContext(CustomElement) {
+export class KCSchematicInfoPanel extends KCUIElement {
     viewer: SchematicViewer;
 
     override connectedCallback() {

@@ -5,12 +5,12 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
-import common_styles from "./common-styles";
+import { html } from "../base/dom/custom-element";
+import { KCUIElement } from "./element";
 
-export class KCUIControlListElement extends CustomElement {
+export class KCUIControlListElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: flex;
@@ -29,9 +29,9 @@ export class KCUIControlListElement extends CustomElement {
 
 window.customElements.define("kc-ui-control-list", KCUIControlListElement);
 
-export class KCUIControlListItemElement extends CustomElement {
+export class KCUIControlListItemElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 margin-top: 0.2rem;

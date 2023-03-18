@@ -4,13 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, CustomElement } from "../../base/dom/custom-element";
+import { html } from "../../base/dom/custom-element";
+import { attribute } from "../../base/dom/decorators";
+import { KCUIElement } from "../../kc-ui";
+import type { KicadPCB } from "../../kicad/board";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { BoardViewer } from "../../viewers/board/viewer";
-import type { KicadPCB } from "../../kicad/board";
-import { attribute } from "../../base/dom/decorators";
 
-export class KiCanvasBoardElement extends CustomElement {
+export class KiCanvasBoardElement extends KCUIElement {
     #canvas: HTMLCanvasElement;
     viewer: BoardViewer;
     selected: any[] = [];

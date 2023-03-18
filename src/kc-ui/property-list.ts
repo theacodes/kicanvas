@@ -5,13 +5,13 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
 import { attribute } from "../base/dom/decorators";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 
-export class KCUIPropertyList extends CustomElement {
+export class KCUIPropertyList extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: grid;
@@ -30,9 +30,9 @@ export class KCUIPropertyList extends CustomElement {
 
 window.customElements.define("kc-ui-property-list", KCUIPropertyList);
 
-export class KCUIPropertyListItemElement extends CustomElement {
+export class KCUIPropertyListItemElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 display: contents;

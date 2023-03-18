@@ -5,32 +5,35 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement, html } from "../base/dom/custom-element";
+import { html } from "../base/dom/custom-element";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-icon is a material symbol
  */
-export class KCUIIconElement extends CustomElement {
-    static override styles = css`
-        :host {
-            box-sizing: border-box;
-            font-family: "Material Symbols Outlined";
-            font-weight: normal;
-            font-style: normal;
-            font-size: inherit;
-            line-height: inherit;
-            letter-spacing: normal;
-            text-transform: none;
-            white-space: nowrap;
-            word-wrap: normal;
-            direction: ltr;
-            -webkit-font-feature-settings: "liga";
-            -moz-font-feature-settings: "liga";
-            font-feature-settings: "liga";
-            -webkit-font-smoothing: antialiased;
-            user-select: none;
-        }
-    `;
+export class KCUIIconElement extends KCUIElement {
+    static override styles = [
+        css`
+            :host {
+                box-sizing: border-box;
+                font-family: "Material Symbols Outlined";
+                font-weight: normal;
+                font-style: normal;
+                font-size: inherit;
+                line-height: inherit;
+                letter-spacing: normal;
+                text-transform: none;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: "liga";
+                -moz-font-feature-settings: "liga";
+                font-feature-settings: "liga";
+                -webkit-font-smoothing: antialiased;
+                user-select: none;
+            }
+        `,
+    ];
 
     override render() {
         return html`<slot></slot>`;

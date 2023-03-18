@@ -1,6 +1,14 @@
-import { css } from "../base/dom/css";
+/*
+    Copyright (c) 2022 Alethea Katherine Flowers.
+    Published under the standard MIT License.
+    Full text available at: https://opensource.org/licenses/MIT
+*/
 
-export default css`
+import { WithContext } from "../base/dom/context";
+import { css } from "../base/dom/css";
+import { CustomElement } from "../base/dom/custom-element";
+
+const common_styles = css`
     :host {
         box-sizing: border-box;
     }
@@ -36,3 +44,10 @@ export default css`
         background: var(--scrollbar-active-fg);
     }
 `;
+
+/**
+ * Base element for all kc-ui-* elements
+ */
+export class KCUIElement extends WithContext(CustomElement) {
+    static override styles = [common_styles];
+}

@@ -5,18 +5,17 @@
 */
 
 import { css } from "../base/dom/css";
-import { CustomElement } from "../base/dom/custom-element";
 import { listen } from "../base/events";
-import common_styles from "./common-styles";
+import { KCUIElement } from "./element";
 
 /**
  * kc-ui-resizer allow re-sizing a kc-ui-view with the mouse.
  *
  * Presently it's only able to resize the element to its immediate right.
  */
-export class KCUIResizerElement extends CustomElement {
+export class KCUIResizerElement extends KCUIElement {
     static override styles = [
-        common_styles,
+        ...KCUIElement.styles,
         css`
             :host {
                 z-index: 999;

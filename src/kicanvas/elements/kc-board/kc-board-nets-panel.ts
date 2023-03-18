@@ -4,22 +4,17 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
+import { html } from "../../../base/dom/custom-element";
 import { query } from "../../../base/dom/decorators";
 import {
+    KCUIElement,
     KCUIFilteredListElement,
     KCUITextFilterInputElement,
     type KCUIMenuItemElement,
 } from "../../../kc-ui";
-import common_styles from "../../../kc-ui/common-styles";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui";
-
-export class KCBoardNetsPanelElement extends WithContext(CustomElement) {
-    static override styles = [common_styles];
-
+export class KCBoardNetsPanelElement extends KCUIElement {
     viewer: BoardViewer;
 
     override connectedCallback() {

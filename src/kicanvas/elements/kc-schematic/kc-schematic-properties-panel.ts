@@ -5,8 +5,8 @@
 */
 
 import { sorted_by_numeric_strings } from "../../../base/array";
-import { WithContext } from "../../../base/dom/context";
-import { CustomElement, html } from "../../../base/dom/custom-element";
+import { html } from "../../../base/dom/custom-element";
+import { KCUIElement } from "../../../kc-ui";
 import { SchematicSymbol } from "../../../kicad/schematic";
 import {
     KiCanvasLoadEvent,
@@ -14,11 +14,7 @@ import {
 } from "../../../viewers/base/events";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
-import "../../../kc-ui";
-
-export class KCSchematicPropertiesPanelElement extends WithContext(
-    CustomElement,
-) {
+export class KCSchematicPropertiesPanelElement extends KCUIElement {
     viewer: SchematicViewer;
     selected_item?: SchematicSymbol;
 

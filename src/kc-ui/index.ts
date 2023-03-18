@@ -9,6 +9,7 @@ export * from "./app";
 export * from "./button";
 export * from "./control-list";
 export * from "./dropdown";
+export * from "./element";
 export * from "./filtered-list";
 export * from "./floating-toolbar";
 export * from "./icon";
