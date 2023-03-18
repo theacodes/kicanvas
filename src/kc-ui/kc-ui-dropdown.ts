@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { attribute } from "../base/dom/decorators";
 import { listen } from "../base/events";
 import common_styles from "./common-styles";
 import { KCUIMenuElement } from "./kc-ui-menu";
@@ -34,51 +35,58 @@ export class KCUIDropdownElement extends CustomElement {
                 font-weight: 300;
             }
 
-            :host([open]) {
+            :host([visible]) {
                 display: flex;
             }
         `,
     ];
 
-    public is_open() {
-        return this.getBooleanAttribute("open");
+    constructor() {
+        super();
+        this.mouseout_padding ??= 50;
     }
 
-    public open() {
-        if (!this.is_open()) {
-            this.setBooleanAttribute("open", true);
-            this.dispatchEvent(
-                new CustomEvent("kc-ui-dropdown:open", {
-                    bubbles: true,
-                    composed: true,
-                }),
-            );
+    public show() {
+        if (this.visible) {
+            return;
         }
+
+        this.visible = true;
+        this.dispatchEvent(
+            new CustomEvent("kc-ui-dropdown:show", {
+                bubbles: true,
+                composed: true,
+            }),
+        );
     }
 
-    public close() {
-        if (this.is_open()) {
-            this.setBooleanAttribute("open", false);
-            this.dispatchEvent(
-                new CustomEvent("kc-ui-dropdown:close", {
-                    bubbles: true,
-                    composed: true,
-                }),
-            );
+    public hide() {
+        if (!this.visible) {
+            return;
         }
+
+        this.visible = false;
+        this.dispatchEvent(
+            new CustomEvent("kc-ui-dropdown:hide", {
+                bubbles: true,
+                composed: true,
+            }),
+        );
     }
 
     public toggle() {
-        if (this.is_open()) {
-            this.close();
+        if (this.visible) {
+            this.hide();
         } else {
-            this.open();
+            this.show();
         }
     }
 
-    private get mouseout_padding() {
-        return parseInt(this.getAttribute("mouseout-padding") ?? "50", 10);
-    }
+    @attribute({ type: Boolean })
+    visible: boolean;
+
+    @attribute({ type: Number })
+    mouseout_padding: number;
 
     public get menu() {
         return this.querySelector<KCUIMenuElement>("kc-ui-menu")!;
@@ -86,7 +94,7 @@ export class KCUIDropdownElement extends CustomElement {
 
     override initialContentCallback() {
         super.initialContentCallback();
-        if (this.hasAttribute("auto-close")) {
+        if (this.hasAttribute("auto-hide")) {
             this.setup_leave_event();
         }
     }
@@ -95,7 +103,7 @@ export class KCUIDropdownElement extends CustomElement {
         // Handles closing the panel when the mouse is well outside of the
         // bounding box.
         this.addEventListener("mouseleave", (e) => {
-            if (!this.is_open) {
+            if (!this.visible) {
                 return;
             }
 
@@ -103,7 +111,7 @@ export class KCUIDropdownElement extends CustomElement {
             const rect = this.getBoundingClientRect();
 
             const move_listener = listen(window, "mousemove", (e) => {
-                if (!this.is_open) {
+                if (!this.visible) {
                     move_listener.dispose();
                 }
 
@@ -113,7 +121,7 @@ export class KCUIDropdownElement extends CustomElement {
                     e.clientY > rect.top - padding &&
                     e.clientY < rect.bottom + padding;
                 if (!in_box) {
-                    this.close();
+                    this.hide();
                     move_listener.dispose();
                 }
             });

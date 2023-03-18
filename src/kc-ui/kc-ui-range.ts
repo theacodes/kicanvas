@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { attribute } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 
 /**
@@ -87,56 +88,23 @@ export class KCUIRangeElement extends CustomElement {
         }
     `;
 
-    private get input() {
-        return this.$<HTMLInputElement>("input")!;
-    }
+    @attribute({ type: String })
+    name: string;
 
-    public get name() {
-        return this.getAttribute("name");
-    }
+    @attribute({ type: String })
+    min: string;
 
-    public set name(val) {
-        if (val) {
-            this.setAttribute("name", val);
-        } else {
-            this.removeAttribute("name");
-        }
-    }
+    @attribute({ type: String })
+    max: string;
 
-    public get min() {
-        return this.getAttribute("min");
-    }
+    @attribute({ type: String })
+    step: string;
 
-    public set min(val) {
-        if (val) {
-            this.setAttribute("min", val);
-        } else {
-            this.removeAttribute("min");
-        }
-    }
+    @attribute({ type: Boolean })
+    disabled: boolean;
 
-    public get max() {
-        return this.getAttribute("max");
-    }
-
-    public set max(val) {
-        if (val) {
-            this.setAttribute("max", val);
-        } else {
-            this.removeAttribute("max");
-        }
-    }
-
-    public get step() {
-        return this.getAttribute("step");
-    }
-
-    public set step(val) {
-        if (val) {
-            this.setAttribute("step", val);
-        } else {
-            this.removeAttribute("step");
-        }
+    static get observedAttributes() {
+        return ["disabled", "min", "max", "step", "value"];
     }
 
     public get value(): string {
@@ -151,16 +119,8 @@ export class KCUIRangeElement extends CustomElement {
         return this.input.valueAsNumber;
     }
 
-    public set disabled(val: boolean) {
-        this.setBooleanAttribute("disabled", val);
-    }
-
-    public get disabled() {
-        return this.getBooleanAttribute("disabled");
-    }
-
-    static get observedAttributes() {
-        return ["disabled", "min", "max", "step", "value"];
+    private get input() {
+        return this.$<HTMLInputElement>("input")!;
     }
 
     attributeChangedCallback(
@@ -191,13 +151,23 @@ export class KCUIRangeElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        if (this.hasAttribute("disabled")) {
+        if (this.disabled) {
             this.attributeChangedCallback(
                 "disabled",
                 null,
                 this.getAttribute("disabled"),
             );
         }
+
+        this.input.addEventListener("input", (e) => {
+            e.stopPropagation();
+            this.dispatchEvent(
+                new CustomEvent("kc-ui-range:input", {
+                    composed: true,
+                    bubbles: true,
+                }),
+            );
+        });
     }
 
     override render() {

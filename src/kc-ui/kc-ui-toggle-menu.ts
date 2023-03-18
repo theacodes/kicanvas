@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { attribute } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 import { KCUIDropdownElement } from "./kc-ui-dropdown";
 
@@ -64,12 +65,12 @@ export class KCUIToggleMenuElement extends CustomElement {
                 margin-left: 0.5rem;
             }
 
-            :host([open]) button {
+            :host([visible]) button {
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
             }
 
-            :host([open]) button span {
+            :host([visible]) button span {
                 display: revert;
             }
 
@@ -80,9 +81,11 @@ export class KCUIToggleMenuElement extends CustomElement {
         `,
     ];
 
-    get icon() {
-        return this.getAttribute("icon") ?? "question-mark";
-    }
+    @attribute({ type: String })
+    icon: string;
+
+    @attribute({ type: Boolean })
+    visible: boolean;
 
     get dropdown() {
         return this.queryAssignedElements<KCUIDropdownElement>(
@@ -100,18 +103,18 @@ export class KCUIToggleMenuElement extends CustomElement {
             this.dropdown.toggle();
         });
 
-        this.addEventListener("kc-ui-dropdown:open", () => {
-            this.setBooleanAttribute("open", true);
+        this.addEventListener("kc-ui-dropdown:show", () => {
+            this.visible = true;
         });
 
-        this.addEventListener("kc-ui-dropdown:close", () => {
-            this.setBooleanAttribute("open", false);
+        this.addEventListener("kc-ui-dropdown:hide", () => {
+            this.visible = false;
         });
     }
 
     override render() {
         return html`<button name="toggle" type="button" title="${this.title}">
-                <kc-ui-icon>${this.icon}</kc-ui-icon>
+                <kc-ui-icon>${this.icon ?? "question-mark"}</kc-ui-icon>
                 <span>${this.title}</span>
             </button>
             <slot name="dropdown"></slot>`;

@@ -8,23 +8,15 @@ import { CustomElement, html } from "../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import type { KicadSch } from "../../kicad/schematic";
 import { SchematicViewer } from "../../viewers/schematic/viewer";
+import { attribute } from "../../base/dom/decorators";
 
 export class KiCanvasSchematicElement extends CustomElement {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
     selected: any[] = [];
 
-    get loaded() {
-        return this.getBooleanAttribute("loaded");
-    }
-
-    set loaded(value) {
-        const old = this.loaded;
-        this.setBooleanAttribute("loaded", value);
-        if (value == true && !old) {
-            this.dispatchEvent(new KiCanvasLoadEvent());
-        }
-    }
+    @attribute({ type: Boolean })
+    loaded: boolean;
 
     override initialContentCallback() {
         (async () => {
@@ -34,6 +26,7 @@ export class KiCanvasSchematicElement extends CustomElement {
             this.addDisposable(
                 this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
                     this.loaded = true;
+                    this.dispatchEvent(new KiCanvasLoadEvent());
                 }),
             );
         })();

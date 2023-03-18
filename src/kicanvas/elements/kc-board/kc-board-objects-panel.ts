@@ -27,7 +27,7 @@ export class KCBoardObjectsPanelElement extends WithContext(CustomElement) {
     }
 
     private setup_events() {
-        delegate(this, "kc-ui-range", "input", (e) => {
+        delegate(this.renderRoot, "kc-ui-range", "kc-ui-range:input", (e) => {
             const control = e.target as KCUIRangeElement;
             const opacity = control.valueAsNumber;
             switch (control.name) {

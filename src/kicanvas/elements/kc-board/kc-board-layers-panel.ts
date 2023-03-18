@@ -5,19 +5,20 @@
 */
 
 import { WithContext } from "../../../base/dom/context";
+import { css } from "../../../base/dom/css";
 import { CustomElement, html } from "../../../base/dom/custom-element";
+import { attribute } from "../../../base/dom/decorators";
+import common_styles from "../../../kc-ui/common-styles";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
-import { css } from "../../../base/dom/css";
-import common_styles from "../../../kc-ui/common-styles";
 
 import "../../../kc-ui/kc-ui-icon";
-import "../../../kc-ui/kc-ui-panel";
 import "../../../kc-ui/kc-ui-menu";
 import {
     KCUIMenuElement,
     type KCUIMenuItemElement,
 } from "../../../kc-ui/kc-ui-menu";
+import "../../../kc-ui/kc-ui-panel";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override styles = [
@@ -227,13 +228,13 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
         const items: ReturnType<typeof html>[] = [];
 
         for (const layer of layers.in_ui_order()) {
-            const visible = layer.visible ? "visible" : "hidden";
+            const visible = layer.visible ? "" : undefined;
             const css_color = layer.color.to_css();
             items.push(
-                html` <kc-board-layer-control
+                html`<kc-board-layer-control
                     layer-name="${layer.name}"
                     layer-color="${css_color}"
-                    layer-visibility="${visible}"></kc-board-layer-control>`,
+                    layer-visible="${visible}"></kc-board-layer-control>`,
             );
         }
 
@@ -312,6 +313,11 @@ class KCBoardLayerControlElement extends CustomElement {
             color: #888;
         }
 
+        :host {
+            background: var(--list-item-disabled-bg);
+            color: var(--list-item-disabled-fg);
+        }
+
         :host(:hover) {
             background: var(--list-item-hover-bg);
             color: var(--list-item-hover-fg);
@@ -325,6 +331,11 @@ class KCBoardLayerControlElement extends CustomElement {
             color: var(--list-item-fg);
         }
 
+        :host([layer-visible]) {
+            background: var(--list-item-bg);
+            color: var(--list-item-fg);
+        }
+
         :host([layer-highlighted]) {
             background: var(--list-item-active-bg);
             color: var(--list-item-active-fg);
@@ -334,18 +345,13 @@ class KCBoardLayerControlElement extends CustomElement {
             color: var(--list-item-fg);
         }
 
-        :host([layer-visibility="hidden"]) {
-            background: var(--list-item-disabled-bg);
-            color: var(--list-item-disabled-fg);
-        }
-
-        :host([layer-visibility="hidden"]) kc-ui-icon.for-visible,
-        :host([layer-visibility="visible"]) kc-ui-icon.for-hidden {
+        :host kc-ui-icon.for-visible,
+        :host([layer-visible]) kc-ui-icon.for-hidden {
             display: none;
         }
 
-        :host([layer-visibility="hidden"]) kc-ui-icon.for-hidden,
-        :host([layer-visibility="visible"]) kc-ui-icon.for-visible {
+        :host kc-ui-icon.for-hidden,
+        :host([layer-visible]) kc-ui-icon.for-visible {
             display: revert;
         }
     `;
@@ -359,6 +365,7 @@ class KCBoardLayerControlElement extends CustomElement {
 
     override initialContentCallback() {
         super.initialContentCallback();
+
         this.renderRoot.addEventListener("click", (e) => {
             e.stopPropagation();
 
@@ -384,38 +391,17 @@ class KCBoardLayerControlElement extends CustomElement {
         });
     }
 
-    get layer_name() {
-        return this.getAttribute("layer-name");
-    }
+    @attribute({ type: String })
+    public layer_name: string;
 
-    get layer_color() {
-        return this.getAttribute("layer-color");
-    }
+    @attribute({ type: String })
+    public layer_color: string;
 
-    set layer_highlighted(v: boolean) {
-        this.setBooleanAttribute("layer-highlighted", v);
-    }
+    @attribute({ type: Boolean })
+    public layer_highlighted: boolean;
 
-    get layer_highlighted(): boolean {
-        return this.getBooleanAttribute("layer-highlighted");
-    }
-
-    set layer_visible(v: boolean) {
-        this.setAttribute("layer-visibility", v ? "visible" : "hidden");
-
-        if (!this.layer_visible) {
-            this.layer_highlighted = false;
-        }
-    }
-
-    get layer_visible(): boolean {
-        if (!this.hasAttribute("layer-visibility")) {
-            return true;
-        }
-        return this.getAttribute("layer-visibility") == "visible"
-            ? true
-            : false;
-    }
+    @attribute({ type: Boolean })
+    public layer_visible: boolean;
 
     override render() {
         return html`<span

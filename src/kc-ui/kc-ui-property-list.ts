@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { attribute } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 
 export class KCUIPropertyList extends CustomElement {
@@ -63,9 +64,11 @@ export class KCUIPropertyListItemElement extends CustomElement {
         `,
     ];
 
+    @attribute({ type: String })
+    name: string;
+
     override render() {
-        const name = this.getAttribute("name");
-        return html`<span>${name}</span><span><slot></slot></span>`;
+        return html`<span>${this.name}</span><span><slot></slot></span>`;
     }
 }
 

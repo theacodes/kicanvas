@@ -4,11 +4,14 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { later } from "../../base/async";
 import { WithContext } from "../../base/dom/context";
 import { CSS } from "../../base/dom/css";
 import { CustomElement, html } from "../../base/dom/custom-element";
+import { attribute } from "../../base/dom/decorators";
 import { DropTarget } from "../../base/dom/drag-drop";
 import { first } from "../../base/iterator";
+import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { KicadPCB } from "../../kicad/board";
 import { KicadSch } from "../../kicad/schematic";
 import * as theme from "../../kicad/theme";
@@ -18,13 +21,11 @@ import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
 import type { KCProjectPanelElement } from "./kc-project-panel";
 import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
 import kicanvas_app_styles from "./kicanvas-app.css";
-import kc_ui_styles from "../../kc-ui/kc-ui.css";
 
 import "../../kc-ui/kc-ui";
 import "./kc-board/kc-board-viewer";
 import "./kc-project-panel";
 import "./kc-schematic/kc-schematic-viewer";
-import { later } from "../../base/async";
 
 class KiCanvasAppElement extends WithContext(CustomElement) {
     static override styles = [
@@ -44,34 +45,22 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
         this.provideContext("project", this.project);
     }
 
-    set loading(val: boolean) {
-        this.setBooleanAttribute("loading", val);
-        if (val) {
-            this.loaded = false;
-        }
-    }
+    @attribute({ type: Boolean })
+    public loading: boolean;
 
-    get loading() {
-        return this.getBooleanAttribute("loading");
-    }
+    @attribute({ type: Boolean })
+    public loaded: boolean;
 
-    set loaded(val: boolean) {
-        this.setBooleanAttribute("loaded", val);
-        this.loading = false;
-    }
-
-    get loaded() {
-        return this.getBooleanAttribute("loaded");
-    }
+    @attribute({ type: String })
+    public src: string;
 
     override initialContentCallback() {
-        const src = this.getAttribute("src");
         const url_params = new URLSearchParams(document.location.search);
         const github_path = url_params.get("github");
 
         later(async () => {
-            if (src) {
-                await this.setup_project(new FetchFileSystem([src]));
+            if (this.src) {
+                await this.setup_project(new FetchFileSystem([this.src]));
                 await this.load_default_file();
                 return;
             }
@@ -100,10 +89,14 @@ class KiCanvasAppElement extends WithContext(CustomElement) {
     }
 
     private async setup_project(vfs: VirtualFileSystem) {
+        this.loaded = false;
         this.loading = true;
+
         await this.project.setup(vfs);
         this.#project_panel.update();
+
         this.loaded = true;
+        this.loading = false;
     }
 
     private async load_default_file() {

@@ -92,7 +92,7 @@ export class KCProjectPanelElement extends WithContext(CustomElement) {
             );
         }
 
-        this.#dropdown = html`<kc-ui-dropdown slot="dropdown">
+        this.#dropdown = html`<kc-ui-dropdown slot="dropdown" auto-hide>
             <kc-ui-menu class="dropdown">
                 ${file_btn_elms}
                 <kc-ui-menu-item icon="receipt">

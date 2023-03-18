@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { attribute } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 import { KCUIIconElement } from "./kc-ui-icon";
 
@@ -111,48 +112,23 @@ export class KCUIButtonElement extends CustomElement {
         return this.$<KCUIIconElement>("kc-ui-icon")!;
     }
 
-    public get name() {
-        return this.getAttribute("name");
-    }
+    @attribute({ type: String })
+    name: string | null;
 
-    public set name(val) {
-        if (val) {
-            this.setAttribute("name", val);
-        } else {
-            this.removeAttribute("name");
-        }
-    }
+    @attribute({ type: String })
+    icon: string | null;
 
-    public set disabled(val: boolean) {
-        this.setBooleanAttribute("disabled", val);
-    }
+    @attribute({ type: String })
+    variant: string | null;
 
-    public get disabled() {
-        return this.getBooleanAttribute("disabled");
-    }
+    @attribute({ type: Boolean })
+    disabled: boolean;
 
-    public set selected(val: boolean) {
-        this.setBooleanAttribute("selected", val);
-    }
-
-    public get selected() {
-        return this.getBooleanAttribute("selected");
-    }
-
-    public get icon() {
-        return this.getAttribute("icon");
-    }
-
-    public set icon(val) {
-        if (val) {
-            this.setAttribute("icon", val);
-        } else {
-            this.removeAttribute("icon");
-        }
-    }
+    @attribute({ type: Boolean })
+    selected: boolean;
 
     static get observedAttributes() {
-        return ["disabled"];
+        return ["disabled", "icon"];
     }
 
     attributeChangedCallback(
@@ -174,11 +150,11 @@ export class KCUIButtonElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        if (this.hasAttribute("variant")) {
-            this.button.classList.add(this.getAttribute("variant") ?? "");
+        if (this.variant) {
+            this.button.classList.add(this.variant);
         }
 
-        if (this.hasAttribute("disabled")) {
+        if (this.disabled) {
             this.attributeChangedCallback(
                 "disabled",
                 null,

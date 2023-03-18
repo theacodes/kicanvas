@@ -8,23 +8,17 @@ import { html, CustomElement } from "../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { BoardViewer } from "../../viewers/board/viewer";
 import type { KicadPCB } from "../../kicad/board";
+import { attribute } from "../../base/dom/decorators";
 
 export class KiCanvasBoardElement extends CustomElement {
     #canvas: HTMLCanvasElement;
     viewer: BoardViewer;
     selected: any[] = [];
 
-    get loaded() {
-        return this.getBooleanAttribute("loaded");
-    }
-
-    set loaded(value) {
-        const old = this.loaded;
-        this.setBooleanAttribute("loaded", value);
-        if (value == true && !old) {
-            this.dispatchEvent(new KiCanvasLoadEvent());
-        }
-    }
+    @attribute({
+        type: Boolean,
+    })
+    public loaded: boolean;
 
     override initialContentCallback() {
         (async () => {
@@ -34,6 +28,7 @@ export class KiCanvasBoardElement extends CustomElement {
             this.addDisposable(
                 this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
                     this.loaded = true;
+                    this.dispatchEvent(new KiCanvasLoadEvent());
                 }),
             );
         })();

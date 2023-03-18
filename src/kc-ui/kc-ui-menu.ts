@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { attribute } from "../base/dom/decorators";
 import { delegate } from "../base/events";
 import { is_string } from "../base/types";
 import common_styles from "./common-styles";
@@ -180,41 +181,17 @@ export class KCUIMenuItemElement extends CustomElement {
         this.role = "menuitem";
     }
 
-    public get name(): string {
-        return this.getAttribute("name") ?? "";
-    }
+    @attribute({ type: String })
+    name: string;
 
-    public set name(string) {
-        this.setAttribute("name", string);
-    }
+    @attribute({ type: String })
+    icon: string;
 
-    public get selected() {
-        return this.getBooleanAttribute("selected");
-    }
+    @attribute({ type: Boolean })
+    selected: boolean;
 
-    public set selected(val: boolean) {
-        this.setBooleanAttribute("selected", val);
-    }
-
-    public get disabled() {
-        return this.getBooleanAttribute("disabled");
-    }
-
-    public set disabled(val: boolean) {
-        this.setBooleanAttribute("disabled", val);
-    }
-
-    public get icon() {
-        return this.getAttribute("icon");
-    }
-
-    public set icon(val) {
-        if (val) {
-            this.setAttribute("icon", val);
-        } else {
-            this.removeAttribute("icon");
-        }
-    }
+    @attribute({ type: Boolean })
+    disabled: boolean;
 
     override render() {
         const icon = this.icon
