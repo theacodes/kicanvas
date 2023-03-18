@@ -4,8 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html } from "../../../base/dom/custom-element";
-import { query } from "../../../base/dom/decorators";
+import { html, query } from "../../../base/web-components";
 import {
     KCUIElement,
     KCUIFilteredListElement,

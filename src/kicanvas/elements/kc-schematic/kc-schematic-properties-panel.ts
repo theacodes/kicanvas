@@ -5,7 +5,7 @@
 */
 
 import { sorted_by_numeric_strings } from "../../../base/array";
-import { html } from "../../../base/dom/custom-element";
+import { html } from "../../../base/web-components";
 import { KCUIElement } from "../../../kc-ui";
 import { SchematicSymbol } from "../../../kicad/schematic";
 import {

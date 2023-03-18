@@ -12,7 +12,7 @@
  *
  */
 
-import { CustomElement } from "../base/dom/custom-element";
+import { CustomElement } from "../base/web-components";
 
 /**
  * kc-ui-app is the parent container for all kc-ui-* elements.

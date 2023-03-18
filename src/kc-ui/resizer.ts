@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
+import { css } from "../base/web-components";
 import { listen } from "../base/events";
 import { KCUIElement } from "./element";
 

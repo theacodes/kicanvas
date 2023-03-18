@@ -5,8 +5,7 @@
 */
 
 import { later } from "../base/async";
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
+import { css, html } from "../base/web-components";
 import { KCUIElement } from "./element";
 
 export class KCUIFilteredListElement extends KCUIElement {

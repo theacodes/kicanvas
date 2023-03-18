@@ -5,14 +5,13 @@
 */
 
 import { sorted_by_numeric_strings } from "../../../base/array";
-import { html } from "../../../base/dom/custom-element";
-import { query } from "../../../base/dom/decorators";
+import { html, query } from "../../../base/web-components";
 import {
+    KCUIElement,
     KCUIFilteredListElement,
     KCUITextFilterInputElement,
     type KCUIMenuElement,
     type KCUIMenuItemElement,
-    KCUIElement,
 } from "../../../kc-ui";
 import {
     KiCanvasLoadEvent,

@@ -4,8 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html } from "../../base/dom/custom-element";
-import { attribute } from "../../base/dom/decorators";
+import { html, attribute } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import type { KicadSch } from "../../kicad/schematic";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";

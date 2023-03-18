@@ -4,11 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
-import { attribute } from "../base/dom/decorators";
 import { delegate } from "../base/events";
 import { is_string } from "../base/types";
+import { attribute, css, html } from "../base/web-components";
 import { KCUIElement } from "./element";
 
 /**

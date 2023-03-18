@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
-import { attribute, query } from "../base/dom/decorators";
+import { attribute, css, html, query } from "../base/web-components";
 import { KCUIElement } from "./element";
 import { KCUIIconElement } from "./icon";
 

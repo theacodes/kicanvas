@@ -4,8 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../../base/dom/css";
-import { html } from "../../base/dom/custom-element";
+import { html, css } from "../../base/web-components";
 import { KCUIElement, type KCUIButtonElement } from "../../kc-ui";
 import {
     KiCanvasMouseMoveEvent,

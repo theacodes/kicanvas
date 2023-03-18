@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html } from "../../../base/dom/custom-element";
 import { delegate } from "../../../base/events";
+import { html } from "../../../base/web-components";
 import { KCUIElement, type KCUIRangeElement } from "../../../kc-ui";
 import { BoardViewer } from "../../../viewers/board/viewer";
 

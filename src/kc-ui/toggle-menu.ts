@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
-import { attribute } from "../base/dom/decorators";
+import { css, html, attribute } from "../base/web-components";
 import { KCUIDropdownElement } from "./dropdown";
 import { KCUIElement } from "./element";
 

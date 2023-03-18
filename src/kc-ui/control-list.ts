@@ -4,8 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
+import { css, html } from "../base/web-components";
 import { KCUIElement } from "./element";
 
 export class KCUIControlListElement extends KCUIElement {

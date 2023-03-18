@@ -7,7 +7,7 @@
 import { as_array } from "../array";
 import { Disposables, type IDisposable } from "../disposable";
 import { adopt_styles, type CSS } from "./css";
-import { html, literal } from "./templates";
+import { html, literal } from "./html";
 export { html, literal };
 
 /**

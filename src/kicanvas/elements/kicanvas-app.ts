@@ -5,11 +5,9 @@
 */
 
 import { later } from "../../base/async";
-import { CSS } from "../../base/dom/css";
-import { html } from "../../base/dom/custom-element";
-import { attribute } from "../../base/dom/decorators";
 import { DropTarget } from "../../base/dom/drag-drop";
 import { first } from "../../base/iterator";
+import { CSS, attribute, html } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import { KicadPCB } from "../../kicad/board";
 import { KicadSch } from "../../kicad/schematic";

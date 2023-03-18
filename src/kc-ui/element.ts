@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { WithContext } from "../base/dom/context";
-import { css } from "../base/dom/css";
-import { CustomElement } from "../base/dom/custom-element";
+import { CustomElement, WithContext, css } from "../base/web-components";
 
 const common_styles = css`
     :host {

@@ -4,9 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
-import { query } from "../base/dom/decorators";
+import { css, html, query } from "../base/web-components";
 import { KCUIElement } from "./element";
 
 export class KCUITextFilterInputElement extends KCUIElement {

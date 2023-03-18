@@ -4,10 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css } from "../base/dom/css";
-import { html } from "../base/dom/custom-element";
-import { query, query_all } from "../base/dom/decorators";
 import { delegate } from "../base/events";
+import { css, html, query, query_all } from "../base/web-components";
 import { KCUIButtonElement } from "./button";
 import { KCUIElement } from "./element";
 
