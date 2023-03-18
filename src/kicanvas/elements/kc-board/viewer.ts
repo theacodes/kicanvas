@@ -11,14 +11,14 @@ import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
-import "../kc-viewer-bottom-toolbar";
+import "../viewer-bottom-toolbar";
 import "../kicanvas-board";
-import "./kc-board-footprints-panel";
-import "./kc-board-info-panel";
-import "./kc-board-layers-panel";
-import "./kc-board-nets-panel";
-import "./kc-board-objects-panel";
-import "./kc-board-properties-panel";
+import "./footprints-panel";
+import "./info-panel";
+import "./layers-panel";
+import "./nets-panel";
+import "./objects-panel";
+import "./properties-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting

@@ -11,11 +11,11 @@ import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
-import "../kc-viewer-bottom-toolbar";
+import "../viewer-bottom-toolbar";
 import "../kicanvas-schematic";
-import "./kc-schematic-info-panel";
-import "./kc-schematic-properties-panel";
-import "./kc-schematic-symbols-panel";
+import "./info-panel";
+import "./properties-panel";
+import "./symbols-panel";
 
 /**
  * Internal custom element for <kicanvas-app>'s board viewer. Handles setting

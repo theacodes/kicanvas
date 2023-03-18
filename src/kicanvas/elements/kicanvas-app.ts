@@ -14,16 +14,16 @@ import { KicadSch } from "../../kicad/schematic";
 import * as theme from "../../kicad/theme";
 import { Project } from "../project";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
-import { KCBoardViewerElement } from "./kc-board/kc-board-viewer";
-import type { KCProjectPanelElement } from "./kc-project-panel";
-import { KCSchematicViewerElement } from "./kc-schematic/kc-schematic-viewer";
+import { KCBoardViewerElement } from "./kc-board/viewer";
+import type { KCProjectPanelElement } from "./project-panel";
+import { KCSchematicViewerElement } from "./kc-schematic/viewer";
 
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import kicanvas_app_styles from "./kicanvas-app.css";
 
-import "./kc-board/kc-board-viewer";
-import "./kc-project-panel";
-import "./kc-schematic/kc-schematic-viewer";
+import "./kc-board/viewer";
+import "./project-panel";
+import "./kc-schematic/viewer";
 
 class KiCanvasAppElement extends KCUIElement {
     static override styles = [
