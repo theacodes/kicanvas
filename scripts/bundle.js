@@ -15,6 +15,7 @@ export async function bundle(options = {}) {
         entryPoints: [ENTRY],
         bundle: true,
         format: "esm",
+        target: "es2022",
         keepNames: true,
         sourcemap: false,
         loader: {
