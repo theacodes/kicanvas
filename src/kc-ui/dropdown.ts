@@ -9,7 +9,7 @@ import { CustomElement, html } from "../base/dom/custom-element";
 import { attribute } from "../base/dom/decorators";
 import { listen } from "../base/events";
 import common_styles from "./common-styles";
-import { KCUIMenuElement } from "./kc-ui-menu";
+import { KCUIMenuElement } from "./menu";
 
 /**
  * kc-ui-dropdown is a basic dropdown menu.

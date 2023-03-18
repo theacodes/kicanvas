@@ -10,8 +10,8 @@ import { query, query_all } from "../base/dom/decorators";
 import { delegate } from "../base/events";
 import common_styles from "./common-styles";
 
-import "./kc-ui-button";
-import type { KCUIButtonElement } from "./kc-ui-button";
+import "./button";
+import type { KCUIButtonElement } from "./button";
 
 /**
  * kc-ui-activity-bar is a vscode-style side bar with an action bar with icons

@@ -8,7 +8,7 @@ import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
 import { attribute, query } from "../base/dom/decorators";
 import common_styles from "./common-styles";
-import { KCUIIconElement } from "./kc-ui-icon";
+import { KCUIIconElement } from "./icon";
 
 /**
  * kc-ui-button wraps the <button> element with common styles and behaviors

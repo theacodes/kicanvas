@@ -8,14 +8,14 @@ import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { query } from "../../../base/dom/decorators";
 import common_styles from "../../../kc-ui/common-styles";
-import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
-import type { KCUIMenuItemElement } from "../../../kc-ui/kc-ui-menu";
+import { KCUIFilteredListElement } from "../../../kc-ui/filtered-list";
+import type { KCUIMenuItemElement } from "../../../kc-ui/menu";
 import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui/kc-ui-filtered-list";
-import "../../../kc-ui/kc-ui-menu";
-import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/filtered-list";
+import "../../../kc-ui/menu";
+import "../../../kc-ui/panel";
 import "../../../kc-ui/kc-ui-text-filter-input";
 
 export class KCBoardNetsPanelElement extends WithContext(CustomElement) {

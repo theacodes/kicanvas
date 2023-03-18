@@ -9,17 +9,14 @@ import { css } from "../../../base/dom/css";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { attribute, query } from "../../../base/dom/decorators";
 import common_styles from "../../../kc-ui/common-styles";
-import {
-    KCUIMenuElement,
-    type KCUIMenuItemElement,
-} from "../../../kc-ui/kc-ui-menu";
-import type { KCUIPanelBodyElement } from "../../../kc-ui/kc-ui-panel";
+import { KCUIMenuElement, type KCUIMenuItemElement } from "../../../kc-ui/menu";
+import type { KCUIPanelBodyElement } from "../../../kc-ui/panel";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
-import "../../../kc-ui/kc-ui-icon";
-import "../../../kc-ui/kc-ui-menu";
-import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/icon";
+import "../../../kc-ui/menu";
+import "../../../kc-ui/panel";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
     static override styles = [

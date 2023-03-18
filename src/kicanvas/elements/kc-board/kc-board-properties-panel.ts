@@ -10,8 +10,8 @@ import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 
-import "../../../kc-ui/kc-ui-panel";
-import "../../../kc-ui/kc-ui-property-list";
+import "../../../kc-ui/panel";
+import "../../../kc-ui/property-list";
 
 export class KCBoardPropertiesPanelElement extends WithContext(CustomElement) {
     viewer: BoardViewer;

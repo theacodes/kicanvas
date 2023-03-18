@@ -7,7 +7,7 @@
 import { WithContext } from "../../base/dom/context";
 import { CustomElement, html } from "../../base/dom/custom-element";
 import common_styles from "../../kc-ui/common-styles";
-import type { KCUIButtonElement } from "../../kc-ui/kc-ui-button";
+import type { KCUIButtonElement } from "../../kc-ui/button";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
@@ -15,8 +15,8 @@ import {
 import type { Viewer } from "../../viewers/base/viewer";
 
 import "../../kc-ui/kc-ui";
-import "../../kc-ui/kc-ui-button";
-import "../../kc-ui/kc-ui-floating-toolbar";
+import "../../kc-ui/button";
+import "../../kc-ui/floating-toolbar";
 import { css } from "../../base/dom/css";
 
 export class KCViewerBottomToolbarElement extends WithContext(CustomElement) {

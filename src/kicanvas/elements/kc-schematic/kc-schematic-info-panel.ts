@@ -9,8 +9,8 @@ import { WithContext } from "../../../base/dom/context";
 import { html, CustomElement } from "../../../base/dom/custom-element";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
 
-import "../../../kc-ui/kc-ui-panel";
-import "../../../kc-ui/kc-ui-property-list";
+import "../../../kc-ui/panel";
+import "../../../kc-ui/property-list";
 
 export class KCSchematicInfoPanel extends WithContext(CustomElement) {
     viewer: SchematicViewer;

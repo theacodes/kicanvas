@@ -8,20 +8,17 @@ import { sorted_by_numeric_strings } from "../../../base/array";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
 import common_styles from "../../../kc-ui/common-styles";
-import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
-import {
-    KCUIMenuElement,
-    type KCUIMenuItemElement,
-} from "../../../kc-ui/kc-ui-menu";
+import { KCUIFilteredListElement } from "../../../kc-ui/filtered-list";
+import { KCUIMenuElement, type KCUIMenuItemElement } from "../../../kc-ui/menu";
 import { KCUITextFilterInputElement } from "../../../kc-ui/kc-ui-text-filter-input";
 import type { Footprint } from "../../../kicad/board";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
 import { query } from "../../../base/dom/decorators";
-import "../../../kc-ui/kc-ui-filtered-list";
-import "../../../kc-ui/kc-ui-menu";
-import "../../../kc-ui/kc-ui-panel";
+import "../../../kc-ui/filtered-list";
+import "../../../kc-ui/menu";
+import "../../../kc-ui/panel";
 import "../../../kc-ui/kc-ui-text-filter-input";
 
 export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {

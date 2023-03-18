@@ -7,13 +7,13 @@
 import { WithContext } from "../../base/dom/context";
 import { CustomElement, html } from "../../base/dom/custom-element";
 import common_styles from "../../kc-ui/common-styles";
-import type { KCUIDropdownElement } from "../../kc-ui/kc-ui-dropdown";
-import type { KCUIMenuItemElement } from "../../kc-ui/kc-ui-menu";
+import type { KCUIDropdownElement } from "../../kc-ui/dropdown";
+import type { KCUIMenuItemElement } from "../../kc-ui/menu";
 import type { Project } from "../project";
 
 import "../../kc-ui/kc-ui";
-import "../../kc-ui/kc-ui-dropdown";
-import "../../kc-ui/kc-ui-menu";
+import "../../kc-ui/dropdown";
+import "../../kc-ui/menu";
 import "../../kc-ui/kc-ui-toggle-menu";
 
 export class KCProjectPanelElement extends WithContext(CustomElement) {

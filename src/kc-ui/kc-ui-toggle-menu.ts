@@ -8,7 +8,7 @@ import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
 import { attribute } from "../base/dom/decorators";
 import common_styles from "./common-styles";
-import { KCUIDropdownElement } from "./kc-ui-dropdown";
+import { KCUIDropdownElement } from "./dropdown";
 
 /**
  * A toggle menu combines a button and a dropdown into a single element.
