@@ -151,13 +151,7 @@ export class KCUIRangeElement extends CustomElement {
     }
 
     override initialContentCallback() {
-        if (this.disabled) {
-            this.attributeChangedCallback(
-                "disabled",
-                null,
-                this.getAttribute("disabled"),
-            );
-        }
+        this.input.disabled = this.disabled;
 
         this.input.addEventListener("input", (e) => {
             e.stopPropagation();

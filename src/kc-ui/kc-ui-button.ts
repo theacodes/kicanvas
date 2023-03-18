@@ -154,13 +154,7 @@ export class KCUIButtonElement extends CustomElement {
             this.button.classList.add(this.variant);
         }
 
-        if (this.disabled) {
-            this.attributeChangedCallback(
-                "disabled",
-                null,
-                this.getAttribute("disabled"),
-            );
-        }
+        this.button.disabled = this.disabled;
     }
 
     override render() {
