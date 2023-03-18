@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { query, query_all } from "../base/dom/decorators";
 import { delegate } from "../base/events";
 import common_styles from "./common-styles";
 
@@ -90,13 +91,11 @@ export class KCUIActivitySideBarElement extends CustomElement {
         return this.querySelectorAll<HTMLElement>("kc-ui-activity");
     }
 
-    private get activities_container() {
-        return this.$(".activities")!;
-    }
+    @query(".activities", true)
+    private activities_container!: HTMLElement;
 
-    private get buttons() {
-        return this.$$<KCUIButtonElement>(`kc-ui-button`);
-    }
+    @query_all("kc-ui-button")
+    private buttons!: KCUIButtonElement[];
 
     override render() {
         const top_buttons: HTMLElement[] = [];

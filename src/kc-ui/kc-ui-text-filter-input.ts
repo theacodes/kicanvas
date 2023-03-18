@@ -6,6 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
+import { query } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 
 export class KCUITextFilterInputElement extends CustomElement {
@@ -65,9 +66,8 @@ export class KCUITextFilterInputElement extends CustomElement {
         `,
     ];
 
-    get input() {
-        return this.$<HTMLInputElement>("input")!;
-    }
+    @query("input", true)
+    private input!: HTMLInputElement;
 
     get value() {
         return this.input.value;
@@ -80,10 +80,13 @@ export class KCUITextFilterInputElement extends CustomElement {
         );
     }
 
+    @query("button", true)
+    private button: HTMLButtonElement;
+
     override initialContentCallback(): void | undefined {
         super.initialContentCallback();
 
-        this.$("button")!.addEventListener("click", (e) => {
+        this.button.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.value = "";

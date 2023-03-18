@@ -6,7 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
-import { attribute } from "../base/dom/decorators";
+import { attribute, query } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 import { KCUIIconElement } from "./kc-ui-icon";
 
@@ -104,13 +104,11 @@ export class KCUIButtonElement extends CustomElement {
         }
     `;
 
-    private get button() {
-        return this.$<HTMLButtonElement>("button")!;
-    }
+    @query("button", true)
+    private button!: HTMLButtonElement;
 
-    private get button_icon() {
-        return this.$<KCUIIconElement>("kc-ui-icon")!;
-    }
+    @query("button_icon", true)
+    private button_icon!: KCUIIconElement;
 
     @attribute({ type: String })
     name: string | null;

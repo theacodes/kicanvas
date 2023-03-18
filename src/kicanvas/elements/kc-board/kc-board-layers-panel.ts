@@ -7,17 +7,18 @@
 import { WithContext } from "../../../base/dom/context";
 import { css } from "../../../base/dom/css";
 import { CustomElement, html } from "../../../base/dom/custom-element";
-import { attribute } from "../../../base/dom/decorators";
+import { attribute, query } from "../../../base/dom/decorators";
 import common_styles from "../../../kc-ui/common-styles";
+import {
+    KCUIMenuElement,
+    type KCUIMenuItemElement,
+} from "../../../kc-ui/kc-ui-menu";
+import type { KCUIPanelBodyElement } from "../../../kc-ui/kc-ui-panel";
 import { LayerNames, LayerSet } from "../../../viewers/board/layers";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
 import "../../../kc-ui/kc-ui-icon";
 import "../../../kc-ui/kc-ui-menu";
-import {
-    KCUIMenuElement,
-    type KCUIMenuItemElement,
-} from "../../../kc-ui/kc-ui-menu";
 import "../../../kc-ui/kc-ui-panel";
 
 export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
@@ -49,9 +50,8 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
 
     viewer: BoardViewer;
 
-    private get panel_body() {
-        return this.$("kc-ui-panel-body")!;
-    }
+    @query("kc-ui-panel-body", true)
+    private panel_body!: KCUIPanelBodyElement;
 
     private get items(): KCBoardLayerControlElement[] {
         return Array.from(
@@ -59,9 +59,8 @@ export class KCBoardLayersPanelElement extends WithContext(CustomElement) {
         );
     }
 
-    private get presets_menu() {
-        return this.$<KCUIMenuElement>("#presets")!;
-    }
+    @query("#presets", true)
+    private presets_menu!: KCUIMenuElement;
 
     override connectedCallback() {
         (async () => {

@@ -6,7 +6,7 @@
 
 import { css } from "../base/dom/css";
 import { CustomElement, html } from "../base/dom/custom-element";
-import { attribute } from "../base/dom/decorators";
+import { attribute, query } from "../base/dom/decorators";
 import common_styles from "./common-styles";
 
 /**
@@ -119,9 +119,8 @@ export class KCUIRangeElement extends CustomElement {
         return this.input.valueAsNumber;
     }
 
-    private get input() {
-        return this.$<HTMLInputElement>("input")!;
-    }
+    @query("input", true)
+    private input!: HTMLInputElement;
 
     attributeChangedCallback(
         name: string,

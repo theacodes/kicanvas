@@ -18,6 +18,7 @@ import type { Footprint } from "../../../kicad/board";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { BoardViewer } from "../../../viewers/board/viewer";
 
+import { query } from "../../../base/dom/decorators";
 import "../../../kc-ui/kc-ui-filtered-list";
 import "../../../kc-ui/kc-ui-menu";
 import "../../../kc-ui/kc-ui-panel";
@@ -38,9 +39,8 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
         })();
     }
 
-    private get menu() {
-        return this.$<KCUIMenuElement>("kc-ui-menu")!;
-    }
+    @query("kc-ui-menu", true)
+    private menu!: KCUIMenuElement;
 
     private sorted_footprints: Footprint[];
     private sort_footprints() {
@@ -76,13 +76,11 @@ export class KCBoardFootprintsPanelElement extends WithContext(CustomElement) {
         });
     }
 
-    private get search_input_elm() {
-        return this.$<KCUITextFilterInputElement>("kc-ui-text-filter-input")!;
-    }
+    @query("kc-ui-text-filter-input", true)
+    private search_input_elm!: KCUITextFilterInputElement;
 
-    private get item_filter_elem() {
-        return this.$<KCUIFilteredListElement>("kc-ui-filtered-list")!;
-    }
+    @query("kc-ui-filtered-list", true)
+    private item_filter_elem!: KCUIFilteredListElement;
 
     override render() {
         return html`

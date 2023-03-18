@@ -7,6 +7,7 @@
 import { sorted_by_numeric_strings } from "../../../base/array";
 import { WithContext } from "../../../base/dom/context";
 import { CustomElement, html } from "../../../base/dom/custom-element";
+import { query } from "../../../base/dom/decorators";
 import common_styles from "../../../kc-ui/common-styles";
 import { KCUIFilteredListElement } from "../../../kc-ui/kc-ui-filtered-list";
 import type {
@@ -30,9 +31,8 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
 
     viewer: SchematicViewer;
 
-    private get menu() {
-        return this.$<KCUIMenuElement>("kc-ui-menu")!;
-    }
+    @query("kc-ui-menu", true)
+    private menu!: KCUIMenuElement;
 
     override connectedCallback() {
         (async () => {
@@ -78,13 +78,11 @@ export class KCSchematicSymbolsPanelElement extends WithContext(CustomElement) {
         });
     }
 
-    private get search_input_elm() {
-        return this.$<KCUITextFilterInputElement>("kc-ui-text-filter-input")!;
-    }
+    @query("kc-ui-text-filter-input", true)
+    private search_input_elm!: KCUITextFilterInputElement;
 
-    private get item_filter_elem() {
-        return this.$<KCUIFilteredListElement>("kc-ui-filtered-list")!;
-    }
+    @query("kc-ui-filtered-list", true)
+    private item_filter_elem!: KCUIFilteredListElement;
 
     override render() {
         const schematic = this.viewer.schematic;
