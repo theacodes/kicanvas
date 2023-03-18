@@ -9,10 +9,7 @@ import { Angle, BBox, Arc as MathArc, Matrix3, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
 import { Arc, Circle, Polygon, Polyline } from "../../graphics/shapes";
 import * as schematic_items from "../../kicad/schematic";
-import { LibText } from "../../kicad/text/lib-text";
-import { SchField } from "../../kicad/text/sch-field";
-import { SchText } from "../../kicad/text/sch-text";
-import { StrokeFont } from "../../kicad/text/stroke-font";
+import { LibText, SchField, SchText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import {

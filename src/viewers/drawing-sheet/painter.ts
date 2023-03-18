@@ -14,8 +14,7 @@ import { Angle, BBox, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
 import { Polyline } from "../../graphics/shapes";
 import * as drawing_sheet from "../../kicad/drawing-sheet";
-import { EDAText } from "../../kicad/text/eda-text";
-import { StrokeFont } from "../../kicad/text/stroke-font";
+import { EDAText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";
 import { ViewLayer, ViewLayerNames, ViewLayerSet } from "../base/view-layers";
 

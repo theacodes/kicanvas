@@ -7,7 +7,7 @@
 import { assert } from "@esm-bundle/chai";
 
 import { Angle, Matrix3, Vec2 } from "../../src/base/math";
-import { SchField } from "../../src/kicad/text/sch-field";
+import { SchField } from "../../src/kicad/text";
 
 // Symbol coordinates are upside down (bottom to top).
 const zero_deg_matrix = Matrix3.identity().scale_self(1, -1);

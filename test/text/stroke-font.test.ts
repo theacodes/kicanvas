@@ -8,9 +8,12 @@ import { AssertionError, assert } from "@esm-bundle/chai";
 
 import { Angle, Vec2 } from "../../src/base/math";
 import { Polyline } from "../../src/graphics/shapes";
-import { TextAttributes, TextStyle } from "../../src/kicad/text/font";
-import { StrokeGlyph } from "../../src/kicad/text/glyph";
-import { StrokeFont } from "../../src/kicad/text/stroke-font";
+import {
+    StrokeFont,
+    StrokeGlyph,
+    TextAttributes,
+    TextStyle,
+} from "../../src/kicad/text";
 import { NullRenderer } from "../null-renderer";
 
 const font = StrokeFont.default();

@@ -15,8 +15,7 @@ import { Angle, Arc, Matrix3, Vec2 } from "../../base/math";
 import { Renderer } from "../../graphics/renderer";
 import { Circle, Polygon, Polyline } from "../../graphics/shapes";
 import * as board_items from "../../kicad/board";
-import { EDAText } from "../../kicad/text/eda-text";
-import { StrokeFont } from "../../kicad/text/stroke-font";
+import { EDAText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";
 import { ViewLayerNames } from "../base/view-layers";
 import {

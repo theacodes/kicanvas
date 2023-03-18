@@ -7,7 +7,7 @@
 import { assert } from "@esm-bundle/chai";
 
 import { Vec2 } from "../../src/base/math";
-import { EDAText } from "../../src/kicad/text/eda-text";
+import { EDAText } from "../../src/kicad/text";
 
 class EDATextImpl extends EDAText {
     constructor(text: string) {

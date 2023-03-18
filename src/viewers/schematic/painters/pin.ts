@@ -9,9 +9,12 @@ import { Angle, Matrix3, Vec2 } from "../../../base/math";
 import { Renderer } from "../../../graphics/renderer";
 import { Effects } from "../../../kicad/common";
 import * as schematic_items from "../../../kicad/schematic";
-import { EDAText } from "../../../kicad/text/eda-text";
-import type { HAlign, VAlign } from "../../../kicad/text/font";
-import { StrokeFont } from "../../../kicad/text/stroke-font";
+import {
+    EDAText,
+    StrokeFont,
+    type HAlign,
+    type VAlign,
+} from "../../../kicad/text";
 import { ItemPainter } from "../../base/painter";
 import { LayerNames, ViewLayer } from "../layers";
 import { SchematicPainter } from "../painter";

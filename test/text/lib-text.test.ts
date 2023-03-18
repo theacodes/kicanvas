@@ -7,7 +7,7 @@
 import { assert } from "@esm-bundle/chai";
 
 import { Vec2 } from "../../src/base/math";
-import { LibText } from "../../src/kicad/text/lib-text";
+import { LibText } from "../../src/kicad/text";
 
 function make_text() {
     const text = new LibText("center/bottom/0");
