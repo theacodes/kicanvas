@@ -86,3 +86,44 @@ const default_attribute_converter = {
         }
     },
 };
+
+export function query(selector: string, cache?: boolean) {
+    return (target: object, propertyKey: string | symbol): void => {
+        const cache_key =
+            typeof propertyKey === "symbol" ? Symbol() : `__${propertyKey}`;
+
+        Object.defineProperty(target, propertyKey, {
+            enumerable: true,
+            configurable: true,
+            get() {
+                const this_as_record = this as unknown as {
+                    [key: string | symbol]: Element | null;
+                };
+
+                if (cache && this_as_record[cache_key] !== undefined) {
+                    return this_as_record[cache_key];
+                }
+
+                const result = this.renderRoot?.querySelector(selector) ?? null;
+
+                if (cache && result) {
+                    this_as_record[cache_key] = result;
+                }
+
+                return result;
+            },
+        });
+    };
+}
+
+export function query_all(selector: string) {
+    return (target: object, propertyKey: string | symbol): void => {
+        Object.defineProperty(target, propertyKey, {
+            enumerable: true,
+            configurable: true,
+            get() {
+                return this.renderRoot?.querySelectorAll(selector) ?? [];
+            },
+        });
+    };
+}
