@@ -113,19 +113,11 @@ export class CustomElement extends HTMLElement {
         this.initialContentCallback();
     }
 
-    protected $<T extends Element = HTMLElement>(selector: string) {
-        return this.renderRoot.querySelector<T>(selector);
-    }
-
-    protected $$<T extends Element = HTMLElement>(selector: string) {
-        return this.renderRoot.querySelectorAll<T>(selector);
-    }
-
     protected queryAssignedElements<T extends Element = HTMLElement>(
         slot_name?: string,
         selector?: string,
     ) {
-        const slot_element = this.$(
+        const slot_element = this.renderRoot.querySelector(
             `slot${slot_name ? `[name=${slot_name}]` : ":not([name])"}`,
         ) as HTMLSlotElement;
 
