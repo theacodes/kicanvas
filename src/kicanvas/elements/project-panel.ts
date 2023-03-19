@@ -40,13 +40,13 @@ export class KCProjectPanelElement extends KCUIElement {
         return this.#selected;
     }
 
-    set selected(filename: string | null) {
-        if (filename == this.selected) {
+    set selected(name: string | null) {
+        if (name == this.selected) {
             return;
         }
 
-        this.#selected = filename;
-        this.#dropdown.menu.selected = filename;
+        this.#selected = name;
+        this.#dropdown.menu.selected = name;
 
         const selected_elm = this.#dropdown.menu.selected;
 
@@ -54,10 +54,13 @@ export class KCProjectPanelElement extends KCUIElement {
             return;
         }
 
+        const [filename, sheet_path] = selected_elm.name.split("//");
+
         this.dispatchEvent(
             new CustomEvent("file:select", {
                 detail: {
-                    filename: selected_elm.name,
+                    filename: filename,
+                    sheet_path: sheet_path,
                 },
                 bubbles: true,
                 composed: true,
@@ -72,20 +75,34 @@ export class KCProjectPanelElement extends KCUIElement {
             return html``;
         }
 
-        for (const board of this.project.list_boards()) {
+        for (const board of this.project.boards()) {
             file_btn_elms.push(
-                html`<kc-ui-menu-item icon="plagiarism" name="${board}">
-                    ${board}
+                html`<kc-ui-menu-item
+                    icon="plagiarism"
+                    name="${board.filename}">
+                    ${board.filename}
                 </kc-ui-menu-item>`,
             );
         }
 
-        for (const schematic of this.project.list_schematics()) {
-            file_btn_elms.push(
-                html`<kc-ui-menu-item icon="description" name="${schematic}">
-                    ${schematic}
-                </kc-ui-menu-item>`,
-            );
+        for (const page of this.project.pages()) {
+            if (page.page) {
+                file_btn_elms.push(
+                    html`<kc-ui-menu-item
+                        icon="description"
+                        name="${page.filename}//${page.path}">
+                        ${page.page}: ${page.name} ${page.filename}
+                    </kc-ui-menu-item>`,
+                );
+            } else {
+                file_btn_elms.push(
+                    html`<kc-ui-menu-item
+                        icon="description"
+                        name="${page.filename}//${page.path}">
+                        ${page.filename}
+                    </kc-ui-menu-item>`,
+                );
+            }
         }
 
         this.#dropdown = html`<kc-ui-dropdown slot="dropdown" auto-hide>

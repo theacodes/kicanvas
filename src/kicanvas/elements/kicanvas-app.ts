@@ -81,7 +81,7 @@ class KiCanvasAppElement extends KCUIElement {
 
         this.addEventListener("file:select", (e) => {
             const detail = (e as CustomEvent).detail;
-            this.load_file(detail.filename);
+            this.load_file(detail.filename, detail.sheet_path);
         });
     }
 
@@ -89,7 +89,7 @@ class KiCanvasAppElement extends KCUIElement {
         this.loaded = false;
         this.loading = true;
 
-        await this.project.setup(vfs);
+        await this.project.load(vfs);
         this.#project_panel.update();
 
         this.loaded = true;
@@ -98,18 +98,29 @@ class KiCanvasAppElement extends KCUIElement {
 
     private async load_default_file() {
         // for right now just load the first schematic or board file
-        if (this.project.has_boards()) {
-            return await this.load_file(first(this.project.list_boards())!);
-        } else if (this.project.has_schematics()) {
-            return await this.load_file(first(this.project.list_schematics())!);
-        } else {
-            throw new Error("No valid KiCAD files found");
+        const root = this.project.root_page;
+
+        if (root) {
+            return await this.load_file(root.filename, root.path);
         }
+
+        const doc = first(this.project.items());
+
+        if (doc) {
+            return await this.load_file(doc.filename);
+        }
+
+        throw new Error("No valid KiCAD files found");
     }
 
-    private async load_file(filename: string) {
-        const doc = await this.project.load_file(filename);
-        this.#project_panel.selected = doc?.filename ?? null;
+    private async load_file(filename: string, sheet_path?: string) {
+        const doc = await this.project.by_name(filename);
+
+        if (sheet_path) {
+            this.#project_panel.selected = `${filename}//${sheet_path}`;
+        } else {
+            this.#project_panel.selected = filename;
+        }
 
         if (doc instanceof KicadPCB) {
             this.#kc_board_viewer.classList.remove("is-hidden");
@@ -118,7 +129,7 @@ class KiCanvasAppElement extends KCUIElement {
         } else if (doc instanceof KicadSch) {
             this.#kc_board_viewer.classList.add("is-hidden");
             this.#kc_schematic_viewer.classList.remove("is-hidden");
-            await this.#kc_schematic_viewer.load(doc);
+            await this.#kc_schematic_viewer.load(doc, sheet_path);
         } else {
             throw new Error(`Unable to load ${filename}`);
         }
