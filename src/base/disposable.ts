@@ -49,7 +49,7 @@ export class Disposables implements IDisposable {
 
     public dispose(): void {
         if (this._is_disposed) {
-            console.warn("dispose() called on an already disposed resource");
+            console.trace("dispose() called on an already disposed resource");
             return;
         }
         for (const item of this._disposables.values()) {
