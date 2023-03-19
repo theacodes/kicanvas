@@ -31,7 +31,7 @@ export class KCUIMenuElement extends KCUIElement {
             }
 
             :host(.dropdown) {
-                --list-item-padding: 0.3rem 1rem 0.3rem 0.6rem;
+                --list-item-padding: 0.3rem 0.6rem;
                 --list-item-bg: var(--dropdown-bg);
                 --list-item-fg: var(--dropdown-fg);
                 --list-item-hover-bg: var(--dropdown-hover-bg);

@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html } from "../../base/web-components";
+import { css, html } from "../../base/web-components";
 import {
     KCUIElement,
     type KCUIDropdownElement,
@@ -15,6 +15,49 @@ import type { Project } from "../project";
 import "../../kc-ui";
 
 export class KCProjectPanelElement extends KCUIElement {
+    static override styles = [
+        ...KCUIElement.styles,
+        css`
+            .page {
+                display: flex;
+                align-items: center;
+            }
+
+            .page span.name {
+                margin-right: 1rem;
+                max-width: 50%;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .page span.number {
+                flex: 0;
+                background: var(--dropdown-hover-bg);
+                border: 1px solid transparent;
+                border-radius: 0.5em;
+                font-size: 0.8rem;
+                padding: 0px 0.3rem;
+                margin-right: 0.5rem;
+            }
+
+            kc-ui-menu-item:hover span.number {
+                background: var(--dropdown-bg);
+            }
+
+            kc-ui-menu-item[selected]:hover span.number {
+                background: var(--dropdown-hover-bg);
+            }
+
+            .page span.filename {
+                flex: 1;
+                margin-left: 1rem;
+                text-align: right;
+                color: #aaa;
+            }
+        `,
+    ];
+
     #dropdown: KCUIDropdownElement;
     #selected: string | null;
 
@@ -80,7 +123,10 @@ export class KCProjectPanelElement extends KCUIElement {
                 html`<kc-ui-menu-item
                     icon="plagiarism"
                     name="${board.filename}">
-                    ${board.filename}
+                    <span class="page">
+                        <span class="name">Board</span>
+                        <span class="filename">${board.filename}</span>
+                    </span>
                 </kc-ui-menu-item>`,
             );
         }
@@ -91,7 +137,11 @@ export class KCProjectPanelElement extends KCUIElement {
                     html`<kc-ui-menu-item
                         icon="description"
                         name="${page.filename}//${page.path}">
-                        ${page.page}: ${page.name} ${page.filename}
+                        <span class="page">
+                            <span class="number">${page.page}</span>
+                            <span class="name">${page.name}</span>
+                            <span class="filename">${page.filename}</span>
+                        </span>
                     </kc-ui-menu-item>`,
                 );
             } else {
@@ -107,10 +157,10 @@ export class KCProjectPanelElement extends KCUIElement {
 
         this.#dropdown = html`<kc-ui-dropdown slot="dropdown" auto-hide>
             <kc-ui-menu class="dropdown">
-                ${file_btn_elms}
                 <kc-ui-menu-item icon="receipt">
                     Bill of materials
                 </kc-ui-menu-item>
+                ${file_btn_elms}
             </kc-ui-menu>
         </kc-ui-dropdown>` as KCUIDropdownElement;
 
