@@ -709,7 +709,7 @@ class SchematicSheetPainter extends ItemPainter {
         }
 
         if (layer.name == LayerNames.symbol_field) {
-            for (const property of ss.properties) {
+            for (const property of ss.properties.values()) {
                 this.view_painter.paint_item(layer, property);
             }
         }
