@@ -157,9 +157,9 @@ export class KCProjectPanelElement extends KCUIElement {
 
         this.#dropdown = html`<kc-ui-dropdown slot="dropdown" auto-hide>
             <kc-ui-menu class="dropdown">
-                <kc-ui-menu-item icon="receipt">
+                <!-- <kc-ui-menu-item icon="receipt">
                     Bill of materials
-                </kc-ui-menu-item>
+                </kc-ui-menu-item> -->
                 ${file_btn_elms}
             </kc-ui-menu>
         </kc-ui-dropdown>` as KCUIDropdownElement;
