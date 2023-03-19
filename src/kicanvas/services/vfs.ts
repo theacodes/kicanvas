@@ -14,6 +14,7 @@
 export abstract class VirtualFileSystem {
     public abstract list(): Generator<string>;
     public abstract get(name: string): Promise<File>;
+    public abstract has(name: string): Promise<boolean>;
 
     public *list_matches(r: RegExp) {
         for (const filename of this.list()) {
@@ -54,6 +55,10 @@ export class FetchFileSystem extends VirtualFileSystem {
 
     public override *list() {
         yield* this.urls.keys();
+    }
+
+    public override async has(name: string): Promise<boolean> {
+        return this.urls.has(name);
     }
 
     public override async get(name: string): Promise<File> {
@@ -120,6 +125,15 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         for (const entry of this.items) {
             yield entry.name;
         }
+    }
+
+    public override async has(name: string): Promise<boolean> {
+        for (const entry of this.items) {
+            if (entry.name == name) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public override async get(name: string): Promise<File> {
