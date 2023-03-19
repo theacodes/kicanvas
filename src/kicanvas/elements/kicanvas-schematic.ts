@@ -40,7 +40,6 @@ export class KiCanvasSchematicElement extends KCUIElement {
     async load(src: KicadSch, sheet_path?: string) {
         this.loaded = false;
         await this.viewer.load(src, sheet_path);
-        this.viewer.draw();
     }
 
     override render() {

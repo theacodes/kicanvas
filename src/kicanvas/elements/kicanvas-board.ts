@@ -42,7 +42,6 @@ export class KiCanvasBoardElement extends KCUIElement {
     async load(src: KicadPCB) {
         this.loaded = false;
         await this.viewer.load(src);
-        this.viewer.draw();
     }
 
     override render() {

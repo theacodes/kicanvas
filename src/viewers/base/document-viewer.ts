@@ -73,6 +73,9 @@ export abstract class DocumentViewer<
 
         // Mark the viewer as loaded and notify event listeners
         this.resolve_loaded(true);
+
+        // Draw
+        this.draw();
     }
 
     protected override on_viewport_change(): void {
@@ -88,7 +91,6 @@ export abstract class DocumentViewer<
     public override select(item: BBox | null): void {
         // If value wasn't explicitly null and no item was found, give up.
         if (item != null && !(item instanceof BBox)) {
-            console.log(item);
             throw new Error(
                 `Unable to select item ${item}, could not find an object that matched.`,
             );
