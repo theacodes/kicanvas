@@ -20,6 +20,8 @@ export class SchematicViewer extends DocumentViewer<
     SchematicPainter,
     LayerSet
 > {
+    #sheet_path?: string;
+
     get schematic(): KicadSch {
         return this.document;
     }
@@ -31,6 +33,15 @@ export class SchematicViewer extends DocumentViewer<
         renderer.state.stroke = theme.schematic.note;
         renderer.state.stroke_width = 0.1524;
         return renderer;
+    }
+
+    override async load(src: KicadSch, sheet_path?: string) {
+        if (sheet_path != this.#sheet_path) {
+            this.#sheet_path = sheet_path;
+            src.update_hierarchical_data(sheet_path);
+            this.document = null!;
+        }
+        return await super.load(src);
     }
 
     protected override create_painter() {
