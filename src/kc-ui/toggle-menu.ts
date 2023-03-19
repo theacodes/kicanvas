@@ -44,8 +44,7 @@ export class KCUIToggleMenuElement extends KCUIElement {
                     background var(--transition-time-medium, 500) ease;
             }
 
-            button:hover,
-            button:focus {
+            button:hover {
                 background: var(--dropdown-hover-bg);
                 color: var(--dropdown-hover-fg);
                 box-shadow: none;
