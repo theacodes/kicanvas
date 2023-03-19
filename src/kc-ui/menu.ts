@@ -38,6 +38,8 @@ export class KCUIMenuElement extends KCUIElement {
                 --list-item-hover-fg: var(--dropdown-hover-fg);
                 --list-item-active-bg: var(--dropdown-active-bg);
                 --list-item-active-fg: var(--dropdown-active-fg);
+                max-height: 50vh;
+                overflow-y: auto;
             }
         `,
     ];
