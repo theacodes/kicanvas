@@ -113,30 +113,30 @@ export class KicadSch {
             ),
         );
 
-        this.#update_symbol_instance_data();
+        this.update_hierarchical_data();
     }
 
-    #update_symbol_instance_data() {
-        // Assigns SchematicSymbol properties based on data in symbol_instances.
-        // For the moment, this does not handle hierarchical sheets.
+    update_hierarchical_data(path?: string) {
+        // Assigns SchematicSymbol properties based on data in symbol_instances,
+        // used for differing values in hierarchical sheet instances.
         // See SCH_SHEET_LIST::UpdateSymbolInstanceData
-        const instances = this.symbol_instances?.symbol_instances;
-        if (!instances) {
-            return;
-        }
+        path ??= ``;
+
+        const global_instances = this.symbol_instances?.symbol_instances;
 
         for (const s of this.symbols) {
-            const path = `/${s.uuid}`;
-            const instance_data = instances.get(path);
+            const instance_data =
+                global_instances?.get(`${path}/${s.uuid}`) ??
+                s.instances.get(path);
 
             if (!instance_data) {
                 continue;
             }
 
-            s.set_property_text("Reference", instance_data.reference);
-            s.set_property_text("Value", instance_data.value);
-            s.set_property_text("Footprint", instance_data.footprint);
-            s.unit = instance_data.unit;
+            s.reference = instance_data.reference ?? s.reference;
+            s.value = instance_data.value ?? s.value;
+            s.footprint = instance_data.footprint ?? s.footprint;
+            s.unit = instance_data.unit ?? s.unit;
         }
     }
 
@@ -992,20 +992,7 @@ export class SchematicSymbol {
         value: string;
         footprint: string;
     };
-    instances: {
-        project: {
-            name: string;
-            instance: {
-                path: {
-                    path: string;
-                    reference: string;
-                    value: string;
-                    unit: string;
-                    footprint: string;
-                };
-            };
-        };
-    }[] = [];
+    instances: Map<string, SchematicSymbolInstance> = new Map();
 
     constructor(expr: Parseable, public parent: KicadSch) {
         /*
@@ -1053,32 +1040,54 @@ export class SchematicSymbol {
             // (instances
             //    (project "kit-dev-coldfire-xilinx_5213"
             //      (path "/f5d7a48d-4587-4550-a504-c505ca11d375" (reference "R111") (unit 1))))
-            P.list(
+            P.object(
                 "instances",
-                T.object(
-                    {},
-                    P.start("project"),
-                    P.positional("name", T.string),
-                    P.expr(
-                        "path",
-                        T.object(
-                            {},
-                            P.start("path"),
-                            P.positional("path"),
-                            P.pair("reference", T.string),
-                            P.pair("value", T.string),
-                            P.pair("unit", T.number),
-                            P.pair("footprint", T.string),
+                {},
+                P.collection(
+                    "projects",
+                    "project",
+                    T.object(
+                        null,
+                        P.start("project"),
+                        P.positional("name", T.string),
+                        P.collection(
+                            "paths",
+                            "path",
+                            T.object(
+                                null,
+                                P.start("path"),
+                                P.positional("path"),
+                                P.pair("reference", T.string),
+                                P.pair("value", T.string),
+                                P.pair("unit", T.number),
+                                P.pair("footprint", T.string),
+                            ),
                         ),
                     ),
                 ),
             ),
         );
 
+        const parsed_instances = parsed["instances"];
+        delete parsed["instances"];
+
         Object.assign(this, parsed);
 
+        // Walk through all instances and flatten them.
+        for (const project of parsed_instances?.["projects"] ?? []) {
+            for (const path of project?.["paths"] ?? []) {
+                const inst = new SchematicSymbolInstance();
+                inst.path = path["path"];
+                inst.reference = path["reference"];
+                inst.value = path["value"];
+                inst.unit = path["unit"];
+                inst.footprint = path["footprint"];
+                this.instances.set(inst.path, inst);
+            }
+        }
+
         // Default instance is used only to set the value and footprint, the
-        // other item seem to be ignored.
+        // other items seem to be ignored.
         if (this.get_property_text("Value") == undefined) {
             this.set_property_text("Value", this.default_instance.value);
         }
@@ -1113,8 +1122,24 @@ export class SchematicSymbol {
         return this.get_property_text("Reference") ?? "?";
     }
 
+    set reference(val: string) {
+        this.set_property_text("Reference", val);
+    }
+
     get value() {
         return this.get_property_text("Value") ?? "";
+    }
+
+    set value(val: string) {
+        this.set_property_text("Value", val);
+    }
+
+    get footprint() {
+        return this.get_property_text("Footprint") ?? "";
+    }
+
+    set footprint(val: string) {
+        this.set_property_text("Footprint", val);
     }
 
     get unit_suffix() {
@@ -1143,6 +1168,17 @@ export class SchematicSymbol {
             return true;
         });
     }
+}
+
+export class SchematicSymbolInstance {
+    path: string;
+    project?: string;
+    reference?: string;
+    value?: string;
+    unit?: number;
+    footprint?: string;
+
+    constructor() {}
 }
 
 export class PinInstance {
@@ -1259,51 +1295,46 @@ export class SchematicSheet {
     fields_autoplaced: boolean;
     stroke: Stroke;
     fill: Fill;
-    properties: Property[] = [];
+    properties: Map<string, Property> = new Map();
     pins: SchematicSheetPin[] = [];
     uuid: string;
-    instances: {
-        project: {
-            name: string;
-            instance: {
-                path: {
-                    path: string;
-                    reference: string;
-                    value: string;
-                    unit: string;
-                    footprint: string;
-                };
-            };
-        };
-    }[] = [];
+    instances: Map<string, SchematicSheetInstance> = new Map();
 
     constructor(expr: Parseable) {
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("sheet"),
-                P.item("at", At),
-                P.vec2("size"),
-                P.item("stroke", Stroke),
-                P.item("fill", Fill),
-                P.pair("fields_autoplaced", T.boolean),
-                P.pair("uuid", T.string),
-                P.collection("properties", "property", T.item(Property, this)),
-                P.collection("pins", "pin", T.item(SchematicSheetPin, this)),
-                // (instances
-                //   (project "kit-dev-coldfire-xilinx_5213"
-                //     (path "/f5d7a48d-4587-4550-a504-c505ca11d375" (page "3"))))
-                P.list(
-                    "instances",
+        const parsed = parse_expr(
+            expr,
+            P.start("sheet"),
+            P.item("at", At),
+            P.vec2("size"),
+            P.item("stroke", Stroke),
+            P.item("fill", Fill),
+            P.pair("fields_autoplaced", T.boolean),
+            P.pair("uuid", T.string),
+            P.mapped_collection(
+                "properties",
+                "property",
+                (prop: Property) => prop.name,
+                T.item(Property, this),
+            ),
+            P.collection("pins", "pin", T.item(SchematicSheetPin, this)),
+            // (instances
+            //   (project "kit-dev-coldfire-xilinx_5213"
+            //     (path "/f5d7a48d-4587-4550-a504-c505ca11d375" (page "3"))))
+            P.object(
+                "instances",
+                {},
+                P.collection(
+                    "projects",
+                    "project",
                     T.object(
-                        {},
+                        null,
                         P.start("project"),
                         P.positional("name", T.string),
-                        P.expr(
+                        P.collection(
+                            "paths",
                             "path",
                             T.object(
-                                {},
+                                null,
                                 P.start("path"),
                                 P.positional("path"),
                                 P.pair("page", T.string),
@@ -1313,6 +1344,33 @@ export class SchematicSheet {
                 ),
             ),
         );
+
+        const parsed_instances = parsed["instances"];
+        delete parsed["instances"];
+
+        Object.assign(this, parsed);
+
+        // Walk through all instances and flatten them.
+        for (const project of parsed_instances["projects"] ?? []) {
+            for (const path of project?.["paths"] ?? []) {
+                const inst = new SchematicSheetInstance();
+                inst.path = path["path"];
+                inst.page = path["page"];
+                this.instances.set(inst.path, inst);
+            }
+        }
+    }
+
+    get_property_text(name: string) {
+        return this.properties.get(name)?.text;
+    }
+
+    get sheetname() {
+        return this.get_property_text("Sheetname");
+    }
+
+    get sheetfile() {
+        return this.get_property_text("Sheetfile");
     }
 }
 
@@ -1337,4 +1395,9 @@ export class SchematicSheetPin {
             ),
         );
     }
+}
+
+export class SchematicSheetInstance {
+    path: string;
+    page?: string;
 }
