@@ -37,9 +37,9 @@ export class KiCanvasSchematicElement extends KCUIElement {
         this.selected = [];
     }
 
-    async load(src: KicadSch) {
+    async load(src: KicadSch, sheet_path?: string) {
         this.loaded = false;
-        await this.viewer.load(src);
+        await this.viewer.load(src, sheet_path);
         this.viewer.draw();
     }
 

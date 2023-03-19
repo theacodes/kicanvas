@@ -48,8 +48,8 @@ export class KCSchematicViewerElement extends KCUIElement {
         );
     }
 
-    async load(src: KicadSch) {
-        this.schematic_elm.load(src);
+    async load(src: KicadSch, sheet_path?: string) {
+        await this.schematic_elm.load(src, sheet_path);
     }
 
     override render() {
