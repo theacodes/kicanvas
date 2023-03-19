@@ -5,14 +5,14 @@
 */
 
 import { Color } from "../../base/color";
-import {
-    type VisibilityType,
-    ViewLayer,
-    ViewLayerSet as BaseLayerSet,
-    ViewLayerNames as BaseLayerNames,
-} from "../base/view-layers";
-import { KicadPCB } from "../../kicad/board";
 import { is_string } from "../../base/types";
+import { KicadPCB } from "../../kicad";
+import {
+    ViewLayerNames as BaseLayerNames,
+    ViewLayerSet as BaseLayerSet,
+    ViewLayer,
+    type VisibilityType,
+} from "../base/view-layers";
 export { ViewLayer };
 
 /** Board view layer names

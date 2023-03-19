@@ -6,7 +6,7 @@
 
 import { attribute, html } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
-import type { KicadPCB } from "../../kicad/board";
+import type { KicadPCB } from "../../kicad";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { BoardViewer } from "../../viewers/board/viewer";
 

@@ -5,10 +5,7 @@
 */
 
 import { BBox, Vec2 } from "../../base/math";
-import {
-    DrawingSheet,
-    type DrawingSheetDocument,
-} from "../../kicad/drawing-sheet";
+import { DrawingSheet, type DrawingSheetDocument } from "../../kicad";
 import { DrawingSheetPainter } from "../drawing-sheet/painter";
 import { Grid } from "./grid";
 import type { DocumentPainter, PaintableDocument } from "./painter";

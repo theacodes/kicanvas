@@ -6,13 +6,13 @@
 
 import { html } from "../../../base/web-components";
 import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
-import type { KicadPCB } from "../../../kicad/board";
+import type { KicadPCB } from "../../../kicad";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
-import "../viewer-bottom-toolbar";
 import "../kicanvas-board";
+import "../viewer-bottom-toolbar";
 import "./footprints-panel";
 import "./info-panel";
 import "./layers-panel";

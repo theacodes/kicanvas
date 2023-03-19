@@ -6,9 +6,7 @@
 
 import { type IDisposable } from "../base/disposable";
 import type { Constructor } from "../base/types";
-import { KicadPCB } from "../kicad/board";
-import { ProjectSettings } from "../kicad/project-settings";
-import { KicadSch } from "../kicad/schematic";
+import { KicadPCB, KicadSch, ProjectSettings } from "../kicad";
 import type { VirtualFileSystem } from "./services/vfs";
 
 export class Project implements IDisposable {

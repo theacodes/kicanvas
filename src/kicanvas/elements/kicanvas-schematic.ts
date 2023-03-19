@@ -4,9 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, attribute } from "../../base/web-components";
+import { attribute, html } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
-import type { KicadSch } from "../../kicad/schematic";
+import type { KicadSch } from "../../kicad";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { SchematicViewer } from "../../viewers/schematic/viewer";
 
