@@ -4,10 +4,6 @@
     box-sizing: border-box;
 }
 
-* {
-    margin: 0;
-}
-
 :host {
     box-sizing: border-box;
     margin: 0;
