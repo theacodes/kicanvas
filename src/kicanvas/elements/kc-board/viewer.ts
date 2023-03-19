@@ -78,12 +78,6 @@ export class KCBoardViewerElement extends KCUIElement {
             <kc-ui-activity slot="activities" name="Board info" icon="info">
                 <kc-board-info-panel></kc-board-info-panel>
             </kc-ui-activity>
-            <kc-ui-activity
-                slot="activities"
-                name="Help"
-                icon="help"
-                button-location="bottom">
-            </kc-ui-activity>
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
         return html` <kc-ui-split-view vertical>
