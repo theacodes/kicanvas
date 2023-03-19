@@ -6,6 +6,7 @@
 
 import { Color } from "../base/color";
 import { Vec2 } from "../base/math";
+import * as log from "../base/log";
 import { At, Effects, Paper, Stroke, TitleBlock } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 
@@ -861,7 +862,7 @@ export class Property {
         } else if (this.parent instanceof SchematicSymbol) {
             this.#effects = new Effects();
         } else {
-            console.log("hrm", this);
+            log.warn(`Couldn't determine Effects for Property ${this.name}`);
         }
         return this.#effects!;
     }

@@ -11,6 +11,7 @@
  */
 
 import { Angle, Arc, Matrix3, Vec2 } from "../../base/math";
+import * as log from "../../base/log";
 import { Circle, Color, Polygon, Polyline, Renderer } from "../../graphics";
 import * as board_items from "../../kicad/board";
 import { EDAText, StrokeFont } from "../../kicad/text";
@@ -325,7 +326,7 @@ class PadPainter extends BoardItemPainter {
             case "connect":
                 break;
             default:
-                console.log("unhandled pad type:", pad);
+                log.warn(`Unhandled pad type "${pad.type}"`);
                 break;
         }
 
@@ -491,7 +492,7 @@ class PadPainter extends BoardItemPainter {
                     break;
 
                 default:
-                    console.log("idk how to draw", pad);
+                    log.warn(`Unknown pad shape "${pad.shape}"`);
                     break;
             }
 

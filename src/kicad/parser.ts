@@ -7,6 +7,7 @@
 import { as_array } from "../base/array";
 import { Color } from "../base/color";
 import { Vec2 } from "../base/math";
+import * as log from "../base/log";
 import { is_number, is_string } from "../base/types";
 import { listify, type List } from "./tokenizer";
 
@@ -302,6 +303,7 @@ export type Parseable = string | List;
 
 export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
     if (is_string(expr)) {
+        log.report(`Parsing expression with ${expr.length} chars`);
         expr = listify(expr);
         if (expr.length == 1 && Array.isArray(expr[0])) {
             expr = expr[0];
@@ -355,7 +357,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
             def = defs_map.get(n);
 
             if (!def) {
-                console.warn(
+                log.warn(
                     `no def for bare element ${element} at position ${n} in expression ${expr}`,
                 );
                 continue;
@@ -370,7 +372,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
         }
 
         if (!def) {
-            console.warn(
+            log.warn(
                 `No def found for element ${element} in expression ${expr}`,
             );
             continue;

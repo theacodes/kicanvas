@@ -7,6 +7,7 @@
 import { later } from "../../base/async";
 import { DropTarget } from "../../base/dom/drag-drop";
 import { first } from "../../base/iterator";
+import * as log from "../../base/log";
 import { CSS, attribute, html } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import { KicadPCB, KicadSch, theme } from "../../kicad";
@@ -58,7 +59,6 @@ class KiCanvasAppElement extends KCUIElement {
         later(async () => {
             if (this.src) {
                 await this.setup_project(new FetchFileSystem([this.src]));
-                await this.load_default_file();
                 return;
             }
 
@@ -75,7 +75,6 @@ class KiCanvasAppElement extends KCUIElement {
 
             new DropTarget(this, async (fs) => {
                 await this.setup_project(fs);
-                this.load_default_file();
             });
         });
 
@@ -89,28 +88,36 @@ class KiCanvasAppElement extends KCUIElement {
         this.loaded = false;
         this.loading = true;
 
-        await this.project.load(vfs);
-        this.#project_panel.update();
-
-        this.loaded = true;
-        this.loading = false;
+        log.start("<kicanvas-app>");
+        try {
+            await this.project.load(vfs);
+            this.#project_panel.update();
+            await this.load_default_file();
+            this.loaded = true;
+        } catch (e) {
+            console.error(e);
+        } finally {
+            this.loading = false;
+            log.finish();
+        }
     }
 
     private async load_default_file() {
-        // for right now just load the first schematic or board file
         const root = this.project.root_page;
 
         if (root) {
+            log.report(`Loading root schematic file ${root.filename}`);
             return await this.load_file(root.filename, root.path);
         }
-
         const doc = first(this.project.items());
 
         if (doc) {
+            log.report(`Loading first valid file ${doc.filename}`);
             return await this.load_file(doc.filename);
         }
 
-        throw new Error("No valid KiCAD files found");
+        log.error("No valid KiCAD files found in project");
+        throw new Error("No valid KiCAD files found in project");
     }
 
     private async load_file(filename: string, sheet_path?: string) {

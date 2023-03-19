@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import * as log from "../../base/log";
 import { Renderer } from "../../graphics";
 import { ViewLayer, ViewLayerSet } from "./view-layers";
 
@@ -54,11 +55,15 @@ export class DocumentPainter {
     }
 
     paint(document: PaintableDocument) {
+        log.start("Painting");
+
+        log.report("Sorting paintable items into layers");
+
         for (const item of document.items()) {
             const painter = this.painter_for(item);
 
             if (!painter) {
-                console.error("No painter found for ", item);
+                log.warn(`No painter found for ${item?.constructor.name}`);
                 continue;
             }
 
@@ -68,8 +73,13 @@ export class DocumentPainter {
         }
 
         for (const layer of this.paintable_layers()) {
+            log.report(
+                `Painting layer ${layer.name} with ${layer.items.length} items`,
+            );
             this.paint_layer(layer);
         }
+
+        log.finish();
     }
 
     *paintable_layers() {

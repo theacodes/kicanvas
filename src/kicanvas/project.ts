@@ -7,6 +7,7 @@
 import { sorted_by_numeric_strings } from "../base/array";
 import { type IDisposable } from "../base/disposable";
 import { first } from "../base/iterator";
+import * as log from "../base/log";
 import type { Constructor } from "../base/types";
 import { KicadPCB, KicadSch, ProjectSettings } from "../kicad";
 import type {
@@ -30,6 +31,8 @@ export class Project implements IDisposable {
     }
 
     public async load(fs: VirtualFileSystem) {
+        log.start(`Loading project from ${fs.constructor.name}`);
+
         this.settings = new ProjectSettings();
         this.#by_name.clear();
         this.#by_uuid.clear();
@@ -41,9 +44,13 @@ export class Project implements IDisposable {
         }
 
         this.determine_schematic_hierarchy();
+
+        log.finish();
     }
 
     private async load_file(filename: string) {
+        log.report(`Loading file ${filename}`);
+
         if (filename.endsWith(".kicad_sch")) {
             return await this.load_doc(KicadSch, filename);
         }
@@ -53,7 +60,8 @@ export class Project implements IDisposable {
         if (filename.endsWith(".kicad_pro")) {
             return this.load_project(filename);
         }
-        console.log(`Couldn't load ${filename}: unknown file type`);
+
+        log.warn(`Couldn't load ${filename}: unknown file type`);
     }
 
     private async load_doc(
@@ -87,6 +95,8 @@ export class Project implements IDisposable {
     }
 
     private determine_schematic_hierarchy() {
+        log.report("Determining schematic hierarchy");
+
         const paths_to_schematics = new Map<string, KicadSch>();
         const paths_to_sheet_instances = new Map<
             string,

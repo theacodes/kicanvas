@@ -5,6 +5,7 @@
 */
 
 import { BBox, Vec2 } from "../../base/math";
+import * as log from "../../base/log";
 import { DrawingSheet, type DrawingSheetDocument } from "../../kicad";
 import { DrawingSheetPainter } from "../drawing-sheet/painter";
 import { Grid } from "./grid";
@@ -12,7 +13,8 @@ import type { DocumentPainter, PaintableDocument } from "./painter";
 import { ViewLayerNames, type ViewLayerSet } from "./view-layers";
 import { Viewer } from "./viewer";
 
-type ViewableDocument = DrawingSheetDocument & PaintableDocument;
+type ViewableDocument = DrawingSheetDocument &
+    PaintableDocument & { filename: string };
 
 export abstract class DocumentViewer<
     DocumentT extends ViewableDocument,
@@ -37,26 +39,33 @@ export abstract class DocumentViewer<
             return;
         }
 
+        log.start(`Loading ${src.filename} into viewer`);
+
         this.document = src;
 
         // Load the default drawing sheet.
+        log.report("Loading drawing sheet");
         this.drawing_sheet = DrawingSheet.default();
         this.drawing_sheet.document = this.document;
 
         // Setup graphical layers
+        log.report("Creating layers");
         this.disposables.disposeAndRemove(this.layers);
         this.layers = this.disposables.add(this.create_layer_set());
 
         // Paint the board
+        log.report("Painting items");
         this.painter = this.create_painter();
         this.painter.paint(this.document);
 
         // Paint the drawing sheet
+        log.report("Painting drawing sheet");
         new DrawingSheetPainter(this.renderer, this.layers).paint(
             this.drawing_sheet,
         );
 
         // Create the grid
+        log.report("Painting grid");
         this.grid = new Grid(
             this.renderer,
             this.viewport.camera,
@@ -65,10 +74,12 @@ export abstract class DocumentViewer<
         );
 
         // Wait for a valid viewport size
+        log.report("Waiting for viewport");
         await this.viewport.ready;
         this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
 
         // Position the camera and draw the scene.
+        log.report("Positioning camera");
         this.zoom_to_page();
 
         // Mark the viewer as loaded and notify event listeners
@@ -76,6 +87,8 @@ export abstract class DocumentViewer<
 
         // Draw
         this.draw();
+
+        log.finish();
     }
 
     protected override on_viewport_change(): void {

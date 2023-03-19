@@ -47,8 +47,6 @@ export class KCBoardObjectsPanelElement extends KCUIElement {
                 case "page":
                     this.viewer.page_opacity = opacity;
                     break;
-                default:
-                    console.log(control.name, opacity);
             }
         });
     }
