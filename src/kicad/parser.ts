@@ -82,7 +82,10 @@ export const T = {
     },
     object(start: any, ...defs: PropertyDefinition[]): TypeProcessor {
         return (obj: Obj, name: string, e: ListOrAtom) => {
-            const existing = obj[name] ?? start ?? {};
+            let existing = {};
+            if (start !== null) {
+                existing = obj[name] ?? start ?? {};
+            }
             return {
                 ...existing,
                 ...parse_expr(e as List, P.start(name), ...defs),
