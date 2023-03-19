@@ -10,10 +10,8 @@
  * Each item class has a corresponding Painter implementation.
  */
 
-import { Color } from "../../base/color";
 import { Angle, Arc, Matrix3, Vec2 } from "../../base/math";
-import { Renderer } from "../../graphics/renderer";
-import { Circle, Polygon, Polyline } from "../../graphics/shapes";
+import { Circle, Color, Polygon, Polyline, Renderer } from "../../graphics";
 import * as board_items from "../../kicad/board";
 import { EDAText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";

@@ -4,10 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../../base/color";
 import { Angle, BBox, Matrix3, Vec2 } from "../../base/math";
-import { Renderer } from "../../graphics/renderer";
-import { Polyline } from "../../graphics/shapes";
+import { Color, Polyline, Renderer } from "../../graphics";
 import { Glyph, StrokeGlyph } from "./glyph";
 import { Markup, MarkupNode } from "./markup";
 

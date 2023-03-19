@@ -5,12 +5,10 @@
 */
 
 import { Deferred, later } from "../../base/async";
-import { Color } from "../../base/color";
 import { Disposables, type IDisposable } from "../../base/disposable";
 import { listen } from "../../base/events";
 import { BBox, Vec2 } from "../../base/math";
-import { Renderer } from "../../graphics/renderer";
-import { Polygon, Polyline } from "../../graphics/shapes";
+import { Color, Polygon, Polyline, Renderer } from "../../graphics";
 import {
     KiCanvasLoadEvent,
     KiCanvasMouseMoveEvent,

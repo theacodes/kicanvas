@@ -7,7 +7,7 @@
 import { AssertionError, assert } from "@esm-bundle/chai";
 
 import { Angle, Vec2 } from "../../src/base/math";
-import { Polyline } from "../../src/graphics/shapes";
+import { Polyline } from "../../src/graphics";
 import {
     StrokeFont,
     StrokeGlyph,

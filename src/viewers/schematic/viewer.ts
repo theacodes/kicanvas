@@ -7,8 +7,8 @@
 import { first } from "../../base/iterator";
 import { BBox } from "../../base/math";
 import { is_string } from "../../base/types";
-import { Canvas2DRenderer } from "../../graphics/canvas2d/renderer";
-import { Renderer } from "../../graphics/renderer";
+import { Renderer } from "../../graphics";
+import { Canvas2DRenderer } from "../../graphics/canvas2d";
 import { theme } from "../../kicad";
 import { KicadSch, SchematicSymbol } from "../../kicad/schematic";
 import { DocumentViewer } from "../base/document-viewer";

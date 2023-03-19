@@ -4,9 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../../../base/color";
 import { Angle, Matrix3, Vec2 } from "../../../base/math";
-import { Renderer } from "../../../graphics/renderer";
+import { Color, Renderer } from "../../../graphics";
 import { Effects } from "../../../kicad/common";
 import * as schematic_items from "../../../kicad/schematic";
 import {

@@ -8,7 +8,7 @@ import { Deferred } from "../../base/async";
 import { PanAndZoom } from "../../base/dom/pan-and-zoom";
 import { SizeObserver } from "../../base/dom/size-observer";
 import { Angle, BBox, Camera2, Matrix3, Vec2 } from "../../base/math";
-import { Renderer } from "../../graphics/renderer";
+import { Renderer } from "../../graphics";
 
 /**
  * Viewport combines a canvas, a renderer, and a camera to represent a view

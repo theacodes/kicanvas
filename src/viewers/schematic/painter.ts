@@ -4,10 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../../base/color";
 import { Angle, BBox, Arc as MathArc, Matrix3, Vec2 } from "../../base/math";
-import { Renderer } from "../../graphics/renderer";
-import { Arc, Circle, Polygon, Polyline } from "../../graphics/shapes";
+import {
+    Arc,
+    Circle,
+    Color,
+    Polygon,
+    Polyline,
+    Renderer,
+} from "../../graphics";
 import * as schematic_items from "../../kicad/schematic";
 import { LibText, SchField, SchText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";

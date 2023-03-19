@@ -4,16 +4,17 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../src/base/color";
 import { Angle, Matrix3, Vec2 } from "../src/base/math";
-import { RenderLayer, Renderer } from "../src/graphics/renderer";
 import {
     Arc,
     Circle,
+    Color,
     Polygon,
     Polyline,
+    RenderLayer,
+    Renderer,
     type Shape,
-} from "../src/graphics/shapes";
+} from "../src/graphics";
 
 export class NullRenderLayer extends RenderLayer {
     shapes: Shape[] = [];

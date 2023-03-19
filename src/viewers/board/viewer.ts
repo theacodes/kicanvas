@@ -6,8 +6,8 @@
 
 import { BBox, Vec2 } from "../../base/math";
 import { is_string } from "../../base/types";
-import { Renderer } from "../../graphics/renderer";
-import { WebGL2Renderer } from "../../graphics/webgl/renderer";
+import { Renderer } from "../../graphics";
+import { WebGL2Renderer } from "../../graphics/webgl";
 import { theme } from "../../kicad";
 import * as board_items from "../../kicad/board";
 import { DocumentViewer } from "../base/document-viewer";

@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Renderer } from "../../graphics/renderer";
+import { Renderer } from "../../graphics";
 import { ViewLayer, ViewLayerSet } from "./view-layers";
 
 /**

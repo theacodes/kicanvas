@@ -4,9 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Color } from "../../base/color";
 import { Angle, BBox, Camera2, Vec2 } from "../../base/math";
-import { Renderer } from "../../graphics/renderer";
+import { Color, Renderer } from "../../graphics";
 import { ViewLayer } from "./view-layers";
 
 /**

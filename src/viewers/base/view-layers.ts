@@ -5,10 +5,9 @@
 */
 
 import { iterable_as_array } from "../../base/array";
-import { Color } from "../../base/color";
 import type { IDisposable } from "../../base/disposable";
 import { BBox, Vec2 } from "../../base/math";
-import { RenderLayer } from "../../graphics/renderer";
+import { Color, RenderLayer } from "../../graphics";
 
 /**
  * Common view layer names across all viewers.
