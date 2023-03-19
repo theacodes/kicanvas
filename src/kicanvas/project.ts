@@ -102,7 +102,6 @@ export class Project implements IDisposable {
                 ) as KicadSch;
 
                 if (!sheet_sch) {
-                    console.log("sheet not found", sheet.sheetfile);
                     continue;
                 }
 
@@ -181,8 +180,6 @@ export class Project implements IDisposable {
                 );
             }
         }
-
-        console.log(this.#pages);
     }
 
     public *items() {
