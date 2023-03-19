@@ -41,6 +41,27 @@ const common_styles = css`
     ::-webkit-scrollbar-thumb:active {
         background: var(--scrollbar-active-fg);
     }
+
+    .invert-scrollbar::-webkit-scrollbar {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        margin-left: -6px;
+        background: var(--scrollbar-fg);
+    }
+
+    .invert-scrollbar::-webkit-scrollbar-thumb {
+        position: absolute;
+        background: var(--scrollbar-bg);
+    }
+
+    .invert-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--scrollbar-hover-bg);
+    }
+
+    .invert-scrollbar::-webkit-scrollbar-thumb:active {
+        background: var(--scrollbar-active-bg);
+    }
 `;
 
 /**

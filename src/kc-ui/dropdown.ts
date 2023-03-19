@@ -95,6 +95,8 @@ export class KCUIDropdownElement extends KCUIElement {
         if (this.hasAttribute("auto-hide")) {
             this.setup_leave_event();
         }
+
+        this.menu.classList.add("invert-scrollbar");
     }
 
     private setup_leave_event() {
