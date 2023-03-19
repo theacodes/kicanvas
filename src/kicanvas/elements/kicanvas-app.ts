@@ -106,13 +106,13 @@ class KiCanvasAppElement extends KCUIElement {
         const root = this.project.root_page;
 
         if (root) {
-            log.report(`Loading root schematic file ${root.filename}`);
+            log.message(`Loading root schematic file ${root.filename}`);
             return await this.load_file(root.filename, root.path);
         }
         const doc = first(this.project.items());
 
         if (doc) {
-            log.report(`Loading first valid file ${doc.filename}`);
+            log.message(`Loading first valid file ${doc.filename}`);
             return await this.load_file(doc.filename);
         }
 

@@ -44,28 +44,28 @@ export abstract class DocumentViewer<
         this.document = src;
 
         // Load the default drawing sheet.
-        log.report("Loading drawing sheet");
+        log.message("Loading drawing sheet");
         this.drawing_sheet = DrawingSheet.default();
         this.drawing_sheet.document = this.document;
 
         // Setup graphical layers
-        log.report("Creating layers");
+        log.message("Creating layers");
         this.disposables.disposeAndRemove(this.layers);
         this.layers = this.disposables.add(this.create_layer_set());
 
         // Paint the board
-        log.report("Painting items");
+        log.message("Painting items");
         this.painter = this.create_painter();
         this.painter.paint(this.document);
 
         // Paint the drawing sheet
-        log.report("Painting drawing sheet");
+        log.message("Painting drawing sheet");
         new DrawingSheetPainter(this.renderer, this.layers).paint(
             this.drawing_sheet,
         );
 
         // Create the grid
-        log.report("Painting grid");
+        log.message("Painting grid");
         this.grid = new Grid(
             this.renderer,
             this.viewport.camera,
@@ -74,12 +74,12 @@ export abstract class DocumentViewer<
         );
 
         // Wait for a valid viewport size
-        log.report("Waiting for viewport");
+        log.message("Waiting for viewport");
         await this.viewport.ready;
         this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
 
         // Position the camera and draw the scene.
-        log.report("Positioning camera");
+        log.message("Positioning camera");
         this.zoom_to_page();
 
         // Mark the viewer as loaded and notify event listeners

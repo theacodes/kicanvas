@@ -49,7 +49,7 @@ export class Project implements IDisposable {
     }
 
     private async load_file(filename: string) {
-        log.report(`Loading file ${filename}`);
+        log.message(`Loading file ${filename}`);
 
         if (filename.endsWith(".kicad_sch")) {
             return await this.load_doc(KicadSch, filename);
@@ -95,7 +95,7 @@ export class Project implements IDisposable {
     }
 
     private determine_schematic_hierarchy() {
-        log.report("Determining schematic hierarchy");
+        log.message("Determining schematic hierarchy");
 
         const paths_to_schematics = new Map<string, KicadSch>();
         const paths_to_sheet_instances = new Map<

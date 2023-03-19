@@ -57,7 +57,7 @@ export class DocumentPainter {
     paint(document: PaintableDocument) {
         log.start("Painting");
 
-        log.report("Sorting paintable items into layers");
+        log.message("Sorting paintable items into layers");
 
         for (const item of document.items()) {
             const painter = this.painter_for(item);
@@ -73,7 +73,7 @@ export class DocumentPainter {
         }
 
         for (const layer of this.paintable_layers()) {
-            log.report(
+            log.message(
                 `Painting layer ${layer.name} with ${layer.items.length} items`,
             );
             this.paint_layer(layer);
