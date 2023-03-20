@@ -5,6 +5,7 @@
 */
 
 import { delegate } from "../base/events";
+import { no_self_recursion } from "../base/functions";
 import { is_string } from "../base/types";
 import { attribute, css, html } from "../base/web-components";
 import { KCUIElement } from "./element";
@@ -86,10 +87,6 @@ export class KCUIMenuElement extends KCUIElement {
             new_selected = element_or_name;
         }
 
-        if (new_selected == this.selected) {
-            return;
-        }
-
         this.deselect();
 
         if (!new_selected || !(new_selected instanceof KCUIMenuItemElement)) {
@@ -98,6 +95,11 @@ export class KCUIMenuElement extends KCUIElement {
 
         new_selected.selected = true;
 
+        this.send_selected_event(new_selected);
+    }
+
+    @no_self_recursion
+    private send_selected_event(new_selected: KCUIMenuItemElement) {
         this.dispatchEvent(
             new CustomEvent("kc-ui-menu:select", {
                 detail: new_selected,
