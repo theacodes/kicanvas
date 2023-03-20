@@ -165,6 +165,15 @@ export class KicadSch {
         return null;
     }
 
+    find_sheet(uuid: string) {
+        for (const sheet of this.sheets) {
+            if (sheet.uuid == uuid) {
+                return sheet;
+            }
+        }
+        return null;
+    }
+
     get text_vars(): Map<string, string | undefined> {
         const vars = new Map(this.title_block?.text_vars);
         vars.set("FILENAME", this.filename);

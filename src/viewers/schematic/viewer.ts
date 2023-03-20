@@ -10,7 +10,11 @@ import { is_string } from "../../base/types";
 import { Renderer } from "../../graphics";
 import { Canvas2DRenderer } from "../../graphics/canvas2d";
 import { theme } from "../../kicad";
-import { KicadSch, SchematicSymbol } from "../../kicad/schematic";
+import {
+    KicadSch,
+    SchematicSheet,
+    SchematicSymbol,
+} from "../../kicad/schematic";
 import { DocumentViewer } from "../base/document-viewer";
 import { LayerSet } from "./layers";
 import { SchematicPainter } from "./painter";
@@ -52,14 +56,18 @@ export class SchematicViewer extends DocumentViewer<
         return new LayerSet(this.renderer.theme);
     }
 
-    public override select(item: SchematicSymbol | string | BBox | null): void {
+    public override select(
+        item: SchematicSymbol | SchematicSheet | string | BBox | null,
+    ): void {
         // If item is a string, find the symbol by uuid or reference.
         if (is_string(item)) {
-            item = this.schematic.find_symbol(item);
+            item =
+                this.schematic.find_symbol(item) ??
+                this.schematic.find_sheet(item);
         }
 
-        // If it's a symbol, find the bounding box for it.
-        if (item instanceof SchematicSymbol) {
+        // If it's a symbol or sheet, find the bounding box for it.
+        if (item instanceof SchematicSymbol || item instanceof SchematicSheet) {
             const bboxes = this.layers.query_item_bboxes(item);
             item = first(bboxes) ?? null;
         }

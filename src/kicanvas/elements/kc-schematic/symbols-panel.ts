@@ -79,6 +79,7 @@ export class KCSchematicSymbolsPanelElement extends KCUIElement {
         const schematic = this.viewer.schematic;
         const symbol_elms: HTMLElement[] = [];
         const power_symbol_elms: HTMLElement[] = [];
+        const sheet_elms: HTMLElement[] = [];
 
         const symbols = sorted_by_numeric_strings(
             schematic.symbols,
@@ -101,6 +102,23 @@ export class KCSchematicSymbolsPanelElement extends KCUIElement {
             }
         }
 
+        const sheets = sorted_by_numeric_strings(
+            schematic.sheets,
+            (sheet) => sheet.sheetname ?? sheet.sheetfile ?? "",
+        );
+
+        for (const sheet of sheets) {
+            const match_text = `${sheet.sheetname} ${sheet.sheetfile}`;
+            sheet_elms.push(
+                html`<kc-ui-menu-item
+                    name="${sheet.uuid}"
+                    data-match-text="${match_text}">
+                    <span class="narrow"> ${sheet.sheetname} </span>
+                    <span> ${sheet.sheetfile} </span>
+                </kc-ui-menu-item>` as HTMLElement,
+            );
+        }
+
         return html`
             <kc-ui-panel>
                 <kc-ui-panel-title title="Symbols"></kc-ui-panel-title>
@@ -109,8 +127,18 @@ export class KCSchematicSymbolsPanelElement extends KCUIElement {
                     <kc-ui-filtered-list>
                         <kc-ui-menu class="outline">
                             ${symbol_elms}
-                            <kc-ui-menu-label>Power symbols</kc-ui-menu-label>
+                            ${power_symbol_elms.length
+                                ? html`<kc-ui-menu-label
+                                      >Power symbols</kc-ui-menu-label
+                                  >`
+                                : null}
                             ${power_symbol_elms}
+                            ${sheet_elms.length
+                                ? html`<kc-ui-menu-label
+                                      >Sheets</kc-ui-menu-label
+                                  >`
+                                : null}
+                            ${sheet_elms}
                         </kc-ui-menu>
                     </kc-ui-filtered-list>
                 </kc-ui-panel-body>
