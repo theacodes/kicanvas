@@ -694,6 +694,10 @@ class SchematicSheetPainter extends ItemPainter {
             ss.size.y,
         );
 
+        if (layer.name == LayerNames.interactive) {
+            this.gfx.polygon(Polygon.from_BBox(bbox.grow(3), fill_color));
+        }
+
         if (layer.name == LayerNames.symbol_background) {
             this.gfx.polygon(Polygon.from_BBox(bbox, fill_color));
         }

@@ -66,7 +66,8 @@ export class KCUIPropertyListItemElement extends KCUIElement {
     name: string;
 
     override render() {
-        return html`<span>${this.name}</span><span><slot></slot></span>`;
+        return html`<span title="${this.name}">${this.name}</span
+            ><span><slot></slot></span>`;
     }
 }
 

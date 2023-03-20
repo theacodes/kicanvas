@@ -7,7 +7,7 @@
 import { sorted_by_numeric_strings } from "../../../base/array";
 import { html } from "../../../base/web-components";
 import { KCUIElement } from "../../../kc-ui";
-import { SchematicSymbol } from "../../../kicad/schematic";
+import { SchematicSheet, SchematicSymbol } from "../../../kicad/schematic";
 import {
     KiCanvasLoadEvent,
     KiCanvasSelectEvent,
@@ -16,7 +16,7 @@ import { SchematicViewer } from "../../../viewers/schematic/viewer";
 
 export class KCSchematicPropertiesPanelElement extends KCUIElement {
     viewer: SchematicViewer;
-    selected_item?: SchematicSymbol;
+    selected_item?: SchematicSymbol | SchematicSheet;
 
     override connectedCallback() {
         (async () => {
@@ -61,19 +61,19 @@ export class KCSchematicPropertiesPanelElement extends KCUIElement {
                 : html`<kc-ui-icon>close</kc-ui-icon>`;
 
         let entries;
+        const item = this.selected_item;
 
-        if (!this.selected_item) {
+        if (!item) {
             entries = header("No item selected");
-        } else {
-            const itm = this.selected_item;
-            const lib = itm.lib_symbol;
+        } else if (item instanceof SchematicSymbol) {
+            const lib = item.lib_symbol;
 
-            const properties = Array.from(itm.properties.values()).map((v) => {
+            const properties = Array.from(item.properties.values()).map((v) => {
                 return entry(v.name, v.text);
             });
 
             const pins = sorted_by_numeric_strings(
-                itm.unit_pins,
+                item.unit_pins,
                 (pin) => pin.number,
             ).map((p) => {
                 return entry(p.number, p.definition.name.text);
@@ -81,28 +81,30 @@ export class KCSchematicPropertiesPanelElement extends KCUIElement {
 
             entries = html`
                 ${header("Basic properties")}
-                ${entry("X", itm.at.position.x.toFixed(4), "mm")}
-                ${entry("Y", itm.at.position.y.toFixed(4), "mm")}
-                ${entry("Orientation", itm.at.rotation, "°")}
+                ${entry("X", item.at.position.x.toFixed(4), "mm")}
+                ${entry("Y", item.at.position.y.toFixed(4), "mm")}
+                ${entry("Orientation", item.at.rotation, "°")}
                 ${entry(
                     "Mirror",
-                    itm.mirror == "x"
+                    item.mirror == "x"
                         ? "Around X axis"
-                        : itm.mirror == "y"
+                        : item.mirror == "y"
                         ? "Around Y axis"
                         : "Not mirrored",
                 )}
                 ${header("Instance properties")}
-                ${entry("Library link", itm.lib_name ?? itm.lib_id)}
-                ${itm.unit
+                ${entry("Library link", item.lib_name ?? item.lib_id)}
+                ${item.unit
                     ? entry(
                           "Unit",
-                          String.fromCharCode("A".charCodeAt(0) + itm.unit - 1),
+                          String.fromCharCode(
+                              "A".charCodeAt(0) + item.unit - 1,
+                          ),
                       )
                     : ""}
-                ${entry("In BOM", checkbox(itm.in_bom))}
-                ${entry("On board", checkbox(itm.in_bom))}
-                ${entry("Populate", checkbox(!itm.dnp))} ${header("Fields")}
+                ${entry("In BOM", checkbox(item.in_bom))}
+                ${entry("On board", checkbox(item.in_bom))}
+                ${entry("Populate", checkbox(!item.dnp))} ${header("Fields")}
                 ${properties} ${header("Symbol properties")}
                 ${entry("Name", lib.name)}
                 ${entry("Description", lib.description)}
@@ -115,6 +117,26 @@ export class KCSchematicPropertiesPanelElement extends KCUIElement {
                 )}
                 ${header("Pins")} ${pins}
             `;
+        } else if (item instanceof SchematicSheet) {
+            const properties = Array.from(item.properties.values()).map((v) => {
+                return entry(v.name, v.text);
+            });
+
+            const pins = sorted_by_numeric_strings(
+                item.pins,
+                (pin) => pin.name,
+            ).map((p) => {
+                return entry(p.name, p.shape);
+            });
+
+            entries = html`
+                ${header("Basic properties")}
+                ${entry("X", item.at.position.x.toFixed(4), "mm")}
+                ${entry("Y", item.at.position.y.toFixed(4), "mm")}
+                ${header("Fields")} ${properties} ${header("Pins")} ${pins}
+            `;
+
+            console.log(item);
         }
 
         return html`
