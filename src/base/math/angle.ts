@@ -84,6 +84,14 @@ export class Angle {
     }
 
     /**
+     * Returns a new Angle representing the different of this angle and the given angle.
+     */
+    sub(other: AngleLike) {
+        const diff = this.radians - new Angle(other).radians;
+        return new Angle(diff);
+    }
+
+    /**
      * @returns a new Angle constrained to 0 to 360 degrees.
      */
     normalize() {
@@ -93,6 +101,25 @@ export class Angle {
             deg += 360;
         }
         while (deg >= 360) {
+            deg -= 360;
+        }
+
+        const a = new Angle(0);
+        a.degrees = deg;
+
+        return a;
+    }
+
+    /**
+     * @returns a new Angle constrained to -180 to 180 degrees.
+     */
+    normalize180() {
+        let deg = Angle.round(this.degrees);
+
+        while (deg <= -180) {
+            deg += 360;
+        }
+        while (deg > 180) {
             deg -= 360;
         }
 
