@@ -39,22 +39,15 @@ export class Arc {
         const start_radial = start.sub(center);
         const mid_radial = mid.sub(center);
         const end_radial = end.sub(center);
-        let start_angle = start_radial.angle.normalize();
-        const mid_angle = mid_radial.angle.normalize();
-        let end_angle = end_radial.angle.normalize();
+        const start_angle = start_radial.angle;
+        const mid_angle = mid_radial.angle;
+        let end_angle = end_radial.angle;
 
-        if (start_angle.degrees > mid_angle.degrees) {
-            start_angle.degrees -= 360;
-        }
+        const angle1 = mid_angle.sub(start_angle).normalize180();
+        const angle2 = end_angle.sub(mid_angle).normalize180();
+        const arc_angle = angle1.add(angle2);
 
-        if (start_angle.degrees > end_angle.degrees) {
-            [start_angle, end_angle] = [end_angle, start_angle];
-        }
-
-        if (end_angle.degrees < mid_angle.degrees) {
-            [start_angle, end_angle] = [end_angle, start_angle];
-            end_angle.degrees += 360;
-        }
+        end_angle = start_angle.add(arc_angle);
 
         return new Arc(center, radius, start_angle, end_angle, width);
     }
@@ -87,14 +80,12 @@ export class Arc {
      * Approximate the Arc using a polyline
      */
     to_polyline(): Vec2[] {
-        const start = this.start_angle.radians;
-        const end = this.end_angle.radians;
         const points: Vec2[] = [];
+        let start = this.start_angle.radians;
+        let end = this.end_angle.radians;
 
         if (start > end) {
-            throw new Error(
-                `Invalid arc, starts at ${start} and ends at ${end}`,
-            );
+            [end, start] = [start, end];
         }
 
         // TODO: Pull KiCAD's logic for this, since it adds more segments the
