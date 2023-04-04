@@ -613,11 +613,115 @@ class DimensionPainter extends BoardItemPainter {
     classes = [board_items.Dimension];
 
     layers_for(d: board_items.Dimension): string[] {
-        return [];
+        return [d.layer];
     }
 
     paint(layer: ViewLayer, d: board_items.Dimension) {
-        if (this.filter_net) return;
+        const thickness = d.style.thickness ?? 0.2;
+
+        if (d.type != "orthogonal" && d.type != "aligned") {
+            return;
+        }
+
+        let extension = new Vec2();
+        let xbar_start = new Vec2();
+        let xbar_end = new Vec2();
+
+        // See PCB_DIM_ORTHOGONAL::updateGeometry
+        if (d.type == "orthogonal") {
+            if (d.orientation == 0) {
+                extension = new Vec2(0, d.height);
+                xbar_start = d.start.add(extension);
+                xbar_end = new Vec2(d.end.x, xbar_start.y);
+            } else {
+                extension = new Vec2(d.height, 0);
+                xbar_start = d.start.add(extension);
+                xbar_end = new Vec2(xbar_start.x, d.end.y);
+            }
+        }
+        // See PCB_DIM_ALIGNED::updateGeometry
+        else {
+            const dimension = d.end.sub(d.start);
+            if (d.height > 0) {
+                extension = new Vec2(-dimension.y, dimension.x);
+            } else {
+                extension = new Vec2(dimension.y, -dimension.x);
+            }
+
+            const xbar_distance = extension
+                .resize(d.height)
+                .multiply(Math.sign(d.height));
+
+            xbar_start = d.start.add(xbar_distance);
+            xbar_end = d.end.add(xbar_distance);
+        }
+
+        // Draw extensions
+        const extension_height =
+            Math.abs(d.height) -
+            d.style.extension_offset +
+            d.style.extension_height;
+
+        // First extension line
+        let ext_start = d.start.add(extension.resize(d.style.extension_offset));
+        let ext_end = ext_start.add(extension.resize(extension_height));
+        this.gfx.line([ext_start, ext_end], thickness, layer.color);
+
+        // Second extension line
+        ext_start = d.end.add(extension.resize(d.style.extension_offset));
+        ext_end = ext_start.add(extension.resize(extension_height));
+        this.gfx.line([ext_start, ext_end], thickness, layer.color);
+
+        // Draw crossbar
+        // TODO: KiCAD checks to see if the text overlaps the crossbar and
+        // conditionally splits or hides the crossbar.
+        this.gfx.line([xbar_start, xbar_end], thickness, layer.color);
+
+        // Arrows
+        const xbar_angle = xbar_end.sub(xbar_start).angle.negative();
+        const arrow_angle = Angle.from_degrees(27.5);
+        const arrow_end_pos = xbar_angle
+            .add(arrow_angle)
+            .rotate_point(new Vec2(d.style.arrow_length, 0));
+        const arrow_end_neg = xbar_angle
+            .sub(arrow_angle)
+            .rotate_point(new Vec2(d.style.arrow_length, 0));
+
+        this.gfx.line(
+            [xbar_start, xbar_start.add(arrow_end_pos)],
+            thickness,
+            layer.color,
+        );
+        this.gfx.line(
+            [xbar_start, xbar_start.add(arrow_end_neg)],
+            thickness,
+            layer.color,
+        );
+        this.gfx.line(
+            [xbar_end, xbar_end.sub(arrow_end_pos)],
+            thickness,
+            layer.color,
+        );
+        this.gfx.line(
+            [xbar_end, xbar_end.sub(arrow_end_neg)],
+            thickness,
+            layer.color,
+        );
+
+        // Text
+        const pcbtext = new EDAText(d.gr_text.shown_text);
+        pcbtext.apply_effects(d.gr_text.effects);
+        pcbtext.apply_at(d.gr_text.at);
+        pcbtext.attributes.color = layer.color;
+
+        this.gfx.state.push();
+        StrokeFont.default().draw(
+            this.gfx,
+            pcbtext.shown_text,
+            pcbtext.text_pos,
+            pcbtext.attributes,
+        );
+        this.gfx.state.pop();
     }
 }
 
