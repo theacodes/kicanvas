@@ -95,6 +95,9 @@ export class Vec2 {
      * @returns A new unit vector in the same direction as this vector
      */
     normalize(): Vec2 {
+        if (this.x == 0 && this.y == 0) {
+            return new Vec2(0, 0);
+        }
         const l = this.magnitude;
         const x = (this.x /= l);
         const y = (this.y /= l);
@@ -128,5 +131,9 @@ export class Vec2 {
         } else {
             return new Vec2(this.x * s.x, this.y * s.y);
         }
+    }
+
+    resize(len: number) {
+        return this.normalize().multiply(len);
     }
 }
