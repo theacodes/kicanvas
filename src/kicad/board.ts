@@ -622,6 +622,14 @@ export class Dimension {
     get text_vars(): Map<string, string | undefined> {
         return new Map(this.parent.text_vars);
     }
+
+    get start(): Vec2 {
+        return this.pts.at(0) ?? new Vec2(0, 0);
+    }
+
+    get end(): Vec2 {
+        return this.pts.at(-1) ?? new Vec2(0, 0);
+    }
 }
 
 export enum DimensionFormatUnits {
