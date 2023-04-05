@@ -194,12 +194,13 @@ export class BBox {
     /**
      * @returns A new BBox with the size uniformly modified from the center
      */
-    grow(s: number) {
+    grow(dx: number, dy?: number) {
+        dy ??= dx;
         return new BBox(
-            this.x - s,
-            this.y - s,
-            this.w + s * 2,
-            this.h + s * 2,
+            this.x - dx,
+            this.y - dy,
+            this.w + dx * 2,
+            this.h + dy * 2,
             this.context,
         );
     }
