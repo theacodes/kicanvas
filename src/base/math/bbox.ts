@@ -242,4 +242,39 @@ export class BBox {
         const y = Math.min(Math.max(v.y, this.y), this.y2);
         return new Vec2(x, y);
     }
+
+    intersect_segment(a: Vec2, b: Vec2) {
+        if (this.contains_point(a)) {
+            return null;
+        }
+
+        const left: [Vec2, Vec2] = [this.top_left, this.bottom_left];
+        const right: [Vec2, Vec2] = [this.top_right, this.bottom_right];
+        const top: [Vec2, Vec2] = [this.top_left, this.top_right];
+        const bottom: [Vec2, Vec2] = [this.bottom_left, this.bottom_right];
+
+        const start = a;
+        const end = b;
+
+        for (const seg of [left, right, top, bottom]) {
+            const intersection = Vec2.segment_intersect(a, b, ...seg);
+
+            if (!intersection) {
+                continue;
+            }
+
+            if (
+                intersection.sub(start).squared_magnitude <
+                end.sub(start).squared_magnitude
+            ) {
+                end.set(intersection);
+            }
+        }
+
+        if (start.equals(end)) {
+            return null;
+        }
+
+        return end;
+    }
 }
