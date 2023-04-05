@@ -617,11 +617,101 @@ class DimensionPainter extends BoardItemPainter {
     }
 
     paint(layer: ViewLayer, d: board_items.Dimension) {
+        switch (d.type) {
+            case "orthogonal":
+            case "aligned":
+                this.paint_linear(layer, d);
+                break;
+            case "center":
+                this.paint_center(layer, d);
+                break;
+            case "radial":
+                this.paint_radial(layer, d);
+                break;
+        }
+    }
+
+    paint_center(layer: ViewLayer, d: board_items.Dimension) {
         const thickness = d.style.thickness ?? 0.2;
 
-        if (d.type != "orthogonal" && d.type != "aligned") {
-            return;
+        let arm = d.end.sub(d.start);
+        this.gfx.line(
+            [d.start.sub(arm), d.start.add(arm)],
+            thickness,
+            layer.color,
+        );
+
+        arm = Angle.from_degrees(90).rotate_point(arm);
+        this.gfx.line(
+            [d.start.sub(arm), d.start.add(arm)],
+            thickness,
+            layer.color,
+        );
+    }
+
+    paint_radial(layer: ViewLayer, d: board_items.Dimension) {
+        const thickness = d.style.thickness ?? 0.2;
+
+        const center = d.start.copy();
+        let center_arm = new Vec2(0, d.style.arrow_length);
+
+        // Cross shape
+        this.gfx.line(
+            [center.sub(center_arm), center.add(center_arm)],
+            thickness,
+            layer.color,
+        );
+
+        center_arm = Angle.from_degrees(90).rotate_point(center_arm);
+        this.gfx.line(
+            [center.sub(center_arm), center.add(center_arm)],
+            thickness,
+            layer.color,
+        );
+
+        // Line from center to text.
+        let radial = d.end.sub(d.start);
+        radial = radial.resize(d.leader_length);
+
+        const text = this.make_text(layer, d);
+        const text_bbox = text.get_text_box().scale(1 / 10000);
+
+        const arrow_segs = [d.end, d.end.add(radial), d.gr_text.at.position];
+
+        const textbox_pt = text_bbox.intersect_segment(
+            arrow_segs[1]!,
+            arrow_segs[2]!,
+        );
+
+        if (textbox_pt) {
+            arrow_segs[2] = textbox_pt;
         }
+
+        this.gfx.line(arrow_segs, thickness, layer.color);
+
+        // Arrows
+        const arrow_angle = Angle.from_degrees(27.5);
+        const inv_radial_angle = radial.angle.negative();
+        const arrow_seg = new Vec2(d.style.arrow_length, 0);
+        const arrow_end_pos = inv_radial_angle
+            .add(arrow_angle)
+            .rotate_point(arrow_seg);
+        const arrow_end_neg = inv_radial_angle
+            .sub(arrow_angle)
+            .rotate_point(arrow_seg);
+
+        this.gfx.line(
+            [d.end.add(arrow_end_neg), d.end, d.end.add(arrow_end_pos)],
+            thickness,
+            layer.color,
+        );
+
+        // Text
+        this.paint_text(text);
+    }
+
+    paint_linear(layer: ViewLayer, d: board_items.Dimension) {
+        const thickness = d.style.thickness ?? 0.2;
 
         let extension = new Vec2();
         let xbar_start = new Vec2();
@@ -688,38 +778,44 @@ class DimensionPainter extends BoardItemPainter {
             .rotate_point(new Vec2(d.style.arrow_length, 0));
 
         this.gfx.line(
-            [xbar_start, xbar_start.add(arrow_end_pos)],
+            [
+                xbar_start.add(arrow_end_neg),
+                xbar_start,
+                xbar_start.add(arrow_end_pos),
+            ],
             thickness,
             layer.color,
         );
         this.gfx.line(
-            [xbar_start, xbar_start.add(arrow_end_neg)],
-            thickness,
-            layer.color,
-        );
-        this.gfx.line(
-            [xbar_end, xbar_end.sub(arrow_end_pos)],
-            thickness,
-            layer.color,
-        );
-        this.gfx.line(
-            [xbar_end, xbar_end.sub(arrow_end_neg)],
+            [
+                xbar_end.sub(arrow_end_neg),
+                xbar_end,
+                xbar_end.sub(arrow_end_pos),
+            ],
             thickness,
             layer.color,
         );
 
         // Text
+        this.paint_text(this.make_text(layer, d));
+    }
+
+    make_text(layer: ViewLayer, d: board_items.Dimension) {
         const pcbtext = new EDAText(d.gr_text.shown_text);
         pcbtext.apply_effects(d.gr_text.effects);
         pcbtext.apply_at(d.gr_text.at);
         pcbtext.attributes.color = layer.color;
 
+        return pcbtext;
+    }
+
+    paint_text(text: EDAText) {
         this.gfx.state.push();
         StrokeFont.default().draw(
             this.gfx,
-            pcbtext.shown_text,
-            pcbtext.text_pos,
-            pcbtext.attributes,
+            text.shown_text,
+            text.text_pos,
+            text.attributes,
         );
         this.gfx.state.pop();
     }
