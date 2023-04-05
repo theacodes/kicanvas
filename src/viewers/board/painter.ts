@@ -628,6 +628,9 @@ class DimensionPainter extends BoardItemPainter {
             case "radial":
                 this.paint_radial(layer, d);
                 break;
+            case "leader":
+                this.paint_leader(layer, d);
+                break;
         }
     }
 
@@ -676,18 +679,18 @@ class DimensionPainter extends BoardItemPainter {
         const text = this.make_text(layer, d);
         const text_bbox = text.get_text_box().scale(1 / 10000);
 
-        const arrow_segs = [d.end, d.end.add(radial), d.gr_text.at.position];
+        const line_segs = [d.end, d.end.add(radial), d.gr_text.at.position];
 
         const textbox_pt = text_bbox.intersect_segment(
-            arrow_segs[1]!,
-            arrow_segs[2]!,
+            line_segs[1]!,
+            line_segs[2]!,
         );
 
         if (textbox_pt) {
-            arrow_segs[2] = textbox_pt;
+            line_segs[2] = textbox_pt;
         }
 
-        this.gfx.line(arrow_segs, thickness, layer.color);
+        this.gfx.line(line_segs, thickness, layer.color);
 
         // Arrows
         const arrow_angle = Angle.from_degrees(27.5);
@@ -702,6 +705,74 @@ class DimensionPainter extends BoardItemPainter {
 
         this.gfx.line(
             [d.end.add(arrow_end_neg), d.end, d.end.add(arrow_end_pos)],
+            thickness,
+            layer.color,
+        );
+
+        // Text
+        this.paint_text(text);
+    }
+
+    paint_leader(layer: ViewLayer, d: board_items.Dimension) {
+        const thickness = d.style.thickness ?? 0.2;
+
+        // Line from center to text.
+        const text = this.make_text(layer, d);
+        const text_bbox = text
+            .get_text_box()
+            .grow(text.text_width / 2, text.get_effective_text_thickness() * 2)
+            .scale(1 / 10000);
+
+        const start = d.start.add(
+            d.end.sub(d.start).resize(d.style.extension_offset),
+        );
+        const line_segs = [start, d.end, d.gr_text.at.position];
+
+        const textbox_pt = text_bbox.intersect_segment(
+            line_segs[1]!,
+            line_segs[2]!,
+        );
+
+        if (textbox_pt) {
+            line_segs[2] = textbox_pt;
+        }
+
+        this.gfx.line(line_segs, thickness, layer.color);
+
+        // Outline
+        if (d.style.text_frame == 1) {
+            this.gfx.line(
+                Polyline.from_BBox(text_bbox, thickness, layer.color),
+            );
+        }
+        if (d.style.text_frame == 2) {
+            const radius =
+                text_bbox.w / 2 -
+                text.get_effective_text_thickness() / 10000 / 2;
+            this.gfx.arc(
+                text_bbox.center,
+                radius,
+                Angle.from_degrees(0),
+                Angle.from_degrees(360),
+                thickness,
+                layer.color,
+            );
+        }
+
+        // Arrows
+        const radial = d.end.sub(d.start);
+        const arrow_angle = Angle.from_degrees(27.5);
+        const inv_radial_angle = radial.angle.negative();
+        const arrow_seg = new Vec2(d.style.arrow_length, 0);
+        const arrow_end_pos = inv_radial_angle
+            .add(arrow_angle)
+            .rotate_point(arrow_seg);
+        const arrow_end_neg = inv_radial_angle
+            .sub(arrow_angle)
+            .rotate_point(arrow_seg);
+
+        this.gfx.line(
+            [start.add(arrow_end_neg), start, start.add(arrow_end_pos)],
             thickness,
             layer.color,
         );
