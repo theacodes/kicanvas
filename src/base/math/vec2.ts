@@ -77,6 +77,10 @@ export class Vec2 {
         return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
 
+    get squared_magnitude(): number {
+        return this.x ** 2 + this.y ** 2;
+    }
+
     /**
      * @returns the perpendicular normal of this vector
      */
@@ -135,5 +139,33 @@ export class Vec2 {
 
     resize(len: number) {
         return this.normalize().multiply(len);
+    }
+
+    cross(b: Vec2) {
+        return this.x * b.y - this.y * b.x;
+    }
+
+    static segment_intersect(a1: Vec2, b1: Vec2, a2: Vec2, b2: Vec2) {
+        const ray_1 = b1.sub(a1);
+        const ray_2 = b2.sub(a2);
+        const delta = a2.sub(a1);
+
+        const d = ray_2.cross(ray_1);
+        const t1 = ray_2.cross(delta);
+        const t2 = ray_1.cross(delta);
+
+        if (d == 0) {
+            return null;
+        }
+
+        if (d > 0 && (t2 < 0 || t2 > d || t1 < 0 || t1 > d)) {
+            return null;
+        }
+
+        if (d < 0 && (t2 < d || t1 < d || t1 > 0 || t2 > 0)) {
+            return null;
+        }
+
+        return new Vec2(a2.x + (t2 / d) * ray_2.x, a2.y + (t2 / d) * ray_2.y);
     }
 }
