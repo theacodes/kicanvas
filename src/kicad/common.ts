@@ -115,6 +115,10 @@ export class Paper {
         if (!this.height && paper_size) {
             this.height = paper_size[1];
         }
+
+        if (this.size != "User" && this.portrait) {
+            [this.width, this.height] = [this.height, this.width];
+        }
     }
 }
 

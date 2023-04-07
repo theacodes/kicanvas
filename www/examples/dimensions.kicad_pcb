@@ -140,7 +140,7 @@
   (dimension (type radial) (layer "F.Cu") (tstamp 2e80db8a-42f9-4f19-ad7e-2c460aecd169)
     (pts (xy -15.494077 4.794077) (xy -14.494077 3.794077))
     (leader_length 3.81)
-    (gr_text "R 1.4142 mm" (at -9.213445 3.686555 315) (layer "F.Cu") (tstamp 5feac3a5-4c33-4c82-89b8-0155089bb623)
+    (gr_text "R 1.4142 mm" (at -9.213445 3.686555 315) (layer "F.Cu") (tstamp 2e80db8a-42f9-4f19-ad7e-2c460aecd169)
       (effects (font (size 1.5 1.5) (thickness 0.3) bold))
     )
     (format (prefix "R ") (suffix "") (units 3) (units_format 1) (precision 4))
