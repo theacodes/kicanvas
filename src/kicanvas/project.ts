@@ -223,6 +223,10 @@ export class Project implements IDisposable {
     public by_name(name: string) {
         return this.#by_name.get(name);
     }
+
+    public async download(name: string) {
+        return await this.#fs.download(name);
+    }
 }
 
 export class ProjectPage {

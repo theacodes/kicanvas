@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { initiate_download } from "../../base/dom/download";
+
 /**
  * Virtual file system abstract class.
  *
@@ -15,6 +17,7 @@ export abstract class VirtualFileSystem {
     public abstract list(): Generator<string>;
     public abstract get(name: string): Promise<File>;
     public abstract has(name: string): Promise<boolean>;
+    public abstract download(name: string): Promise<void>;
 
     public *list_matches(r: RegExp) {
         for (const filename of this.list()) {
@@ -73,6 +76,10 @@ export class FetchFileSystem extends VirtualFileSystem {
         const blob = await response.blob();
 
         return new File([blob], name);
+    }
+
+    public async download(name: string) {
+        initiate_download(await this.get(name));
     }
 }
 
@@ -152,5 +159,9 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         return await new Promise((resolve, reject) => {
             file_entry!.file(resolve, reject);
         });
+    }
+
+    public async download(name: string) {
+        initiate_download(await this.get(name));
     }
 }
