@@ -13,11 +13,16 @@ import {
 import type { Project } from "../project";
 
 import "../../kc-ui";
+import { delegate } from "../../base/events";
 
 export class KCProjectPanelElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
         css`
+            :host {
+                max-width: 60vw;
+            }
+
             .page {
                 display: flex;
                 align-items: center;
@@ -25,7 +30,7 @@ export class KCProjectPanelElement extends KCUIElement {
 
             .page span.name {
                 margin-right: 1rem;
-                max-width: 50%;
+                flex-grow: 1;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
@@ -55,6 +60,10 @@ export class KCProjectPanelElement extends KCUIElement {
                 text-align: right;
                 color: #aaa;
             }
+
+            .page kc-ui-button {
+                margin-left: 0.5rem;
+            }
         `,
     ];
 
@@ -76,6 +85,14 @@ export class KCProjectPanelElement extends KCUIElement {
         this.addEventListener("kc-ui-menu:select", (e) => {
             const source = (e as CustomEvent).detail as KCUIMenuItemElement;
             this.selected = source?.name ?? null;
+        });
+
+        delegate(this.renderRoot, "kc-ui-button", "click", (e, source) => {
+            const menu_item = source.closest(
+                "kc-ui-menu-item",
+            ) as KCUIMenuItemElement;
+
+            this.project.download(menu_item.name);
         });
     }
 
@@ -126,6 +143,10 @@ export class KCProjectPanelElement extends KCUIElement {
                     <span class="page">
                         <span class="name">Board</span>
                         <span class="filename">${board.filename}</span>
+                        <kc-ui-button
+                            variant="menu"
+                            icon="download"
+                            title="Download"></kc-ui-button>
                     </span>
                 </kc-ui-menu-item>`,
             );
@@ -141,6 +162,10 @@ export class KCProjectPanelElement extends KCUIElement {
                             <span class="number">${page.page}</span>
                             <span class="name">${page.name}</span>
                             <span class="filename">${page.filename}</span>
+                            <kc-ui-button
+                                variant="menu"
+                                icon="download"
+                                title="Download"></kc-ui-button>
                         </span>
                     </kc-ui-menu-item>`,
                 );
@@ -149,7 +174,13 @@ export class KCProjectPanelElement extends KCUIElement {
                     html`<kc-ui-menu-item
                         icon="description"
                         name="${page.filename}//${page.path}">
-                        ${page.filename}
+                        <span class="page">
+                            <span class="name">${page.filename}</span>
+                            <kc-ui-button
+                                variant="menu"
+                                icon="download"
+                                title="Download"></kc-ui-button>
+                        </span>
                     </kc-ui-menu-item>`,
                 );
             }
