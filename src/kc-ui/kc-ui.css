@@ -73,6 +73,12 @@
     --button-toolbar-hover-fg: #81eeff;
     --button-toolbar-disabled-bg: #131218;
     --button-toolbar-disabled-fg: #888;
+    --button-menu-bg: transparent;
+    --button-menu-fg: #f8f8f0;
+    --button-menu-hover-bg: transparent;
+    --button-menu-hover-fg: #81eeff;
+    --button-menu-disabled-bg: transparent;
+    --button-menu-disabled-fg: #888;
 
     --input-bg: #131218;
     --input-fg: #f8f8f0;

@@ -16,11 +16,13 @@ export class KCUIButtonElement extends KCUIElement {
         ...KCUIElement.styles,
         css`
             :host {
-                display: inline-block;
+                display: inline-flex;
                 position: relative;
                 width: auto;
                 cursor: pointer;
                 user-select: none;
+                align-items: center;
+                justify-content: center;
             }
 
             button {
@@ -100,6 +102,33 @@ export class KCUIButtonElement extends KCUIElement {
                 background: var(--button-toolbar-disabled-bg);
                 color: var(--button--toolbar-disabled-fg);
             }
+
+            button.menu {
+                background: var(--button-menu-bg);
+                color: var(--button-menu-fg);
+                padding: 0;
+            }
+
+            button.menu:hover {
+                background: var(--button-menu-hover-bg);
+                color: var(--button-menu-hover-fg);
+                outline: none;
+            }
+
+            button.menu:focus {
+                outline: none;
+            }
+
+            button.menu:disabled {
+                background: var(--button-menu-disabled-bg);
+                color: var(--button-menu-disabled-fg);
+            }
+
+            :host([selected]) button.menu {
+                background: var(--button-menu-disabled-bg);
+                color: var(--button--menu-disabled-fg);
+                outline: none;
+            }
         `,
     ];
 
@@ -155,8 +184,9 @@ export class KCUIButtonElement extends KCUIElement {
     }
 
     override render() {
-        return html`<button>
-            <kc-ui-icon>${this.icon}</kc-ui-icon><slot></slot>
+        return html`<button part="base">
+            <kc-ui-icon part="icon">${this.icon}</kc-ui-icon
+            ><slot part="contents"></slot>
         </button>`;
     }
 }
