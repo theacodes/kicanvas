@@ -113,6 +113,10 @@ export class KCUIMenuElement extends KCUIElement {
         super.initialContentCallback();
 
         delegate(this, `kc-ui-menu-item`, "click", (e, source) => {
+            if ((e.target as HTMLElement).tagName == "KC-UI-BUTTON") {
+                return;
+            }
+
             e.stopPropagation();
             this.selected = source as KCUIMenuItemElement;
         });
@@ -131,6 +135,7 @@ export class KCUIMenuItemElement extends KCUIElement {
         css`
             :host {
                 display: flex;
+                align-items: center;
                 flex-wrap: nowrap;
                 padding: var(--list-item-padding, 0.2rem 0.3rem);
                 user-select: none;
