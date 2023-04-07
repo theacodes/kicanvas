@@ -129,7 +129,7 @@ export class TitleBlock {
     company = "";
     comment: Record<string, string> = {};
 
-    constructor(expr: Parseable) {
+    constructor(expr?: Parseable) {
         /*
         (title_block
             (title "Starfish")
@@ -141,23 +141,25 @@ export class TitleBlock {
             (comment 3 "starfish.wntr.dev")
         )
         */
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("title_block"),
-                P.pair("title", T.string),
-                P.pair("date", T.string),
-                P.pair("rev", T.string),
-                P.pair("company", T.string),
-                P.expr("comment", (obj, name, e) => {
-                    const ep = e as [string, string, string];
-                    const record: Record<string, any> = obj[name] ?? {};
-                    record[ep[1]] = ep[2];
-                    return record;
-                }),
-            ),
-        );
+        if (expr) {
+            Object.assign(
+                this,
+                parse_expr(
+                    expr,
+                    P.start("title_block"),
+                    P.pair("title", T.string),
+                    P.pair("date", T.string),
+                    P.pair("rev", T.string),
+                    P.pair("company", T.string),
+                    P.expr("comment", (obj, name, e) => {
+                        const ep = e as [string, string, string];
+                        const record: Record<string, any> = obj[name] ?? {};
+                        record[ep[1]] = ep[2];
+                        return record;
+                    }),
+                ),
+            );
+        }
     }
 
     get text_vars(): Map<string, string | undefined> {
@@ -166,15 +168,15 @@ export class TitleBlock {
             ["REVISION", this.rev],
             ["TITLE", this.title],
             ["COMPANY", this.company],
-            ["COMMENT1", this.comment[1]],
-            ["COMMENT2", this.comment[2]],
-            ["COMMENT3", this.comment[3]],
-            ["COMMENT4", this.comment[4]],
-            ["COMMENT5", this.comment[5]],
-            ["COMMENT6", this.comment[6]],
-            ["COMMENT7", this.comment[7]],
-            ["COMMENT8", this.comment[8]],
-            ["COMMENT9", this.comment[9]],
+            ["COMMENT1", this.comment[1] ?? ""],
+            ["COMMENT2", this.comment[2] ?? ""],
+            ["COMMENT3", this.comment[3] ?? ""],
+            ["COMMENT4", this.comment[4] ?? ""],
+            ["COMMENT5", this.comment[5] ?? ""],
+            ["COMMENT6", this.comment[6] ?? ""],
+            ["COMMENT7", this.comment[7] ?? ""],
+            ["COMMENT8", this.comment[8] ?? ""],
+            ["COMMENT9", this.comment[9] ?? ""],
         ]);
     }
 }

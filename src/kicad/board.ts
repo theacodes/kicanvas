@@ -30,7 +30,7 @@ export class KicadPCB {
     generator?: string;
     general?: { thickness: number };
     paper?: Paper;
-    title_block?: TitleBlock;
+    title_block = new TitleBlock();
     setup?: Setup;
     properties: Property[] = [];
     layers: Layer[] = [];
@@ -87,7 +87,7 @@ export class KicadPCB {
     }
 
     get text_vars(): Map<string, string | undefined> {
-        const vars = new Map(this.title_block?.text_vars);
+        const vars = this.title_block.text_vars;
         for (const p of this.properties) {
             vars.set(p.name, p.value);
         }

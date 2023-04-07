@@ -51,7 +51,7 @@ export class KicadSch {
     generator?: string;
     uuid: string;
     paper?: Paper;
-    title_block?: TitleBlock;
+    title_block = new TitleBlock();
     lib_symbols?: LibSymbols;
     wires: Wire[] = [];
     buses: Bus[] = [];
@@ -175,7 +175,7 @@ export class KicadSch {
     }
 
     get text_vars(): Map<string, string | undefined> {
-        const vars = new Map(this.title_block?.text_vars);
+        const vars = this.title_block.text_vars;
         vars.set("FILENAME", this.filename);
         return vars;
     }
