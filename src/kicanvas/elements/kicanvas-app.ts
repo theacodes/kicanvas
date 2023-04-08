@@ -12,6 +12,7 @@ import { CSS, attribute, html } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import { KicadPCB, KicadSch, theme } from "../../kicad";
 import { Project } from "../project";
+import { GitHubFileSystem } from "../services/github-vfs";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
 import { KCBoardViewerElement } from "./kc-board/viewer";
 import { KCSchematicViewerElement } from "./kc-schematic/viewer";
@@ -58,18 +59,14 @@ class KiCanvasAppElement extends KCUIElement {
 
         later(async () => {
             if (this.src) {
-                await this.setup_project(new FetchFileSystem([this.src]));
+                const vfs = new FetchFileSystem([this.src]);
+                await this.setup_project(vfs);
                 return;
             }
 
             if (github_path) {
-                // TODO: Use VFS
-                console.log("Github loading disabled");
-                // const gh = new GitHubUserContent();
-                // const gh_url = gh.convert_url(github_path);
-                // (async () => {
-                //     this.load(await gh.get(gh_url));
-                // })();
+                const vfs = await GitHubFileSystem.fromURL(github_path);
+                await this.setup_project(vfs);
                 return;
             }
 

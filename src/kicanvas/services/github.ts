@@ -112,7 +112,7 @@ export class GitHubUserContent {
      * becomes
      * https://raw.githubusercontent.com/wntrblm/Helium/main/hardware/board/board.kicad_sch
      */
-    convert_url(url: string): URL {
+    convert_url(url: string | URL): URL {
         const u = new URL(url, "https://github.com/");
 
         if (u.host == "raw.githubusercontent.com") {
