@@ -135,8 +135,6 @@ export class KCSchematicPropertiesPanelElement extends KCUIElement {
                 ${entry("Y", item.at.position.y.toFixed(4), "mm")}
                 ${header("Fields")} ${properties} ${header("Pins")} ${pins}
             `;
-
-            console.log(item);
         }
 
         return html`
