@@ -79,6 +79,7 @@ class KiCanvasAppElement extends KCUIElement {
         });
 
         this.addEventListener("file:select", (e) => {
+            e.stopPropagation();
             const detail = (e as CustomEvent).detail;
             this.load_file(detail.filename, detail.sheet_path);
         });
@@ -138,7 +139,7 @@ class KiCanvasAppElement extends KCUIElement {
             this.#kc_schematic_viewer.classList.remove("is-hidden");
             await this.#kc_schematic_viewer.load(doc, sheet_path);
         } else {
-            throw new Error(`Unable to load ${filename}`);
+            log.error(`Unable to load ${filename}`);
         }
     }
 
