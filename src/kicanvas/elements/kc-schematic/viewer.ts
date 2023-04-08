@@ -7,6 +7,7 @@
 import { html } from "../../../base/web-components";
 import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
 import type { KicadSch } from "../../../kicad";
+import { SchematicSheet } from "../../../kicad/schematic";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
@@ -18,9 +19,9 @@ import "./properties-panel";
 import "./symbols-panel";
 
 /**
- * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
+ * Internal custom element for <kicanvas-app>'s schematic viewer. Handles setting
  * up the actual board viewer as well as interface controls. It's basically
- * KiCanvas's version of PCBNew.
+ * KiCanvas's version of EESchema.
  */
 export class KCSchematicViewerElement extends KCUIElement {
     static override useShadowRoot = false;
@@ -40,9 +41,26 @@ export class KCSchematicViewerElement extends KCUIElement {
     override initialContentCallback() {
         this.addDisposable(
             this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+                const item = e.detail.item;
+
                 // Selecting the same item twice should show the properties panel.
-                if (e.detail.item && e.detail.item == e.detail.previous) {
+                if (item && item == e.detail.previous) {
                     this.activity_bar_elm.change_activity("properties");
+
+                    // If the user clicked on a sheet instance, send this event
+                    // upwards so kicanvas-app can load the sheet.
+                    if (item instanceof SchematicSheet) {
+                        this.dispatchEvent(
+                            new CustomEvent("file:select", {
+                                detail: {
+                                    filename: item.sheetfile,
+                                    sheet_path: `${item.path}/${item.uuid}`,
+                                },
+                                composed: true,
+                                bubbles: true,
+                            }),
+                        );
+                    }
                 }
             }),
         );
