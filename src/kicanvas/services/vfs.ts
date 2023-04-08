@@ -60,8 +60,8 @@ export class FetchFileSystem extends VirtualFileSystem {
         yield* this.urls.keys();
     }
 
-    public override async has(name: string): Promise<boolean> {
-        return this.urls.has(name);
+    public override async has(name: string) {
+        return Promise.resolve(this.urls.has(name));
     }
 
     public override async get(name: string): Promise<File> {
