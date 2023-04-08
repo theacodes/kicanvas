@@ -7,6 +7,7 @@
 import { Deferred, later } from "../../base/async";
 import { Disposables, type IDisposable } from "../../base/disposable";
 import { listen } from "../../base/events";
+import { no_self_recursion } from "../../base/functions";
 import { BBox, Vec2 } from "../../base/math";
 import { Color, Polygon, Polyline, Renderer } from "../../graphics";
 import {
@@ -186,6 +187,11 @@ export abstract class Viewer extends EventTarget {
     }
 
     public set selected(bb: BBox | null) {
+        this._set_selected(bb);
+    }
+
+    @no_self_recursion
+    private _set_selected(bb: BBox | null) {
         const previous = this.#selected;
         this.#selected = bb?.copy() || null;
 
