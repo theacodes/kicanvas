@@ -123,11 +123,11 @@ export class KicadSch {
         // See SCH_SHEET_LIST::UpdateSymbolInstanceData
         path ??= ``;
 
-        const global_instances = this.symbol_instances?.symbol_instances;
+        const global_symbol_instances = this.symbol_instances?.symbol_instances;
 
         for (const s of this.symbols) {
             const instance_data =
-                global_instances?.get(`${path}/${s.uuid}`) ??
+                global_symbol_instances?.get(`${path}/${s.uuid}`) ??
                 s.instances.get(path);
 
             if (!instance_data) {
@@ -138,6 +138,22 @@ export class KicadSch {
             s.value = instance_data.value ?? s.value;
             s.footprint = instance_data.footprint ?? s.footprint;
             s.unit = instance_data.unit ?? s.unit;
+        }
+
+        // See SCH_SHEET_LIST::UpdateSheetInstanceData
+        const global_sheet_instances = this.sheet_instances?.sheet_instances;
+
+        for (const s of this.sheets) {
+            const instance_data =
+                global_sheet_instances?.get(`${path}/${s.uuid}`) ??
+                s.instances.get(path);
+
+            if (!instance_data) {
+                continue;
+            }
+
+            s.page = instance_data.page;
+            s.path = instance_data.path;
         }
     }
 
@@ -1220,7 +1236,7 @@ export class PinInstance {
 }
 
 export class SheetInstances {
-    sheet_instances: SheetInstance[] = [];
+    sheet_instances: Map<string, SheetInstance> = new Map();
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -1228,7 +1244,12 @@ export class SheetInstances {
             parse_expr(
                 expr,
                 P.start("sheet_instances"),
-                P.collection("sheet_instances", "path", T.item(SheetInstance)),
+                P.mapped_collection(
+                    "sheet_instances",
+                    "path",
+                    (obj: SheetInstance) => obj.path,
+                    T.item(SheetInstance),
+                ),
             ),
         );
     }
@@ -1309,6 +1330,8 @@ export class SchematicSheet {
     pins: SchematicSheetPin[] = [];
     uuid: string;
     instances: Map<string, SchematicSheetInstance> = new Map();
+    page?: string;
+    path?: string;
 
     constructor(expr: Parseable) {
         const parsed = parse_expr(
