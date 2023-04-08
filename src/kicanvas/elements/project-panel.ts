@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { delegate } from "../../base/events";
+import { no_self_recursion } from "../../base/functions";
 import { css, html } from "../../base/web-components";
 import {
     KCUIElement,
@@ -13,7 +15,6 @@ import {
 import type { Project } from "../project";
 
 import "../../kc-ui";
-import { delegate } from "../../base/events";
 
 export class KCProjectPanelElement extends KCUIElement {
     static override styles = [
@@ -83,8 +84,11 @@ export class KCProjectPanelElement extends KCUIElement {
         super.initialContentCallback();
 
         this.addEventListener("kc-ui-menu:select", (e) => {
+            if (this.#setting_selected) return;
+
             const source = (e as CustomEvent).detail as KCUIMenuItemElement;
             this.selected = source?.name ?? null;
+            this.send_selected_event();
         });
 
         delegate(this.renderRoot, "kc-ui-button", "click", (e, source) => {
@@ -105,9 +109,16 @@ export class KCProjectPanelElement extends KCUIElement {
             return;
         }
 
+        this.#setting_selected = true;
         this.#selected = name;
         this.#dropdown.menu.selected = name;
+        this.#setting_selected = false;
+    }
 
+    #setting_selected = false;
+
+    @no_self_recursion
+    private send_selected_event() {
         const selected_elm = this.#dropdown.menu.selected;
 
         if (!selected_elm) {
