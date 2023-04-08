@@ -85,6 +85,11 @@ export abstract class DocumentViewer<
         // Mark the viewer as loaded and notify event listeners
         this.resolve_loaded(true);
 
+        // Deselect any selected items.
+        if (this.selected) {
+            this.selected = null;
+        }
+
         // Draw
         this.draw();
 
