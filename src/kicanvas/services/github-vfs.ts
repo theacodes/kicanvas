@@ -17,16 +17,17 @@ export class GitHubFileSystem extends VirtualFileSystem {
         super();
     }
 
-    public static async fromURL(url: string | URL) {
-        // Case 1: A URL to a single file like
+    public static async fromURLs(...urls: (string | URL)[]) {
+        // Handles URLs like this:
         // https://github.com/wntrblm/Helium/blob/main/hardware/board/board.kicad_sch
-
-        const guc_url = gh_user_content.convert_url(url);
-        const basename = guc_url.pathname.split("/").at(-1)!;
 
         const files_to_urls = new Map();
 
-        files_to_urls.set(basename, guc_url);
+        for (const url of urls) {
+            const guc_url = gh_user_content.convert_url(url);
+            const basename = guc_url.pathname.split("/").at(-1)!;
+            files_to_urls.set(basename, guc_url);
+        }
 
         return new GitHubFileSystem(files_to_urls);
     }

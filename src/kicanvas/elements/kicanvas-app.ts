@@ -55,7 +55,7 @@ class KiCanvasAppElement extends KCUIElement {
 
     override initialContentCallback() {
         const url_params = new URLSearchParams(document.location.search);
-        const github_path = url_params.get("github");
+        const github_paths = url_params.getAll("github");
 
         later(async () => {
             if (this.src) {
@@ -64,8 +64,9 @@ class KiCanvasAppElement extends KCUIElement {
                 return;
             }
 
-            if (github_path) {
-                const vfs = await GitHubFileSystem.fromURL(github_path);
+            if (github_paths.length) {
+                console.log(github_paths);
+                const vfs = await GitHubFileSystem.fromURLs(...github_paths);
                 await this.setup_project(vfs);
                 return;
             }
