@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { initiate_download } from "../../base/dom/download";
+import { basename } from "../../base/paths";
 import { GitHubUserContent } from "./github";
 import { VirtualFileSystem } from "./vfs";
 
@@ -25,8 +27,8 @@ export class GitHubFileSystem extends VirtualFileSystem {
 
         for (const url of urls) {
             const guc_url = gh_user_content.convert_url(url);
-            const basename = guc_url.pathname.split("/").at(-1)!;
-            files_to_urls.set(basename, guc_url);
+            const name = basename(guc_url);
+            files_to_urls.set(name, guc_url);
         }
 
         return new GitHubFileSystem(files_to_urls);
@@ -50,7 +52,11 @@ export class GitHubFileSystem extends VirtualFileSystem {
         return Promise.resolve(this.files_to_urls.has(name));
     }
 
-    public override download(name: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    public override async download(name: string) {
+        // Note: we can't just use the GitHub URL to download since the anchor
+        // tag method used by initiate_download() only works for same-origin
+        // or data: urls, so this actually fetch()s the file and then initiates
+        // the download.
+        initiate_download(await this.get(name));
     }
 }
