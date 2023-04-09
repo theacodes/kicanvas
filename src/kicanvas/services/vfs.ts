@@ -5,6 +5,7 @@
 */
 
 import { initiate_download } from "../../base/dom/download";
+import { basename } from "../../base/paths";
 
 /**
  * Virtual file system abstract class.
@@ -51,8 +52,8 @@ export class FetchFileSystem extends VirtualFileSystem {
 
         for (const item of urls) {
             const url = new URL(item, window.location.toString());
-            const basename = url.pathname.split("/").at(-1)!;
-            this.urls.set(basename, url);
+            const name = basename(url);
+            this.urls.set(name, url);
         }
     }
 

@@ -4,6 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { basename } from "../../base/paths";
+
 export class BaseAPIError extends Error {
     constructor(
         public override name: string,
@@ -100,7 +102,7 @@ export class GitHubUserContent {
         const request = new Request(url, { method: "GET" });
         const response = await fetch(request);
         const blob = await response.blob();
-        const name = url.pathname.split("/").at(-1) ?? "unknown";
+        const name = basename(url) ?? "unknown";
 
         return new File([blob], name);
     }
