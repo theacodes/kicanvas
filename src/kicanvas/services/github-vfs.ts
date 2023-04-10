@@ -5,11 +5,13 @@
 */
 
 import { initiate_download } from "../../base/dom/download";
-import { basename } from "../../base/paths";
-import { GitHubUserContent } from "./github";
+import { basename, extension } from "../../base/paths";
+import { GitHub, GitHubUserContent } from "./github";
 import { VirtualFileSystem } from "./vfs";
 
+const kicad_extensions = ["kicad_pcb", "kicad_pro", "kicad_sch"];
 const gh_user_content = new GitHubUserContent();
+const gh = new GitHub();
 
 /**
  * Virtual file system for GitHub.
@@ -26,9 +28,43 @@ export class GitHubFileSystem extends VirtualFileSystem {
         const files_to_urls = new Map();
 
         for (const url of urls) {
-            const guc_url = gh_user_content.convert_url(url);
-            const name = basename(guc_url);
-            files_to_urls.set(name, guc_url);
+            const info = GitHub.parse_url(url);
+
+            if (!info || !info.owner || !info.repo) {
+                continue;
+            }
+
+            // Link to a single file.
+            if (info.type == "blob") {
+                const guc_url = gh_user_content.convert_url(url);
+                const name = basename(guc_url);
+                files_to_urls.set(name, guc_url);
+            }
+
+            // Link to a directory.
+            else if (info.type == "tree") {
+                // Get a list of files in the directory.
+                const gh_file_list = (await gh.repos_contents(
+                    info.owner,
+                    info.repo,
+                    info.path ?? "",
+                    info.ref,
+                )) as Record<string, string>[];
+
+                for (const gh_file of gh_file_list) {
+                    const name = gh_file["name"];
+                    const download_url = gh_file["download_url"];
+                    if (
+                        !name ||
+                        !download_url ||
+                        !kicad_extensions.includes(extension(name))
+                    ) {
+                        continue;
+                    }
+
+                    files_to_urls.set(name, download_url);
+                }
+            }
         }
 
         return new GitHubFileSystem(files_to_urls);
