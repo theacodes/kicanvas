@@ -30,6 +30,7 @@ export class NotFoundError extends BaseAPIError {
 }
 
 export class GitHub {
+    static readonly html_base_url = "https://github.com";
     static readonly base_url = "https://api.github.com/";
     static readonly api_version = "2022-11-28";
     static readonly accept_header = "application/vnd.github+json";
@@ -45,10 +46,55 @@ export class GitHub {
         };
     }
 
-    async request(path: string, data?: unknown): Promise<unknown> {
+    /**
+     * Parse an html (user-facing) URL
+     */
+    static parse_url(url: string | URL) {
+        url = new URL(url, GitHub.html_base_url);
+        const path_parts = url.pathname.split("/");
+
+        if (path_parts.length < 3) {
+            return null;
+        }
+
+        const [, owner, repo, ...parts] = path_parts;
+
+        let type;
+        let ref;
+        let path;
+
+        if (parts.length) {
+            if (parts[0] == "blob" || parts[0] == "tree") {
+                type = parts.shift();
+                ref = parts.shift();
+                path = parts.join("/");
+            }
+        }
+
+        return {
+            owner: owner,
+            repo: repo,
+            type: type,
+            ref: ref,
+            path: path,
+        };
+    }
+
+    async request(
+        path: string,
+        params?: Record<string, string>,
+        data?: unknown,
+    ): Promise<unknown> {
         const static_this = this.constructor as typeof GitHub;
 
-        const request = new Request(new URL(path, static_this.base_url), {
+        const url = new URL(path, static_this.base_url);
+
+        if (params) {
+            const url_params = new URLSearchParams(params).toString();
+            url.search = `?${url_params}`;
+        }
+
+        const request = new Request(url, {
             method: data ? "POST" : "GET",
             headers: this.headers,
             body: data ? JSON.stringify(data) : undefined,
@@ -89,6 +135,17 @@ export class GitHub {
                 );
             }
         }
+    }
+
+    async repos_contents(
+        owner: string,
+        repo: string,
+        path: string,
+        ref?: string,
+    ) {
+        return await this.request(`repos/${owner}/${repo}/contents/${path}`, {
+            ref: ref ?? "",
+        });
     }
 }
 
