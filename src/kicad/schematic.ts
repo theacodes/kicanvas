@@ -1169,7 +1169,7 @@ export class SchematicSymbol {
     }
 
     get unit_suffix() {
-        if (!this.unit || this.lib_symbol.units.size <= 1) {
+        if (!this.unit || this.lib_symbol.unit_count <= 1) {
             return "";
         }
 
