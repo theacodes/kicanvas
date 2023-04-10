@@ -65,7 +65,6 @@ class KiCanvasAppElement extends KCUIElement {
             }
 
             if (github_paths.length) {
-                console.log(github_paths);
                 const vfs = await GitHubFileSystem.fromURLs(...github_paths);
                 await this.setup_project(vfs);
                 return;
