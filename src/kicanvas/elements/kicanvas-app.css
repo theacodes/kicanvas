@@ -45,6 +45,18 @@ section.overlay p {
     max-width: 50%;
 }
 
+section.overlay input {
+    font-size: 1.5rem;
+    color: var(--fg);
+    background: var(--gradient-purple-red);
+    max-width: 50%;
+    margin-top: 2rem;
+}
+
+section.overlay input::placeholder {
+    color: var(--fg);
+}
+
 kicanvas-schematic,
 kicanvas-board {
     width: 100%;

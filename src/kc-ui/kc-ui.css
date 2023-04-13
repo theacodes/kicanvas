@@ -158,6 +158,7 @@
             hsl(149deg 27% 50%) 100%
         )
         0 0 fixed;
+    --gradient-purple-red: linear-gradient(90deg, #8864cb, #cb6488) 0 0 fixed;
 
     --scrollbar-bg: var(--gradient-purple-blue-dark);
     --scrollbar-fg: var(--gradient-purple-green-light);
@@ -270,4 +271,75 @@ kc-ui-view.fixed,
 kc-ui-split-view.fixed {
     flex-grow: 0;
     flex-shrink: 0;
+}
+
+/*
+    Input elements
+*/
+
+label {
+    display: block;
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+input,
+select,
+textarea {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0.5rem;
+    font-family: inherit;
+    border-radius: 0.25rem;
+    text-align: center;
+    padding: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-fg);
+    transition: color var(--transition-time-medium) ease,
+        box-shadow var(--transition-time-medium) ease,
+        outline var(--transition-time-medium) ease,
+        background var(--transition-time-medium) ease,
+        border var(--transition-time-medium) ease;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    z-index: 10;
+    box-shadow: var(--input-hover-shadow);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    z-index: 10;
+    box-shadow: none;
+    outline: var(--input-focus-outline);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: var(--input-disabled-bg);
+    color: var(--input-disabled-fg);
+}
+
+input:disabled:hover,
+select:disabled:hover,
+textarea:disabled:hover {
+    z-index: 10;
+    cursor: unset;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+textarea {
+    text-align: left;
+    padding: 0.5rem;
 }

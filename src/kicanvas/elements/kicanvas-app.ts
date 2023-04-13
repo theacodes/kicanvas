@@ -8,10 +8,11 @@ import { later } from "../../base/async";
 import { DropTarget } from "../../base/dom/drag-drop";
 import { first } from "../../base/iterator";
 import * as log from "../../base/log";
-import { CSS, attribute, html } from "../../base/web-components";
+import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import { KicadPCB, KicadSch, theme } from "../../kicad";
 import { Project } from "../project";
+import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
 import { KCBoardViewerElement } from "./kc-board/viewer";
@@ -53,6 +54,9 @@ class KiCanvasAppElement extends KCUIElement {
     @attribute({ type: String })
     public src: string;
 
+    @query(`input[name="link"]`, true)
+    public link_input: HTMLInputElement;
+
     override initialContentCallback() {
         const url_params = new URLSearchParams(document.location.search);
         const github_paths = url_params.getAll("github");
@@ -79,6 +83,20 @@ class KiCanvasAppElement extends KCUIElement {
             e.stopPropagation();
             const detail = (e as CustomEvent).detail;
             this.load_file(detail.filename, detail.sheet_path);
+        });
+
+        this.link_input.addEventListener("input", async (e) => {
+            const link = this.link_input.value;
+            if (!GitHub.parse_url(link)) {
+                return;
+            }
+
+            const vfs = await GitHubFileSystem.fromURLs(link);
+            await this.setup_project(vfs);
+
+            const location = new URL(window.location.href);
+            location.searchParams.set("github", link);
+            window.history.pushState(null, "", location);
         });
     }
 
@@ -155,7 +173,12 @@ class KiCanvasAppElement extends KCUIElement {
             <kc-ui-app>
                 <section class="overlay">
                     <img src="kicanvas.png" />
-                    <p>Drag & drop your kicad schematic or board file here.</p>
+                    <input
+                        name="link"
+                        type="text"
+                        placeholder="Paste a GitHub link"
+                        autofocus />
+                    <p>or drag & drop your KiCAD files</p>
                 </section>
                 <main>
                     <kc-ui-floating-toolbar location="top">
