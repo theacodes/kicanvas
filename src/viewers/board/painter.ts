@@ -565,9 +565,12 @@ class FpTextPainter extends BoardItemPainter {
         }
 
         if (t.render_cache) {
+            this.gfx.state.push();
+            this.gfx.state.matrix = Matrix3.identity();
             for (const poly of t.render_cache.polygons) {
                 this.view_painter.paint_item(layer, poly);
             }
+            this.gfx.state.pop();
             return;
         }
 
