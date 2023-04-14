@@ -159,6 +159,8 @@
         )
         0 0 fixed;
     --gradient-purple-red: linear-gradient(90deg, #8864cb, #cb6488) 0 0 fixed;
+    --gradient-purple-red-highlight: linear-gradient(90deg, #b187ff, #ff80ac) 0
+        0 fixed;
 
     --scrollbar-bg: var(--gradient-purple-blue-dark);
     --scrollbar-fg: var(--gradient-purple-green-light);

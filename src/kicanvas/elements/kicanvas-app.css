@@ -35,8 +35,18 @@ section.overlay {
     justify-content: center;
 }
 
-section.overlay img {
-    max-width: 20%;
+section.overlay h1 {
+    display: flex;
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    font-weight: 300;
+    text-shadow: 0 0 5px var(--gradient-purple-red);
+}
+
+section.overlay h1 img {
+    width: 1.5em;
 }
 
 section.overlay p {
@@ -45,12 +55,27 @@ section.overlay p {
     max-width: 50%;
 }
 
+section.overlay strong {
+    background: var(--gradient-purple-red-highlight);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+section.overlay a {
+    color: #81eeff;
+}
+
+section.overlay a:hover {
+    color: #a3f3ff;
+}
+
 section.overlay input {
     font-size: 1.5rem;
     color: var(--fg);
     background: var(--gradient-purple-red);
     max-width: 50%;
-    margin-top: 2rem;
 }
 
 section.overlay input::placeholder {

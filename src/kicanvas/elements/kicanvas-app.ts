@@ -172,7 +172,21 @@ class KiCanvasAppElement extends KCUIElement {
         return html`
             <kc-ui-app>
                 <section class="overlay">
-                    <img src="kicanvas.png" />
+                    <h1>
+                        <img src="kicanvas.png" />
+                        KiCanvas
+                    </h1>
+                    <p>
+                        KiCanvas is an <strong>interactive</strong>,
+                        <strong>browser-based</strong> viewer for KiCAD
+                        schematics and boards. It's in <strong>alpha</strong> so
+                        please
+                        <a
+                            href="https://github.com/theacodes/kicanvas/issues/new"
+                            target="_blank">
+                            report any bugs</a
+                        >!
+                    </p>
                     <input
                         name="link"
                         type="text"
