@@ -193,6 +193,14 @@ class KiCanvasAppElement extends KCUIElement {
                         placeholder="Paste a GitHub link"
                         autofocus />
                     <p>or drag & drop your KiCAD files</p>
+                    <p class="github">
+                        <a
+                            href="https://github.com/theacodes/kicanvas"
+                            target="_blank"
+                            title="Visit on GitHub"
+                            ><img src="github-mark-white.svg"
+                        /></a>
+                    </p>
                 </section>
                 <main>
                     <kc-ui-floating-toolbar location="top">

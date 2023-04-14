@@ -33,6 +33,7 @@ section.overlay {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: var(--gradient-purple-blue-dark);
 }
 
 section.overlay h1 {
@@ -80,6 +81,10 @@ section.overlay input {
 
 section.overlay input::placeholder {
     color: var(--fg);
+}
+
+section.overlay p.github img {
+    width: 2rem;
 }
 
 kicanvas-schematic,
