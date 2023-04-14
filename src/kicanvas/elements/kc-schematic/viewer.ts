@@ -12,6 +12,7 @@ import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
+import "../help-panel";
 import "../kicanvas-schematic";
 import "../viewer-bottom-toolbar";
 import "./info-panel";
@@ -83,6 +84,13 @@ export class KCSchematicViewerElement extends KCUIElement {
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Info" icon="info">
                 <kc-schematic-info-panel></kc-schematic-info-panel>
+            </kc-ui-activity>
+            <kc-ui-activity
+                slot="activities"
+                name="Help"
+                icon="help"
+                button-location="bottom">
+                <kc-help-panel></kc-help-panel>
             </kc-ui-activity>
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 

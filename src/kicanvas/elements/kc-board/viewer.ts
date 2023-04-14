@@ -11,6 +11,7 @@ import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KiCanvasBoardElement } from "../kicanvas-board";
 
 // import dependent elements so they're registered before use.
+import "../help-panel";
 import "../kicanvas-board";
 import "../viewer-bottom-toolbar";
 import "./footprints-panel";
@@ -77,6 +78,13 @@ export class KCBoardViewerElement extends KCUIElement {
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Board info" icon="info">
                 <kc-board-info-panel></kc-board-info-panel>
+            </kc-ui-activity>
+            <kc-ui-activity
+                slot="activities"
+                name="Help"
+                icon="help"
+                button-location="bottom">
+                <kc-help-panel></kc-help-panel>
             </kc-ui-activity>
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
