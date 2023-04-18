@@ -14,6 +14,7 @@ import {
 } from "../../kc-ui";
 import type { Project } from "../project";
 
+import "../../icons";
 import "../../kc-ui";
 
 export class KCProjectPanelElement extends KCUIElement {
@@ -149,7 +150,7 @@ export class KCProjectPanelElement extends KCUIElement {
         for (const board of this.project.boards()) {
             file_btn_elms.push(
                 html`<kc-ui-menu-item
-                    icon="plagiarism"
+                    icon="svg:pcb_file"
                     name="${board.filename}">
                     <span class="page">
                         <span class="name">Board</span>
@@ -167,7 +168,7 @@ export class KCProjectPanelElement extends KCUIElement {
             if (page.page) {
                 file_btn_elms.push(
                     html`<kc-ui-menu-item
-                        icon="description"
+                        icon="svg:schematic_file"
                         name="${page.filename}//${page.path}">
                         <span class="page">
                             <span class="number">${page.page}</span>
@@ -183,7 +184,7 @@ export class KCProjectPanelElement extends KCUIElement {
             } else {
                 file_btn_elms.push(
                     html`<kc-ui-menu-item
-                        icon="description"
+                        icon="svg:schematic_file"
                         name="${page.filename}//${page.path}">
                         <span class="page">
                             <span class="name">${page.filename}</span>

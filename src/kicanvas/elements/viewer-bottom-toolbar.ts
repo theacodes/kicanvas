@@ -5,13 +5,14 @@
 */
 
 import { css, html } from "../../base/web-components";
-import { zoom_footprint, zoom_page } from "../../icons";
 import { KCUIElement, type KCUIButtonElement } from "../../kc-ui";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
 } from "../../viewers/base/events";
 import type { Viewer } from "../../viewers/base/viewer";
+
+import "../../icons";
 
 export class KCViewerBottomToolbarElement extends KCUIElement {
     static override styles = [
@@ -86,16 +87,16 @@ export class KCViewerBottomToolbarElement extends KCUIElement {
         this.#zoom_to_page_btn = html`<kc-ui-button
             variant="toolbar"
             name="zoom_to_page"
-            title="zoom to page">
-            ${zoom_page}
+            title="zoom to page"
+            icon="svg:zoom_page">
         </kc-ui-button>` as KCUIButtonElement;
 
         this.#zoom_to_selection_btn = html` <kc-ui-button
             variant="toolbar"
             name="zoom_to_selection"
             title="zoom to selection"
+            icon="svg:zoom_footprint"
             disabled>
-            ${zoom_footprint}
         </kc-ui-button>` as KCUIButtonElement;
 
         this.update_position();
