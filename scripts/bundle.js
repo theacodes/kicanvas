@@ -22,6 +22,7 @@ export async function bundle(options = {}) {
             ".js": "ts",
             ".glsl": "text",
             ".css": "text",
+            ".svg": "text",
             ".kicad_wks": "text",
         },
         plugins: [CSSMinifyPlugin],

@@ -4,7 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { html, css } from "../../base/web-components";
+import { css, html } from "../../base/web-components";
+import { zoom_footprint, zoom_page } from "../../icons";
 import { KCUIElement, type KCUIButtonElement } from "../../kc-ui";
 import {
     KiCanvasMouseMoveEvent,
@@ -84,17 +85,17 @@ export class KCViewerBottomToolbarElement extends KCUIElement {
 
         this.#zoom_to_page_btn = html`<kc-ui-button
             variant="toolbar"
-            icon="document_scanner"
             name="zoom_to_page"
             title="zoom to page">
+            ${zoom_page}
         </kc-ui-button>` as KCUIButtonElement;
 
         this.#zoom_to_selection_btn = html` <kc-ui-button
             variant="toolbar"
             name="zoom_to_selection"
             title="zoom to selection"
-            icon="jump_to_element"
             disabled>
+            ${zoom_footprint}
         </kc-ui-button>` as KCUIButtonElement;
 
         this.update_position();

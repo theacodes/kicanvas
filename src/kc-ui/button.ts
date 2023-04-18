@@ -42,6 +42,10 @@ export class KCUIButtonElement extends KCUIElement {
                     background var(--transition-time-short) ease;
             }
 
+            :host {
+                fill: var(--button-fg);
+            }
+
             button:hover {
                 background: var(--button-hover-bg);
                 color: var(--button-hover-fg);
@@ -59,6 +63,12 @@ export class KCUIButtonElement extends KCUIElement {
             :host([selected]) button {
                 background: var(--button-selected-bg);
                 color: var(--button-selected-fg);
+            }
+
+            ::slotted(svg) {
+                width: 1em;
+                height: auto;
+                fill: currentColor;
             }
 
             /* variants */
@@ -184,9 +194,12 @@ export class KCUIButtonElement extends KCUIElement {
     }
 
     override render() {
+        const icon = this.icon
+            ? html`<kc-ui-icon part="icon">${this.icon}</kc-ui-icon>`
+            : undefined;
         return html`<button part="base">
-            <kc-ui-icon part="icon">${this.icon}</kc-ui-icon
-            ><slot part="contents"></slot>
+            ${icon}
+            <slot part="contents"></slot>
         </button>`;
     }
 }
