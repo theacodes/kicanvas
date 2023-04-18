@@ -12,8 +12,6 @@ import {
 } from "../../viewers/base/events";
 import type { Viewer } from "../../viewers/base/viewer";
 
-import "../../icons";
-
 export class KCViewerBottomToolbarElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,

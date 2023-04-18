@@ -14,7 +14,6 @@ import {
 } from "../../kc-ui";
 import type { Project } from "../project";
 
-import "../../icons";
 import "../../kc-ui";
 
 export class KCProjectPanelElement extends KCUIElement {

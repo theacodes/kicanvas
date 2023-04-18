@@ -9,8 +9,9 @@ import { DropTarget } from "../../base/dom/drag-drop";
 import { first } from "../../base/iterator";
 import * as log from "../../base/log";
 import { CSS, attribute, html, query } from "../../base/web-components";
-import { KCUIElement } from "../../kc-ui";
+import { KCUIElement, KCUIIconElement } from "../../kc-ui";
 import { KicadPCB, KicadSch, theme } from "../../kicad";
+import { sprites_url } from "../icons/sprites";
 import { Project } from "../project";
 import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
@@ -22,9 +23,13 @@ import type { KCProjectPanelElement } from "./project-panel";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import kicanvas_app_styles from "./kicanvas-app.css";
 
+import "../icons/sprites";
 import "./kc-board/viewer";
 import "./kc-schematic/viewer";
 import "./project-panel";
+
+// Setup KCUIIconElement to use icon sprites.
+KCUIIconElement.sprites_url = sprites_url;
 
 class KiCanvasAppElement extends KCUIElement {
     static override styles = [
@@ -171,6 +176,7 @@ class KiCanvasAppElement extends KCUIElement {
 
         return html`
             <kc-ui-app>
+                <kc-sprites-src></kc-sprites-src>
                 <section class="overlay">
                     <h1>
                         <img src="kicanvas.png" />
