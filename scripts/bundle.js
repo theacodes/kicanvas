@@ -5,8 +5,8 @@
 */
 
 import esbuild from "esbuild";
-import { resolve } from "path";
-import { readFile } from "fs/promises";
+import { resolve } from "node:path";
+import { readFile } from "node:fs/promises";
 
 export const ENTRY = resolve("src/index.ts");
 
