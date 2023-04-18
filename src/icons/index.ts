@@ -4,9 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import zoom_page_src from "./zoom_page.svg";
+import { KCUIIconElement } from "../kc-ui";
+import pcb_file_src from "./pcb_file.svg";
+import schematic_file_src from "./schematic_file.svg";
 import zoom_footprint_src from "./zoom_footprint.svg";
-import { literal } from "../base/web-components";
+import zoom_page_src from "./zoom_page.svg";
 
-export const zoom_page = literal`${zoom_page_src}`;
-export const zoom_footprint = literal`${zoom_footprint_src}`;
+KCUIIconElement.add_svg_icon("pcb_file", pcb_file_src);
+KCUIIconElement.add_svg_icon("schematic_file", schematic_file_src);
+KCUIIconElement.add_svg_icon("zoom_footprint", zoom_footprint_src);
+KCUIIconElement.add_svg_icon("zoom_page", zoom_page_src);

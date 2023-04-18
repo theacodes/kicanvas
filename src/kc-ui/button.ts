@@ -65,12 +65,6 @@ export class KCUIButtonElement extends KCUIElement {
                 color: var(--button-selected-fg);
             }
 
-            ::slotted(svg) {
-                width: 1em;
-                height: auto;
-                fill: currentColor;
-            }
-
             /* variants */
 
             button.outline {

@@ -4,13 +4,19 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css, html } from "../base/web-components";
+import { css, html, literal } from "../base/web-components";
 import { KCUIElement } from "./element";
 
 /**
  * kc-ui-icon is a material symbol
  */
 export class KCUIIconElement extends KCUIElement {
+    private static svg_icons = new Map<string, ReturnType<typeof literal>>();
+
+    public static add_svg_icon(name: string, src: string) {
+        this.svg_icons.set(name, literal`${src}`);
+    }
+
     static override styles = [
         css`
             :host {
@@ -31,11 +37,24 @@ export class KCUIIconElement extends KCUIElement {
                 -webkit-font-smoothing: antialiased;
                 user-select: none;
             }
+
+            svg {
+                width: 1.2em;
+                height: auto;
+                fill: currentColor;
+            }
         `,
     ];
 
     override render() {
-        return html`<slot></slot>`;
+        const text = this.textContent ?? "";
+        if (text.startsWith("svg:")) {
+            const name = text.slice(4);
+            const icon = KCUIIconElement.svg_icons.get(name) ?? "";
+            return html`${icon}`;
+        } else {
+            return html`<slot></slot>`;
+        }
     }
 }
 
