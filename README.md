@@ -188,22 +188,22 @@ Contributions are welcome! However, since KiCanvas is in a super early stage ple
 
 KiCanvas would not be possible without the incredible financial support of our [sponsors]. I'd specifically like to thank the following people for their support:
 
-- @mithro
-- @jeremysf
-- @blues
-- @bradanlane
-- @timonsku
-- @todbot
-- @friggeri
-- @voidmar
-- @casundra
-- @ntpopgetdope
-- @ehughes
-- @guru
-- @jamesneal
-- @calithameridi
-- @jwr
-- @forsyth
-- @mattimo
-- @mzollin
+- [@mithro](https://github.com/mithro)
+- [@jeremysf](https://github.com/jeremysf)
+- [@blues](https://github.com/blues)
+- [@bradanlane](https://github.com/bradanlane)
+- [@timonsku](https://github.com/timonsku)
+- [@todbot](https://github.com/todbot)
+- [@friggeri](https://github.com/friggeri)
+- [@voidmar](https://github.com/voidmar)
+- [@casundra](https://github.com/casundra)
+- [@ntpopgetdope](https://github.com/ntpopgetdope)
+- [@ehughes](https://github.com/ehughes)
+- [@guru](https://github.com/guru)
+- [@jamesneal](https://github.com/jamesneal)
+- [@calithameridi](https://github.com/calithameridi)
+- [@jwr](https://github.com/jwr)
+- [@forsyth](https://github.com/forsyth)
+- [@mattimo](https://github.com/mattimo)
+- [@mzollin](https://github.com/mzollin)
 
