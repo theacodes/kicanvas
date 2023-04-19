@@ -10,7 +10,7 @@ KiCanvas is developed by [Thea Flowers](https://thea.codes) with financial suppo
 
 [KiCanvas]: https://kicanvas.org
 [KiCAD]: https://kicad.org
-[file an issue]: https://github.com/theacodes/kicanvas/issues/new
+[file an issue]: https://github.com/theacodes/kicanvas/issues/new/choose
 [TypeScript]: https://typescript.dev
 [Canvas]: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
 [WebGL]: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API

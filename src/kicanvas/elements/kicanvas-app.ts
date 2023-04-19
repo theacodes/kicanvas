@@ -188,7 +188,7 @@ class KiCanvasAppElement extends KCUIElement {
                         schematics and boards. It's in <strong>alpha</strong> so
                         please
                         <a
-                            href="https://github.com/theacodes/kicanvas/issues/new"
+                            href="https://github.com/theacodes/kicanvas/issues/new/choose"
                             target="_blank">
                             report any bugs</a
                         >!

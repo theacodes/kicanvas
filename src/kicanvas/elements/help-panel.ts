@@ -42,7 +42,7 @@ export class KCHelpPanel extends KCUIElement {
                         KiCanvas is very much in <strong>alpha</strong>, so
                         please
                         <a
-                            href="https://github.com/theacodes/kicanvas/issues/new"
+                            href="https://github.com/theacodes/kicanvas/issues/new/choose"
                             target="_blank"
                             >file an issue on GitHub</a
                         >
