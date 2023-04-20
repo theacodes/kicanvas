@@ -2,6 +2,8 @@
 
 [KiCanvas] is an **interactive**, **browser-based** viewer for [KiCAD] schematics and boards. You can try it out for yourself at https://kicanvas.org.
 
+https://user-images.githubusercontent.com/250995/233475339-43c89a26-c825-4999-9d0a-7bde690c96ca.mp4
+
 **NOTE**: KiCanvas is currently in **early alpha**. There will be bugs and missing features. Please take a look at [known issues](#known-issues) and [file an issue] if you run into trouble.
 
 KiCanvas is written in modern vanilla [TypeScript] and uses the [Canvas] element and [WebGL] for rendering.
