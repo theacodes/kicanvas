@@ -106,6 +106,7 @@ export class KicadSch {
                     T.item(SchematicSymbol, this),
                 ),
                 P.collection("drawings", "polyline", T.item(Polyline, this)),
+                P.collection("drawings", "rectangle", T.item(Rectangle, this)),
                 P.collection("drawings", "text", T.item(Text, this)),
                 P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
@@ -220,6 +221,7 @@ export class GraphicItem {
     private = false;
     stroke?: Stroke;
     fill?: Fill;
+    uuid?: string;
 
     constructor(parent?: LibSymbol | SchematicSymbol) {
         this.parent = parent;
@@ -229,6 +231,7 @@ export class GraphicItem {
         P.atom("private"),
         P.item("stroke", Stroke),
         P.item("fill", Fill),
+        P.pair("uuid", T.string),
     ];
 }
 
@@ -442,7 +445,6 @@ export class Circle extends GraphicItem {
 
 export class Polyline extends GraphicItem {
     pts: Vec2[];
-    uuid?: string;
 
     constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
         /*
@@ -461,7 +463,6 @@ export class Polyline extends GraphicItem {
                 P.start("polyline"),
                 P.list("pts", T.vec2),
                 ...GraphicItem.common_expr_defs,
-                P.pair("uuid", T.string),
             ),
         );
     }
