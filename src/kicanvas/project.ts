@@ -129,7 +129,7 @@ export class Project implements IDisposable {
         }
 
         // Find the root sheet. This is done by sorting all of the paths
-        // from shorest to longest and waling through the paths to see if
+        // from shortest to longest and walking through the paths to see if
         // we can find the schematic for the parent. The first one we find
         // it the common ancestor (root).
         const paths = Array.from(paths_to_sheet_instances.keys()).sort(

@@ -155,6 +155,13 @@ export class KicadSch {
 
             s.page = instance_data.page;
             s.path = instance_data.path;
+
+            if (!s.instances.size) {
+                const inst = new SchematicSheetInstance();
+                inst.page = instance_data.page;
+                inst.path = instance_data.path;
+                s.instances.set("", inst);
+            }
         }
     }
 
@@ -1385,7 +1392,7 @@ export class SchematicSheet {
         Object.assign(this, parsed);
 
         // Walk through all instances and flatten them.
-        for (const project of parsed_instances["projects"] ?? []) {
+        for (const project of parsed_instances?.["projects"] ?? []) {
             for (const path of project?.["paths"] ?? []) {
                 const inst = new SchematicSheetInstance();
                 inst.path = path["path"];
@@ -1400,11 +1407,17 @@ export class SchematicSheet {
     }
 
     get sheetname() {
-        return this.get_property_text("Sheetname");
+        return (
+            this.get_property_text("Sheetname") ??
+            this.get_property_text("Sheet name")
+        );
     }
 
     get sheetfile() {
-        return this.get_property_text("Sheetfile");
+        return (
+            this.get_property_text("Sheetfile") ??
+            this.get_property_text("Sheet file")
+        );
     }
 }
 

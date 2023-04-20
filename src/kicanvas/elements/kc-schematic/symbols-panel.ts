@@ -113,8 +113,8 @@ export class KCSchematicSymbolsPanelElement extends KCUIElement {
                 html`<kc-ui-menu-item
                     name="${sheet.uuid}"
                     data-match-text="${match_text}">
-                    <span class="narrow"> ${sheet.sheetname} </span>
-                    <span> ${sheet.sheetfile} </span>
+                    <span class="narrow"> ${sheet.sheetname}</span>
+                    <span>${sheet.sheetfile}</span>
                 </kc-ui-menu-item>` as HTMLElement,
             );
         }
