@@ -39,9 +39,13 @@ export class Project implements IDisposable {
 
         this.#fs = fs;
 
+        const promises = [];
+
         for (const filename of this.#fs.list()) {
-            await this.load_file(filename);
+            promises.push(this.load_file(filename));
         }
+
+        await Promise.all(promises);
 
         this.determine_schematic_hierarchy();
 
