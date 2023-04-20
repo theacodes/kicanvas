@@ -46,8 +46,9 @@ export class KCUIIconElement extends KCUIElement {
         const text = this.textContent ?? "";
         if (text.startsWith("svg:")) {
             const name = text.slice(4);
+            const url = `${KCUIIconElement.sprites_url}#${name}`;
             return html`<svg viewBox="0 0 48 48" width="48">
-                <use xlink:href="${KCUIIconElement.sprites_url}#${name}" />
+                <use xlink:href="${url}" />
             </svg>`;
         } else {
             return html`<slot></slot>`;
