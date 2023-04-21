@@ -193,7 +193,6 @@ KiCanvas would not be possible without the incredible financial support of our [
 - [@mithro](https://github.com/mithro)
 - [@jeremysf](https://github.com/jeremysf)
 - [@blues](https://github.com/blues)
-- [@bradanlane](https://github.com/bradanlane)
 - [@timonsku](https://github.com/timonsku)
 - [@todbot](https://github.com/todbot)
 - [@friggeri](https://github.com/friggeri)
