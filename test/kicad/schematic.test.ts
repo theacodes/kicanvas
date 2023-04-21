@@ -19,11 +19,15 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     test("with empty schematic file", function () {
         const sch = new schematic.KicadSch("test.kicad_sch", empty_sch_src);
 
+        console.log(sch);
+
         assert_deep_partial(sch, {
             version: 20211123,
             generator: "eeschema",
             paper: { size: "A4" },
-            sheet_instances: { sheet_instances: [{ path: "/", page: "1" }] },
+            sheet_instances: {
+                sheet_instances: new Map([["/", { path: "/", page: "1" }]]),
+            },
         });
     });
 
