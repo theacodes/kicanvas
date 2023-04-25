@@ -280,7 +280,7 @@ class TextPainter extends ItemPainter {
             return;
         }
 
-        const schtext = new SchText(t.text);
+        const schtext = new SchText(t.shown_text);
 
         schtext.apply_effects(t.effects);
         schtext.apply_at(t.at);
@@ -480,7 +480,7 @@ class PropertyPainter extends ItemPainter {
         const parent = p.parent as schematic_items.SchematicSymbol;
         const transform = get_symbol_transform(parent);
 
-        let text = p.text;
+        let text = p.shown_text;
 
         if (p.name == "Reference" && parent.unit) {
             text += parent.unit_suffix;
@@ -558,7 +558,7 @@ class LibTextPainter extends ItemPainter {
         const current_symbol_transform = (this.view_painter as SchematicPainter)
             .current_symbol_transform!;
 
-        const libtext = new LibText(lt.text);
+        const libtext = new LibText(lt.shown_text);
 
         libtext.apply_effects(lt.effects);
         libtext.apply_at(lt.at);

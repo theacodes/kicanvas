@@ -8,10 +8,37 @@ import { Color } from "../base/color";
 import { Vec2 } from "../base/math";
 import { P, T, parse_expr, type Parseable } from "./parser";
 
+export function unescape_string(str: string): string {
+    const escape_vars = {
+        dblquote: '"',
+        quote: "'",
+        lt: "<",
+        gt: ">",
+        backslash: "\\",
+        slash: "/",
+        bar: "|",
+        comma: ",",
+        colon: ":",
+        space: " ",
+        dollar: "$",
+        tab: "\t",
+        return: "\n",
+        brace: "{",
+    };
+
+    for (const [k, v] of Object.entries(escape_vars)) {
+        str = str.replaceAll("{" + k + "}", v);
+    }
+
+    return str;
+}
+
 export function expand_text_vars(
     text: string,
     vars?: Map<string, string | undefined>,
 ): string {
+    text = unescape_string(text);
+
     if (!vars) {
         return text;
     }
@@ -19,22 +46,6 @@ export function expand_text_vars(
     for (const [k, v] of vars.entries()) {
         text = text.replaceAll("${" + k + "}", v ?? "");
         text = text.replaceAll("${" + k.toUpperCase() + "}", v ?? "");
-    }
-
-    const escape_vars = {
-        slash: "/",
-        backslash: "\\",
-        lt: "<",
-        gt: ">",
-        colon: ":",
-        dblquote: '"',
-        bar: "|",
-        tab: "\t",
-        return: "\n",
-    };
-
-    for (const [k, v] of Object.entries(escape_vars)) {
-        text = text.replaceAll("{" + k + "}", v);
     }
 
     return text;

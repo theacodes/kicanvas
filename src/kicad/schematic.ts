@@ -7,7 +7,14 @@
 import { Color } from "../base/color";
 import { Vec2 } from "../base/math";
 import * as log from "../base/log";
-import { At, Effects, Paper, Stroke, TitleBlock } from "./common";
+import {
+    At,
+    Effects,
+    Paper,
+    Stroke,
+    TitleBlock,
+    expand_text_vars,
+} from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 
 /* Default values for various things found in schematics
@@ -80,7 +87,7 @@ export class KicadSch {
                 P.pair("uuid", T.string),
                 P.item("paper", Paper),
                 P.item("title_block", TitleBlock),
-                P.item("lib_symbols", LibSymbols),
+                P.item("lib_symbols", LibSymbols, this),
                 P.collection("wires", "wire", T.item(Wire)),
                 P.collection("buses", "bus", T.item(Bus)),
                 P.collection("bus_entries", "bus_entry", T.item(BusEntry)),
@@ -91,12 +98,12 @@ export class KicadSch {
                 P.collection(
                     "global_labels",
                     "global_label",
-                    T.item(GlobalLabel),
+                    T.item(GlobalLabel, this),
                 ),
                 P.collection(
                     "hierarchical_labels",
                     "hierarchical_label",
-                    T.item(HierarchicalLabel),
+                    T.item(HierarchicalLabel, this),
                 ),
                 // images
                 // sheets
@@ -111,7 +118,7 @@ export class KicadSch {
                 P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
                 P.item("symbol_instances", SymbolInstances),
-                P.collection("sheets", "sheet", T.item(SchematicSheet)),
+                P.collection("sheets", "sheet", T.item(SchematicSheet, this)),
             ),
         );
 
@@ -525,7 +532,10 @@ export class Text {
     effects = new Effects();
     uuid?: string;
 
-    constructor(expr: Parseable) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadSch | LibSymbol | SchematicSymbol,
+    ) {
         /*
         (text "SWD" (at -5.08 0 900)
           (effects (font (size 2.54 2.54))))
@@ -547,11 +557,26 @@ export class Text {
             this.text = this.text.slice(0, this.text.length - 1);
         }
     }
+
+    #expanded_text: string;
+
+    get shown_text() {
+        if (!this.#expanded_text) {
+            this.#expanded_text = expand_text_vars(
+                this.text,
+                this.parent?.text_vars,
+            );
+        }
+        return this.#expanded_text;
+    }
 }
 
 export class LibText extends Text {
-    constructor(expr: Parseable, public parent?: LibSymbol | SchematicSymbol) {
-        super(expr);
+    constructor(
+        expr: Parseable,
+        public override parent: LibSymbol | SchematicSymbol,
+    ) {
+        super(expr, parent);
 
         if (parent instanceof LibSymbol || parent instanceof SchematicSymbol) {
             // From sch_sexpr_parser.cpp:LIB_TEXT* SCH_SEXPR_PARSER::parseText()
@@ -679,13 +704,13 @@ export class LibSymbols {
     symbols: LibSymbol[] = [];
     #symbols_by_name: Map<string, LibSymbol> = new Map();
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent: KicadSch) {
         Object.assign(
             this,
             parse_expr(
                 expr,
                 P.start("lib_symbols"),
-                P.collection("symbols", "symbol", T.item(LibSymbol)),
+                P.collection("symbols", "symbol", T.item(LibSymbol, parent)),
             ),
         );
 
@@ -723,7 +748,7 @@ export class LibSymbol {
     #pins_by_number: Map<string, PinDefinition> = new Map();
     #properties_by_id: Map<number, Property> = new Map();
 
-    constructor(expr: Parseable, public parent?: LibSymbol) {
+    constructor(expr: Parseable, public parent?: LibSymbol | KicadSch) {
         Object.assign(
             this,
             parse_expr(
@@ -777,7 +802,7 @@ export class LibSymbol {
     }
 
     get root(): LibSymbol {
-        if (this.parent) {
+        if (this.parent instanceof LibSymbol) {
             return this.parent.root;
         }
         return this;
@@ -856,6 +881,10 @@ export class LibSymbol {
     get units_interchangable(): boolean {
         return this.properties.get("ki_locked")?.text ? false : true;
     }
+
+    get text_vars(): Map<string, string | undefined> {
+        return new Map(this.parent?.text_vars);
+    }
 }
 
 export class Property {
@@ -902,6 +931,18 @@ export class Property {
 
     set effects(e: Effects) {
         this.#effects = e;
+    }
+
+    #expanded_text: string;
+
+    get shown_text() {
+        if (!this.#expanded_text) {
+            this.#expanded_text = expand_text_vars(
+                this.text,
+                this.parent?.text_vars,
+            );
+        }
+        return this.#expanded_text;
     }
 }
 
@@ -1202,6 +1243,10 @@ export class SchematicSymbol {
             return true;
         });
     }
+
+    get text_vars(): Map<string, string | undefined> {
+        return new Map(this.parent.text_vars);
+    }
 }
 
 export class SchematicSymbolInstance {
@@ -1341,7 +1386,7 @@ export class SchematicSheet {
     page?: string;
     path?: string;
 
-    constructor(expr: Parseable) {
+    constructor(expr: Parseable, public parent: KicadSch) {
         const parsed = parse_expr(
             expr,
             P.start("sheet"),
@@ -1418,6 +1463,10 @@ export class SchematicSheet {
             this.get_property_text("Sheetfile") ??
             this.get_property_text("Sheet file")
         );
+    }
+
+    get text_vars(): Map<string, string | undefined> {
+        return new Map(this.parent.text_vars);
     }
 }
 
