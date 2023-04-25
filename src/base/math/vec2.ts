@@ -96,6 +96,42 @@ export class Vec2 {
     }
 
     /**
+     * KiCAD has to be weird about this, ofc.
+     */
+    get kicad_angle(): Angle {
+        // See explicit EDA_ANGLE( const VECTOR2D& aVector )
+        if (this.x == 0 && this.y == 0) {
+            return new Angle(0);
+        } else if (this.y == 0) {
+            if (this.x >= 0) {
+                return new Angle(0);
+            } else {
+                return Angle.from_degrees(-180);
+            }
+        } else if (this.x == 0) {
+            if (this.y >= 0) {
+                return Angle.from_degrees(90);
+            } else {
+                return Angle.from_degrees(-90);
+            }
+        } else if (this.x == this.y) {
+            if (this.x >= 0) {
+                return Angle.from_degrees(45);
+            } else {
+                return Angle.from_degrees(-135);
+            }
+        } else if (this.x == -this.y) {
+            if (this.x >= 0) {
+                return Angle.from_degrees(-45);
+            } else {
+                return Angle.from_degrees(135);
+            }
+        } else {
+            return this.angle;
+        }
+    }
+
+    /**
      * @returns A new unit vector in the same direction as this vector
      */
     normalize(): Vec2 {

@@ -104,10 +104,7 @@ export class Angle {
             deg -= 360;
         }
 
-        const a = new Angle(0);
-        a.degrees = deg;
-
-        return a;
+        return Angle.from_degrees(deg);
     }
 
     /**
@@ -123,10 +120,23 @@ export class Angle {
             deg -= 360;
         }
 
-        const a = new Angle(0);
-        a.degrees = deg;
+        return Angle.from_degrees(deg);
+    }
 
-        return a;
+    /**
+     * @returns a new Angle constrained to -360 to +360 degrees.
+     */
+    normalize720() {
+        let deg = Angle.round(this.degrees);
+
+        while (deg < -360) {
+            deg += 360;
+        }
+        while (deg >= 360) {
+            deg -= 360;
+        }
+
+        return Angle.from_degrees(deg);
     }
 
     /**

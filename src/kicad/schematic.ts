@@ -219,11 +219,6 @@ export class KicadSch {
             const symbol = this.symbols.get(uuid);
 
             if (symbol) {
-                console.log(
-                    symbol,
-                    field_name,
-                    symbol.resolve_text_var(field_name),
-                );
                 return symbol.resolve_text_var(field_name);
             }
         }
@@ -433,8 +428,8 @@ export class Arc extends GraphicItem {
         if (parsed["radius"]?.["length"]) {
             const arc = MathArc.from_center_start_end(
                 parsed["radius"]["at"],
-                parsed["start"],
                 parsed["end"],
+                parsed["start"],
                 1,
             );
 

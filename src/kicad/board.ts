@@ -1047,38 +1047,68 @@ export class Arc extends GraphicItem {
     end: Vec2;
     width: number;
     stroke: Stroke;
+    #arc: MathArc;
 
     constructor(expr: Parseable, public override parent?: Footprint) {
         super();
 
         const static_this = this.constructor as typeof Arc;
 
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start(static_this.expr_start),
-                P.atom("locked"),
-                P.pair("layer", T.string),
-                P.vec2("start"),
-                P.vec2("mid"),
-                P.vec2("end"),
-                P.pair("width", T.number),
-                P.pair("tstamp", T.string),
-                P.item("stroke", Stroke),
-            ),
+        const parsed = parse_expr(
+            expr,
+            P.start(static_this.expr_start),
+            P.atom("locked"),
+            P.pair("layer", T.string),
+            P.vec2("start"),
+            P.vec2("mid"),
+            P.vec2("end"),
+            P.pair("angle", T.number),
+            P.pair("width", T.number),
+            P.pair("tstamp", T.string),
+            P.item("stroke", Stroke),
         );
+
+        // Handle old format.
+        // See LEGACY_ARC_FORMATTING and EDA_SHAPE::SetArcAngleAndEnd
+        if (parsed["angle"] !== undefined) {
+            const angle = Angle.from_degrees(parsed["angle"]).normalize720();
+            const center = parsed["start"];
+            let start = parsed["end"];
+
+            let end = angle.negative().rotate_point(start, center);
+
+            if (angle.degrees < 0) {
+                [start, end] = [end, start];
+            }
+
+            this.#arc = MathArc.from_center_start_end(
+                center,
+                start,
+                end,
+                parsed["width"],
+            );
+
+            parsed["start"] = this.#arc.start_point;
+            parsed["mid"] = this.#arc.mid_point;
+            parsed["end"] = this.#arc.end_point;
+
+            delete parsed["angle"];
+        } else {
+            this.#arc = MathArc.from_three_points(
+                parsed["start"],
+                parsed["mid"],
+                parsed["end"],
+                parsed["width"],
+            );
+        }
+
+        Object.assign(this, parsed);
 
         this.width ??= this.stroke?.width || 0;
     }
 
     get arc() {
-        return MathArc.from_three_points(
-            this.start,
-            this.mid,
-            this.end,
-            this.width,
-        );
+        return this.#arc;
     }
 
     override get bbox() {

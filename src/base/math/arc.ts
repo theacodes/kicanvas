@@ -60,9 +60,11 @@ export class Arc {
     ) {
         // See EDA_SHAPE::CalcArcAngles - normalizes the start and end angle so
         // that start < end and their values are between -360 and +360.
-        const radius = center.sub(start).magnitude;
-        let start_angle = center.sub(start).angle;
-        let end_angle = center.sub(end).angle;
+        const radius = start.sub(center).magnitude;
+        const start_radial = start.sub(center);
+        const end_radial = end.sub(center);
+        let start_angle = start_radial.kicad_angle;
+        let end_angle = end_radial.kicad_angle;
 
         if (end_angle.degrees == start_angle.degrees) {
             // This is a circle, not a zero-length arc.
