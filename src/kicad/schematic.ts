@@ -5,8 +5,8 @@
 */
 
 import { Color } from "../base/color";
-import { Vec2 } from "../base/math";
 import * as log from "../base/log";
+import { Arc as MathArc, Vec2 } from "../base/math";
 import {
     At,
     Effects,
@@ -400,22 +400,58 @@ export class Arc extends GraphicItem {
 
     constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
         /*
+        Current form:
         (arc (start 2.032 -1.27) (mid 0 -0.5572) (end -2.032 -1.27)
           (stroke (width 0.508) (type default) (color 0 0 0 0))
           (fill (type none)))
+
+        Previous form:
+        (arc (start -0.254 1.016) (end -0.254 -1.016)
+          (radius (at -0.254 0) (length 1.016) (angles 90.1 -90.1))
+          (stroke (width 0)) (fill(type none)))
         */
         super(parent);
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("arc"),
-                P.vec2("start"),
-                P.vec2("mid"),
-                P.vec2("end"),
-                ...GraphicItem.common_expr_defs,
+
+        const parsed = parse_expr(
+            expr,
+            P.start("arc"),
+            P.vec2("start"),
+            P.vec2("mid"),
+            P.vec2("end"),
+            P.object(
+                "radius",
+                {},
+                P.start("radius"),
+                P.vec2("at"),
+                P.pair("length"),
+                P.vec2("angles"),
             ),
+            ...GraphicItem.common_expr_defs,
         );
+
+        // Deal with old format
+        if (parsed["radius"]?.["length"]) {
+            const arc = MathArc.from_center_start_end(
+                parsed["radius"]["at"],
+                parsed["start"],
+                parsed["end"],
+                1,
+            );
+
+            if (arc.arc_angle.degrees > 180) {
+                [arc.start_angle, arc.end_angle] = [
+                    arc.end_angle,
+                    arc.start_angle,
+                ];
+            }
+
+            parsed["start"] = arc.start_point;
+            parsed["mid"] = arc.mid_point;
+            parsed["end"] = arc.end_point;
+        }
+        delete parsed["radius"];
+
+        Object.assign(this, parsed);
     }
 }
 

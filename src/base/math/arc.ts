@@ -52,16 +52,50 @@ export class Arc {
         return new Arc(center, radius, start_angle, end_angle, width);
     }
 
+    static from_center_start_end(
+        center: Vec2,
+        start: Vec2,
+        end: Vec2,
+        width: number,
+    ) {
+        // See EDA_SHAPE::CalcArcAngles - normalizes the start and end angle so
+        // that start < end and their values are between -360 and +360.
+        const radius = center.sub(start).magnitude;
+        let start_angle = center.sub(start).angle;
+        let end_angle = center.sub(end).angle;
+
+        if (end_angle.degrees == start_angle.degrees) {
+            // This is a circle, not a zero-length arc.
+            end_angle.degrees = start_angle.degrees + 360;
+        }
+
+        if (start_angle.degrees > end_angle.degrees) {
+            if (end_angle.degrees < 0) {
+                end_angle = end_angle.normalize();
+            } else {
+                start_angle = start_angle
+                    .normalize()
+                    .sub(Angle.from_degrees(-360));
+            }
+        }
+
+        return new Arc(center, radius, start_angle, end_angle, width);
+    }
+
     get start_radial() {
-        return this.center.add(
-            this.start_angle.rotate_point(new Vec2(this.radius, 0)),
-        );
+        return this.start_angle.rotate_point(new Vec2(this.radius, 0));
+    }
+
+    get start_point() {
+        return this.center.add(this.start_radial);
     }
 
     get end_radial() {
-        return this.center.add(
-            this.end_angle.rotate_point(new Vec2(this.radius, 0)),
-        );
+        return this.end_angle.rotate_point(new Vec2(this.radius, 0));
+    }
+
+    get end_point() {
+        return this.center.add(this.end_radial);
     }
 
     get mid_angle() {
@@ -71,9 +105,15 @@ export class Arc {
     }
 
     get mid_radial() {
-        return this.center.add(
-            this.mid_angle.rotate_point(new Vec2(this.radius, 0)),
-        );
+        return this.mid_angle.rotate_point(new Vec2(this.radius, 0));
+    }
+
+    get mid_point() {
+        return this.center.add(this.mid_radial);
+    }
+
+    get arc_angle(): Angle {
+        return this.end_angle.sub(this.start_angle);
     }
 
     /**
@@ -120,7 +160,7 @@ export class Arc {
         // start angle, the radial for the end angle, and the radial inbetween.
         // However, that doesn't cover all cases. Whenever the arc crosses an
         // axis, the radial at that axis must also be included.
-        const points = [this.start_radial, this.mid_radial, this.end_radial];
+        const points = [this.start_point, this.mid_point, this.end_point];
 
         if (this.start_angle.degrees < 0 && this.end_angle.degrees >= 0) {
             points.push(this.center.add(new Vec2(this.radius, 0)));
