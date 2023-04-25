@@ -33,20 +33,32 @@ export function unescape_string(str: string): string {
     return str;
 }
 
+export type HasResolveTextVars = {
+    resolve_text_var: (name: string) => string | undefined;
+};
+
 export function expand_text_vars(
     text: string,
-    vars?: Map<string, string | undefined>,
+    resolveable: HasResolveTextVars | undefined,
 ): string {
     text = unescape_string(text);
 
-    if (!vars) {
+    if (resolveable === undefined) {
         return text;
     }
 
-    for (const [k, v] of vars.entries()) {
-        text = text.replaceAll("${" + k + "}", v ?? "");
-        text = text.replaceAll("${" + k.toUpperCase() + "}", v ?? "");
-    }
+    text = text.replaceAll(
+        /(\$\{(.+?)\})/g,
+        (substring: string, all: string, name: string) => {
+            const val = resolveable.resolve_text_var(name);
+
+            if (val === undefined) {
+                return all;
+            }
+
+            return val;
+        },
+    );
 
     return text;
 }
@@ -173,7 +185,7 @@ export class TitleBlock {
         }
     }
 
-    get text_vars(): Map<string, string | undefined> {
+    resolve_text_var(name: string): string | undefined {
         return new Map([
             ["ISSUE_DATE", this.date],
             ["REVISION", this.rev],
@@ -188,7 +200,7 @@ export class TitleBlock {
             ["COMMENT7", this.comment[7] ?? ""],
             ["COMMENT8", this.comment[8] ?? ""],
             ["COMMENT9", this.comment[9] ?? ""],
-        ]);
+        ]).get(name);
     }
 }
 

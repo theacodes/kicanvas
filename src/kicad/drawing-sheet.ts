@@ -12,7 +12,7 @@ import { P, T, parse_expr, type Parseable } from "./parser";
 
 export type DrawingSheetDocument = {
     paper?: Paper;
-    text_vars: Map<string, string | undefined>;
+    resolve_text_var(name: string): string | undefined;
 };
 
 export class DrawingSheet {
@@ -54,22 +54,6 @@ export class DrawingSheet {
             this,
         );
         yield* this.drawings;
-    }
-
-    get text_vars(): Map<string, string | undefined> {
-        const vars = this.document?.text_vars || new Map();
-        vars.set("PAPER", this.paper?.size || "");
-        // TODO: Mock values for now, should be provided by the project
-        // when that's implemented.
-        // Sheet number
-        vars.set("#", "1");
-        // Sheet count
-        vars.set("##", "1");
-        // Sheet path (hierarchical path)
-        vars.set("SHEETPATH", "/");
-        // KiCAD Version
-        vars.set("KICAD_VERSION", "KiCanvas Alpha");
-        return vars;
     }
 
     get paper() {
@@ -119,6 +103,28 @@ export class DrawingSheet {
 
     get page_bbox() {
         return BBox.from_corners(0, 0, this.width, this.height);
+    }
+
+    resolve_text_var(name: string): string | undefined {
+        switch (name) {
+            case "PAPER":
+                return this.paper?.size || "";
+            // TODO: Mock values for now, should be provided by the project
+            // when that's implemented.
+            case "#":
+                // Sheet number
+                return "1";
+            case "##":
+                // Sheet count
+                return "1";
+            case "SHEETPATH":
+                // Sheet path (hierarchical path)
+                return "/";
+            case "KICAD_VERSION":
+                // KiCAD Version
+                return "KiCanvas Alpha";
+        }
+        return undefined;
     }
 }
 
@@ -278,7 +284,6 @@ export class Bitmap extends DrawingSheetItem {
 
 export class TbText extends DrawingSheetItem {
     text: string;
-    #expanded_text: string;
     incrlabel = 1;
     pos: Coordinate;
     maxlen: number;
@@ -308,13 +313,7 @@ export class TbText extends DrawingSheetItem {
     }
 
     get shown_text() {
-        if (!this.#expanded_text) {
-            this.#expanded_text = expand_text_vars(
-                this.text,
-                this.parent.text_vars,
-            );
-        }
-        return this.#expanded_text;
+        return expand_text_vars(this.text, this.parent);
     }
 }
 

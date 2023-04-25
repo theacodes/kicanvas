@@ -32,7 +32,7 @@ export class KicadPCB {
     paper?: Paper;
     title_block = new TitleBlock();
     setup?: Setup;
-    properties: Property[] = [];
+    properties = new Map<string, Property>();
     layers: Layer[] = [];
     nets: Net[] = [];
     footprints: Footprint[] = [];
@@ -55,7 +55,12 @@ export class KicadPCB {
                 P.item("title_block", TitleBlock),
                 P.list("layers", T.item(Layer)),
                 P.item("setup", Setup),
-                P.collection("properties", "property", T.item(Property)),
+                P.mapped_collection(
+                    "properties",
+                    "property",
+                    (p: Property) => p.name,
+                    T.item(Property, this),
+                ),
                 P.collection("nets", "net", T.item(Net)),
                 P.collection(
                     "footprints",
@@ -86,13 +91,16 @@ export class KicadPCB {
         yield* this.footprints;
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        const vars = this.title_block.text_vars;
-        for (const p of this.properties) {
-            vars.set(p.name, p.value);
+    resolve_text_var(name: string): string | undefined {
+        if (name == "FILENAME") {
+            return this.filename;
         }
-        vars.set("FILENAME", this.filename);
-        return vars;
+
+        if (this.properties.has(name)) {
+            return this.properties.get(name)!.value;
+        }
+
+        return this.title_block.resolve_text_var(name);
     }
 
     get edge_cuts_bbox(): BBox {
@@ -619,8 +627,8 @@ export class Dimension {
         );
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        return new Map(this.parent.text_vars);
+    resolve_text_var(name: string): string | undefined {
+        return this.parent.resolve_text_var(name);
     }
 
     get start(): Vec2 {
@@ -759,7 +767,7 @@ export class Footprint {
     };
     properties: Record<string, string> = {};
     drawings: FootprintDrawings[] = [];
-    pads: Pad[] = [];
+    pads = new Map<string, Pad>();
     zones: Zone[] = [];
     models: Model[] = [];
     #bbox: BBox;
@@ -811,8 +819,13 @@ export class Footprint {
                 P.collection("drawings", "fp_rect", T.item(FpRect, this)),
                 P.collection("drawings", "fp_text", T.item(FpText, this)),
                 P.collection("zones", "zone", T.item(Zone, this)),
-                P.collection("pads", "pad", T.item(Pad, this)),
                 P.collection("models", "model", T.item(Model)),
+                P.mapped_collection(
+                    "pads",
+                    "pad",
+                    (p: Pad) => p.number,
+                    T.item(Pad, this),
+                ),
             ),
         );
 
@@ -837,29 +850,46 @@ export class Footprint {
     *items(): Generator<FootprintDrawings | Pad | Zone, void, undefined> {
         yield* this.drawings ?? [];
         yield* this.zones ?? [];
-        yield* this.pads ?? [];
+        yield* this.pads.values() ?? [];
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        const vars = new Map<string, string | undefined>([
-            ["REFERENCE", this.reference],
-            ["VALUE", this.value],
-            ["LAYER", this.layer],
-            ["FOOTPRINT_LIBRARY", this.library_link.split(":")[0]],
-            ["FOOTPRINT_NAME", this.library_link.split(":").at(-1)],
-        ]);
-
-        for (const [k, v] of Object.entries(this.properties)) {
-            vars.set(k, v);
+    resolve_text_var(name: string): string | undefined {
+        switch (name) {
+            case "REFERENCE":
+                return this.reference;
+            case "VALUE":
+                return this.value;
+            case "LAYER":
+                return this.layer;
+            case "FOOTPRINT_LIBRARY":
+                return this.library_link.split(":").at(0);
+            case "FOOTPRINT_NAME":
+                return this.library_link.split(":").at(-1);
         }
 
-        for (const pad of this.pads) {
-            vars.set(`NET_NAME(${pad.number})`, `${pad.net?.number ?? ""}`);
-            vars.set(`NET_CLASS(${pad.number})`, pad.net?.name ?? "");
-            vars.set(`PIN_NAME(${pad.number})`, pad.pinfunction ?? "");
+        const pad_expr = /^(NET_NAME|NET_CLASS|PIN_NAME)\(.+?\)$/.exec(name);
+
+        if (pad_expr?.length == 3) {
+            const [_, expr_type, pad_name] = pad_expr as unknown as [
+                string,
+                string,
+                string,
+            ];
+            switch (expr_type) {
+                case "NET_NAME":
+                    return this.pads.get(pad_name)?.net.number.toString();
+                case "NET_CLASS":
+                    return this.pads.get(pad_name)?.net.name;
+                case "PIN_NAME":
+                    return this.pads.get(pad_name)?.pinfunction;
+            }
         }
 
-        return new Map([...this.parent.text_vars, ...vars]);
+        if (this.properties[name] !== undefined) {
+            return this.properties[name]!;
+        }
+
+        return this.parent.resolve_text_var(name);
     }
 
     /**
@@ -1194,8 +1224,6 @@ export class Text {
     tstamp: string;
     render_cache: TextRenderCache;
 
-    #expanded_text: string;
-
     static common_expr_defs = [
         P.item("at", At),
         P.atom("hide"),
@@ -1212,13 +1240,7 @@ export class Text {
     ];
 
     get shown_text() {
-        if (!this.#expanded_text) {
-            this.#expanded_text = expand_text_vars(
-                this.text,
-                this.parent?.text_vars,
-            );
-        }
-        return this.#expanded_text;
+        return expand_text_vars(this.text, this.parent);
     }
 }
 

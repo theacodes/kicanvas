@@ -19,6 +19,7 @@ import zones_pcb_src from "./files/zones.kicad_pcb";
 import vias_pcb_src from "./files/vias.kicad_pcb";
 import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
 import footprint_pads_pcb_src from "./files/footprint-pads.kicad_pcb";
+import { first } from "../../src/base/iterator";
 
 suite("kicad.board.KicadPCB(): board parsing", function () {
     test("with empty pcb file", function () {
@@ -91,28 +92,27 @@ suite("kicad.board.KicadPCB(): board parsing", function () {
     test("with title block and properties", function () {
         const pcb = new board.KicadPCB("test.kicad_pcb", properties_pcb_src);
 
-        assert.equal(pcb.properties.length, 2);
-        assert.deepEqual(pcb.properties[0], {
+        assert.equal(pcb.properties.size, 2);
+        assert.deepEqual(pcb.properties.get("var1"), {
             name: "var1",
             value: "var 1 value",
         });
-        assert.deepEqual(pcb.properties[1], {
+        assert.deepEqual(pcb.properties.get("var2"), {
             name: "var2",
             value: "var 2 value",
         });
 
-        const text_vars = pcb.text_vars;
-        assert.equal(text_vars.get("var1"), "var 1 value");
-        assert.equal(text_vars.get("var2"), "var 2 value");
-        assert.equal(text_vars.get("TITLE"), "A board");
-        assert.equal(text_vars.get("ISSUE_DATE"), "2023-02-01");
-        assert.equal(text_vars.get("REVISION"), "v1");
-        assert.equal(text_vars.get("COMPANY"), "Winterbloom");
-        assert.equal(text_vars.get("COMMENT1"), "Comment 1");
-        assert.equal(text_vars.get("COMMENT3"), "Comment 3");
-        assert.equal(text_vars.get("COMMENT5"), "Comment 5");
-        assert.equal(text_vars.get("COMMENT7"), "Comment 7");
-        assert.equal(text_vars.get("COMMENT9"), "Comment 9");
+        assert.equal(pcb.resolve_text_var("var1"), "var 1 value");
+        assert.equal(pcb.resolve_text_var("var2"), "var 2 value");
+        assert.equal(pcb.resolve_text_var("TITLE"), "A board");
+        assert.equal(pcb.resolve_text_var("ISSUE_DATE"), "2023-02-01");
+        assert.equal(pcb.resolve_text_var("REVISION"), "v1");
+        assert.equal(pcb.resolve_text_var("COMPANY"), "Winterbloom");
+        assert.equal(pcb.resolve_text_var("COMMENT1"), "Comment 1");
+        assert.equal(pcb.resolve_text_var("COMMENT3"), "Comment 3");
+        assert.equal(pcb.resolve_text_var("COMMENT5"), "Comment 5");
+        assert.equal(pcb.resolve_text_var("COMMENT7"), "Comment 7");
+        assert.equal(pcb.resolve_text_var("COMMENT9"), "Comment 9");
 
         const text = pcb.drawings[0] as board.GrText;
         assert.equal(text.shown_text, "hello var 1 value");
@@ -795,7 +795,7 @@ suite("kicad.board.Footprint()", function () {
         );
         assert.equal(pcb.footprints.length, 13);
 
-        const pad1 = pcb.footprints[0]!.pads[0]!;
+        const pad1 = first(pcb.footprints[0]!.pads.values());
         assert.deepInclude(pad1, {
             number: "1",
             type: "smd",
@@ -805,7 +805,7 @@ suite("kicad.board.Footprint()", function () {
             layers: ["F.Cu", "F.Mask"],
         } as Partial<board.Pad>);
 
-        const pad2 = pcb.footprints[1]!.pads[0]!;
+        const pad2 = first(pcb.footprints[1]!.pads.values());
         assert.deepInclude(pad2, {
             number: "1",
             type: "smd",
@@ -821,7 +821,7 @@ suite("kicad.board.Footprint()", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad3 = pcb.footprints[2]!.pads[0]!;
+        const pad3 = first(pcb.footprints[2]!.pads.values());
         assert.deepInclude(pad3, {
             number: "1",
             type: "smd",
@@ -832,7 +832,7 @@ suite("kicad.board.Footprint()", function () {
             roundrect_rratio: 0.4,
         } as Partial<board.Pad>);
 
-        const pad4 = pcb.footprints[3]!.pads[0]!;
+        const pad4 = first(pcb.footprints[3]!.pads.values())!;
         assert.deepInclude(pad4, {
             number: "1",
             type: "smd",
@@ -856,7 +856,7 @@ suite("kicad.board.Footprint()", function () {
             ],
         } as Partial<board.GrPoly>);
 
-        const pad5 = pcb.footprints[4]!.pads[0]!;
+        const pad5 = first(pcb.footprints[4]!.pads.values())!;
         assert.deepInclude(pad5, {
             number: "1",
             type: "thru_hole",
@@ -872,7 +872,7 @@ suite("kicad.board.Footprint()", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad6 = pcb.footprints[5]!.pads[0]!;
+        const pad6 = first(pcb.footprints[5]!.pads.values())!;
         assert.deepInclude(pad6, {
             number: "1",
             type: "thru_hole",
@@ -888,7 +888,7 @@ suite("kicad.board.Footprint()", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad7 = pcb.footprints[6]!.pads[0]!;
+        const pad7 = first(pcb.footprints[6]!.pads.values());
         assert.deepInclude(pad7, {
             number: "1",
             type: "thru_hole",
@@ -904,7 +904,7 @@ suite("kicad.board.Footprint()", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad8 = pcb.footprints[7]!.pads[0]!;
+        const pad8 = first(pcb.footprints[7]!.pads.values())!;
         assert.deepInclude(pad8, {
             number: "1",
             type: "smd",
@@ -914,7 +914,7 @@ suite("kicad.board.Footprint()", function () {
             layers: ["F.Cu", "F.Mask"],
         } as Partial<board.Pad>);
 
-        const pad9 = pcb.footprints[8]!.pads[0]!;
+        const pad9 = first(pcb.footprints[8]!.pads.values())!;
         assert.deepInclude(pad9, {
             number: "1",
             type: "smd",
@@ -930,7 +930,7 @@ suite("kicad.board.Footprint()", function () {
             },
         } as Partial<board.Pad>);
 
-        const pad10 = pcb.footprints[9]!.pads[0]!;
+        const pad10 = first(pcb.footprints[9]!.pads.values());
         assert.deepInclude(pad10, {
             number: "1",
             type: "smd",
@@ -941,7 +941,7 @@ suite("kicad.board.Footprint()", function () {
             rect_delta: { x: 0.5, y: 0 },
         } as Partial<board.Pad>);
 
-        const pad11 = pcb.footprints[10]!.pads[0]!;
+        const pad11 = first(pcb.footprints[10]!.pads.values())!;
         assert.deepInclude(pad11, {
             number: "1",
             type: "smd",
@@ -971,7 +971,7 @@ suite("kicad.board.Footprint()", function () {
             fill: "none",
         } as Partial<board.GrCircle>);
 
-        const pad12 = pcb.footprints[11]!.pads[0]!;
+        const pad12 = first(pcb.footprints[11]!.pads.values())!;
         assert.deepInclude(pad12, {
             number: "1",
             type: "thru_hole",
@@ -987,7 +987,7 @@ suite("kicad.board.Footprint()", function () {
             layers: ["*.Cu", "*.Mask"],
         } as Partial<board.Pad>);
 
-        const pad13 = pcb.footprints[12]!.pads[0]!;
+        const pad13 = first(pcb.footprints[12]!.pads.values())!;
         assert.deepInclude(pad13, {
             number: "",
             type: "smd",

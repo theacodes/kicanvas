@@ -503,9 +503,10 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     test("with symbols", function () {
         const sch = new schematic.KicadSch("test.kicad_sch", symbols_sch_src);
 
-        assert.equal(sch.symbols.length, 5);
+        const symbols = Array.from(sch.symbols.values());
+        assert.equal(symbols.length, 5);
 
-        assert_deep_partial(sch.symbols[0], {
+        assert_deep_partial(symbols[0], {
             lib_id: "Device:C",
             at: { position: { x: 5, y: 0 }, rotation: 90 },
             unit: 1,
@@ -515,20 +516,20 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
             pins: [{ number: "1" }, { number: "2" }],
         });
 
-        assert_deep_partial(sch.symbols[0]?.properties.get("Reference"), {
+        assert_deep_partial(symbols[0]?.properties.get("Reference"), {
             name: "Reference",
             text: "C?",
             id: 0,
             at: { position: { x: 5, y: -6.35 }, rotation: 90 },
         });
 
-        assert_deep_partial(sch.symbols[0]?.properties.get("Value"), {
+        assert_deep_partial(symbols[0]?.properties.get("Value"), {
             name: "Value",
             text: "10u",
             id: 1,
         });
 
-        assert_deep_partial(sch.symbols[0]?.properties.get("Footprint"), {
+        assert_deep_partial(symbols[0]?.properties.get("Footprint"), {
             name: "Footprint",
             text: "Capacitor_SMD:C_0603_1608Metric",
             id: 2,
@@ -538,27 +539,27 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
             },
         });
 
-        assert_deep_partial(sch.symbols[0]?.properties.get("Datasheet"), {
+        assert_deep_partial(symbols[0]?.properties.get("Datasheet"), {
             name: "Datasheet",
             text: "~",
             id: 3,
             effects: { hide: true },
         });
 
-        assert_deep_partial(sch.symbols[1], {
+        assert_deep_partial(symbols[1], {
             lib_id: "Device:C",
             at: { position: { x: 5, y: 0 }, rotation: 0 },
         });
 
-        assert_deep_partial(sch.symbols[2], {
+        assert_deep_partial(symbols[2], {
             lib_id: "power:GND",
         });
 
-        assert_deep_partial(sch.symbols[3], {
+        assert_deep_partial(symbols[3], {
             lib_id: "Regulator_Linear:AP1117-15",
         });
 
-        assert_deep_partial(sch.symbols[4], {
+        assert_deep_partial(symbols[4], {
             lib_id: "Device:C_Polarized_US",
             mirror: "x",
         });

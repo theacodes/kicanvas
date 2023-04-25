@@ -68,7 +68,7 @@ export class KicadSch {
     net_labels: NetLabel[] = [];
     global_labels: GlobalLabel[] = [];
     hierarchical_labels: HierarchicalLabel[] = [];
-    symbols: SchematicSymbol[] = [];
+    symbols = new Map<string, SchematicSymbol>();
     no_connects: NoConnect[] = [];
     drawings: (Polyline | Text)[] = [];
     images: Image[] = [];
@@ -106,10 +106,10 @@ export class KicadSch {
                     T.item(HierarchicalLabel, this),
                 ),
                 // images
-                // sheets
-                P.collection(
+                P.mapped_collection(
                     "symbols",
                     "symbol",
+                    (p: SchematicSymbol) => p.uuid,
                     T.item(SchematicSymbol, this),
                 ),
                 P.collection("drawings", "polyline", T.item(Polyline, this)),
@@ -133,7 +133,7 @@ export class KicadSch {
 
         const global_symbol_instances = this.symbol_instances?.symbol_instances;
 
-        for (const s of this.symbols) {
+        for (const s of this.symbols.values()) {
             const instance_data =
                 global_symbol_instances?.get(`${path}/${s.uuid}`) ??
                 s.instances.get(path);
@@ -181,14 +181,17 @@ export class KicadSch {
         yield* this.global_labels;
         yield* this.hierarchical_labels;
         yield* this.no_connects;
-        yield* this.symbols;
+        yield* this.symbols.values();
         yield* this.drawings;
         yield* this.images;
         yield* this.sheets;
     }
 
     find_symbol(uuid_or_ref: string) {
-        for (const sym of this.symbols) {
+        if (this.symbols.has(uuid_or_ref)) {
+            return this.symbols.get(this.uuid)!;
+        }
+        for (const sym of this.symbols.values()) {
             if (sym.uuid == uuid_or_ref || sym.reference == uuid_or_ref) {
                 return sym;
             }
@@ -205,10 +208,27 @@ export class KicadSch {
         return null;
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        const vars = this.title_block.text_vars;
-        vars.set("FILENAME", this.filename);
-        return vars;
+    resolve_text_var(name: string): string | undefined {
+        if (name == "FILENAME") {
+            return this.filename;
+        }
+
+        // Cross-reference
+        if (name.includes(":")) {
+            const [uuid, field_name] = name.split(":") as [string, string];
+            const symbol = this.symbols.get(uuid);
+
+            if (symbol) {
+                console.log(
+                    symbol,
+                    field_name,
+                    symbol.resolve_text_var(field_name),
+                );
+                return symbol.resolve_text_var(field_name);
+            }
+        }
+
+        return this.title_block.resolve_text_var(name);
     }
 }
 
@@ -558,16 +578,8 @@ export class Text {
         }
     }
 
-    #expanded_text: string;
-
     get shown_text() {
-        if (!this.#expanded_text) {
-            this.#expanded_text = expand_text_vars(
-                this.text,
-                this.parent?.text_vars,
-            );
-        }
-        return this.#expanded_text;
+        return expand_text_vars(this.text, this.parent);
     }
 }
 
@@ -842,6 +854,22 @@ export class LibSymbol {
         return null;
     }
 
+    get library_name() {
+        if (this.name.includes(":")) {
+            return this.name.split(":").at(0)!;
+        }
+
+        return "";
+    }
+
+    get library_item_name() {
+        if (this.name.includes(":")) {
+            return this.name.split(":").at(1)!;
+        }
+
+        return "";
+    }
+
     get unit_count(): number {
         // Unit 0 is common to all units, so it doesn't count towards
         // the total number of units.
@@ -882,8 +910,8 @@ export class LibSymbol {
         return this.properties.get("ki_locked")?.text ? false : true;
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        return new Map(this.parent?.text_vars);
+    resolve_text_var(name: string): string | undefined {
+        return this.parent?.resolve_text_var(name);
     }
 }
 
@@ -933,16 +961,8 @@ export class Property {
         this.#effects = e;
     }
 
-    #expanded_text: string;
-
     get shown_text() {
-        if (!this.#expanded_text) {
-            this.#expanded_text = expand_text_vars(
-                this.text,
-                this.parent?.text_vars,
-            );
-        }
-        return this.#expanded_text;
+        return expand_text_vars(this.text, this.parent);
     }
 }
 
@@ -1244,8 +1264,43 @@ export class SchematicSymbol {
         });
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        return new Map(this.parent.text_vars);
+    resolve_text_var(name: string): string | undefined {
+        if (this.properties.has(name)) {
+            return this.properties.get(name)?.shown_text;
+        }
+
+        switch (name) {
+            case "REFERENCE":
+                return this.reference;
+            case "VALUE":
+                return this.value;
+            case "FOOTPRINT":
+                return this.footprint;
+            case "DATASHEET":
+                return this.properties.get("Datasheet")?.name;
+            case "FOOTPRINT_LIBRARY":
+                return this.footprint.split(":").at(0);
+            case "FOOTPRINT_NAME":
+                return this.footprint.split(":").at(-1);
+            case "UNIT":
+                return this.unit_suffix;
+            case "SYMBOL_LIBRARY":
+                return this.lib_symbol.library_name;
+            case "SYMBOL_NAME":
+                return this.lib_symbol.library_item_name;
+            case "SYMBOL_DESCRIPTION":
+                return this.lib_symbol.description;
+            case "SYMBOL_KEYWORDS":
+                return this.lib_symbol.keywords;
+            case "EXCLUDE_FROM_BOM":
+                return this.in_bom ? "" : "Excluded from BOM";
+            case "EXCLUDE_FROM_BOARD":
+                return this.on_board ? "" : "Excluded from board";
+            case "DNP":
+                return this.dnp ? "DNP" : "";
+        }
+
+        return this.parent.resolve_text_var(name);
     }
 }
 
@@ -1465,8 +1520,8 @@ export class SchematicSheet {
         );
     }
 
-    get text_vars(): Map<string, string | undefined> {
-        return new Map(this.parent.text_vars);
+    resolve_text_var(name: string): string | undefined {
+        return this.parent?.resolve_text_var(name);
     }
 }
 

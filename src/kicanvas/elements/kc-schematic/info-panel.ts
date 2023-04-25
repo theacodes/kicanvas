@@ -62,7 +62,7 @@ export class KCSchematicInfoPanel extends KCUIElement {
                         ${entry("Revision", schematic.title_block?.rev)}
                         ${entry("Company", schematic.title_block?.company)}
                         ${comments}
-                        ${entry("Symbols", schematic.symbols.length)}
+                        ${entry("Symbols", schematic.symbols.size)}
                         ${entry(
                             "Unique symbols",
                             schematic.lib_symbols?.symbols.length ?? 0,

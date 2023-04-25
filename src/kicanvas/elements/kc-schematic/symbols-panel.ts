@@ -82,7 +82,7 @@ export class KCSchematicSymbolsPanelElement extends KCUIElement {
         const sheet_elms: HTMLElement[] = [];
 
         const symbols = sorted_by_numeric_strings(
-            schematic.symbols,
+            Array.from(schematic.symbols.values()),
             (sym) => sym.reference,
         );
 
