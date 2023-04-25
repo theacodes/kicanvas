@@ -96,7 +96,9 @@ export class KCProjectPanelElement extends KCUIElement {
                 "kc-ui-menu-item",
             ) as KCUIMenuItemElement;
 
-            this.project.download(menu_item.name);
+            const filename = menu_item.name.split("///")[0]!;
+
+            this.project.download(filename);
         });
     }
 
