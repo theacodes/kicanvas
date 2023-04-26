@@ -1104,7 +1104,8 @@ export class Arc extends GraphicItem {
 
         Object.assign(this, parsed);
 
-        this.width ??= this.stroke?.width || 0;
+        this.width ??= this.stroke?.width ?? this.#arc.width;
+        this.#arc.width = this.width;
     }
 
     get arc() {
