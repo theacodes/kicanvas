@@ -282,8 +282,8 @@ class TextPainter extends ItemPainter {
 
         const schtext = new SchText(t.shown_text);
 
-        schtext.apply_effects(t.effects);
         schtext.apply_at(t.at);
+        schtext.apply_effects(t.effects);
 
         schtext.attributes.color = this.gfx.theme["notes"] as Color;
 
