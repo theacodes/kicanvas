@@ -19,6 +19,7 @@ import { DocumentPainter, ItemPainter } from "../base/painter";
 import { ViewLayerNames } from "../base/view-layers";
 import {
     CopperVirtualLayerNames,
+    CopperLayerNames,
     LayerNames,
     LayerSet,
     ViewLayer,
@@ -261,9 +262,13 @@ class ZonePainter extends BoardItemPainter {
 
     layers_for(z: board_items.Zone): string[] {
         const layers = z.layers ?? [z.layer];
-        return layers.map((l) =>
-            virtual_layer_for(l, CopperVirtualLayerNames.zones),
-        );
+        return layers.map((l) => {
+            if (CopperLayerNames.includes(l as LayerNames)) {
+                return virtual_layer_for(l, CopperVirtualLayerNames.zones);
+            } else {
+                return l;
+            }
+        });
     }
 
     paint(layer: ViewLayer, z: board_items.Zone) {

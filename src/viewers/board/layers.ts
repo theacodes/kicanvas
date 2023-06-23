@@ -93,7 +93,7 @@ export enum LayerNames {
     grid = BaseLayerNames.grid,
 }
 
-const HoleLayerNames = [
+export const HoleLayerNames = [
     LayerNames.non_plated_holes,
     LayerNames.via_holes,
     LayerNames.pad_holes,
@@ -101,7 +101,7 @@ const HoleLayerNames = [
     LayerNames.via_holewalls,
 ];
 
-const CopperLayerNames = [
+export const CopperLayerNames = [
     LayerNames.f_cu,
     LayerNames.in1_cu,
     LayerNames.in2_cu,
