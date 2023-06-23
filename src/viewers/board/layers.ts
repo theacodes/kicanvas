@@ -38,6 +38,7 @@ export enum LayerNames {
     user_8 = "User.8",
     user_9 = "User.9",
     anchors = ":Anchors",
+    non_plated_holes = ":NonPlatedHoles",
     via_holes = ":Via:Holes",
     pad_holes = ":Pad:Holes",
     pad_holewalls = ":Pad:HoleWalls",
@@ -93,6 +94,7 @@ export enum LayerNames {
 }
 
 const HoleLayerNames = [
+    LayerNames.non_plated_holes,
     LayerNames.via_holes,
     LayerNames.pad_holes,
     LayerNames.pad_holewalls,
@@ -298,6 +300,8 @@ export class LayerSet extends BaseLayerSet {
                     (this.theme["copper"] as Record<string, Color>)?.["b"] ??
                     Color.white
                 );
+            case LayerNames.non_plated_holes:
+                return (this.theme["non_plated_hole"] as Color) ?? Color.white;
             case LayerNames.via_holes:
                 return (this.theme["via_hole"] as Color) ?? Color.white;
             case LayerNames.via_holewalls:

@@ -767,7 +767,8 @@ export class Footprint {
     };
     properties: Record<string, string> = {};
     drawings: FootprintDrawings[] = [];
-    pads = new Map<string, Pad>();
+    pads: Pad[] = [];
+    #pads_by_number = new Map<string, Pad>();
     zones: Zone[] = [];
     models: Model[] = [];
     #bbox: BBox;
@@ -820,14 +821,13 @@ export class Footprint {
                 P.collection("drawings", "fp_text", T.item(FpText, this)),
                 P.collection("zones", "zone", T.item(Zone, this)),
                 P.collection("models", "model", T.item(Model)),
-                P.mapped_collection(
-                    "pads",
-                    "pad",
-                    (p: Pad) => p.number,
-                    T.item(Pad, this),
-                ),
+                P.collection("pads", "pad", T.item(Pad, this)),
             ),
         );
+
+        for (const pad of this.pads) {
+            this.#pads_by_number.set(pad.number, pad);
+        }
 
         for (const d of this.drawings) {
             if (!(d instanceof FpText)) {
@@ -877,11 +877,11 @@ export class Footprint {
             ];
             switch (expr_type) {
                 case "NET_NAME":
-                    return this.pads.get(pad_name)?.net.number.toString();
+                    return this.pad_by_number(pad_name)?.net.number.toString();
                 case "NET_CLASS":
-                    return this.pads.get(pad_name)?.net.name;
+                    return this.pad_by_number(pad_name)?.net.name;
                 case "PIN_NAME":
-                    return this.pads.get(pad_name)?.pinfunction;
+                    return this.pad_by_number(pad_name)?.pinfunction;
             }
         }
 
@@ -890,6 +890,10 @@ export class Footprint {
         }
 
         return this.parent.resolve_text_var(name);
+    }
+
+    pad_by_number(number: string): Pad {
+        return this.#pads_by_number.get(number)!;
     }
 
     /**

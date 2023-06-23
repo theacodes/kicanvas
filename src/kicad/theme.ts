@@ -72,7 +72,7 @@ export const board = {
     no_connect: Color.from_css("rgb(255, 148, 0)"),
     pad_plated_hole: Color.from_css("rgb(194, 194, 0)"),
     pad_through_hole: Color.from_css("rgb(227, 209, 46)"),
-    plated_hole: Color.from_css("rgb(129, 255, 190)"),
+    non_plated_hole: Color.from_css("rgb(129, 255, 190)"),
     ratsnest: Color.from_css("rgb(128, 119, 168)"),
     user_1: Color.from_css("rgb(194, 118, 0)"),
     user_2: Color.from_css("rgb(89, 148, 220)"),

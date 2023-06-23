@@ -320,7 +320,7 @@ class PadPainter extends BoardItemPainter {
                 layers.push(LayerNames.pad_holes);
                 break;
             case "np_thru_hole":
-                layers.push(LayerNames.pad_holes);
+                layers.push(LayerNames.non_plated_holes);
                 break;
             case "smd":
             case "connect":
@@ -352,7 +352,11 @@ class PadPainter extends BoardItemPainter {
 
         const center = new Vec2(0, 0);
 
-        if (layer.name == LayerNames.pad_holes && pad.drill != null) {
+        const is_hole_layer =
+            layer.name == LayerNames.pad_holes ||
+            layer.name == LayerNames.non_plated_holes;
+
+        if (is_hole_layer && pad.drill != null) {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 this.gfx.circle(
