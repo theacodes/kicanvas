@@ -69,6 +69,8 @@ export class GitHub {
                 ref = parts.shift();
                 path = parts.join("/");
             }
+        } else {
+            type = "root";
         }
 
         return {

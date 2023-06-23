@@ -34,6 +34,12 @@ export class GitHubFileSystem extends VirtualFileSystem {
                 continue;
             }
 
+            // Link to the root of a repo, treat it as tree using HEAD
+            if (info.type == "root") {
+                info.ref = "HEAD";
+                info.type = "tree";
+            }
+
             // Link to a single file.
             if (info.type == "blob") {
                 const guc_url = gh_user_content.convert_url(url);
