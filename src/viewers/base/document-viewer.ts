@@ -96,14 +96,19 @@ export abstract class DocumentViewer<
         log.finish();
     }
 
-    protected override on_viewport_change(): void {
-        super.on_viewport_change();
-        this.grid?.update();
-    }
-
-    override zoom_to_page() {
+    public override zoom_to_page() {
         this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
         this.draw();
+    }
+
+    public override draw(): void {
+        if (!this.viewport) {
+            return;
+        }
+
+        this.grid?.update();
+
+        super.draw();
     }
 
     public override select(item: BBox | null): void {
