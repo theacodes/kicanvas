@@ -393,6 +393,13 @@ class PadPainter extends BoardItemPainter {
                 shape = pad.options.anchor;
             }
 
+            if (pad.drill?.offset) {
+                this.gfx.state.matrix.translate_self(
+                    pad.drill.offset.x,
+                    pad.drill.offset.y,
+                );
+            }
+
             switch (shape) {
                 case "circle":
                     this.gfx.circle(new Circle(center, pad.size.x / 2, color));
