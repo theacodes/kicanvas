@@ -83,6 +83,11 @@ section.overlay input::placeholder {
     color: var(--fg);
 }
 
+section.overlay p.note {
+    color: var(--input-placeholder);
+    font-size: 1rem;
+}
+
 section.overlay p.github img {
     width: 2rem;
 }

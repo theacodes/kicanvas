@@ -199,6 +199,10 @@ class KiCanvasAppElement extends KCUIElement {
                         placeholder="Paste a GitHub link"
                         autofocus />
                     <p>or drag & drop your KiCAD files</p>
+                    <p class="note">
+                        KiCanvas runs entirely within your browser, so your
+                        files don't ever leave your machine.
+                    </p>
                     <p class="github">
                         <a
                             href="https://github.com/theacodes/kicanvas"
