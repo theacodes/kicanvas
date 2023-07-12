@@ -124,7 +124,7 @@ export class DrawingSheet {
                 // KiCAD Version
                 return "KiCanvas Alpha";
         }
-        return undefined;
+        return this.document?.resolve_text_var(name);
     }
 }
 
