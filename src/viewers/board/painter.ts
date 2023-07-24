@@ -262,6 +262,12 @@ class ZonePainter extends BoardItemPainter {
 
     layers_for(z: board_items.Zone): string[] {
         const layers = z.layers ?? [z.layer];
+
+        if (layers.length && layers[0] == "F&B.Cu") {
+            layers.shift();
+            layers.push("F.Cu", "B.Cu");
+        }
+
         return layers.map((l) => {
             if (CopperLayerNames.includes(l as LayerNames)) {
                 return virtual_layer_for(l, CopperVirtualLayerNames.zones);
