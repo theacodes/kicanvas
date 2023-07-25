@@ -155,6 +155,15 @@ export class Arc {
     }
 
     /**
+     * Same as to_polyline, but includes the arc center
+     */
+    to_polygon(): Vec2[] {
+        const points = this.to_polyline();
+        points.push(this.center);
+        return points;
+    }
+
+    /**
      * Get a bounding box that encloses the entire arc.
      */
     get bbox(): BBox {
