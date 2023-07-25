@@ -309,7 +309,7 @@ class LibSymbolPainter extends ItemPainter {
         ];
     }
 
-    paint(layer: ViewLayer, s: schematic_items.LibSymbol) {
+    paint(layer: ViewLayer, s: schematic_items.LibSymbol, body_style = 1) {
         if (
             ![
                 LayerNames.symbol_background,
@@ -324,7 +324,7 @@ class LibSymbolPainter extends ItemPainter {
         // LIB_ITEM::m_unit.
         const common_unit = s.units.get(0);
         if (common_unit) {
-            this.#paint_unit(layer, common_unit);
+            this.#paint_unit(layer, common_unit, body_style);
         }
 
         const si = (this.view_painter as SchematicPainter).current_symbol;
@@ -332,15 +332,23 @@ class LibSymbolPainter extends ItemPainter {
         const symbol_unit = s.units.get(si?.unit || 1);
 
         if (symbol_unit) {
-            this.#paint_unit(layer, symbol_unit);
+            this.#paint_unit(layer, symbol_unit, body_style);
         }
     }
 
-    #paint_unit(layer: ViewLayer, unit: schematic_items.LibSymbol[]) {
+    #paint_unit(
+        layer: ViewLayer,
+        unit: schematic_items.LibSymbol[],
+        body_style = 1,
+    ) {
         const outline_color = this.gfx.theme["component_outline"] as Color;
         const fill_color = this.gfx.theme["component_body"] as Color;
 
         for (const sym of unit) {
+            if (sym.style > 0 && body_style != sym.style) {
+                continue;
+            }
+
             for (const g of sym.drawings) {
                 if (g instanceof schematic_items.GraphicItem) {
                     if (
@@ -642,7 +650,8 @@ class SchematicSymbolPainter extends ItemPainter {
         );
         this.gfx.state.multiply(transform.matrix);
 
-        this.view_painter.paint_item(layer, si.lib_symbol);
+        const body_style = si.convert ?? 1;
+        this.view_painter.paint_item(layer, si.lib_symbol, body_style);
 
         this.gfx.state.pop();
 

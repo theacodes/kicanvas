@@ -913,16 +913,31 @@ export class LibSymbol {
         return count;
     }
 
-    get unit(): number | null {
+    get unit(): number {
         // KiCAD encodes the symbol unit into the name, for example,
         // MCP6001_1_1 is unit 1 and MCP6001_2_1 is unit 2.
+        // Unit 0 is common to all units.
         // See SCH_SEXPR_PARSER::ParseSymbol.
         const parts = this.name.split("_");
         if (parts.length < 3) {
-            return null;
+            return 0;
         }
 
         return parseInt(parts.at(-2)!, 10);
+    }
+
+    get style(): number {
+        // KiCAD "De Morgan" body styles are indicated with a number greater
+        // than one at the end of the symbol name.
+        // MCP6001_1_1 is the normal body and and MCP6001_1_2 is the alt style.
+        // Style 0 is common to all styles.
+        // See SCH_SEXPR_PARSER::ParseSymbol.
+        const parts = this.name.split("_");
+        if (parts.length < 3) {
+            return 0;
+        }
+
+        return parseInt(parts.at(-1)!, 10);
     }
 
     get description(): string {
@@ -1105,7 +1120,7 @@ export class SchematicSymbol {
     at: At;
     mirror?: "x" | "y";
     unit?: number;
-    convert? = false;
+    convert: number;
     in_bom = false;
     on_board = false;
     dnp = false;
@@ -1142,7 +1157,7 @@ export class SchematicSymbol {
             P.item("at", At),
             P.pair("mirror", T.string),
             P.pair("unit", T.number),
-            P.atom("convert"),
+            P.pair("convert", T.number),
             P.pair("in_bom", T.boolean),
             P.pair("on_board", T.boolean),
             P.pair("dnp", T.boolean),
