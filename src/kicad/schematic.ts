@@ -856,12 +856,15 @@ export class LibSymbol {
         return this.#pins_by_number.has(number);
     }
 
-    pin_by_number(number: string): PinDefinition {
+    pin_by_number(number: string, style = 1): PinDefinition {
         if (this.has_pin(number)) {
             return this.#pins_by_number.get(number)!;
         }
         for (const child of this.children) {
-            if (child.has_pin(number)) {
+            if (
+                (child.style == 0 || child.style == style) &&
+                child.has_pin(number)
+            ) {
                 return child.pin_by_number(number);
             }
         }
@@ -1382,7 +1385,10 @@ export class PinInstance {
     }
 
     get definition() {
-        return this.parent.lib_symbol.pin_by_number(this.number);
+        return this.parent.lib_symbol.pin_by_number(
+            this.number,
+            this.parent.convert,
+        );
     }
 
     get unit() {
