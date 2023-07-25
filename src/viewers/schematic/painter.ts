@@ -38,6 +38,61 @@ function color_maybe(
     return fail_color;
 }
 
+function determine_stroke(
+    gfx: Renderer,
+    layer: ViewLayer,
+    item: schematic_items.GraphicItem,
+) {
+    const width = item.stroke?.width || gfx.state.stroke_width;
+
+    if (width < 0) {
+        return { width: 0, color: null };
+    }
+
+    const stroke_type = item.stroke?.type ?? "none";
+
+    if (stroke_type == "none") {
+        return { width: 0, color: null };
+    }
+
+    const default_stroke =
+        layer.name == LayerNames.symbol_foreground
+            ? (gfx.theme["component_outline"] as Color)
+            : (gfx.theme["note"] as Color);
+
+    const color = item.stroke?.color ?? default_stroke;
+
+    return { width, color };
+}
+
+function determine_fill(
+    gfx: Renderer,
+    layer: ViewLayer,
+    item: schematic_items.GraphicItem,
+) {
+    const fill_type = item.fill?.type ?? "none";
+
+    if (fill_type == "none") {
+        return null;
+    }
+
+    if (
+        fill_type == "background" &&
+        layer.name != LayerNames.symbol_background
+    ) {
+        return null;
+    }
+
+    switch (fill_type) {
+        case "background":
+            return gfx.theme["component_body"] as Color;
+        case "outline":
+            return gfx.theme["component_outline"] as Color;
+        case "color":
+            return item.fill!.color;
+    }
+}
+
 class RectanglePainter extends ItemPainter {
     classes = [schematic_items.Rectangle];
 
@@ -46,12 +101,6 @@ class RectanglePainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, r: schematic_items.Rectangle) {
-        const color = color_maybe(
-            r.stroke?.color,
-            this.gfx.state.stroke,
-            this.gfx.theme["note"] as Color,
-        );
-
         const pts = [
             r.start,
             new Vec2(r.end.x, r.start.y),
@@ -60,8 +109,15 @@ class RectanglePainter extends ItemPainter {
             r.start,
         ];
 
-        if (r.fill?.type !== "none") {
-            this.gfx.polygon(new Polygon(pts, this.gfx.state.fill));
+        this.#fill(layer, r, pts);
+        this.#stroke(layer, r, pts);
+    }
+
+    #stroke(layer: ViewLayer, r: schematic_items.Rectangle, pts: Vec2[]) {
+        const { width, color } = determine_stroke(this.gfx, layer, r);
+
+        if (!width || !color) {
+            return;
         }
 
         this.gfx.line(
@@ -71,6 +127,16 @@ class RectanglePainter extends ItemPainter {
                 color,
             ),
         );
+    }
+
+    #fill(layer: ViewLayer, r: schematic_items.Rectangle, pts: Vec2[]) {
+        const color = determine_fill(this.gfx, layer, r);
+
+        if (!color) {
+            return;
+        }
+
+        this.gfx.polygon(new Polygon(pts, color));
     }
 }
 
@@ -82,23 +148,28 @@ class PolylinePainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, pl: schematic_items.Polyline) {
-        const color = color_maybe(
-            pl.stroke?.color,
-            this.gfx.state.stroke,
-            this.gfx.theme["note"] as Color,
-        );
+        this.#fill(layer, pl);
+        this.#stroke(layer, pl);
+    }
 
-        this.gfx.line(
-            new Polyline(
-                pl.pts,
-                pl.stroke?.width || this.gfx.state.stroke_width,
-                color,
-            ),
-        );
+    #stroke(layer: ViewLayer, pl: schematic_items.Polyline) {
+        const { width, color } = determine_stroke(this.gfx, layer, pl);
 
-        if (pl.fill?.type !== "none") {
-            this.gfx.polygon(new Polygon(pl.pts, this.gfx.state.fill));
+        if (!width || !color) {
+            return;
         }
+
+        this.gfx.line(new Polyline(pl.pts, width, color));
+    }
+
+    #fill(layer: ViewLayer, pl: schematic_items.Polyline) {
+        const color = determine_fill(this.gfx, layer, pl);
+
+        if (!color) {
+            return;
+        }
+
+        this.gfx.polygon(new Polygon(pl.pts, color));
     }
 }
 
@@ -164,8 +235,16 @@ class CirclePainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, c: schematic_items.Circle) {
-        const color =
-            this.gfx.state.stroke ?? (this.gfx.theme["note"] as Color);
+        this.#fill(layer, c);
+        this.#stroke(layer, c);
+    }
+
+    #stroke(layer: ViewLayer, c: schematic_items.Circle) {
+        const { width, color } = determine_stroke(this.gfx, layer, c);
+
+        if (!width || !color) {
+            return;
+        }
 
         this.gfx.arc(
             new Arc(
@@ -173,14 +252,20 @@ class CirclePainter extends ItemPainter {
                 c.radius,
                 new Angle(0),
                 new Angle(Math.PI * 2),
-                c.stroke?.width || this.gfx.state.stroke_width,
+                width,
                 color,
             ),
         );
+    }
 
-        if (c.fill?.type != "none") {
-            this.gfx.circle(new Circle(c.center, c.radius, color));
+    #fill(layer: ViewLayer, c: schematic_items.Circle) {
+        const color = determine_fill(this.gfx, layer, c);
+
+        if (!color) {
+            return;
         }
+
+        this.gfx.circle(new Circle(c.center, c.radius, color));
     }
 }
 
@@ -192,9 +277,6 @@ class ArcPainter extends ItemPainter {
     }
 
     paint(layer: ViewLayer, a: schematic_items.Arc) {
-        const color =
-            this.gfx.state.stroke ?? (this.gfx.theme["note"] as Color);
-
         const arc = MathArc.from_three_points(
             a.start,
             a.mid,
@@ -202,16 +284,37 @@ class ArcPainter extends ItemPainter {
             a.stroke?.width,
         );
 
+        this.#fill(layer, a, arc);
+        this.#stroke(layer, a, arc);
+    }
+
+    #stroke(layer: ViewLayer, a: schematic_items.Arc, arc: MathArc) {
+        const { width, color } = determine_stroke(this.gfx, layer, a);
+
+        if (!width || !color) {
+            return;
+        }
+
         this.gfx.arc(
             new Arc(
                 arc.center,
                 arc.radius,
                 arc.start_angle,
                 arc.end_angle,
-                a.stroke?.width || this.gfx.state.stroke_width,
+                width,
                 color,
             ),
         );
+    }
+
+    #fill(layer: ViewLayer, a: schematic_items.Arc, arc: MathArc) {
+        const color = determine_fill(this.gfx, layer, a);
+
+        if (!color) {
+            return;
+        }
+
+        this.gfx.polygon(new Polygon(arc.to_polygon(), color));
     }
 }
 
@@ -303,7 +406,7 @@ class LibSymbolPainter extends ItemPainter {
 
     layers_for(item: schematic_items.LibSymbol) {
         return [
-            LayerNames.symbol_foreground,
+            LayerNames.symbol_background,
             LayerNames.symbol_foreground,
             LayerNames.symbol_field,
         ];
