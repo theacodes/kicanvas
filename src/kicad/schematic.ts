@@ -114,6 +114,7 @@ export class KicadSch {
                 ),
                 P.collection("drawings", "polyline", T.item(Polyline, this)),
                 P.collection("drawings", "rectangle", T.item(Rectangle, this)),
+                P.collection("drawings", "arc", T.item(Arc, this)),
                 P.collection("drawings", "text", T.item(Text, this)),
                 P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
