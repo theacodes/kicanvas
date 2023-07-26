@@ -12,6 +12,7 @@
 
 import { Angle, BBox, Vec2 } from "../../base/math";
 import { Polyline, Renderer } from "../../graphics";
+import type { BaseTheme } from "../../kicad";
 import * as drawing_sheet from "../../kicad/drawing-sheet";
 import { EDAText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";
@@ -218,8 +219,8 @@ class TbTextPainter extends ItemPainter {
 }
 
 export class DrawingSheetPainter extends DocumentPainter {
-    constructor(gfx: Renderer, layers: ViewLayerSet) {
-        super(gfx, layers);
+    constructor(gfx: Renderer, layers: ViewLayerSet, theme: BaseTheme) {
+        super(gfx, layers, theme);
         this.painter_list = [
             new LinePainter(this, gfx),
             new RectPainter(this, gfx),
