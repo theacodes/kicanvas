@@ -2007,7 +2007,7 @@
     (pin "11" (uuid b3d26a48-7549-42b4-90d7-350a77e45747))
     (pin "4" (uuid 132cd10c-93e4-439e-b0ee-7bff80edcb4c))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U1") (unit 2)
         )
@@ -2040,7 +2040,7 @@
     (pin "T" (uuid 63ba7882-b487-4d17-81f5-73e33c715868))
     (pin "TN" (uuid 227d90d0-5893-4b73-bd77-593f80362faa))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J2") (unit 1)
         )
@@ -2078,7 +2078,7 @@
     (pin "1" (uuid 424358fa-0908-4959-b9e7-6f8b89508a13))
     (pin "2" (uuid 0cb90ede-3266-4150-a561-83f4a3aa892b))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R1") (unit 1)
         )
@@ -2111,7 +2111,7 @@
     (pin "T" (uuid c95a8aa1-3885-4834-b938-0bf48f7225e3))
     (pin "TN" (uuid 24115978-c75a-4afb-b9ff-8c654d269f56))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J3") (unit 1)
         )
@@ -2136,7 +2136,7 @@
     )
     (pin "1" (uuid abfb3a8e-201b-4181-a716-cdf88468ecca))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR02") (unit 1)
         )
@@ -2183,7 +2183,7 @@
     (pin "11" (uuid 15143a42-1a60-4172-9f74-5851566612d3))
     (pin "4" (uuid 1697a2d1-1df8-4e43-9dd9-07e62d074649))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U1") (unit 4)
         )
@@ -2221,7 +2221,7 @@
     (pin "1" (uuid 03f15e5f-7e82-40a6-bc70-7dd3fd8b2748))
     (pin "2" (uuid 21307c1d-5035-4fc7-9d82-a05605a2aea7))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R2") (unit 1)
         )
@@ -2253,7 +2253,7 @@
     (pin "T" (uuid 49996e5f-2048-45fb-b7cb-320f2acfcff1))
     (pin "TN" (uuid 178139c5-5cc1-4995-8f33-a1819558c7c2))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J4") (unit 1)
         )
@@ -2300,7 +2300,7 @@
     (pin "11" (uuid 0272c021-97e3-4fea-ab80-60242f0ba0a8))
     (pin "4" (uuid 53ee9368-a53b-461c-aad8-c1290a4ba485))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U1") (unit 3)
         )
@@ -2338,7 +2338,7 @@
     (pin "1" (uuid 5a67438a-ab5b-4183-8e42-670ff11ecf76))
     (pin "2" (uuid 602554b1-7f0f-449a-badb-8b204746e5d5))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R3") (unit 1)
         )
@@ -2370,7 +2370,7 @@
     (pin "T" (uuid 8d4eced6-57c6-41ff-b149-3e1523752ff2))
     (pin "TN" (uuid 2f9f8bef-bf17-42ac-a259-d34d1c5a7e8d))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J5") (unit 1)
         )
@@ -2417,7 +2417,7 @@
     (pin "11" (uuid e43012dc-1991-482a-bb8a-8e13f543515f))
     (pin "4" (uuid 4126c247-6401-41a4-b3a5-ddf71780c361))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U1") (unit 1)
         )
@@ -2442,7 +2442,7 @@
     )
     (pin "1" (uuid 62b04c01-f216-4648-a8ff-92e79b27eadf))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR01") (unit 1)
         )
@@ -2451,7 +2451,7 @@
   )
 
   (symbol (lib_id "winterbloom:OPA4991") (at 142.875 93.345 0) (unit 2)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom yes) (on_board yes) (dnp yes)
     (uuid 00000000-0000-0000-0000-0000613dbb75)
     (property "Reference" "U2" (at 142.875 88.265 0)
       (effects (font (size 1.27 1.27)))
@@ -2489,7 +2489,7 @@
     (pin "11" (uuid e45c80d9-44e0-4732-b329-dbfd9766ba8b))
     (pin "4" (uuid d9ed7cab-cfaa-4cef-af41-68889e0ac9f4))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U2") (unit 2)
         )
@@ -2522,7 +2522,7 @@
     (pin "T" (uuid a9512742-c757-470e-8c67-abd12918c79c))
     (pin "TN" (uuid 42d7eead-77cb-4631-8d4e-42e4bd16d3a7))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J7") (unit 1)
         )
@@ -2560,7 +2560,7 @@
     (pin "1" (uuid b93cf749-d51c-462a-b8bb-cf5bfd7c303f))
     (pin "2" (uuid ffaa5254-be8b-4c9e-be08-9db36bf7a4a2))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R5") (unit 1)
         )
@@ -2593,7 +2593,7 @@
     (pin "T" (uuid c985d1af-52c0-48e3-a29e-ba2d6abb8cef))
     (pin "TN" (uuid 3997524c-5cb8-4ffe-ba03-ed7718e657b7))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J8") (unit 1)
         )
@@ -2618,7 +2618,7 @@
     )
     (pin "1" (uuid 3d70fa54-3f4d-4988-8bfe-675c8c547cb9))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR07") (unit 1)
         )
@@ -2627,7 +2627,7 @@
   )
 
   (symbol (lib_id "winterbloom:OPA4991") (at 142.875 115.57 0) (unit 4)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom yes) (on_board yes) (dnp yes)
     (uuid 00000000-0000-0000-0000-0000613dbbaf)
     (property "Reference" "U2" (at 142.875 110.49 0)
       (effects (font (size 1.27 1.27)))
@@ -2665,7 +2665,7 @@
     (pin "11" (uuid 291b3feb-a298-48c1-be97-77dd630e63ee))
     (pin "4" (uuid f01aef7b-a4a7-443b-a5e2-5f6d208d4875))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U2") (unit 4)
         )
@@ -2703,7 +2703,7 @@
     (pin "1" (uuid d5962ba9-e091-4500-aecd-bfe4d1ad6366))
     (pin "2" (uuid 6ee0da76-25bd-4854-ba2e-3439bdbdc533))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R6") (unit 1)
         )
@@ -2735,7 +2735,7 @@
     (pin "T" (uuid 883d9c29-1826-4d48-b045-2d38701438c8))
     (pin "TN" (uuid 1c80b247-756b-4a11-82ac-6f9782392d4a))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J9") (unit 1)
         )
@@ -2744,7 +2744,7 @@
   )
 
   (symbol (lib_id "winterbloom:OPA4991") (at 142.875 137.16 0) (unit 3)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom yes) (on_board yes) (dnp yes)
     (uuid 00000000-0000-0000-0000-0000613dbbde)
     (property "Reference" "U2" (at 142.875 132.08 0)
       (effects (font (size 1.27 1.27)))
@@ -2782,7 +2782,7 @@
     (pin "11" (uuid 35a60d74-5637-4aeb-9b47-221eb7424b0e))
     (pin "4" (uuid 2aa76e05-3e7f-4595-9be4-7d0cd4cd4db6))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U2") (unit 3)
         )
@@ -2820,7 +2820,7 @@
     (pin "1" (uuid d2f99d6e-0d4d-49fc-ad4d-c713356d660b))
     (pin "2" (uuid e33f0f71-bdb9-4e6a-b21f-5364c78ba2af))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R7") (unit 1)
         )
@@ -2852,7 +2852,7 @@
     (pin "T" (uuid 50d26a03-9cb0-49a0-8123-3074d1f8000d))
     (pin "TN" (uuid 3a801748-6d9e-4dca-8ee5-5a13de14e9f3))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J10") (unit 1)
         )
@@ -2861,7 +2861,7 @@
   )
 
   (symbol (lib_id "winterbloom:OPA4991") (at 142.875 158.75 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom yes) (on_board yes) (dnp yes)
     (uuid 00000000-0000-0000-0000-0000613dbc0d)
     (property "Reference" "U2" (at 142.875 153.67 0)
       (effects (font (size 1.27 1.27)))
@@ -2899,7 +2899,7 @@
     (pin "11" (uuid a6afb45c-2392-471d-8988-87d8bc33153e))
     (pin "4" (uuid 43e3cfe3-d819-425c-85b7-e776cdf73d17))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U2") (unit 1)
         )
@@ -2924,7 +2924,7 @@
     )
     (pin "1" (uuid 611c1bf6-7ef4-404d-bb78-d734cb4a19fc))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR06") (unit 1)
         )
@@ -2964,7 +2964,7 @@
     (pin "8" (uuid 072685da-4059-4922-b573-90f0bc768881))
     (pin "9" (uuid c04bbfb0-ecc8-45f1-ad0f-742a11f535ae))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J1") (unit 1)
         )
@@ -3005,7 +3005,7 @@
     (pin "1" (uuid e3bbc838-3d33-4eed-a6cd-155d2b6d4cdc))
     (pin "2" (uuid b29f6603-b146-4f88-85ab-68e5fd245b7b))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "FB1") (unit 1)
         )
@@ -3046,7 +3046,7 @@
     (pin "1" (uuid 495de5ad-6b2d-4fa4-8609-8acc3cc5f5e4))
     (pin "2" (uuid bdfbdb55-0008-4436-95b1-51a8159ddb03))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D1") (unit 1)
         )
@@ -3093,7 +3093,7 @@
     (pin "11" (uuid bd1eae94-c1a9-4479-a326-d60a297c44e0))
     (pin "4" (uuid 7949b785-9691-46cb-88b9-bed885cfb10c))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U1") (unit 5)
         )
@@ -3102,7 +3102,7 @@
   )
 
   (symbol (lib_id "winterbloom:OPA4991") (at 195.58 38.1 0) (unit 5)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom yes) (on_board yes) (dnp yes)
     (uuid 00000000-0000-0000-0000-0000613e95ce)
     (property "Reference" "U2" (at 194.31 43.18 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -3140,7 +3140,7 @@
     (pin "11" (uuid 2132bcf8-239f-43fd-ade0-7748a177694e))
     (pin "4" (uuid 0bb8e3cb-fb62-410b-9ea6-e12610a17a04))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U2") (unit 5)
         )
@@ -3181,7 +3181,7 @@
     (pin "1" (uuid c647b2dc-a8b5-4072-8920-3446f7ed5d0e))
     (pin "2" (uuid 2a7f20ad-0c79-4136-aa62-4117782785b0))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "FB2") (unit 1)
         )
@@ -3222,7 +3222,7 @@
     (pin "1" (uuid 311aed84-8a89-4ffe-a02a-3765af6e3b2e))
     (pin "2" (uuid 099e4a0c-f85c-42a3-a7d6-851a0d8b2a2c))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D2") (unit 1)
         )
@@ -3247,7 +3247,7 @@
     )
     (pin "1" (uuid cc5fac80-7884-46c0-ad96-90863a481dab))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0101") (unit 1)
         )
@@ -3272,7 +3272,7 @@
     )
     (pin "1" (uuid a676e5d8-8a33-4af4-8e49-5c57f8fbac29))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0103") (unit 1)
         )
@@ -3297,7 +3297,7 @@
     )
     (pin "1" (uuid de0ea009-fcd6-4adf-bc10-d6d5a78fd2be))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0104") (unit 1)
         )
@@ -3322,7 +3322,7 @@
     )
     (pin "1" (uuid 9f7df657-1d12-45bb-a28d-b7f33efe3e30))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0105") (unit 1)
         )
@@ -3347,7 +3347,7 @@
     )
     (pin "1" (uuid 4f443b5c-c1d4-4051-843e-accb97cdfaa3))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0149") (unit 1)
         )
@@ -3388,7 +3388,7 @@
     (pin "1" (uuid 26f839d5-4d05-4dec-9b37-976f7d5f6f48))
     (pin "2" (uuid 7fa632e9-79d7-43d8-a145-195fa7d7457e))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C3") (unit 1)
         )
@@ -3413,7 +3413,7 @@
     )
     (pin "1" (uuid be0b653a-deab-4d86-93c4-709a69618ca3))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0110") (unit 1)
         )
@@ -3454,7 +3454,7 @@
     (pin "1" (uuid f47238bb-cbf3-4e16-8c4a-abdf6ce94c8b))
     (pin "2" (uuid 679bb042-71d3-4cdf-84c8-8a9e0b064915))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C5") (unit 1)
         )
@@ -3479,7 +3479,7 @@
     )
     (pin "1" (uuid 8a56c616-1d93-4c46-96ab-acb8b977af07))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0112") (unit 1)
         )
@@ -3520,7 +3520,7 @@
     (pin "1" (uuid 1a67499d-8bb9-4aa2-a948-630ae52d52fe))
     (pin "2" (uuid 30426451-d556-4301-b088-83c38cddaff2))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C4") (unit 1)
         )
@@ -3545,7 +3545,7 @@
     )
     (pin "1" (uuid 187dfd5d-b5c2-4bc6-b013-0fc1dbd5c434))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0113") (unit 1)
         )
@@ -3586,7 +3586,7 @@
     (pin "1" (uuid f0f750d5-98b5-40d1-ae9d-6417e3cf1979))
     (pin "2" (uuid 363b3a9c-279d-43a4-a600-03c0a7d56995))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C6") (unit 1)
         )
@@ -3611,7 +3611,7 @@
     )
     (pin "1" (uuid 5c8c1769-487f-49dc-8683-c09c3a248c4c))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0114") (unit 1)
         )
@@ -3620,7 +3620,7 @@
   )
 
   (symbol (lib_id "Device:C_Small") (at 71.755 48.26 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom yes) (on_board yes) (dnp yes) (fields_autoplaced)
     (uuid 00000000-0000-0000-0000-000061441595)
     (property "Reference" "C1" (at 74.93 46.3613 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -3652,7 +3652,7 @@
     (pin "1" (uuid 57066040-05ed-4786-9e12-3332017ce764))
     (pin "2" (uuid 6b42fabd-d2b3-4abb-ad63-3acc92231a71))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C1") (unit 1)
         )
@@ -3677,7 +3677,7 @@
     )
     (pin "1" (uuid 87ffb814-d937-48cd-b93d-5eeb913d90d1))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0118") (unit 1)
         )
@@ -3718,7 +3718,7 @@
     (pin "1" (uuid f231a712-f432-4d95-9fcc-4dfba6c60e72))
     (pin "2" (uuid 36d21b3d-8364-46a7-a528-4cfe4670042c))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C2") (unit 1)
         )
@@ -3756,7 +3756,7 @@
     (pin "1" (uuid 409bcb76-277f-45aa-b67d-60fcb759d720))
     (pin "2" (uuid 35707dec-36d5-43d2-8721-83780692d257))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R4") (unit 1)
         )
@@ -3794,7 +3794,7 @@
     (pin "1" (uuid d3f91831-a89c-4542-8e7a-f9f232ef2ec4))
     (pin "2" (uuid c4e9623c-1a4e-47c5-a6fb-ee65a42a2cfa))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R8") (unit 1)
         )
@@ -3832,7 +3832,7 @@
     (pin "1" (uuid e32dd766-da62-4e39-882f-9268368b2963))
     (pin "2" (uuid 9c0cc06d-265e-46be-93da-27fe527091f5))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R15") (unit 1)
         )
@@ -3857,7 +3857,7 @@
     )
     (pin "1" (uuid 6b659910-15be-4bb2-a78a-77d8fca0aab9))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0145") (unit 1)
         )
@@ -3904,7 +3904,7 @@
     (pin "11" (uuid 260aa955-295a-4c92-9900-cbfb0c635dff))
     (pin "4" (uuid 9ee66ffe-c5e5-4480-a96c-4cbaaec90108))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U4") (unit 2)
         )
@@ -3937,7 +3937,7 @@
     (pin "T" (uuid 6f13bb93-4305-4d46-9d4d-c42f38e69acb))
     (pin "TN" (uuid dba235e8-888e-4f38-b739-3f347dc4403f))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J12") (unit 1)
         )
@@ -3975,7 +3975,7 @@
     (pin "1" (uuid e197342b-3722-47e0-b7cb-9a800379225b))
     (pin "2" (uuid 3f15063e-257b-49ff-a175-b33019d70662))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R12") (unit 1)
         )
@@ -4008,7 +4008,7 @@
     (pin "T" (uuid b0b53725-8358-4b4a-a44c-9f24609a07c6))
     (pin "TN" (uuid eef4cf55-cd71-451b-8575-08048380fc87))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J13") (unit 1)
         )
@@ -4033,7 +4033,7 @@
     )
     (pin "1" (uuid ec5ea7ea-af6e-4e15-919e-2a30ba6727e1))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0125") (unit 1)
         )
@@ -4080,7 +4080,7 @@
     (pin "11" (uuid e6eacfe6-fa66-460d-a164-4496e7daa096))
     (pin "4" (uuid bf43ade6-494c-4148-aa9c-e777fbe3f564))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U4") (unit 4)
         )
@@ -4118,7 +4118,7 @@
     (pin "1" (uuid 1e307d6c-b99d-4056-9c7f-81b66284cec6))
     (pin "2" (uuid 4df8cda0-d09f-4c8d-b7f1-155a1d802567))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R13") (unit 1)
         )
@@ -4150,7 +4150,7 @@
     (pin "T" (uuid 432c814b-20fc-44f4-be5e-d31d6929bb51))
     (pin "TN" (uuid caaacad7-81ca-4905-b0a6-e98003c6173b))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J14") (unit 1)
         )
@@ -4197,7 +4197,7 @@
     (pin "11" (uuid 18e608b9-1285-4d81-a141-f39b76fa444d))
     (pin "4" (uuid e664ffb0-18bf-4d1f-9c8f-80c4fa5062de))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U4") (unit 3)
         )
@@ -4235,7 +4235,7 @@
     (pin "1" (uuid b1a758f7-4e21-4225-8ff8-a62813f23dba))
     (pin "2" (uuid 4f4c4197-4c30-43a9-9369-6f71b3704617))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R14") (unit 1)
         )
@@ -4267,7 +4267,7 @@
     (pin "T" (uuid f7c68b52-5e45-49ad-8eca-7aee636f1b99))
     (pin "TN" (uuid 0b58bca7-30a3-4fd7-9d89-d9ff116c7b12))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J15") (unit 1)
         )
@@ -4314,7 +4314,7 @@
     (pin "11" (uuid 2c25dc28-ca59-4097-b9b2-6f2e9258d7c7))
     (pin "4" (uuid 498b5f95-0884-4854-a530-9015360317dd))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U4") (unit 1)
         )
@@ -4339,7 +4339,7 @@
     )
     (pin "1" (uuid 159ae8ff-4879-40b3-9761-2af9f0aee5d7))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0129") (unit 1)
         )
@@ -4377,7 +4377,7 @@
     (pin "1" (uuid b12108f9-007b-4dab-a584-d025a45fe68c))
     (pin "2" (uuid d3bf5ebb-7751-4bea-84bf-2e959b5ee426))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D8") (unit 1)
         )
@@ -4415,7 +4415,7 @@
     (pin "1" (uuid 9f9bd24c-496c-4b7c-8ebd-52530885a0ff))
     (pin "2" (uuid 9905316d-eab2-4d07-8967-0bb8d044830b))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D7") (unit 1)
         )
@@ -4456,7 +4456,7 @@
     (pin "1" (uuid 071d3c16-d087-4468-86d3-b7acf011eeb8))
     (pin "2" (uuid 22424d0a-b59a-48d5-85a1-d2efc3a8a8f1))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R11") (unit 1)
         )
@@ -4481,7 +4481,7 @@
     )
     (pin "1" (uuid 0edf6caa-b3f1-4cb1-a105-249e2bb69e86))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0130") (unit 1)
         )
@@ -4506,7 +4506,7 @@
     )
     (pin "1" (uuid bd47c505-732e-4cbb-b5ee-95917ddebf97))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0150") (unit 1)
         )
@@ -4531,7 +4531,7 @@
     )
     (pin "1" (uuid bb817733-2b63-4d0b-b6f5-207f34e5db94))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0151") (unit 1)
         )
@@ -4556,7 +4556,7 @@
     )
     (pin "1" (uuid dbb3501f-cee0-44d7-9af8-88dd586bdcfa))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0152") (unit 1)
         )
@@ -4594,7 +4594,7 @@
     (pin "1" (uuid 7d0a893b-4d02-4310-9089-ffa69100f603))
     (pin "2" (uuid f55d3da8-0fdb-49f5-9211-5e255ed36d5f))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R18") (unit 1)
         )
@@ -4641,7 +4641,7 @@
     (pin "11" (uuid 42d37ff9-4a13-467e-b8e8-dabdf0086fee))
     (pin "4" (uuid 26a7f140-0631-401a-9b1d-511b9df44df9))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U6") (unit 2)
         )
@@ -4666,7 +4666,7 @@
     )
     (pin "1" (uuid b1c9279b-fe2f-4e7c-9260-71ab486e55f0))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0148") (unit 1)
         )
@@ -4691,7 +4691,7 @@
     )
     (pin "1" (uuid 47d5fa6a-47e6-41c9-827a-9498d4452da8))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0146") (unit 1)
         )
@@ -4729,7 +4729,7 @@
     (pin "1" (uuid 07513b62-1876-4175-92a9-0a856c3874b7))
     (pin "2" (uuid 55e7c849-5a28-4391-bd72-90f395d85ee0))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R19") (unit 1)
         )
@@ -4767,7 +4767,7 @@
     (pin "1" (uuid 31aa1fdb-bab9-4085-af9a-915f3ea8d317))
     (pin "2" (uuid 1cd1ad64-d765-4afd-a484-5b58c5a12889))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R20") (unit 1)
         )
@@ -4814,7 +4814,7 @@
     (pin "11" (uuid 5faaecd7-902c-4a9d-b40f-63969dd84cb0))
     (pin "4" (uuid 8c65334c-2dd2-4165-b48c-cba972ceb0cc))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U6") (unit 1)
         )
@@ -4846,7 +4846,7 @@
     (pin "T" (uuid e36e0f12-0f77-4d0e-8703-af7a9d8d05a6))
     (pin "TN" (uuid 5314c12e-f415-488c-b9b6-bb6f43c787f1))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J17") (unit 1)
         )
@@ -4884,7 +4884,7 @@
     (pin "1" (uuid 5eb175cb-6dd6-4f2c-8565-4bb424674805))
     (pin "2" (uuid 3efd3b84-f628-4891-a9d4-352b6e1fc0c5))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R17") (unit 1)
         )
@@ -4917,7 +4917,7 @@
     (pin "T" (uuid fe8f7238-24a0-43df-83ca-3ac076abf355))
     (pin "TN" (uuid 407d920f-8465-470c-bec2-597ad7b73550))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J18") (unit 1)
         )
@@ -4942,7 +4942,7 @@
     )
     (pin "1" (uuid 075036a6-a65f-4b3e-b928-666d4936e131))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0131") (unit 1)
         )
@@ -4989,7 +4989,7 @@
     (pin "11" (uuid d5ace6c0-bb10-40de-b529-2172ba98dfe4))
     (pin "4" (uuid c7145c6a-18fb-426d-aabc-3e37f0efae74))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U6") (unit 3)
         )
@@ -5022,7 +5022,7 @@
     (pin "T" (uuid 2e8f4504-61ce-40e3-82f4-7050e60daf8a))
     (pin "TN" (uuid b52456fb-2ae9-4545-8fac-e9de1663ed5d))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J19") (unit 1)
         )
@@ -5047,7 +5047,7 @@
     )
     (pin "1" (uuid fbcab784-1ffe-461b-aeff-61a12a498a1f))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0132") (unit 1)
         )
@@ -5079,7 +5079,7 @@
     (pin "T" (uuid f1a27b63-82eb-47dc-b29b-824094344917))
     (pin "TN" (uuid 5603919e-3e82-43b9-aa81-b9cb9d0c21d4))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "J20") (unit 1)
         )
@@ -5126,7 +5126,7 @@
     (pin "11" (uuid 1d4312b8-10dc-4483-beea-c765b77f0d53))
     (pin "4" (uuid b9d1b219-76cb-4722-90d3-3da211631942))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U6") (unit 4)
         )
@@ -5164,7 +5164,7 @@
     (pin "1" (uuid ebe4e0d1-2708-4368-acbd-54ebbe5529d6))
     (pin "2" (uuid 761489be-49d9-4ce5-a1d4-118f56c3863d))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D10") (unit 1)
         )
@@ -5202,7 +5202,7 @@
     (pin "1" (uuid 888b0bfc-b30b-45dd-8652-f7d998a8d1a0))
     (pin "2" (uuid 325580eb-e8a1-43c2-97ca-8d4aa224b14f))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D9") (unit 1)
         )
@@ -5243,7 +5243,7 @@
     (pin "1" (uuid 9107795e-c071-4e9b-a678-847c3ba4de42))
     (pin "2" (uuid 86e7b903-a105-407a-b12f-ed15cd7fb4ed))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R16") (unit 1)
         )
@@ -5268,7 +5268,7 @@
     )
     (pin "1" (uuid 1878eb37-04b0-414f-8ea2-19faf8d04730))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0136") (unit 1)
         )
@@ -5306,7 +5306,7 @@
     (pin "1" (uuid af1b4003-8429-4065-8a7e-21b1a7137027))
     (pin "2" (uuid d7f4a8dd-e9b6-49f2-868a-29d91b2cc982))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D4") (unit 1)
         )
@@ -5344,7 +5344,7 @@
     (pin "1" (uuid 60df034f-a878-4c96-8619-68c5debae27a))
     (pin "2" (uuid a2e9ceda-cbf8-44e9-b755-81a9be13c455))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D3") (unit 1)
         )
@@ -5385,7 +5385,7 @@
     (pin "1" (uuid 68db7050-da0c-48d6-8fdc-944f6ab96998))
     (pin "2" (uuid 09f94c5d-74a7-4d0a-81a8-09eb7619f1a5))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R9") (unit 1)
         )
@@ -5410,7 +5410,7 @@
     )
     (pin "1" (uuid 3c503f86-80bc-4ef3-b967-9c921dfe39d4))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0121") (unit 1)
         )
@@ -5448,7 +5448,7 @@
     (pin "1" (uuid 43be6f91-9ac7-4c06-99c7-c25ec361a7e2))
     (pin "2" (uuid 1c458cbe-e7ad-45ce-9ac4-7aa5f8811bba))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D6") (unit 1)
         )
@@ -5486,7 +5486,7 @@
     (pin "1" (uuid df013c28-d2c5-48e5-b784-c9ff6cdc663a))
     (pin "2" (uuid ae816a72-b68b-40bb-866a-fed00687d7d5))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "D5") (unit 1)
         )
@@ -5527,7 +5527,7 @@
     (pin "1" (uuid ad9e41a3-cdb4-4b80-aef2-0c65ee7ac3c7))
     (pin "2" (uuid b758daec-fc20-444f-be45-bbeffdc5fc6f))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "R10") (unit 1)
         )
@@ -5552,7 +5552,7 @@
     )
     (pin "1" (uuid 7012d983-0ba9-4c38-8fad-89036407cdc7))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0122") (unit 1)
         )
@@ -5590,7 +5590,7 @@
     (pin "1" (uuid bd8529bb-480b-4881-af61-4acc4889868d))
     (pin "2" (uuid faf942fd-890f-49fc-b1d1-3aa32793a276))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C11") (unit 1)
         )
@@ -5631,7 +5631,7 @@
     (pin "1" (uuid 933809c5-2951-4e72-b8dc-63d5b68e7fd8))
     (pin "2" (uuid 593d77ae-0534-4f9c-9841-bc1cda54c36d))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C7") (unit 1)
         )
@@ -5656,7 +5656,7 @@
     )
     (pin "1" (uuid 1a73a3c4-a50e-454e-a3fa-6167e6fab773))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0124") (unit 1)
         )
@@ -5697,7 +5697,7 @@
     (pin "1" (uuid 6040d935-f0bc-4915-a769-3033275d81ac))
     (pin "2" (uuid 31dde698-d67f-46a5-9e8f-fe49ef1e4b29))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C9") (unit 1)
         )
@@ -5722,7 +5722,7 @@
     )
     (pin "1" (uuid eae67515-1aa9-4c83-9c58-d990e570bfdd))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0128") (unit 1)
         )
@@ -5747,7 +5747,7 @@
     )
     (pin "1" (uuid e4ded428-5000-4112-9afd-2b210cf08454))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0134") (unit 1)
         )
@@ -5788,7 +5788,7 @@
     (pin "1" (uuid c0e1cc48-28e8-49e6-bf38-c9567d8261f8))
     (pin "2" (uuid 89100491-b068-40bc-867a-16af5f4110d6))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C8") (unit 1)
         )
@@ -5813,7 +5813,7 @@
     )
     (pin "1" (uuid 2549d616-37e2-4fc4-a5bb-88571a25f888))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0137") (unit 1)
         )
@@ -5854,7 +5854,7 @@
     (pin "1" (uuid 15e6c20e-e194-45db-8a11-b08ba873a5d0))
     (pin "2" (uuid 5a7405f0-23f0-4764-b920-c5fb4fdb2c44))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "C10") (unit 1)
         )
@@ -5879,7 +5879,7 @@
     )
     (pin "1" (uuid 57ab7468-8240-407e-98db-1bcbdf151591))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0138") (unit 1)
         )
@@ -5926,7 +5926,7 @@
     (pin "11" (uuid b16dbfa7-1e7e-4fd0-9233-7310403c0843))
     (pin "4" (uuid 30dd32d9-5dd3-4c02-b57a-5687fb47b413))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U4") (unit 5)
         )
@@ -5973,7 +5973,7 @@
     (pin "11" (uuid 2f980f29-0679-42a1-90f1-a58d89374327))
     (pin "4" (uuid 5a72d974-5708-4069-a463-e89514dfd458))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "U6") (unit 5)
         )
@@ -5998,7 +5998,7 @@
     )
     (pin "1" (uuid 96da41c7-1901-49e9-8613-1f7a4a8861e1))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#PWR0102") (unit 1)
         )
@@ -6023,7 +6023,7 @@
     )
     (pin "1" (uuid dfcaa1bf-763a-45e0-8791-f194c9e95d60))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#FLG0101") (unit 1)
         )
@@ -6048,7 +6048,7 @@
     )
     (pin "1" (uuid d08538ca-452c-4c77-9ae8-19de2d376452))
     (instances
-      (project "board"
+      (project "helium"
         (path "/55082cc1-c956-45a6-b2b5-3db02a6da9d0"
           (reference "#FLG0102") (unit 1)
         )
