@@ -6,8 +6,10 @@
 
 import { assert } from "@esm-bundle/chai";
 import { Angle, Vec2 } from "../../../src/base/math";
+import { NullRenderer } from "../../../src/graphics/null-renderer";
 import { GlobalLabel, HierarchicalLabel } from "../../../src/kicad/schematic";
 import { SchText } from "../../../src/kicad/text";
+import witch_hazel from "../../../src/kicanvas/themes/witch-hazel";
 import { DocumentPainter } from "../../../src/viewers/base/painter";
 import { ViewLayerSet } from "../../../src/viewers/base/view-layers";
 import {
@@ -15,11 +17,14 @@ import {
     HierarchicalLabelPainter,
     LabelPainter,
 } from "../../../src/viewers/schematic/painters/label";
-import { NullRenderer } from "../../../src/graphics/null-renderer";
 
 const renderer = new NullRenderer();
 const layer_set = new ViewLayerSet();
-const document_painter = new DocumentPainter(renderer, layer_set);
+const document_painter = new DocumentPainter(
+    renderer,
+    layer_set,
+    witch_hazel.board,
+);
 
 suite("sch.painters.label.LabelPainter()", function () {
     const painter = new LabelPainter(document_painter, renderer);
