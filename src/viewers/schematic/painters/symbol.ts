@@ -4,10 +4,9 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import type { Color } from "../../../base/color";
 import { BBox, Matrix3, Vec2 } from "../../../base/math";
-import type { Renderer } from "../../../graphics";
 import { NullRenderer } from "../../../graphics/null-renderer";
+import type { SchematicTheme } from "../../../kicad";
 import * as schematic_items from "../../../kicad/schematic";
 import { LayerNames, LayerSet, ViewLayer } from "../layers";
 import { SchematicPainter } from "../painter";
@@ -133,9 +132,9 @@ export class SchematicSymbolPainter extends SchematicItemPainter {
         }
 
         if (si.dnp && layer.name == LayerNames.marks) {
-            const bbox = get_symbol_body_and_pins_bbox(this.gfx, si);
+            const bbox = get_symbol_body_and_pins_bbox(this.theme, si);
             const width = schematic_items.DefaultValues.line_width * 3;
-            const color = this.gfx.theme["erc_error"] as Color;
+            const color = this.theme.erc_error;
 
             this.gfx.line([bbox.top_left, bbox.bottom_right], width, color);
             this.gfx.line([bbox.bottom_left, bbox.top_right], width, color);
@@ -229,13 +228,12 @@ function get_symbol_transform(
  * and the pins, not any fields or text items.
  */
 function get_symbol_body_and_pins_bbox(
-    ref_gfx: Renderer,
+    theme: SchematicTheme,
     si: schematic_items.SchematicSymbol,
 ): BBox {
     const gfx = new NullRenderer();
-    gfx.theme = ref_gfx.theme;
-    const layerset = new LayerSet(ref_gfx.theme);
-    const painter = new SchematicPainter(gfx, layerset);
+    const layerset = new LayerSet(theme);
+    const painter = new SchematicPainter(gfx, layerset, theme);
 
     const layer_names = [
         LayerNames.symbol_foreground,

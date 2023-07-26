@@ -10,6 +10,7 @@ import {
     ViewLayer,
 } from "../base/view-layers";
 import { Color } from "../../base/color";
+import type { SchematicTheme } from "../../kicad";
 export { ViewLayer };
 
 export enum LayerNames {
@@ -45,7 +46,7 @@ export enum LayerNames {
  * "virtual" layers used to make sure things are drawn in the right order.
  */
 export class LayerSet extends BaseLayerSet {
-    constructor(public theme: Record<string, Color | Record<string, Color>>) {
+    constructor(public theme: SchematicTheme) {
         super();
 
         for (const name of Object.values(LayerNames)) {

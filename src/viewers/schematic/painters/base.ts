@@ -5,18 +5,25 @@
 */
 
 import type { Color } from "../../../base/color";
+import type { SchematicTheme } from "../../../kicad";
 import * as schematic_items from "../../../kicad/schematic";
 import { DocumentPainter, ItemPainter } from "../../base/painter";
 import { LayerNames, type ViewLayer } from "../layers";
+import type { SchematicPainter } from "../painter";
 import type { SymbolTransform } from "./symbol";
 
 export abstract class BaseSchematicPainter extends DocumentPainter {
+    override theme: SchematicTheme;
     current_symbol?: schematic_items.SchematicSymbol;
     current_symbol_transform?: SymbolTransform;
 }
 
 export abstract class SchematicItemPainter extends ItemPainter {
-    override view_painter: BaseSchematicPainter;
+    override view_painter: SchematicPainter;
+
+    override get theme(): SchematicTheme {
+        return this.view_painter.theme;
+    }
 
     protected get is_dimmed() {
         return this.view_painter.current_symbol?.dnp ?? false;
@@ -28,7 +35,7 @@ export abstract class SchematicItemPainter extends ItemPainter {
         // alpha would be fine, it ends up showing the grid and other stuff
         // behind it.
         color = color.desaturate();
-        return color.mix(this.gfx.theme["background"] as Color, 0.5);
+        return color.mix(this.theme.background, 0.5);
     }
 
     protected dim_if_needed(color: Color) {
@@ -53,8 +60,8 @@ export abstract class SchematicItemPainter extends ItemPainter {
 
         const default_stroke =
             layer.name == LayerNames.symbol_foreground
-                ? (this.gfx.theme["component_outline"] as Color)
-                : (this.gfx.theme["note"] as Color);
+                ? this.theme.component_outline
+                : this.theme.note;
 
         const color = this.dim_if_needed(item.stroke?.color ?? default_stroke);
 
@@ -82,10 +89,10 @@ export abstract class SchematicItemPainter extends ItemPainter {
 
         switch (fill_type) {
             case "background":
-                color = this.gfx.theme["component_body"] as Color;
+                color = this.theme.component_body;
                 break;
             case "outline":
-                color = this.gfx.theme["component_outline"] as Color;
+                color = this.theme.component_outline;
                 break;
             case "color":
                 color = item.fill!.color;

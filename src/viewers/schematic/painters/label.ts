@@ -8,8 +8,8 @@ import { Color } from "../../../base/color";
 import { Angle, Vec2 } from "../../../base/math";
 import * as schematic_items from "../../../kicad/schematic";
 import { SchText, StrokeFont } from "../../../kicad/text";
-import { ItemPainter } from "../../base/painter";
 import { LayerNames, ViewLayer } from "../layers";
+import { SchematicItemPainter } from "./base";
 
 /**
  * Implements KiCAD rendering logic for net, global, and hierarchical labels.
@@ -26,7 +26,7 @@ import { LayerNames, ViewLayer } from "../layers";
  *
  */
 
-export class LabelPainter extends ItemPainter {
+export class LabelPainter extends SchematicItemPainter {
     override classes: any[] = [];
 
     override layers_for(item: schematic_items.Label) {
@@ -131,7 +131,7 @@ export class NetLabelPainter extends LabelPainter {
     override classes: any[] = [schematic_items.NetLabel];
 
     override get color() {
-        return this.gfx.theme["label_local"] as Color;
+        return this.theme.label_local;
     }
 }
 
@@ -139,7 +139,7 @@ export class GlobalLabelPainter extends LabelPainter {
     override classes: any[] = [schematic_items.GlobalLabel];
 
     override get color() {
-        return this.gfx.theme["label_global"] as Color;
+        return this.theme.label_global;
     }
 
     override get_schematic_text_offset(
@@ -241,7 +241,7 @@ export class HierarchicalLabelPainter extends LabelPainter {
     override classes: any[] = [schematic_items.HierarchicalLabel];
 
     override get color() {
-        return this.gfx.theme["label_hier"] as Color;
+        return this.theme.label_hier;
     }
 
     override after_apply(

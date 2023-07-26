@@ -13,6 +13,7 @@ import {
     Polyline,
     Renderer,
 } from "../../graphics";
+import type { SchematicTheme } from "../../kicad";
 import * as schematic_items from "../../kicad/schematic";
 import { LibText, SchField, SchText, StrokeFont } from "../../kicad/text";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
@@ -114,11 +115,7 @@ class WirePainter extends SchematicItemPainter {
 
     paint(layer: ViewLayer, w: schematic_items.Wire) {
         this.gfx.line(
-            new Polyline(
-                w.pts,
-                this.gfx.state.stroke_width,
-                this.gfx.theme["wire"] as Color,
-            ),
+            new Polyline(w.pts, this.gfx.state.stroke_width, this.theme.wire),
         );
     }
 }
@@ -135,7 +132,7 @@ class BusPainter extends SchematicItemPainter {
             new Polyline(
                 w.pts,
                 schematic_items.DefaultValues.bus_width,
-                this.gfx.theme["bus"] as Color,
+                this.theme.bus,
             ),
         );
     }
@@ -153,7 +150,7 @@ class BusEntryPainter extends SchematicItemPainter {
             new Polyline(
                 [be.at.position, be.at.position.add(be.size)],
                 schematic_items.DefaultValues.wire_width,
-                this.gfx.theme["wire"] as Color,
+                this.theme.wire,
             ),
         );
     }
@@ -258,7 +255,7 @@ class JunctionPainter extends SchematicItemPainter {
     }
 
     paint(layer: ViewLayer, j: schematic_items.Junction) {
-        const color = this.gfx.theme["junction"] as Color;
+        const color = this.theme.junction;
         this.gfx.circle(
             new Circle(j.at.position, (j.diameter || 1) / 2, color),
         );
@@ -273,7 +270,7 @@ class NoConnectPainter extends SchematicItemPainter {
     }
 
     paint(layer: ViewLayer, nc: schematic_items.NoConnect): void {
-        const color = this.gfx.theme["no_connect"] as Color;
+        const color = this.theme.no_connect;
         const width = schematic_items.DefaultValues.line_width;
         const size = schematic_items.DefaultValues.noconnect_size / 2;
 
@@ -320,9 +317,7 @@ class TextPainter extends SchematicItemPainter {
         schtext.apply_at(t.at);
         schtext.apply_effects(t.effects);
 
-        schtext.attributes.color = this.dim_if_needed(
-            this.gfx.theme["notes"] as Color,
-        );
+        schtext.attributes.color = this.dim_if_needed(this.theme.note);
 
         this.gfx.state.push();
         StrokeFont.default().draw(
@@ -347,23 +342,23 @@ class PropertyPainter extends SchematicItemPainter {
             return;
         }
 
-        let color = this.gfx.theme["fields"] as Color;
+        let color = this.theme.fields;
         if (p.parent instanceof schematic_items.SchematicSheet) {
-            color = this.gfx.theme["sheet_fields"] as Color;
+            color = this.theme.sheet_fields;
         }
 
         switch (p.name) {
             case "Reference":
-                color = this.gfx.theme["reference"] as Color;
+                color = this.theme.reference;
                 break;
             case "Value":
-                color = this.gfx.theme["value"] as Color;
+                color = this.theme.value;
                 break;
             case "Sheet name":
-                color = this.gfx.theme["sheet_name"] as Color;
+                color = this.theme.sheet_name;
                 break;
             case "Sheet file":
-                color = this.gfx.theme["sheet_filename"] as Color;
+                color = this.theme.sheet_filename;
                 break;
         }
 
@@ -457,7 +452,7 @@ class LibTextPainter extends SchematicItemPainter {
         libtext.apply_symbol_transformations(current_symbol_transform);
 
         libtext.attributes.color = this.dim_if_needed(
-            this.gfx.theme["foreground"] as Color,
+            this.theme.component_outline,
         );
 
         // This gets the absolute world coordinates where the text should
@@ -518,8 +513,8 @@ class SchematicSheetPainter extends SchematicItemPainter {
     }
 
     paint(layer: ViewLayer, ss: schematic_items.SchematicSheet) {
-        const outline_color = this.gfx.theme["sheet"] as Color;
-        const fill_color = this.gfx.theme["sheet_background"] as Color;
+        const outline_color = this.theme.sheet;
+        const fill_color = this.theme.sheet_background;
         const bbox = new BBox(
             ss.at.position.x,
             ss.at.position.y,
@@ -587,8 +582,10 @@ class SchematicSheetPainter extends SchematicItemPainter {
 }
 
 export class SchematicPainter extends BaseSchematicPainter {
-    constructor(gfx: Renderer, layers: LayerSet) {
-        super(gfx, layers);
+    override theme: SchematicTheme;
+
+    constructor(gfx: Renderer, layers: LayerSet, theme: SchematicTheme) {
+        super(gfx, layers, theme);
         this.painter_list = [
             new RectanglePainter(this, gfx),
             new PolylinePainter(this, gfx),

@@ -9,7 +9,7 @@ import { BBox } from "../../base/math";
 import { is_string } from "../../base/types";
 import { Renderer } from "../../graphics";
 import { Canvas2DRenderer } from "../../graphics/canvas2d";
-import { theme } from "../../kicad";
+import type { SchematicTheme } from "../../kicad";
 import {
     KicadSch,
     SchematicSheet,
@@ -22,7 +22,8 @@ import { SchematicPainter } from "./painter";
 export class SchematicViewer extends DocumentViewer<
     KicadSch,
     SchematicPainter,
-    LayerSet
+    LayerSet,
+    SchematicTheme
 > {
     #sheet_path?: string;
 
@@ -32,9 +33,8 @@ export class SchematicViewer extends DocumentViewer<
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new Canvas2DRenderer(canvas);
-        renderer.theme = theme.schematic;
-        renderer.state.fill = theme.schematic.note;
-        renderer.state.stroke = theme.schematic.note;
+        renderer.state.fill = this.theme.note;
+        renderer.state.stroke = this.theme.note;
         renderer.state.stroke_width = 0.1524;
         return renderer;
     }
@@ -49,11 +49,11 @@ export class SchematicViewer extends DocumentViewer<
     }
 
     protected override create_painter() {
-        return new SchematicPainter(this.renderer, this.layers);
+        return new SchematicPainter(this.renderer, this.layers, this.theme);
     }
 
     protected override create_layer_set() {
-        return new LayerSet(this.renderer.theme);
+        return new LayerSet(this.theme);
     }
 
     public override select(
