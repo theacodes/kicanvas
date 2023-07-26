@@ -8,7 +8,7 @@ import { BBox, Vec2 } from "../../base/math";
 import { is_string } from "../../base/types";
 import { Renderer } from "../../graphics";
 import { WebGL2Renderer } from "../../graphics/webgl";
-import { theme } from "../../kicad";
+import type { BoardTheme } from "../../kicad";
 import * as board_items from "../../kicad/board";
 import { DocumentViewer } from "../base/document-viewer";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
@@ -17,7 +17,8 @@ import { BoardPainter } from "./painter";
 export class BoardViewer extends DocumentViewer<
     board_items.KicadPCB,
     BoardPainter,
-    LayerSet
+    LayerSet,
+    BoardTheme
 > {
     get board(): board_items.KicadPCB {
         return this.document;
@@ -25,16 +26,15 @@ export class BoardViewer extends DocumentViewer<
 
     protected override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new WebGL2Renderer(canvas);
-        renderer.theme = theme.board;
         return renderer;
     }
 
     protected override create_painter() {
-        return new BoardPainter(this.renderer, this.layers);
+        return new BoardPainter(this.renderer, this.layers, this.theme);
     }
 
     protected override create_layer_set() {
-        return new LayerSet(this.board, this.renderer.theme);
+        return new LayerSet(this.board, this.theme);
     }
 
     protected override get grid_origin() {

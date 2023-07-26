@@ -26,8 +26,15 @@ import {
     copper_layers_between,
     virtual_layer_for,
 } from "./layers";
+import type { BoardTheme } from "../../kicad";
 
 abstract class BoardItemPainter extends ItemPainter {
+    override view_painter: BoardPainter;
+
+    override get theme(): BoardTheme {
+        return this.view_painter.theme;
+    }
+
     /** Alias for BoardPainter.filter_net */
     get filter_net(): number | null {
         return (this.view_painter as BoardPainter).filter_net;
@@ -955,11 +962,10 @@ class FootprintPainter extends BoardItemPainter {
 }
 
 export class BoardPainter extends DocumentPainter {
-    /**
-     * Create a Painter
-     */
-    constructor(gfx: Renderer, layers: LayerSet) {
-        super(gfx, layers);
+    override theme: BoardTheme;
+
+    constructor(gfx: Renderer, layers: LayerSet, theme: BoardTheme) {
+        super(gfx, layers, theme);
         this.painter_list = [
             new LinePainter(this, gfx),
             new RectPainter(this, gfx),
