@@ -4,23 +4,22 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle, Matrix3, Vec2 } from "../src/base/math";
-import {
-    Arc,
-    Circle,
-    Color,
-    Polygon,
-    Polyline,
-    RenderLayer,
-    Renderer,
-    type Shape,
-} from "../src/graphics";
+import { Angle, Matrix3, Vec2 } from "../base/math";
+import { Arc, Circle, Polygon, Polyline, type Shape } from "./shapes";
+import { RenderLayer, Renderer } from "./renderer";
+import type { Color } from "../base/color";
 
 export class NullRenderLayer extends RenderLayer {
     shapes: Shape[] = [];
 
-    override dispose(): void {}
-    override clear(): void {}
+    override dispose(): void {
+        this.clear();
+    }
+
+    override clear(): void {
+        this.shapes = [];
+    }
+
     override render(camera: Matrix3): void {}
 }
 
@@ -39,7 +38,7 @@ export class NullRenderer extends Renderer {
 
     override clear_canvas(): void {}
 
-    override start_layer(name = "test"): void {
+    override start_layer(name: string): void {
         this.#active_layer = new NullRenderLayer(this, name);
     }
 

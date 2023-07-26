@@ -14,7 +14,7 @@ import {
     TextAttributes,
     TextStyle,
 } from "../../src/kicad/text";
-import { NullRenderer } from "../null-renderer";
+import { NullRenderer } from "../../src/graphics/null-renderer";
 
 const font = StrokeFont.default();
 
@@ -278,7 +278,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         attributes.multiline = true;
         attributes.size = new Vec2(12700, 12700);
 
-        renderer.start_layer();
+        renderer.start_layer("test");
 
         font.draw(renderer, "abc", new Vec2(0, 0), attributes);
 
@@ -351,7 +351,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         attributes.multiline = true;
         attributes.size = new Vec2(12700, 12700);
 
-        renderer.start_layer();
+        renderer.start_layer("test");
 
         font.draw(renderer, "ab\nc", new Vec2(0, 0), attributes);
 

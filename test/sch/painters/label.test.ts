@@ -15,7 +15,7 @@ import {
     HierarchicalLabelPainter,
     LabelPainter,
 } from "../../../src/viewers/schematic/painters/label";
-import { NullRenderer } from "../../null-renderer";
+import { NullRenderer } from "../../../src/graphics/null-renderer";
 
 const renderer = new NullRenderer();
 const layer_set = new ViewLayerSet();
