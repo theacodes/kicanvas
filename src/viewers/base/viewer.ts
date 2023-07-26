@@ -35,7 +35,6 @@ export abstract class Viewer extends EventTarget {
     constructor(canvas: HTMLCanvasElement) {
         super();
         this.canvas = canvas;
-        this.renderer = this.disposables.add(this.create_renderer(canvas));
     }
 
     dispose() {
@@ -66,6 +65,8 @@ export abstract class Viewer extends EventTarget {
     protected abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
 
     async setup() {
+        this.renderer = this.disposables.add(this.create_renderer(this.canvas));
+
         await this.renderer.setup();
 
         this.viewport = this.disposables.add(

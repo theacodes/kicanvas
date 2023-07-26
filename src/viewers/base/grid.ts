@@ -37,19 +37,16 @@ export class GridLOD {
 export class Grid {
     #last_grid_bbox: BBox = new BBox(0, 0, 0, 0);
     #last_grid_lod?: GridLOD;
-    color: Color;
-    origin_color: Color;
 
     constructor(
         public gfx: Renderer,
         public camera: Camera2,
         public layer: ViewLayer,
         public origin = new Vec2(0, 0),
+        public color = Color.white,
+        public origin_color = Color.white,
         public lods = [new GridLOD(2.5, 10, 0.2), new GridLOD(15, 1, 0.05)],
-    ) {
-        this.color = this.gfx.theme["grid"] as Color;
-        this.origin_color = this.gfx.theme["grid_axes"] as Color;
-    }
+    ) {}
 
     update() {
         let lod;

@@ -6,7 +6,11 @@
 
 import { BBox, Vec2 } from "../../base/math";
 import * as log from "../../base/log";
-import { DrawingSheet, type DrawingSheetDocument } from "../../kicad";
+import {
+    DrawingSheet,
+    type DrawingSheetDocument,
+    type BaseTheme,
+} from "../../kicad";
 import { DrawingSheetPainter } from "../drawing-sheet/painter";
 import { Grid } from "./grid";
 import type { DocumentPainter, PaintableDocument } from "./painter";
@@ -20,13 +24,20 @@ export abstract class DocumentViewer<
     DocumentT extends ViewableDocument,
     PainterT extends DocumentPainter,
     ViewLayerSetT extends ViewLayerSet,
+    ThemeT extends BaseTheme,
 > extends Viewer {
     public document: DocumentT;
     public drawing_sheet: DrawingSheet;
     public declare layers: ViewLayerSetT;
+    public theme: ThemeT;
 
     protected painter: PainterT;
     protected grid: Grid;
+
+    constructor(canvas: HTMLCanvasElement, theme: ThemeT) {
+        super(canvas);
+        this.theme = theme;
+    }
 
     protected abstract create_painter(): PainterT;
     protected abstract create_layer_set(): ViewLayerSetT;
@@ -60,7 +71,7 @@ export abstract class DocumentViewer<
 
         // Paint the drawing sheet
         log.message("Painting drawing sheet");
-        new DrawingSheetPainter(this.renderer, this.layers).paint(
+        new DrawingSheetPainter(this.renderer, this.layers, this.theme).paint(
             this.drawing_sheet,
         );
 
@@ -71,6 +82,8 @@ export abstract class DocumentViewer<
             this.viewport.camera,
             this.layers.by_name(ViewLayerNames.grid)!,
             this.grid_origin,
+            this.theme.grid,
+            this.theme.grid_axes,
         );
 
         // Wait for a valid viewport size
