@@ -9,6 +9,7 @@ import { KCUIElement } from "../../kc-ui";
 import type { KicadPCB } from "../../kicad";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { BoardViewer } from "../../viewers/board/viewer";
+import themes from "../themes";
 
 export class KiCanvasBoardElement extends KCUIElement {
     #canvas: HTMLCanvasElement;
@@ -20,9 +21,14 @@ export class KiCanvasBoardElement extends KCUIElement {
     })
     public loaded: boolean;
 
+    @attribute({ type: String })
+    theme: string = "default";
+
     override initialContentCallback() {
         (async () => {
-            this.viewer = this.addDisposable(new BoardViewer(this.#canvas));
+            this.viewer = this.addDisposable(
+                new BoardViewer(this.#canvas, themes.by_name(this.theme).board),
+            );
             await this.viewer.setup();
 
             this.addDisposable(

@@ -9,6 +9,7 @@ import { KCUIElement } from "../../kc-ui";
 import type { KicadSch } from "../../kicad";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { SchematicViewer } from "../../viewers/schematic/viewer";
+import themes from "../themes";
 
 export class KiCanvasSchematicElement extends KCUIElement {
     #canvas: HTMLCanvasElement;
@@ -18,9 +19,18 @@ export class KiCanvasSchematicElement extends KCUIElement {
     @attribute({ type: Boolean })
     loaded: boolean;
 
+    @attribute({ type: String })
+    theme: string = "default";
+
     override initialContentCallback() {
         (async () => {
-            this.viewer = this.addDisposable(new SchematicViewer(this.#canvas));
+            this.viewer = this.addDisposable(
+                new SchematicViewer(
+                    this.#canvas,
+                    themes.by_name(this.theme).schematic,
+                ),
+            );
+
             await this.viewer.setup();
 
             this.addDisposable(

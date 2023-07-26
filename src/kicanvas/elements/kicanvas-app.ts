@@ -10,12 +10,13 @@ import { first } from "../../base/iterator";
 import * as log from "../../base/log";
 import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement, KCUIIconElement } from "../../kc-ui";
-import { KicadPCB, KicadSch, theme } from "../../kicad";
+import { KicadPCB, KicadSch, type Theme } from "../../kicad";
 import { sprites_url } from "../icons/sprites";
 import { Project } from "../project";
 import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
+import witch_hazel from "../themes/witch-hazel";
 import { KCBoardViewerElement } from "./kc-board/viewer";
 import { KCSchematicViewerElement } from "./kc-schematic/viewer";
 import type { KCProjectPanelElement } from "./project-panel";
@@ -40,6 +41,7 @@ class KiCanvasAppElement extends KCUIElement {
     ];
 
     project: Project = new Project();
+    theme: Theme = witch_hazel;
 
     #kc_schematic_viewer: KCSchematicViewerElement;
     #kc_board_viewer: KCBoardViewerElement;
@@ -164,8 +166,8 @@ class KiCanvasAppElement extends KCUIElement {
     }
 
     override render() {
-        this.style.backgroundColor = theme.schematic.background.to_css();
-        this.style.color = theme.schematic.note.to_css();
+        this.style.backgroundColor = this.theme.schematic.background.to_css();
+        this.style.color = this.theme.schematic.note.to_css();
 
         this.#kc_schematic_viewer = html`<kc-schematic-viewer
             class="is-hidden"></kc-schematic-viewer>` as KCSchematicViewerElement;
