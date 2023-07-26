@@ -74,7 +74,7 @@ export class KCBoardPropertiesPanelElement extends KCUIElement {
                         ? "smd"
                         : "unspecified",
                 )}
-                ${entry("Pads", itm.pads.size)}
+                ${entry("Pads", itm.pads.length)}
                 ${entry("Library link", itm.library_link)}
                 ${entry("Description", itm.descr)}
                 ${entry("Keywords", itm.tags)} ${properties}
