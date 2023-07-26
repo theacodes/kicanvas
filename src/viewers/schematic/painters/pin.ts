@@ -14,9 +14,8 @@ import {
     type HAlign,
     type VAlign,
 } from "../../../kicad/text";
-import { ItemPainter } from "../../base/painter";
 import { LayerNames, ViewLayer } from "../layers";
-import { SchematicPainter } from "../painter";
+import { SchematicItemPainter } from "./base";
 
 /**
  * Implements KiCAD rendering logic for symbol pins.
@@ -29,7 +28,7 @@ import { SchematicPainter } from "../painter";
  * a massive method at over 400 lines!
  *
  */
-export class PinPainter extends ItemPainter {
+export class PinPainter extends SchematicItemPainter {
     override classes = [schematic_items.PinInstance];
 
     override layers_for(item: schematic_items.PinInstance) {
@@ -52,14 +51,16 @@ export class PinPainter extends ItemPainter {
             orientation: angle_to_orientation(p.definition.at.rotation),
         };
 
-        const current_symbol_transform = (this.view_painter as SchematicPainter)
-            .current_symbol_transform!;
+        const current_symbol_transform =
+            this.view_painter.current_symbol_transform!;
+
+        const color = this.dim_if_needed(this.gfx.theme["pin"] as Color);
 
         PinPainter.apply_symbol_transformations(pin, current_symbol_transform);
 
         this.gfx.state.push();
         this.gfx.state.matrix = Matrix3.identity();
-        this.gfx.state.stroke = this.gfx.theme["pin"] as Color;
+        this.gfx.state.stroke = color;
 
         if (
             layer.name == LayerNames.symbol_pin ||
