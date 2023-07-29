@@ -6,9 +6,11 @@
 
 import type { Theme } from "../../kicad";
 import witch_hazel from "./witch-hazel";
+import kicad_default from "./kicad-default";
 
 export default {
     default: witch_hazel,
+    kicad_default: kicad_default,
     witch_hazel: witch_hazel,
 
     by_name(name: string): Theme {

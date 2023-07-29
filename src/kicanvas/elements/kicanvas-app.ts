@@ -16,7 +16,7 @@ import { Project } from "../project";
 import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
-import witch_hazel from "../themes/witch-hazel";
+import themes from "../themes";
 import { KCBoardViewerElement } from "./kc-board/viewer";
 import { KCSchematicViewerElement } from "./kc-schematic/viewer";
 import type { KCProjectPanelElement } from "./project-panel";
@@ -41,7 +41,7 @@ class KiCanvasAppElement extends KCUIElement {
     ];
 
     project: Project = new Project();
-    theme: Theme = witch_hazel;
+    theme: Theme = themes.default;
 
     #kc_schematic_viewer: KCSchematicViewerElement;
     #kc_board_viewer: KCBoardViewerElement;
