@@ -17,6 +17,7 @@ export class KCUIControlListElement extends KCUIElement {
                 flex-wrap: nowrap;
                 background: var(--list-item-bg);
                 color: var(--list-item-fg);
+                padding-top: 0.2rem;
             }
         `,
     ];
@@ -52,7 +53,8 @@ export class KCUIControlListItemElement extends KCUIElement {
                 overflow: hidden;
             }
 
-            ::slotted(input) {
+            ::slotted(input),
+            ::slotted(select) {
                 margin: 0;
                 padding-left: 0;
                 padding-right: 0;
