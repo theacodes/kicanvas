@@ -82,6 +82,7 @@
 
     --input-bg: #131218;
     --input-fg: #f8f8f0;
+    --input-border: 1px solid #8077a8;
     --input-accent: #ae81ff;
     --input-hover-shadow: 1px 1px 10px 5px rgba(0, 0, 0, 0.2);
     --input-focus-outline: 1px solid #ae81ff;
