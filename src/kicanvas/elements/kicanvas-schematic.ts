@@ -9,9 +9,10 @@ import { KCUIElement } from "../../kc-ui";
 import type { KicadSch } from "../../kicad";
 import { KiCanvasLoadEvent } from "../../viewers/base/events";
 import { SchematicViewer } from "../../viewers/schematic/viewer";
+import { Preferences, WithPreferences } from "../preferences";
 import themes from "../themes";
 
-export class KiCanvasSchematicElement extends KCUIElement {
+export class KiCanvasSchematicElement extends WithPreferences(KCUIElement) {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
     selected: any[] = [];
@@ -20,15 +21,21 @@ export class KiCanvasSchematicElement extends KCUIElement {
     loaded: boolean;
 
     @attribute({ type: String })
-    theme: string = "default";
+    theme: string;
+
+    private get schematic_theme() {
+        // If the theme attribute is set, override preferences.
+        if (this.theme) {
+            return themes.by_name(this.theme).schematic;
+        } else {
+            return Preferences.INSTANCE.theme.schematic;
+        }
+    }
 
     override initialContentCallback() {
         (async () => {
             this.viewer = this.addDisposable(
-                new SchematicViewer(
-                    this.#canvas,
-                    themes.by_name(this.theme).schematic,
-                ),
+                new SchematicViewer(this.#canvas, this.schematic_theme),
             );
 
             await this.viewer.setup();
@@ -40,6 +47,16 @@ export class KiCanvasSchematicElement extends KCUIElement {
                 }),
             );
         })();
+    }
+
+    override async preferenceChangeCallback(preferences: Preferences) {
+        // Don't apply preference changes if the theme has been set via an attribute.
+        if (this.theme || !this.viewer || !this.viewer.loaded) {
+            return;
+        }
+        this.viewer.theme = this.schematic_theme;
+        this.viewer.paint();
+        this.viewer.draw();
     }
 
     override disconnectedCallback() {
