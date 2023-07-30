@@ -8,6 +8,8 @@ import { Color } from "../../base/color";
 import type { Theme } from "../../kicad/theme";
 
 const theme: Theme = {
+    name: "kicad",
+    friendly_name: "KiCAD",
     board: {
         anchor: Color.from_css("rgb(255, 38, 226)"),
         aux_items: Color.from_css("rgb(255, 255, 255)"),

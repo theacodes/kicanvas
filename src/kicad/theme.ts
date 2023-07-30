@@ -7,6 +7,8 @@
 import { Color } from "../base/color";
 
 export interface Theme {
+    name: string;
+    friendly_name: string;
     board: BoardTheme;
     schematic: SchematicTheme;
 }
