@@ -53,10 +53,44 @@ export abstract class DocumentViewer<
         log.start(`Loading ${src.filename} into viewer`);
 
         this.document = src;
+        this.paint();
+
+        // Wait for a valid viewport size
+        log.message("Waiting for viewport");
+        await this.viewport.ready;
+        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
+
+        // Position the camera and draw the scene.
+        log.message("Positioning camera");
+        this.zoom_to_page();
+
+        // Mark the viewer as loaded and notify event listeners
+        this.resolve_loaded(true);
+
+        // Deselect any selected items.
+        if (this.selected) {
+            this.selected = null;
+        }
+
+        // Draw
+        this.draw();
+
+        log.finish();
+    }
+
+    public paint() {
+        if (!this.document) {
+            return;
+        }
+
+        // Update the renderer's background color to match the theme.
+        this.renderer.background_color = this.theme.background;
 
         // Load the default drawing sheet.
         log.message("Loading drawing sheet");
-        this.drawing_sheet = DrawingSheet.default();
+        if (!this.drawing_sheet) {
+            this.drawing_sheet = DrawingSheet.default();
+        }
         this.drawing_sheet.document = this.document;
 
         // Setup graphical layers
@@ -85,28 +119,6 @@ export abstract class DocumentViewer<
             this.theme.grid,
             this.theme.grid_axes,
         );
-
-        // Wait for a valid viewport size
-        log.message("Waiting for viewport");
-        await this.viewport.ready;
-        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
-
-        // Position the camera and draw the scene.
-        log.message("Positioning camera");
-        this.zoom_to_page();
-
-        // Mark the viewer as loaded and notify event listeners
-        this.resolve_loaded(true);
-
-        // Deselect any selected items.
-        if (this.selected) {
-            this.selected = null;
-        }
-
-        // Draw
-        this.draw();
-
-        log.finish();
     }
 
     public override zoom_to_page() {
