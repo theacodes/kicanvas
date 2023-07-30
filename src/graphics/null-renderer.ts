@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Angle, Matrix3, Vec2 } from "../base/math";
-import { Arc, Circle, Polygon, Polyline, type Shape } from "./shapes";
-import { RenderLayer, Renderer } from "./renderer";
 import type { Color } from "../base/color";
+import { Angle, Matrix3, Vec2 } from "../base/math";
+import { RenderLayer, Renderer } from "./renderer";
+import { Arc, Circle, Polygon, Polyline, type Shape } from "./shapes";
 
 export class NullRenderLayer extends RenderLayer {
     shapes: Shape[] = [];
@@ -29,6 +29,8 @@ export class NullRenderer extends Renderer {
     constructor() {
         super(null!);
     }
+
+    override set background_color(color: Color) {}
 
     override async setup() {}
 

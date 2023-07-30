@@ -32,10 +32,20 @@ export abstract class Renderer implements IDisposable {
     canvas: HTMLCanvasElement;
     canvas_size: Vec2 = new Vec2(0, 0);
     state: RenderStateStack = new RenderStateStack();
-    background_color: Color = Color.black.copy();
+    #background_color: Color = Color.black.copy();
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
+        this.background_color = this.#background_color;
+    }
+
+    get background_color(): Color {
+        return this.#background_color;
+    }
+
+    set background_color(color: Color) {
+        this.#background_color = color;
+        this.canvas.style.backgroundColor = this.background_color.to_css();
     }
 
     abstract setup(): Promise<void>;

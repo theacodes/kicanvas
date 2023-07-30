@@ -43,11 +43,6 @@ export class Canvas2DRenderer extends Renderer {
      * Create and configure the 2D Canvas context.
      */
     override async setup() {
-        // just in case the browser still gives us a backbuffer with alpha,
-        // set the background color of the canvas to black so that it behaves
-        // correctly.
-        this.canvas.style.backgroundColor = this.background_color.to_css();
-
         const ctx2d = this.canvas.getContext("2d", {
             alpha: false,
             desynchronized: true,
