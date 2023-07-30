@@ -16,7 +16,7 @@ const themes_by_name = new Map(
 );
 
 export default {
-    default: kicad_default,
+    default: witch_hazel,
 
     by_name(name: string): Theme {
         return themes_by_name.get(name) ?? this.default;
