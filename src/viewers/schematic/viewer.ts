@@ -33,7 +33,6 @@ export class SchematicViewer extends DocumentViewer<
 
     override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new Canvas2DRenderer(canvas);
-        renderer.background_color = this.theme.background;
         renderer.state.fill = this.theme.note;
         renderer.state.stroke = this.theme.note;
         renderer.state.stroke_width = 0.1524;

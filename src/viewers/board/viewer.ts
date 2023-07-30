@@ -26,7 +26,6 @@ export class BoardViewer extends DocumentViewer<
 
     protected override create_renderer(canvas: HTMLCanvasElement): Renderer {
         const renderer = new WebGL2Renderer(canvas);
-        renderer.background_color = this.theme.background;
         return renderer;
     }
 
