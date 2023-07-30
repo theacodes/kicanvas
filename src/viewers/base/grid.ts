@@ -48,6 +48,13 @@ export class Grid {
         public lods = [new GridLOD(2.5, 10, 0.2), new GridLOD(15, 1, 0.05)],
     ) {}
 
+    reset() {
+        this.#last_grid_lod = undefined;
+        this.#last_grid_bbox.w = 0;
+        this.#last_grid_bbox.h = 0;
+        this.layer.clear();
+    }
+
     update() {
         let lod;
         for (const l of this.lods) {
@@ -58,10 +65,7 @@ export class Grid {
 
         // If the camera is too far zoomed out, don't bother drawing the grid.
         if (!lod) {
-            this.#last_grid_lod = undefined;
-            this.#last_grid_bbox.w = 0;
-            this.#last_grid_bbox.h = 0;
-            this.layer.clear();
+            this.reset();
             return;
         }
 
