@@ -14,6 +14,7 @@ import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 // import dependent elements so they're registered before use.
 import "../help-panel";
 import "../kicanvas-schematic";
+import "../preferences-panel";
 import "../viewer-bottom-toolbar";
 import "./info-panel";
 import "./properties-panel";
@@ -84,6 +85,13 @@ export class KCSchematicViewerElement extends KCUIElement {
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Info" icon="info">
                 <kc-schematic-info-panel></kc-schematic-info-panel>
+            </kc-ui-activity>
+            <kc-ui-activity
+                slot="activities"
+                name="Preferences"
+                icon="settings"
+                button-location="bottom">
+                <kc-preferences-panel></kc-preferences-panel>
             </kc-ui-activity>
             <kc-ui-activity
                 slot="activities"
