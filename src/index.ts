@@ -5,6 +5,6 @@
 */
 
 import "./kicanvas/elements/kc-board/viewer";
-import "./kicanvas/elements/kicanvas-app";
+import "./kicanvas/elements/kicanvas-shell";
 import "./kicanvas/elements/kicanvas-board";
 import "./kicanvas/elements/kicanvas-schematic";

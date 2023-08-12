@@ -21,7 +21,7 @@ import { KCSchematicViewerElement } from "./kc-schematic/viewer";
 import type { KCProjectPanelElement } from "./project-panel";
 
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
-import kicanvas_app_styles from "./kicanvas-app.css";
+import shell_styles from "./kicanvas-shell.css";
 
 import "../icons/sprites";
 import "./kc-board/viewer";
@@ -31,12 +31,33 @@ import "./project-panel";
 // Setup KCUIIconElement to use icon sprites.
 KCUIIconElement.sprites_url = sprites_url;
 
-class KiCanvasAppElement extends KCUIElement {
+/**
+ * <kc-kicanvas-shell> is the main entrypoint for the standalone KiCanvas
+ * application- it's the thing you see when you go to kicanvas.org.
+ *
+ * The shell is responsible for managing the currently loaded Project and
+ * switching between the different viewer apps (<kc-schematic-app>,
+ * <kc-board-app>).
+ *
+ * This is a simplified version of the subtree:
+ *
+ * <kc-kicanvas-shell>
+ *   <kc-ui-app>
+ *     <kc-project-panel>
+ *     <kc-schematic-app>
+ *       <kc-schematic-viewer>
+ *       <kc-ui-activity-side-bar>
+ *     <kc-board-app>
+ *       <kc-board-viewer>
+ *       <kc-ui-activity-side-bar>
+ *
+ */
+class KiCanvasShellElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
         // TODO: Figure out a better way to handle these two styles.
         new CSS(kc_ui_styles),
-        new CSS(kicanvas_app_styles),
+        new CSS(shell_styles),
     ];
 
     project: Project = new Project();
@@ -109,7 +130,7 @@ class KiCanvasAppElement extends KCUIElement {
         this.loaded = false;
         this.loading = true;
 
-        log.start("<kicanvas-app>");
+        log.start("<kc-kicanvas-shell>");
         try {
             await this.project.load(vfs);
             this.#project_panel.update();
@@ -220,4 +241,4 @@ class KiCanvasAppElement extends KCUIElement {
     }
 }
 
-window.customElements.define("kicanvas-app", KiCanvasAppElement);
+window.customElements.define("kc-kicanvas-shell", KiCanvasShellElement);

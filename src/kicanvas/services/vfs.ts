@@ -10,7 +10,7 @@ import { basename } from "../../base/paths";
 /**
  * Virtual file system abstract class.
  *
- * This is the interface used by <kicanvas-app> to find and load files.
+ * This is the interface used by <kc-kicanvas-shell> to find and load files.
  * It's implemented using Drag and Drop and GitHub to provide a common interface
  * for interacting and loading files.
  */

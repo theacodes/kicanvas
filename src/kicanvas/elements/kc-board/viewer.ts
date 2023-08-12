@@ -23,9 +23,9 @@ import "./objects-panel";
 import "./properties-panel";
 
 /**
- * Internal custom element for <kicanvas-app>'s board viewer. Handles setting
- * up the actual board viewer as well as interface controls. It's basically
- * KiCanvas's version of PCBNew.
+ * Internal custom element for <kc-kicanvas-shell>'s board viewer. Handles
+ * setting up the actual board viewer as well as interface controls. It's
+ * basically KiCanvas's version of PCBNew.
  */
 export class KCBoardViewerElement extends KCUIElement {
     static override useShadowRoot = false;

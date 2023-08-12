@@ -21,9 +21,9 @@ import "./properties-panel";
 import "./symbols-panel";
 
 /**
- * Internal custom element for <kicanvas-app>'s schematic viewer. Handles setting
- * up the actual board viewer as well as interface controls. It's basically
- * KiCanvas's version of EESchema.
+ * Internal custom element for <kc-kicanvas-shell>'s schematic viewer. Handles
+ * setting up the actual board viewer as well as interface controls. It's
+ * basically KiCanvas's version of EESchema.
  */
 export class KCSchematicViewerElement extends KCUIElement {
     static override useShadowRoot = false;
@@ -50,7 +50,7 @@ export class KCSchematicViewerElement extends KCUIElement {
                     this.activity_bar_elm.change_activity("properties");
 
                     // If the user clicked on a sheet instance, send this event
-                    // upwards so kicanvas-app can load the sheet.
+                    // upwards so kc-kicanvas-shell can load the sheet.
                     if (item instanceof SchematicSheet) {
                         this.dispatchEvent(
                             new CustomEvent("file:select", {
