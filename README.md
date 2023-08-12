@@ -35,9 +35,9 @@ Here's a non-exhaustive roadmap:
     - [x] Rendering KiCAD 6 text
     - [x] Rendering worksheets
     - [x] Loading hierarchical schematics
-    - [ ] Rendering KiCAD 7 schematics
-    - [ ] Rendering KiCAD 7 boards
-    - [ ] Rendering KiCAD 7 text
+    - [x] Rendering KiCAD 7 schematics
+    - [x] Rendering KiCAD 7 boards
+    - [x] Rendering KiCAD 7 text
     - [ ] Rendering bitmap objects
 - [ ] Viewer functionality
     - [x] Pan/zoom
@@ -57,7 +57,7 @@ Here's a non-exhaustive roadmap:
     - [ ] Board trace selection
     - [ ] Board zone selection
     - [ ] Copy selected item for pasting into KiCAD
-    - [ ] Theming
+    - [x] Theming
     - [ ] Onion view
 - [x] Standalone web application (kicanvas.org)
     - [x] Project viewer
@@ -83,8 +83,8 @@ Here's a non-exhaustive roadmap:
     - [ ] Sphinx integration
 - [ ] Browser compatibility
     - [x] Chrome
-    - [ ] Firefox
-    - [ ] Safari
+    - [x] Firefox
+    - [x] Safari
     - [ ] Chrome (Android)
     - [ ] Firefox mobile
     - [ ] Safari mobile
@@ -103,8 +103,8 @@ KiCanvas also has a list of specific non-goals. At this time, we won't be adding
 In general, please check the [GitHub issues] page before filing new issues. Some high-level things that we known won't work:
 
 - Any KiCAD 5 files, KiCanvas can only parse files from KiCAD 6 and later.
-- Many KiCAD 7 features, include text boxes, custom fonts in schematics, some new schematic shapes, etc. KiCAD 7 files should still parse and partially render.
-- Browsers other than desktop Chrome may run into issues, as we aren't currently running automated tests against other browsers. We welcome issues related to browser compatibility, just make sure it hasn't already been reported.
+- Some KiCAD 7 features might not be fully implemented, such as custom fonts in schematics.
+- Browsers other than desktop Chrome, Firefox, and Safari may run into issues, as we aren't currently running automated tests against other browsers. We welcome issues related to browser compatibility, just make sure it hasn't already been reported.
 
 [GitHub issues]: https://github.com/theacodes/kicanvas/issues
 
