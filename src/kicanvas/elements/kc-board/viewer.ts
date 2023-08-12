@@ -4,15 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { attribute, html } from "../../base/web-components";
-import { KCUIElement } from "../../kc-ui";
-import type { KicadPCB } from "../../kicad";
-import { KiCanvasLoadEvent } from "../../viewers/base/events";
-import { BoardViewer } from "../../viewers/board/viewer";
-import { Preferences, WithPreferences } from "../preferences";
-import themes from "../themes";
+import { attribute, html } from "../../../base/web-components";
+import { KCUIElement } from "../../../kc-ui";
+import type { KicadPCB } from "../../../kicad";
+import { KiCanvasLoadEvent } from "../../../viewers/base/events";
+import { BoardViewer } from "../../../viewers/board/viewer";
+import { Preferences, WithPreferences } from "../../preferences";
+import themes from "../../themes";
 
-export class KiCanvasBoardElement extends WithPreferences(KCUIElement) {
+export class KCBoardViewerElement extends WithPreferences(KCUIElement) {
     #canvas: HTMLCanvasElement;
     viewer: BoardViewer;
     selected: any[] = [];
@@ -88,4 +88,4 @@ export class KiCanvasBoardElement extends WithPreferences(KCUIElement) {
     }
 }
 
-window.customElements.define("kicanvas-board", KiCanvasBoardElement);
+window.customElements.define("kc-board-viewer", KCBoardViewerElement);

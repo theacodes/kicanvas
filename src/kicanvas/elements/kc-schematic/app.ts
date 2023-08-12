@@ -9,11 +9,11 @@ import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
 import type { KicadSch } from "../../../kicad";
 import { SchematicSheet } from "../../../kicad/schematic";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
-import { KiCanvasSchematicElement } from "../kicanvas-schematic";
+import { KCSchematicViewerElement } from "./viewer";
 
 // import dependent elements so they're registered before use.
 import "../help-panel";
-import "../kicanvas-schematic";
+import "./viewer";
 import "../preferences-panel";
 import "../viewer-bottom-toolbar";
 import "./info-panel";
@@ -28,7 +28,7 @@ import "./symbols-panel";
 export class KCSchematicAppElement extends KCUIElement {
     static override useShadowRoot = false;
 
-    schematic_elm: KiCanvasSchematicElement;
+    viewer_elm: KCSchematicViewerElement;
     activity_bar_elm: KCUIActivitySideBarElement;
 
     constructor() {
@@ -37,7 +37,7 @@ export class KCSchematicAppElement extends KCUIElement {
     }
 
     get viewer() {
-        return this.schematic_elm.viewer;
+        return this.viewer_elm.viewer;
     }
 
     override initialContentCallback() {
@@ -69,12 +69,12 @@ export class KCSchematicAppElement extends KCUIElement {
     }
 
     async load(src: KicadSch, sheet_path?: string) {
-        await this.schematic_elm.load(src, sheet_path);
+        await this.viewer_elm.load(src, sheet_path);
     }
 
     override render() {
-        this.schematic_elm =
-            html`<kicanvas-schematic></kicanvas-schematic>` as KiCanvasSchematicElement;
+        this.viewer_elm =
+            html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
             <kc-ui-activity slot="activities" name="Symbols" icon="interests">
@@ -104,7 +104,7 @@ export class KCSchematicAppElement extends KCUIElement {
 
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow">
-                ${this.schematic_elm}
+                ${this.viewer_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>
             <kc-ui-resizer></kc-ui-resizer>

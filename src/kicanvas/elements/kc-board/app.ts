@@ -8,11 +8,11 @@ import { html } from "../../../base/web-components";
 import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
 import type { KicadPCB } from "../../../kicad";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
-import { KiCanvasBoardElement } from "../kicanvas-board";
+import { KCBoardViewerElement } from "./viewer";
 
 // import dependent elements so they're registered before use.
 import "../help-panel";
-import "../kicanvas-board";
+import "./viewer";
 import "../preferences-panel";
 import "../viewer-bottom-toolbar";
 import "./footprints-panel";
@@ -30,7 +30,7 @@ import "./properties-panel";
 export class KCBoardAppElement extends KCUIElement {
     static override useShadowRoot = false;
 
-    board_elm: KiCanvasBoardElement;
+    viewer_elm: KCBoardViewerElement;
     activity_bar_elm: KCUIActivitySideBarElement;
 
     constructor() {
@@ -39,7 +39,7 @@ export class KCBoardAppElement extends KCUIElement {
     }
 
     get viewer() {
-        return this.board_elm.viewer;
+        return this.viewer_elm.viewer;
     }
 
     override initialContentCallback() {
@@ -54,12 +54,12 @@ export class KCBoardAppElement extends KCUIElement {
     }
 
     async load(src: KicadPCB) {
-        this.board_elm.load(src);
+        this.viewer_elm.load(src);
     }
 
     override render() {
-        this.board_elm =
-            html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
+        this.viewer_elm =
+            html`<kc-board-viewer></kc-board-viewer>` as KCBoardViewerElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
             <kc-ui-activity slot="activities" name="Layers" icon="layers">
@@ -98,7 +98,7 @@ export class KCBoardAppElement extends KCUIElement {
 
         return html` <kc-ui-split-view vertical>
             <kc-ui-view class="grow is-relative">
-                ${this.board_elm}
+                ${this.viewer_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>
             <kc-ui-resizer></kc-ui-resizer>

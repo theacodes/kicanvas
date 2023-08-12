@@ -4,15 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { attribute, html } from "../../base/web-components";
-import { KCUIElement } from "../../kc-ui";
-import type { KicadSch } from "../../kicad";
-import { KiCanvasLoadEvent } from "../../viewers/base/events";
-import { SchematicViewer } from "../../viewers/schematic/viewer";
-import { Preferences, WithPreferences } from "../preferences";
-import themes from "../themes";
+import { attribute, html } from "../../../base/web-components";
+import { KCUIElement } from "../../../kc-ui";
+import type { KicadSch } from "../../../kicad";
+import { KiCanvasLoadEvent } from "../../../viewers/base/events";
+import { SchematicViewer } from "../../../viewers/schematic/viewer";
+import { Preferences, WithPreferences } from "../../preferences";
+import themes from "../../themes";
 
-export class KiCanvasSchematicElement extends WithPreferences(KCUIElement) {
+export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
     #canvas: HTMLCanvasElement;
     viewer: SchematicViewer;
     selected: any[] = [];
@@ -87,4 +87,4 @@ export class KiCanvasSchematicElement extends WithPreferences(KCUIElement) {
     }
 }
 
-window.customElements.define("kicanvas-schematic", KiCanvasSchematicElement);
+window.customElements.define("kc-schematic-viewer", KCSchematicViewerElement);
