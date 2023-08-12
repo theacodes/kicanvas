@@ -119,8 +119,8 @@ kicanvas-board {
 
 /*                                         */
 
-kc-board-viewer,
-kc-schematic-viewer {
+kc-board-app,
+kc-schematic-app {
     width: 100%;
     height: 100%;
     flex: 1;

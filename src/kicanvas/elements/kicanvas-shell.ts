@@ -16,16 +16,16 @@ import { Project } from "../project";
 import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
-import { KCBoardViewerElement } from "./kc-board/viewer";
-import { KCSchematicViewerElement } from "./kc-schematic/viewer";
+import { KCBoardAppElement } from "./kc-board/app";
+import { KCSchematicAppElement } from "./kc-schematic/app";
 import type { KCProjectPanelElement } from "./project-panel";
 
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import shell_styles from "./kicanvas-shell.css";
 
 import "../icons/sprites";
-import "./kc-board/viewer";
-import "./kc-schematic/viewer";
+import "./kc-board/app";
+import "./kc-schematic/app";
 import "./project-panel";
 
 // Setup KCUIIconElement to use icon sprites.
@@ -62,8 +62,8 @@ class KiCanvasShellElement extends KCUIElement {
 
     project: Project = new Project();
 
-    #kc_schematic_viewer: KCSchematicViewerElement;
-    #kc_board_viewer: KCBoardViewerElement;
+    #schematic_app: KCSchematicAppElement;
+    #board_app: KCBoardAppElement;
     #project_panel: KCProjectPanelElement;
 
     constructor() {
@@ -172,23 +172,23 @@ class KiCanvasShellElement extends KCUIElement {
         }
 
         if (doc instanceof KicadPCB) {
-            this.#kc_board_viewer.classList.remove("is-hidden");
-            this.#kc_schematic_viewer.classList.add("is-hidden");
-            await this.#kc_board_viewer.load(doc);
+            this.#board_app.classList.remove("is-hidden");
+            this.#schematic_app.classList.add("is-hidden");
+            await this.#board_app.load(doc);
         } else if (doc instanceof KicadSch) {
-            this.#kc_board_viewer.classList.add("is-hidden");
-            this.#kc_schematic_viewer.classList.remove("is-hidden");
-            await this.#kc_schematic_viewer.load(doc, sheet_path);
+            this.#board_app.classList.add("is-hidden");
+            this.#schematic_app.classList.remove("is-hidden");
+            await this.#schematic_app.load(doc, sheet_path);
         } else {
             log.error(`Unable to load ${filename}`);
         }
     }
 
     override render() {
-        this.#kc_schematic_viewer = html`<kc-schematic-viewer
-            class="is-hidden"></kc-schematic-viewer>` as KCSchematicViewerElement;
-        this.#kc_board_viewer = html`<kc-board-viewer
-            class="is-hidden"></kc-board-viewer>` as KCBoardViewerElement;
+        this.#schematic_app = html` <kc-schematic-app
+            class="is-hidden"></kc-schematic-app>` as KCSchematicAppElement;
+        this.#board_app = html`<kc-board-app
+            class="is-hidden"></kc-board-app>` as KCBoardAppElement;
         this.#project_panel =
             html`<kc-project-panel></kc-project-panel>` as KCProjectPanelElement;
 
@@ -234,7 +234,7 @@ class KiCanvasShellElement extends KCUIElement {
                     <kc-ui-floating-toolbar location="top">
                         <div slot="left">${this.#project_panel}</div>
                     </kc-ui-floating-toolbar>
-                    ${this.#kc_schematic_viewer} ${this.#kc_board_viewer}
+                    ${this.#schematic_app} ${this.#board_app}
                 </main>
             </kc-ui-app>
         `;

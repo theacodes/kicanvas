@@ -1,36 +1,34 @@
 /*
-    Copyright (c) 2022 Alethea Katherine Flowers.
+    Copyright (c) 2023 Alethea Katherine Flowers.
     Published under the standard MIT License.
     Full text available at: https://opensource.org/licenses/MIT
 */
 
 import { html } from "../../../base/web-components";
 import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
-import type { KicadPCB } from "../../../kicad";
+import type { KicadSch } from "../../../kicad";
+import { SchematicSheet } from "../../../kicad/schematic";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
-import { KiCanvasBoardElement } from "../kicanvas-board";
+import { KiCanvasSchematicElement } from "../kicanvas-schematic";
 
 // import dependent elements so they're registered before use.
 import "../help-panel";
-import "../kicanvas-board";
+import "../kicanvas-schematic";
 import "../preferences-panel";
 import "../viewer-bottom-toolbar";
-import "./footprints-panel";
 import "./info-panel";
-import "./layers-panel";
-import "./nets-panel";
-import "./objects-panel";
 import "./properties-panel";
+import "./symbols-panel";
 
 /**
- * Internal custom element for <kc-kicanvas-shell>'s board viewer. Handles
+ * Internal custom element for <kc-kicanvas-shell>'s schematic viewer. Handles
  * setting up the actual board viewer as well as interface controls. It's
- * basically KiCanvas's version of PCBNew.
+ * basically KiCanvas's version of EESchema.
  */
-export class KCBoardViewerElement extends KCUIElement {
+export class KCSchematicAppElement extends KCUIElement {
     static override useShadowRoot = false;
 
-    board_elm: KiCanvasBoardElement;
+    schematic_elm: KiCanvasSchematicElement;
     activity_bar_elm: KCUIActivitySideBarElement;
 
     constructor() {
@@ -39,46 +37,54 @@ export class KCBoardViewerElement extends KCUIElement {
     }
 
     get viewer() {
-        return this.board_elm.viewer;
+        return this.schematic_elm.viewer;
     }
 
     override initialContentCallback() {
         this.addDisposable(
             this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
+                const item = e.detail.item;
+
                 // Selecting the same item twice should show the properties panel.
-                if (e.detail.item && e.detail.item == e.detail.previous) {
+                if (item && item == e.detail.previous) {
                     this.activity_bar_elm.change_activity("properties");
+
+                    // If the user clicked on a sheet instance, send this event
+                    // upwards so kc-kicanvas-shell can load the sheet.
+                    if (item instanceof SchematicSheet) {
+                        this.dispatchEvent(
+                            new CustomEvent("file:select", {
+                                detail: {
+                                    filename: item.sheetfile,
+                                    sheet_path: `${item.path}/${item.uuid}`,
+                                },
+                                composed: true,
+                                bubbles: true,
+                            }),
+                        );
+                    }
                 }
             }),
         );
     }
 
-    async load(src: KicadPCB) {
-        this.board_elm.load(src);
+    async load(src: KicadSch, sheet_path?: string) {
+        await this.schematic_elm.load(src, sheet_path);
     }
 
     override render() {
-        this.board_elm =
-            html`<kicanvas-board></kicanvas-board>` as KiCanvasBoardElement;
+        this.schematic_elm =
+            html`<kicanvas-schematic></kicanvas-schematic>` as KiCanvasSchematicElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar>
-            <kc-ui-activity slot="activities" name="Layers" icon="layers">
-                <kc-board-layers-panel></kc-board-layers-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Objects" icon="category">
-                <kc-board-objects-panel></kc-board-objects-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Footprints" icon="memory">
-                <kc-board-footprints-panel></kc-board-footprints-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Nets" icon="hub">
-                <kc-board-nets-panel></kc-board-nets-panel>
+            <kc-ui-activity slot="activities" name="Symbols" icon="interests">
+                <kc-schematic-symbols-panel></kc-schematic-symbols-panel>
             </kc-ui-activity>
             <kc-ui-activity slot="activities" name="Properties" icon="list">
-                <kc-board-properties-panel></kc-board-properties-panel>
+                <kc-schematic-properties-panel></kc-schematic-properties-panel>
             </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Board info" icon="info">
-                <kc-board-info-panel></kc-board-info-panel>
+            <kc-ui-activity slot="activities" name="Info" icon="info">
+                <kc-schematic-info-panel></kc-schematic-info-panel>
             </kc-ui-activity>
             <kc-ui-activity
                 slot="activities"
@@ -97,8 +103,8 @@ export class KCBoardViewerElement extends KCUIElement {
         </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
 
         return html` <kc-ui-split-view vertical>
-            <kc-ui-view class="grow is-relative">
-                ${this.board_elm}
+            <kc-ui-view class="grow">
+                ${this.schematic_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>
             <kc-ui-resizer></kc-ui-resizer>
@@ -107,4 +113,4 @@ export class KCBoardViewerElement extends KCUIElement {
     }
 }
 
-window.customElements.define("kc-board-viewer", KCBoardViewerElement);
+window.customElements.define("kc-schematic-app", KCSchematicAppElement);
