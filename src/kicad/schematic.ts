@@ -7,6 +7,7 @@
 import { Color } from "../base/color";
 import * as log from "../base/log";
 import { Arc as MathArc, Vec2 } from "../base/math";
+import type { Project } from "../kicanvas/project";
 import {
     At,
     Effects,
@@ -54,6 +55,7 @@ export const DefaultValues = {
 };
 
 export class KicadSch {
+    project?: Project;
     version: number;
     generator?: string;
     uuid: string;
@@ -132,11 +134,16 @@ export class KicadSch {
         // See SCH_SHEET_LIST::UpdateSymbolInstanceData
         path ??= ``;
 
-        const global_symbol_instances = this.symbol_instances?.symbol_instances;
+        const root_symbol_instances = (
+            this.project?.root_schematic_page?.document as KicadSch
+        )?.symbol_instances;
+        const global_symbol_instances = this.symbol_instances;
 
         for (const s of this.symbols.values()) {
+            const symbol_path = `${path}/${s.uuid}`;
             const instance_data =
-                global_symbol_instances?.get(`${path}/${s.uuid}`) ??
+                root_symbol_instances?.get(symbol_path) ??
+                global_symbol_instances?.get(symbol_path) ??
                 s.instances.get(path);
 
             if (!instance_data) {
@@ -150,11 +157,16 @@ export class KicadSch {
         }
 
         // See SCH_SHEET_LIST::UpdateSheetInstanceData
-        const global_sheet_instances = this.sheet_instances?.sheet_instances;
+        const root_sheet_instances = (
+            this.project?.root_schematic_page?.document as KicadSch
+        )?.sheet_instances;
+        const global_sheet_instances = this.sheet_instances;
 
         for (const s of this.sheets) {
+            const sheet_path = `${path}/${s.uuid}`;
             const instance_data =
-                global_sheet_instances?.get(`${path}/${s.uuid}`) ??
+                root_sheet_instances?.get(sheet_path) ??
+                global_sheet_instances?.get(sheet_path) ??
                 s.instances.get(path);
 
             if (!instance_data) {
@@ -1414,6 +1426,10 @@ export class SheetInstances {
             ),
         );
     }
+
+    get(key: string) {
+        return this.sheet_instances.get(key);
+    }
 }
 
 export class SheetInstance {
@@ -1452,6 +1468,10 @@ export class SymbolInstances {
                 ),
             ),
         );
+    }
+
+    get(key: string) {
+        return this.symbol_instances.get(key);
     }
 }
 

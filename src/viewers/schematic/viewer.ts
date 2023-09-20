@@ -15,6 +15,7 @@ import {
     SchematicSheet,
     SchematicSymbol,
 } from "../../kicad/schematic";
+import type { ProjectPage } from "../../kicanvas/project";
 import { DocumentViewer } from "../base/document-viewer";
 import { LayerSet } from "./layers";
 import { SchematicPainter } from "./painter";
@@ -25,8 +26,6 @@ export class SchematicViewer extends DocumentViewer<
     LayerSet,
     SchematicTheme
 > {
-    #sheet_path?: string;
-
     get schematic(): KicadSch {
         return this.document;
     }
@@ -39,13 +38,17 @@ export class SchematicViewer extends DocumentViewer<
         return renderer;
     }
 
-    override async load(src: KicadSch, sheet_path?: string) {
-        if (sheet_path != this.#sheet_path) {
-            this.#sheet_path = sheet_path;
-            src.update_hierarchical_data(sheet_path);
-            this.document = null!;
+    override async load(src: KicadSch | ProjectPage) {
+        if (src instanceof KicadSch) {
+            return await super.load(src);
         }
-        return await super.load(src);
+
+        this.document = null!;
+
+        const doc = src.document as KicadSch;
+        doc.update_hierarchical_data(src.sheet_path);
+
+        return await super.load(doc);
     }
 
     protected override create_painter() {

@@ -19,6 +19,7 @@ import "../viewer-bottom-toolbar";
 import "./info-panel";
 import "./properties-panel";
 import "./symbols-panel";
+import type { ProjectPage } from "../../project";
 
 /**
  * Internal custom element for <kc-kicanvas-shell>'s schematic viewer. Handles
@@ -67,8 +68,8 @@ export class KCSchematicAppElement extends KCUIElement {
         );
     }
 
-    async load(src: KicadSch, sheet_path?: string) {
-        await this.viewer_elm.load(src, sheet_path);
+    async load(src: KicadSch | ProjectPage) {
+        await this.viewer_elm.load(src);
     }
 
     override render() {

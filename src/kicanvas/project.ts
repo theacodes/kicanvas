@@ -20,6 +20,7 @@ export class Project implements IDisposable {
     #fs: VirtualFileSystem;
     #files_by_name: Map<string, KicadPCB | KicadSch | null> = new Map();
     #pages_by_path: Map<string, ProjectPage> = new Map();
+    #root_schematic_page?: ProjectPage;
 
     public settings: ProjectSettings = new ProjectSettings();
 
@@ -76,14 +77,22 @@ export class Project implements IDisposable {
 
         const text = await this.#get_file_text(filename);
         const doc = new document_class(filename, text);
+        doc.project = this;
 
         this.#files_by_name.set(filename, doc);
 
         if (doc instanceof KicadPCB) {
             // Go ahead and add PCBs to the list of pages. Schematics will
             // get added during #determine_schematic_hierarchy.
-            const page = new ProjectPage("pcb", doc.filename, "", "Board", "");
-            this.#pages_by_path.set(page.fullpath, page);
+            const page = new ProjectPage(
+                this,
+                "pcb",
+                doc.filename,
+                "",
+                "Board",
+                "",
+            );
+            this.#pages_by_path.set(page.project_path, page);
         }
 
         return doc;
@@ -161,19 +170,20 @@ export class Project implements IDisposable {
         let pages = [];
 
         if (root) {
-            pages.push(
-                new ProjectPage(
-                    "schematic",
-                    root.filename,
-                    `/${root!.uuid}`,
-                    "Root",
-                    "1",
-                ),
+            this.#root_schematic_page = new ProjectPage(
+                this,
+                "schematic",
+                root.filename,
+                `/${root!.uuid}`,
+                "Root",
+                "1",
             );
+            pages.push(this.#root_schematic_page);
 
             for (const [path, sheet] of paths_to_sheet_instances.entries()) {
                 pages.push(
                     new ProjectPage(
+                        this,
                         "schematic",
                         sheet.sheet.sheetfile!,
                         path,
@@ -186,10 +196,10 @@ export class Project implements IDisposable {
 
         // Sort the pages we've collected so far and then insert them
         // into the pages map.
-        pages = sorted_by_numeric_strings(pages, (p) => p.page);
+        pages = sorted_by_numeric_strings(pages, (p) => p.page!);
 
         for (const page of pages) {
-            this.#pages_by_path.set(page.fullpath, page);
+            this.#pages_by_path.set(page.project_path, page);
         }
 
         // Add any "orphan" sheets to the list of pages now that we've added all
@@ -201,13 +211,13 @@ export class Project implements IDisposable {
         for (const schematic of this.schematics()) {
             if (!seen_schematic_files.has(schematic.filename)) {
                 const page = new ProjectPage(
+                    this,
                     "schematic",
                     schematic.filename,
                     `/${schematic.uuid}`,
                     schematic.filename,
-                    "",
                 );
-                this.#pages_by_path.set(page.fullpath, page);
+                this.#pages_by_path.set(page.project_path, page);
             }
         }
     }
@@ -240,12 +250,16 @@ export class Project implements IDisposable {
         yield* this.#pages_by_path.values();
     }
 
-    public get root_page() {
+    public get first_page() {
         return first(this.pages());
     }
 
-    public page_by_path(fullpath: string) {
-        return this.#pages_by_path.get(fullpath);
+    public get root_schematic_page() {
+        return this.#root_schematic_page;
+    }
+
+    public page_by_path(project_path: string) {
+        return this.#pages_by_path.get(project_path);
     }
 
     public async download(name: string) {
@@ -258,21 +272,27 @@ export class Project implements IDisposable {
 
 export class ProjectPage {
     constructor(
+        public project: Project,
         public type: "pcb" | "schematic",
         public filename: string,
         public sheet_path: string,
-        public name: string,
-        public page: string,
+        public name?: string,
+        public page?: string,
     ) {}
 
     /**
-     * A unique identifier made from the filename and sheet path.
+     * A unique identifier for this page within the project,
+     * made from the filename and sheet path.
      */
-    get fullpath() {
+    get project_path() {
         if (this.sheet_path) {
             return `${this.filename}:${this.sheet_path}`;
         } else {
             return this.filename;
         }
+    }
+
+    get document() {
+        return this.project.file_by_name(this.filename)!;
     }
 }

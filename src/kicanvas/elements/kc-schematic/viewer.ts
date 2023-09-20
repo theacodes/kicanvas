@@ -10,6 +10,7 @@ import type { KicadSch } from "../../../kicad";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
 import { SchematicViewer } from "../../../viewers/schematic/viewer";
 import { Preferences, WithPreferences } from "../../preferences";
+import type { ProjectPage } from "../../project";
 import themes from "../../themes";
 
 export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
@@ -64,9 +65,9 @@ export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
         this.selected = [];
     }
 
-    async load(src: KicadSch, sheet_path?: string) {
+    async load(src: KicadSch | ProjectPage) {
         this.loaded = false;
-        await this.viewer.load(src, sheet_path);
+        await this.viewer.load(src);
     }
 
     override render() {

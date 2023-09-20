@@ -154,7 +154,9 @@ export class KCProjectPanelElement extends KCUIElement {
                 : "";
 
             file_btn_elms.push(
-                html`<kc-ui-menu-item icon="${icon}" name="${page.fullpath}">
+                html`<kc-ui-menu-item
+                    icon="${icon}"
+                    name="${page.project_path}">
                     <span class="page">
                         ${number}
                         <span class="name">

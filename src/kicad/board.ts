@@ -5,6 +5,7 @@
 */
 
 import { Angle, BBox, Arc as MathArc, Matrix3, Vec2 } from "../base/math";
+import type { Project } from "../kicanvas/project";
 import {
     At,
     Effects,
@@ -26,6 +27,7 @@ export type Drawing =
     | Dimension;
 
 export class KicadPCB {
+    project?: Project;
     version: number;
     generator?: string;
     general?: { thickness: number };

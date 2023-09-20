@@ -6,7 +6,6 @@
 
 import { later } from "../../base/async";
 import { DropTarget } from "../../base/dom/drag-drop";
-import { first } from "../../base/iterator";
 import * as log from "../../base/log";
 import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement, KCUIIconElement } from "../../kc-ui";
@@ -108,7 +107,7 @@ class KiCanvasShellElement extends KCUIElement {
         this.addEventListener("file:select", (e) => {
             e.stopPropagation();
             const detail = (e as CustomEvent).detail;
-            this.load_file(detail.path);
+            this.load_page(detail.path);
         });
 
         this.link_input.addEventListener("input", async (e) => {
@@ -134,7 +133,7 @@ class KiCanvasShellElement extends KCUIElement {
         try {
             await this.project.load(vfs);
             this.#project_panel.update();
-            await this.load_file();
+            await this.load_page();
             this.loaded = true;
         } catch (e) {
             console.error(e);
@@ -144,30 +143,28 @@ class KiCanvasShellElement extends KCUIElement {
         }
     }
 
-    private async load_file(fullpath?: string) {
-        const page = fullpath
-            ? this.project.page_by_path(fullpath)
-            : this.project.root_page;
+    private async load_page(project_path?: string) {
+        const page = project_path
+            ? this.project.page_by_path(project_path)
+            : this.project.first_page;
 
         if (!page) {
-            log.error(`Unable to load ${fullpath}`);
+            log.error(`Unable to load ${project_path}`);
             return;
         }
 
-        this.#project_panel.selected = page.fullpath;
+        this.#project_panel.selected = page.project_path;
 
-        const doc = this.project.file_by_name(page.filename);
-
-        if (doc instanceof KicadPCB) {
+        if (page.document instanceof KicadPCB) {
             this.#board_app.classList.remove("is-hidden");
             this.#schematic_app.classList.add("is-hidden");
-            await this.#board_app.load(doc);
-        } else if (doc instanceof KicadSch) {
+            await this.#board_app.load(page.document);
+        } else if (page.document instanceof KicadSch) {
             this.#board_app.classList.add("is-hidden");
             this.#schematic_app.classList.remove("is-hidden");
-            await this.#schematic_app.load(doc, page.sheet_path);
+            await this.#schematic_app.load(page);
         } else {
-            log.error(`Unable to load ${fullpath}`);
+            log.error(`Unable to load ${project_path}`);
         }
     }
 
