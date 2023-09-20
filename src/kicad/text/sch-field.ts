@@ -10,6 +10,7 @@ import { EDAText } from "./eda-text";
 type Parent = {
     position: Vec2;
     transform: Matrix3;
+    is_symbol: boolean;
 };
 
 /**
@@ -78,6 +79,10 @@ export class SchField extends EDAText {
     get bounding_box(): BBox {
         const bbox = this.get_text_box();
 
+        if (!this.parent?.is_symbol) {
+            return bbox;
+        }
+
         // adjust bounding box according to parent location
         const origin = this.parent?.position ?? new Vec2(0, 0);
         const pos = this.text_pos.sub(origin);
@@ -89,12 +94,10 @@ export class SchField extends EDAText {
 
         // adjust bounding box based on symbol tranform
 
-        if (this.parent) {
-            // Symbols have the y axis direction flipped, so the bounding
-            // box must also be flipped.
-            begin.y = mirror(begin.y, pos.y);
-            end.y = mirror(end.y, pos.y);
-        }
+        // Symbols have the y axis direction flipped, so the bounding
+        // box must also be flipped.
+        begin.y = mirror(begin.y, pos.y);
+        end.y = mirror(end.y, pos.y);
 
         // Note: Real identity matrix (without flipped y) is actually needed
         // here.

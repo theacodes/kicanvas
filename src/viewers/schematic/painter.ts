@@ -377,6 +377,7 @@ class PropertyPainter extends SchematicItemPainter {
         const schfield = new SchField(text, {
             position: parent.at.position.multiply(10000),
             transform: matrix,
+            is_symbol: parent instanceof schematic_items.SchematicSymbol,
         });
 
         schfield.apply_effects(p.effects);

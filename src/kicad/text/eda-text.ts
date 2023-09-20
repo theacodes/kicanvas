@@ -275,6 +275,7 @@ export class EDAText {
                 break;
             case "bottom":
                 bbox.y = bbox.y - (bbox.h + overbar_offset);
+                break;
         }
 
         return bbox;
