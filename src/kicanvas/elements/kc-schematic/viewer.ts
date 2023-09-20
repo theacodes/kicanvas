@@ -77,6 +77,8 @@ export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
                 :host {
                     display: block;
                     touch-action: none;
+                    width: 100%;
+                    height: 100%;
                 }
 
                 canvas {
