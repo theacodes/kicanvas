@@ -108,7 +108,7 @@ class KiCanvasShellElement extends KCUIElement {
         this.addEventListener("file:select", (e) => {
             e.stopPropagation();
             const detail = (e as CustomEvent).detail;
-            this.load_file(detail.filename, detail.sheet_path);
+            this.load_file(detail.path);
         });
 
         this.link_input.addEventListener("input", async (e) => {
@@ -134,7 +134,7 @@ class KiCanvasShellElement extends KCUIElement {
         try {
             await this.project.load(vfs);
             this.#project_panel.update();
-            await this.load_default_file();
+            await this.load_file();
             this.loaded = true;
         } catch (e) {
             console.error(e);
@@ -144,32 +144,19 @@ class KiCanvasShellElement extends KCUIElement {
         }
     }
 
-    private async load_default_file() {
-        const root = this.project.root_page;
+    private async load_file(fullpath?: string) {
+        const page = fullpath
+            ? this.project.page_by_path(fullpath)
+            : this.project.root_page;
 
-        if (root) {
-            log.message(`Loading root schematic file ${root.filename}`);
-            return await this.load_file(root.filename, root.path);
-        }
-        const doc = first(this.project.items());
-
-        if (doc) {
-            log.message(`Loading first valid file ${doc.filename}`);
-            return await this.load_file(doc.filename);
+        if (!page) {
+            log.error(`Unable to load ${fullpath}`);
+            return;
         }
 
-        log.error("No valid KiCAD files found in project");
-        throw new Error("No valid KiCAD files found in project");
-    }
+        this.#project_panel.selected = page.fullpath;
 
-    private async load_file(filename: string, sheet_path?: string) {
-        const doc = await this.project.by_name(filename);
-
-        if (sheet_path) {
-            this.#project_panel.selected = `${filename}//${sheet_path}`;
-        } else {
-            this.#project_panel.selected = filename;
-        }
+        const doc = this.project.file_by_name(page.filename);
 
         if (doc instanceof KicadPCB) {
             this.#board_app.classList.remove("is-hidden");
@@ -178,9 +165,9 @@ class KiCanvasShellElement extends KCUIElement {
         } else if (doc instanceof KicadSch) {
             this.#board_app.classList.add("is-hidden");
             this.#schematic_app.classList.remove("is-hidden");
-            await this.#schematic_app.load(doc, sheet_path);
+            await this.#schematic_app.load(doc, page.sheet_path);
         } else {
-            log.error(`Unable to load ${filename}`);
+            log.error(`Unable to load ${fullpath}`);
         }
     }
 

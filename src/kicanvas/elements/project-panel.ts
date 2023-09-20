@@ -96,9 +96,7 @@ export class KCProjectPanelElement extends KCUIElement {
                 "kc-ui-menu-item",
             ) as KCUIMenuItemElement;
 
-            const filename = menu_item.name.split("///")[0]!;
-
-            this.project.download(filename);
+            this.project.download(menu_item.name);
         });
     }
 
@@ -127,13 +125,10 @@ export class KCProjectPanelElement extends KCUIElement {
             return;
         }
 
-        const [filename, sheet_path] = selected_elm.name.split("//");
-
         this.dispatchEvent(
             new CustomEvent("file:select", {
                 detail: {
-                    filename: filename,
-                    sheet_path: sheet_path,
+                    path: selected_elm.name,
                 },
                 bubbles: true,
                 composed: true,
@@ -148,14 +143,26 @@ export class KCProjectPanelElement extends KCUIElement {
             return html``;
         }
 
-        for (const board of this.project.boards()) {
+        for (const page of this.project.pages()) {
+            const icon =
+                page.type == "schematic"
+                    ? "svg:schematic_file"
+                    : "svg:pcb_file";
+
+            const number = page.page
+                ? html`<span class="number">${page.page}</span>`
+                : "";
+
             file_btn_elms.push(
-                html`<kc-ui-menu-item
-                    icon="svg:pcb_file"
-                    name="${board.filename}">
+                html`<kc-ui-menu-item icon="${icon}" name="${page.fullpath}">
                     <span class="page">
-                        <span class="name">Board</span>
-                        <span class="filename">${board.filename}</span>
+                        ${number}
+                        <span class="name">
+                            ${page.name ?? page.filename}
+                        </span>
+                        <span class="filename">
+                            ${page.name ? page.filename : ""}
+                        </span>
                         <kc-ui-button
                             variant="menu"
                             icon="download"
@@ -163,40 +170,6 @@ export class KCProjectPanelElement extends KCUIElement {
                     </span>
                 </kc-ui-menu-item>`,
             );
-        }
-
-        for (const page of this.project.pages()) {
-            if (page.page) {
-                file_btn_elms.push(
-                    html`<kc-ui-menu-item
-                        icon="svg:schematic_file"
-                        name="${page.filename}//${page.path}">
-                        <span class="page">
-                            <span class="number">${page.page}</span>
-                            <span class="name">${page.name}</span>
-                            <span class="filename">${page.filename}</span>
-                            <kc-ui-button
-                                variant="menu"
-                                icon="download"
-                                title="Download"></kc-ui-button>
-                        </span>
-                    </kc-ui-menu-item>`,
-                );
-            } else {
-                file_btn_elms.push(
-                    html`<kc-ui-menu-item
-                        icon="svg:schematic_file"
-                        name="${page.filename}//${page.path}">
-                        <span class="page">
-                            <span class="name">${page.filename}</span>
-                            <kc-ui-button
-                                variant="menu"
-                                icon="download"
-                                title="Download"></kc-ui-button>
-                        </span>
-                    </kc-ui-menu-item>`,
-                );
-            }
         }
 
         this.#dropdown = html`<kc-ui-dropdown slot="dropdown" auto-hide>

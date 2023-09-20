@@ -6,7 +6,7 @@
 
 import { sorted_by_numeric_strings } from "../base/array";
 import { type IDisposable } from "../base/disposable";
-import { first } from "../base/iterator";
+import { first, map } from "../base/iterator";
 import * as log from "../base/log";
 import type { Constructor } from "../base/types";
 import { KicadPCB, KicadSch, ProjectSettings } from "../kicad";
@@ -18,87 +18,88 @@ import type { VirtualFileSystem } from "./services/vfs";
 
 export class Project implements IDisposable {
     #fs: VirtualFileSystem;
-    #by_name: Map<string, KicadPCB | KicadSch | null> = new Map();
-    #by_uuid: Map<string, KicadPCB | KicadSch> = new Map();
-    #pages: ProjectPage[] = [];
+    #files_by_name: Map<string, KicadPCB | KicadSch | null> = new Map();
+    #pages_by_path: Map<string, ProjectPage> = new Map();
 
     public settings: ProjectSettings = new ProjectSettings();
 
     public dispose() {
-        this.#by_name.clear();
-        this.#by_uuid.clear();
-        this.#pages.length = 0;
+        this.#files_by_name.clear();
+        this.#pages_by_path.clear();
     }
 
     public async load(fs: VirtualFileSystem) {
         log.start(`Loading project from ${fs.constructor.name}`);
 
         this.settings = new ProjectSettings();
-        this.#by_name.clear();
-        this.#by_uuid.clear();
+        this.#files_by_name.clear();
+        this.#pages_by_path.clear();
 
         this.#fs = fs;
 
         const promises = [];
 
         for (const filename of this.#fs.list()) {
-            promises.push(this.load_file(filename));
+            promises.push(this.#load_file(filename));
         }
 
         await Promise.all(promises);
 
-        this.determine_schematic_hierarchy();
+        this.#determine_schematic_hierarchy();
 
         log.finish();
     }
 
-    private async load_file(filename: string) {
+    async #load_file(filename: string) {
         log.message(`Loading file ${filename}`);
 
         if (filename.endsWith(".kicad_sch")) {
-            return await this.load_doc(KicadSch, filename);
+            return await this.#load_doc(KicadSch, filename);
         }
         if (filename.endsWith(".kicad_pcb")) {
-            return await this.load_doc(KicadPCB, filename);
+            return await this.#load_doc(KicadPCB, filename);
         }
         if (filename.endsWith(".kicad_pro")) {
-            return this.load_project(filename);
+            return this.#load_project(filename);
         }
 
         log.warn(`Couldn't load ${filename}: unknown file type`);
     }
 
-    private async load_doc(
+    async #load_doc(
         document_class: Constructor<KicadPCB | KicadSch>,
         filename: string,
     ) {
-        if (this.#by_name.has(filename)) {
-            return this.#by_name.get(filename);
+        if (this.#files_by_name.has(filename)) {
+            return this.#files_by_name.get(filename);
         }
 
-        const text = await this.get_file_text(filename);
+        const text = await this.#get_file_text(filename);
         const doc = new document_class(filename, text);
 
-        this.#by_name.set(filename, doc);
+        this.#files_by_name.set(filename, doc);
 
-        if (doc instanceof KicadSch) {
-            this.#by_uuid.set(doc.uuid, doc);
+        if (doc instanceof KicadPCB) {
+            // Go ahead and add PCBs to the list of pages. Schematics will
+            // get added during #determine_schematic_hierarchy.
+            const page = new ProjectPage("pcb", doc.filename, "", "Board", "");
+            this.#pages_by_path.set(page.fullpath, page);
         }
 
         return doc;
     }
 
-    private async load_project(filename: string) {
-        const text = await this.get_file_text(filename);
+    async #load_project(filename: string) {
+        const text = await this.#get_file_text(filename);
         const data = JSON.parse(text);
         this.settings = ProjectSettings.load(data);
     }
 
-    private async get_file_text(filename: string) {
+    async #get_file_text(filename: string) {
         return await (await this.#fs.get(filename)).text();
     }
 
-    private determine_schematic_hierarchy() {
+    #determine_schematic_hierarchy() {
         log.message("Determining schematic hierarchy");
 
         const paths_to_schematics = new Map<string, KicadSch>();
@@ -111,7 +112,7 @@ export class Project implements IDisposable {
             paths_to_schematics.set(`/${schematic.uuid}`, schematic);
 
             for (const sheet of schematic.sheets) {
-                const sheet_sch = this.#by_name.get(
+                const sheet_sch = this.#files_by_name.get(
                     sheet.sheetfile ?? "",
                 ) as KicadSch;
 
@@ -157,14 +158,23 @@ export class Project implements IDisposable {
 
         // If we found a root page, we can build out the list of pages by
         // walking through paths_to_sheet with root as page one.
+        let pages = [];
+
         if (root) {
-            this.#pages.push(
-                new ProjectPage(root.filename, `/${root!.uuid}`, "Root", "1"),
+            pages.push(
+                new ProjectPage(
+                    "schematic",
+                    root.filename,
+                    `/${root!.uuid}`,
+                    "Root",
+                    "1",
+                ),
             );
 
             for (const [path, sheet] of paths_to_sheet_instances.entries()) {
-                this.#pages.push(
+                pages.push(
                     new ProjectPage(
+                        "schematic",
                         sheet.sheet.sheetfile!,
                         path,
                         sheet.sheet.sheetname ?? sheet.sheet.sheetfile!,
@@ -174,34 +184,44 @@ export class Project implements IDisposable {
             }
         }
 
-        this.#pages = sorted_by_numeric_strings(this.#pages, (p) => p.page);
+        // Sort the pages we've collected so far and then insert them
+        // into the pages map.
+        pages = sorted_by_numeric_strings(pages, (p) => p.page);
+
+        for (const page of pages) {
+            this.#pages_by_path.set(page.fullpath, page);
+        }
 
         // Add any "orphan" sheets to the list of pages now that we've added all
         // the hierarchical ones.
         const seen_schematic_files = new Set(
-            this.#pages.map((p) => p.filename),
+            map(this.#pages_by_path.values(), (p) => p.filename),
         );
 
         for (const schematic of this.schematics()) {
             if (!seen_schematic_files.has(schematic.filename)) {
-                this.#pages.push(
-                    new ProjectPage(
-                        schematic.filename,
-                        `/${schematic.uuid}`,
-                        schematic.filename,
-                        "",
-                    ),
+                const page = new ProjectPage(
+                    "schematic",
+                    schematic.filename,
+                    `/${schematic.uuid}`,
+                    schematic.filename,
+                    "",
                 );
+                this.#pages_by_path.set(page.fullpath, page);
             }
         }
     }
 
-    public *items() {
-        yield* this.#by_name.values();
+    public *files() {
+        yield* this.#files_by_name.values();
+    }
+
+    public file_by_name(name: string) {
+        return this.#files_by_name.get(name);
     }
 
     public *boards() {
-        for (const value of this.#by_name.values()) {
+        for (const value of this.#files_by_name.values()) {
             if (value instanceof KicadPCB) {
                 yield value;
             }
@@ -209,7 +229,7 @@ export class Project implements IDisposable {
     }
 
     public *schematics() {
-        for (const value of this.#by_name.values()) {
+        for (const value of this.#files_by_name.values()) {
             if (value instanceof KicadSch) {
                 yield value;
             }
@@ -217,27 +237,42 @@ export class Project implements IDisposable {
     }
 
     public *pages() {
-        yield* this.#pages;
+        yield* this.#pages_by_path.values();
     }
 
     public get root_page() {
         return first(this.pages());
     }
 
-    public by_name(name: string) {
-        return this.#by_name.get(name);
+    public page_by_path(fullpath: string) {
+        return this.#pages_by_path.get(fullpath);
     }
 
     public async download(name: string) {
+        if (this.#pages_by_path.has(name)) {
+            name = this.#pages_by_path.get(name)!.filename;
+        }
         return await this.#fs.download(name);
     }
 }
 
 export class ProjectPage {
     constructor(
+        public type: "pcb" | "schematic",
         public filename: string,
-        public path: string,
+        public sheet_path: string,
         public name: string,
         public page: string,
     ) {}
+
+    /**
+     * A unique identifier made from the filename and sheet path.
+     */
+    get fullpath() {
+        if (this.sheet_path) {
+            return `${this.filename}:${this.sheet_path}`;
+        } else {
+            return this.filename;
+        }
+    }
 }

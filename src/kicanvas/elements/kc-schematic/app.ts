@@ -55,8 +55,7 @@ export class KCSchematicAppElement extends KCUIElement {
                         this.dispatchEvent(
                             new CustomEvent("file:select", {
                                 detail: {
-                                    filename: item.sheetfile,
-                                    sheet_path: `${item.path}/${item.uuid}`,
+                                    path: `${item.sheetfile}:${item.path}/${item.uuid}`,
                                 },
                                 composed: true,
                                 bubbles: true,
