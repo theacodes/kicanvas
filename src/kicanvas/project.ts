@@ -220,6 +220,9 @@ export class Project implements IDisposable {
                 this.#pages_by_path.set(page.project_path, page);
             }
         }
+
+        // Finally, if no root schematic was found, just use the first one we saw.
+        this.#root_schematic_page = first(this.#pages_by_path.values());
     }
 
     public *files() {
