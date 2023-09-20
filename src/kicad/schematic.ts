@@ -202,7 +202,7 @@ export class KicadSch {
 
     find_symbol(uuid_or_ref: string) {
         if (this.symbols.has(uuid_or_ref)) {
-            return this.symbols.get(this.uuid)!;
+            return this.symbols.get(uuid_or_ref)!;
         }
         for (const sym of this.symbols.values()) {
             if (sym.uuid == uuid_or_ref || sym.reference == uuid_or_ref) {
