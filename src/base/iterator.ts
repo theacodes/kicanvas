@@ -20,3 +20,10 @@ export function* map<T, U>(
         n++;
     }
 }
+
+export function isEmpty(iterable: Iterable<unknown>) {
+    for (const _ of iterable) {
+        return false;
+    }
+    return true;
+}
