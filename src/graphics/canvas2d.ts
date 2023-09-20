@@ -70,8 +70,8 @@ export class Canvas2DRenderer extends Renderer {
         const pixel_h = Math.round(rect.height * dpr);
 
         if (this.canvas.width != pixel_w || this.canvas.height != pixel_h) {
-            this.canvas.width = Math.round(rect.width * dpr);
-            this.canvas.height = Math.round(rect.height * dpr);
+            this.canvas.width = pixel_w;
+            this.canvas.height = pixel_h;
         }
     }
 
