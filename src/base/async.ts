@@ -92,3 +92,32 @@ export class Deferred<T> {
         this.#reject(error);
     }
 }
+
+/**
+ * A "Barrier" for waiting for a task to complete before taking an action.
+ */
+export class Barrier {
+    #isOpen: boolean;
+    #promise: Promise<boolean>;
+    #resolve!: (v: boolean) => void;
+
+    constructor() {
+        this.#isOpen = false;
+        this.#promise = new Promise<boolean>((c, e) => {
+            this.#resolve = c;
+        });
+    }
+
+    isOpen(): boolean {
+        return this.#isOpen;
+    }
+
+    open(): void {
+        this.#isOpen = true;
+        this.#resolve(true);
+    }
+
+    wait(): Promise<boolean> {
+        return this.#promise;
+    }
+}
