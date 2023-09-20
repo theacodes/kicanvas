@@ -178,7 +178,6 @@ class KiCanvasShellElement extends KCUIElement {
 
         return html`
             <kc-ui-app>
-                <kc-sprites-src></kc-sprites-src>
                 <section class="overlay">
                     <h1>
                         <img src="kicanvas.png" />
