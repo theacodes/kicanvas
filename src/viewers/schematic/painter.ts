@@ -365,7 +365,8 @@ class PropertyPainter extends SchematicItemPainter {
         color = this.dim_if_needed(color);
 
         const parent = p.parent as schematic_items.SchematicSymbol;
-        const transform = this.view_painter.current_symbol_transform!;
+        const transform = this.view_painter.current_symbol_transform;
+        const matrix = transform?.matrix ?? Matrix3.identity();
 
         let text = p.shown_text;
 
@@ -375,7 +376,7 @@ class PropertyPainter extends SchematicItemPainter {
 
         const schfield = new SchField(text, {
             position: parent.at.position.multiply(10000),
-            transform: transform.matrix,
+            transform: matrix,
         });
 
         schfield.apply_effects(p.effects);
@@ -388,7 +389,7 @@ class PropertyPainter extends SchematicItemPainter {
         let rel_position = p.at.position
             .multiply(10000)
             .sub(schfield.parent!.position);
-        rel_position = transform.matrix.inverse().transform(rel_position);
+        rel_position = matrix.inverse().transform(rel_position);
         rel_position = rel_position.add(schfield.parent!.position);
 
         schfield.text_pos = rel_position;
