@@ -5,7 +5,7 @@
 */
 
 import { delegate } from "../base/events";
-import { css, html, query, query_all } from "../base/web-components";
+import { attribute, css, html, query, query_all } from "../base/web-components";
 import { KCUIButtonElement } from "./button";
 import { KCUIElement } from "./element";
 
@@ -93,6 +93,9 @@ export class KCUIActivitySideBarElement extends KCUIElement {
     @query_all("kc-ui-button")
     private buttons!: KCUIButtonElement[];
 
+    @attribute({ type: Boolean })
+    public collapsed: boolean;
+
     override render() {
         const top_buttons: HTMLElement[] = [];
         const bottom_buttons: HTMLElement[] = [];
@@ -124,15 +127,37 @@ export class KCUIActivitySideBarElement extends KCUIElement {
     }
 
     override initialContentCallback() {
-        const default_activity = this.activities[0]?.getAttribute("name");
+        if (!this.collapsed) {
+            const default_activity = this.activities[0]?.getAttribute("name");
 
-        if (default_activity) {
-            this.change_activity(default_activity);
+            if (default_activity) {
+                this.change_activity(default_activity);
+            }
+        } else {
+            this.change_activity(null);
         }
 
         delegate(this.renderRoot, "kc-ui-button", "click", (e, source) => {
             this.change_activity((source as KCUIButtonElement).name, true);
         });
+    }
+
+    attributeChangedCallback(
+        name: string,
+        old: string | null,
+        value: string | null,
+    ) {
+        switch (name) {
+            case "collapsed":
+                if (value) {
+                    this.show_activities();
+                } else {
+                    this.hide_activities();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     get activity() {
