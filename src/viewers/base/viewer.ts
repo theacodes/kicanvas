@@ -64,7 +64,7 @@ export abstract class Viewer extends EventTarget {
 
     protected abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
 
-    async setup() {
+    async setup(interactive = true) {
         this.renderer = this.disposables.add(this.create_renderer(this.canvas));
 
         await this.renderer.setup();
@@ -75,26 +75,28 @@ export abstract class Viewer extends EventTarget {
             }),
         );
 
-        this.viewport.enable_pan_and_zoom(0.5, 190);
+        if (interactive) {
+            this.viewport.enable_pan_and_zoom(0.5, 190);
 
-        this.disposables.add(
-            listen(this.canvas, "mousemove", (e) => {
-                this.on_mouse_change(e);
-            }),
-        );
+            this.disposables.add(
+                listen(this.canvas, "mousemove", (e) => {
+                    this.on_mouse_change(e);
+                }),
+            );
 
-        this.disposables.add(
-            listen(this.canvas, "panzoom", (e) => {
-                this.on_mouse_change(e as MouseEvent);
-            }),
-        );
+            this.disposables.add(
+                listen(this.canvas, "panzoom", (e) => {
+                    this.on_mouse_change(e as MouseEvent);
+                }),
+            );
 
-        this.disposables.add(
-            listen(this.canvas, "click", (e) => {
-                const items = this.layers.query_point(this.mouse_position);
-                this.on_pick(this.mouse_position, items);
-            }),
-        );
+            this.disposables.add(
+                listen(this.canvas, "click", (e) => {
+                    const items = this.layers.query_point(this.mouse_position);
+                    this.on_pick(this.mouse_position, items);
+                }),
+            );
+        }
 
         this.setup_finished.open();
     }

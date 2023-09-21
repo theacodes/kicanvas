@@ -93,6 +93,8 @@ export class Viewport {
      * Limit the camera's center within the given bounds.
      */
     set bounds(bb: BBox) {
-        this.#pan_and_zoom.bounds = bb;
+        if (this.#pan_and_zoom) {
+            this.#pan_and_zoom.bounds = bb;
+        }
     }
 }

@@ -24,6 +24,9 @@ export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
     @attribute({ type: String })
     theme: string;
 
+    @attribute({ type: Boolean })
+    disableinteraction: boolean;
+
     private get schematic_theme() {
         // If the theme attribute is set, override preferences.
         if (this.theme) {
@@ -39,7 +42,7 @@ export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
                 new SchematicViewer(this.#canvas, this.schematic_theme),
             );
 
-            await this.viewer.setup();
+            await this.viewer.setup(!this.disableinteraction);
 
             this.addDisposable(
                 this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {

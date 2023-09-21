@@ -81,8 +81,9 @@ export class KCSchematicAppElement extends KCUIElement {
     override render() {
         const controls = this.controls ?? "full";
 
-        this.viewer_elm =
-            html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
+        this.viewer_elm = html`<kc-schematic-viewer
+            disableinteraction="${this.controls ==
+            "none"}"></kc-schematic-viewer>` as KCSchematicViewerElement;
 
         let resizer = null;
 
@@ -119,10 +120,14 @@ export class KCSchematicAppElement extends KCUIElement {
             resizer = html`<kc-ui-resizer></kc-ui-resizer>`;
         }
 
+        let bottom_toolbar = null;
+        if (controls != "none") {
+            bottom_toolbar = html`<kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>`;
+        }
+
         return html`<kc-ui-split-view vertical>
             <kc-ui-view class="grow">
-                ${this.viewer_elm}
-                <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
+                ${this.viewer_elm} ${bottom_toolbar}
             </kc-ui-view>
             ${resizer} ${this.activity_bar_elm}
         </kc-ui-split-view>`;
