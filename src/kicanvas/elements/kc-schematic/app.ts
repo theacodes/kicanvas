@@ -42,10 +42,9 @@ export class KCSchematicAppElement extends KCUIElement {
     }
 
     @attribute({ type: Boolean })
-    sidebar_collapsed: boolean;
+    sidebarcollapsed: boolean;
 
     override initialContentCallback() {
-        console.log("collapsed?", this.sidebar_collapsed);
         this.addDisposable(
             this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
                 const item = e.detail.item;
@@ -72,15 +71,23 @@ export class KCSchematicAppElement extends KCUIElement {
         );
     }
 
+    static get observedAttributes() {
+        return ["sidebarcollapsed"];
+    }
+
     attributeChangedCallback(
         name: string,
         old: string | null,
-        value: string | null,
+        value: string | null | undefined,
     ) {
         switch (name) {
-            case "sidebarCollapsed":
+            case "sidebarcollapsed":
                 if (this.activity_bar_elm) {
-                    this.activity_bar_elm.collapsed = !!value;
+                    if (value == undefined) {
+                        this.activity_bar_elm.removeAttribute("collapsed");
+                    } else {
+                        this.activity_bar_elm.setAttribute("collapsed", "");
+                    }
                 }
                 break;
             default:
@@ -97,7 +104,7 @@ export class KCSchematicAppElement extends KCUIElement {
             html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
 
         this.activity_bar_elm = html`<kc-ui-activity-side-bar
-            collapsed="${this.sidebar_collapsed}">
+            collapsed="${this.sidebarcollapsed}">
             <kc-ui-activity slot="activities" name="Symbols" icon="interests">
                 <kc-schematic-symbols-panel></kc-schematic-symbols-panel>
             </kc-ui-activity>
