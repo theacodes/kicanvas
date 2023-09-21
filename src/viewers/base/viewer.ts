@@ -20,7 +20,6 @@ import { ViewLayerSet } from "./view-layers";
 import { Viewport } from "./viewport";
 
 export abstract class Viewer extends EventTarget {
-    public canvas: HTMLCanvasElement;
     public renderer: Renderer;
     public viewport: Viewport;
     public layers: ViewLayerSet;
@@ -32,9 +31,11 @@ export abstract class Viewer extends EventTarget {
     #selected: BBox | null;
     #loaded_deferred = new Deferred<boolean>();
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(
+        public canvas: HTMLCanvasElement,
+        protected interactive: boolean = true,
+    ) {
         super();
-        this.canvas = canvas;
     }
 
     dispose() {
@@ -64,7 +65,7 @@ export abstract class Viewer extends EventTarget {
 
     protected abstract create_renderer(canvas: HTMLCanvasElement): Renderer;
 
-    async setup(interactive = true) {
+    async setup() {
         this.renderer = this.disposables.add(this.create_renderer(this.canvas));
 
         await this.renderer.setup();
@@ -75,7 +76,7 @@ export abstract class Viewer extends EventTarget {
             }),
         );
 
-        if (interactive) {
+        if (this.interactive) {
             this.viewport.enable_pan_and_zoom(0.5, 190);
 
             this.disposables.add(
@@ -102,7 +103,9 @@ export abstract class Viewer extends EventTarget {
     }
 
     protected on_viewport_change() {
-        this.draw();
+        if (this.interactive) {
+            this.draw();
+        }
     }
 
     protected on_mouse_change(e: MouseEvent) {

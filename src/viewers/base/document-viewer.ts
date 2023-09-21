@@ -34,8 +34,12 @@ export abstract class DocumentViewer<
     protected painter: PainterT;
     protected grid: Grid;
 
-    constructor(canvas: HTMLCanvasElement, theme: ThemeT) {
-        super(canvas);
+    constructor(
+        canvas: HTMLCanvasElement,
+        interactive: boolean,
+        theme: ThemeT,
+    ) {
+        super(canvas, interactive);
         this.theme = theme;
     }
 

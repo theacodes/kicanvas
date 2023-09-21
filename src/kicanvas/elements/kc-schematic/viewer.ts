@@ -39,10 +39,14 @@ export class KCSchematicViewerElement extends WithPreferences(KCUIElement) {
     override initialContentCallback() {
         (async () => {
             this.viewer = this.addDisposable(
-                new SchematicViewer(this.#canvas, this.schematic_theme),
+                new SchematicViewer(
+                    this.#canvas,
+                    !this.disableinteraction,
+                    this.schematic_theme,
+                ),
             );
 
-            await this.viewer.setup(!this.disableinteraction);
+            await this.viewer.setup();
 
             this.addDisposable(
                 this.viewer.addEventListener(KiCanvasLoadEvent.type, () => {
