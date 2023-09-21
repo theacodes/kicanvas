@@ -21,7 +21,7 @@ export class KCUIIconElement extends KCUIElement {
                 font-weight: normal;
                 font-style: normal;
                 font-size: inherit;
-                line-height: inherit;
+                line-height: 1;
                 letter-spacing: normal;
                 text-transform: none;
                 white-space: nowrap;
