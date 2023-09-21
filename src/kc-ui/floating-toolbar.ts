@@ -44,32 +44,23 @@ export class KCUIFloatingToolbarElement extends KCUIElement {
                 pointer-events: initial;
             }
 
-            div.left {
+            slot[name="left"] {
                 flex-grow: 999;
                 display: flex;
             }
 
-            div.right {
+            slot[name="right"] {
                 display: flex;
             }
 
-            div.left kc-ui-button {
-                margin-right: 0.5rem;
-            }
-
-            div.right kc-ui-button {
-                margin-left: 0.5rem;
+            ::slotted(kc-ui-button) {
+                margin-left: 0.25rem;
             }
         `,
     ];
 
     override render() {
-        return html` <div class="left">
-                <slot name="left"></slot>
-            </div>
-            <div class="right">
-                <slot name="right"></slot>
-            </div>`;
+        return html`<slot name="left"></slot><slot name="right"></slot>`;
     }
 }
 

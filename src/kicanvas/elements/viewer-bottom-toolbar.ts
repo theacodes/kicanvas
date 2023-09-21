@@ -80,9 +80,11 @@ export class KCViewerBottomToolbarElement extends KCUIElement {
 
     override render() {
         this.#position_elm = html`<output
+            slot="left"
             class="toolbar"></output>` as HTMLOutputElement;
 
         this.#zoom_to_page_btn = html`<kc-ui-button
+            slot="right"
             variant="toolbar"
             name="zoom_to_page"
             title="zoom to page"
@@ -90,6 +92,7 @@ export class KCViewerBottomToolbarElement extends KCUIElement {
         </kc-ui-button>` as KCUIButtonElement;
 
         this.#zoom_to_selection_btn = html` <kc-ui-button
+            slot="right"
             variant="toolbar"
             name="zoom_to_selection"
             title="zoom to selection"
@@ -100,10 +103,8 @@ export class KCViewerBottomToolbarElement extends KCUIElement {
         this.update_position();
 
         return html`<kc-ui-floating-toolbar location="bottom">
-            <div slot="left">${this.#position_elm}</div>
-            <div slot="right" class="button-group margin-left">
-                ${this.#zoom_to_selection_btn} ${this.#zoom_to_page_btn}
-            </div>
+            ${this.#position_elm} ${this.#zoom_to_selection_btn}
+            ${this.#zoom_to_page_btn}
         </kc-ui-floating-toolbar>`;
     }
 }
