@@ -107,6 +107,26 @@ export class KCUIButtonElement extends KCUIElement {
                 color: var(--button--toolbar-disabled-fg);
             }
 
+            button.toolbar-alt {
+                background: var(--button-toolbar-alt-bg);
+                color: var(--button-toolbar-alt-fg);
+            }
+
+            button.toolbar-alt:hover {
+                background: var(--button-toolbar-alt-hover-bg);
+                color: var(--button-toolbar-alt-hover-fg);
+            }
+
+            button.toolbar-alt:disabled {
+                background: var(--button-toolbar-alt-disabled-bg);
+                color: var(--button-toolbar-alt-disabled-fg);
+            }
+
+            :host([selected]) button.toolbar-alt {
+                background: var(--button-toolbar-alt-disabled-bg);
+                color: var(--button--toolbar-alt-disabled-fg);
+            }
+
             button.menu {
                 background: var(--button-menu-bg);
                 color: var(--button-menu-fg);

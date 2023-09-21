@@ -182,6 +182,11 @@
     --button-toolbar-hover-fg: #f8f8f0;
     --button-toolbar-disabled-bg: var(--gradient-purple-blue-dark);
 
+    --button-toolbar-alt-bg: var(--gradient-purple-green-light);
+    --button-toolbar-alt-hover-bg: var(--gradient-purple-green-highlight);
+    --button-toolbar-alt-hover-fg: #f8f8f0;
+    --button-toolbar-alt-disabled-bg: var(--gradient-purple-blue-dark);
+
     --dropdown-bg: var(--gradient-purple-green-light);
     --dropdown-fg: #f8f8f0;
     --dropdown-hover-bg: var(--gradient-purple-green-highlight);
