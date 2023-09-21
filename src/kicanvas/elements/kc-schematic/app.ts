@@ -41,6 +41,9 @@ export class KCSchematicAppElement extends KCUIElement {
         return this.viewer_elm.viewer;
     }
 
+    @attribute({ type: String })
+    controls: "none" | "basic" | "full";
+
     @attribute({ type: Boolean })
     sidebarcollapsed: boolean;
 
@@ -51,7 +54,7 @@ export class KCSchematicAppElement extends KCUIElement {
 
                 // Selecting the same item twice should show the properties panel.
                 if (item && item == e.detail.previous) {
-                    this.activity_bar_elm.change_activity("properties");
+                    this.activity_bar_elm?.change_activity("properties");
 
                     // If the user clicked on a sheet instance, send this event
                     // upwards so kc-kicanvas-shell can load the sheet.
@@ -71,64 +74,47 @@ export class KCSchematicAppElement extends KCUIElement {
         );
     }
 
-    static get observedAttributes() {
-        return ["sidebarcollapsed"];
-    }
-
-    attributeChangedCallback(
-        name: string,
-        old: string | null,
-        value: string | null | undefined,
-    ) {
-        switch (name) {
-            case "sidebarcollapsed":
-                if (this.activity_bar_elm) {
-                    if (value == undefined) {
-                        this.activity_bar_elm.removeAttribute("collapsed");
-                    } else {
-                        this.activity_bar_elm.setAttribute("collapsed", "");
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
     async load(src: KicadSch | ProjectPage) {
         await this.viewer_elm.load(src);
     }
 
     override render() {
+        const controls = this.controls ?? "full";
+
         this.viewer_elm =
             html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
 
-        this.activity_bar_elm = html`<kc-ui-activity-side-bar
-            collapsed="${this.sidebarcollapsed}">
-            <kc-ui-activity slot="activities" name="Symbols" icon="interests">
-                <kc-schematic-symbols-panel></kc-schematic-symbols-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Properties" icon="list">
-                <kc-schematic-properties-panel></kc-schematic-properties-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Info" icon="info">
-                <kc-schematic-info-panel></kc-schematic-info-panel>
-            </kc-ui-activity>
-            <kc-ui-activity
-                slot="activities"
-                name="Preferences"
-                icon="settings"
-                button-location="bottom">
-                <kc-preferences-panel></kc-preferences-panel>
-            </kc-ui-activity>
-            <kc-ui-activity
-                slot="activities"
-                name="Help"
-                icon="help"
-                button-location="bottom">
-                <kc-help-panel></kc-help-panel>
-            </kc-ui-activity>
-        </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
+        if (controls == "full") {
+            this.activity_bar_elm = html`<kc-ui-activity-side-bar
+                collapsed="${this.sidebarcollapsed}">
+                <kc-ui-activity
+                    slot="activities"
+                    name="Symbols"
+                    icon="interests">
+                    <kc-schematic-symbols-panel></kc-schematic-symbols-panel>
+                </kc-ui-activity>
+                <kc-ui-activity slot="activities" name="Properties" icon="list">
+                    <kc-schematic-properties-panel></kc-schematic-properties-panel>
+                </kc-ui-activity>
+                <kc-ui-activity slot="activities" name="Info" icon="info">
+                    <kc-schematic-info-panel></kc-schematic-info-panel>
+                </kc-ui-activity>
+                <kc-ui-activity
+                    slot="activities"
+                    name="Preferences"
+                    icon="settings"
+                    button-location="bottom">
+                    <kc-preferences-panel></kc-preferences-panel>
+                </kc-ui-activity>
+                <kc-ui-activity
+                    slot="activities"
+                    name="Help"
+                    icon="help"
+                    button-location="bottom">
+                    <kc-help-panel></kc-help-panel>
+                </kc-ui-activity>
+            </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
+        }
 
         return html`<kc-ui-split-view vertical>
             <kc-ui-view class="grow">
