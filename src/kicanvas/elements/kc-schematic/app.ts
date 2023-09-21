@@ -84,6 +84,8 @@ export class KCSchematicAppElement extends KCUIElement {
         this.viewer_elm =
             html`<kc-schematic-viewer></kc-schematic-viewer>` as KCSchematicViewerElement;
 
+        let resizer = null;
+
         if (controls == "full") {
             this.activity_bar_elm = html`<kc-ui-activity-side-bar
                 collapsed="${this.sidebarcollapsed}">
@@ -114,6 +116,7 @@ export class KCSchematicAppElement extends KCUIElement {
                     <kc-help-panel></kc-help-panel>
                 </kc-ui-activity>
             </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
+            resizer = html`<kc-ui-resizer></kc-ui-resizer>`;
         }
 
         return html`<kc-ui-split-view vertical>
@@ -121,8 +124,7 @@ export class KCSchematicAppElement extends KCUIElement {
                 ${this.viewer_elm}
                 <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
             </kc-ui-view>
-            <kc-ui-resizer></kc-ui-resizer>
-            ${this.activity_bar_elm}
+            ${resizer} ${this.activity_bar_elm}
         </kc-ui-split-view>`;
     }
 }
