@@ -64,6 +64,12 @@ export class KCUIResizerElement extends KCUIElement {
 
             this.classList.add("active");
 
+            // If the element we're resizing is collapsed, un-collapse it.
+            if (next.hasAttribute("collapsed")) {
+                console.log("removing collapsed");
+                next.removeAttribute("collapsed");
+            }
+
             const mouse_move = (e: MouseEvent) => {
                 const dx = mouse_x - e.clientX;
                 const new_width =

@@ -81,10 +81,14 @@ export class KCUIActivitySideBarElement extends KCUIElement {
 
     #activity: string | null | undefined;
 
-    private get activities() {
+    get #activities() {
         // Slightly hacky: using querySelectorAll on light DOM instead of slots
         // so this can be accessed before initial render.
         return this.querySelectorAll<HTMLElement>("kc-ui-activity");
+    }
+
+    get #default_activity_name() {
+        return this.#activities[0]?.getAttribute("name");
     }
 
     @query(".activities", true)
@@ -100,7 +104,7 @@ export class KCUIActivitySideBarElement extends KCUIElement {
         const top_buttons: HTMLElement[] = [];
         const bottom_buttons: HTMLElement[] = [];
 
-        for (const activity of this.activities) {
+        for (const activity of this.#activities) {
             const name = activity.getAttribute("name");
             const icon = activity.getAttribute("icon");
             const button_location = activity.getAttribute("button-location");
@@ -128,11 +132,7 @@ export class KCUIActivitySideBarElement extends KCUIElement {
 
     override initialContentCallback() {
         if (!this.collapsed) {
-            const default_activity = this.activities[0]?.getAttribute("name");
-
-            if (default_activity) {
-                this.change_activity(default_activity);
-            }
+            this.change_activity(this.#default_activity_name);
         } else {
             this.change_activity(null);
         }
@@ -142,14 +142,18 @@ export class KCUIActivitySideBarElement extends KCUIElement {
         });
     }
 
+    static get observedAttributes() {
+        return ["collapsed"];
+    }
+
     attributeChangedCallback(
         name: string,
         old: string | null,
-        value: string | null,
+        value: string | null | undefined,
     ) {
         switch (name) {
             case "collapsed":
-                if (value) {
+                if (value == undefined) {
                     this.show_activities();
                 } else {
                     this.hide_activities();
@@ -169,6 +173,10 @@ export class KCUIActivitySideBarElement extends KCUIElement {
     }
 
     hide_activities() {
+        if (!this.activities_container) {
+            return;
+        }
+
         // unset width and minWidth so the container can shrink.
         this.style.width = "unset";
         this.style.minWidth = "unset";
@@ -179,6 +187,14 @@ export class KCUIActivitySideBarElement extends KCUIElement {
     }
 
     show_activities() {
+        if (!this.activities_container) {
+            return;
+        }
+
+        if (!this.#activity) {
+            this.change_activity(this.#default_activity_name);
+        }
+
         this.style.minWidth = "";
         this.activities_container.style.width = "";
     }
@@ -196,9 +212,9 @@ export class KCUIActivitySideBarElement extends KCUIElement {
         // If there's no current activity, collapse the activity item
         // container
         if (!this.#activity) {
-            this.hide_activities();
+            this.collapsed = true;
         } else {
-            this.show_activities();
+            this.collapsed = false;
         }
 
         this.update_state();
@@ -212,7 +228,7 @@ export class KCUIActivitySideBarElement extends KCUIElement {
         }
 
         // Mark the selected activity element active, clearing the others.
-        for (const activity of this.activities) {
+        for (const activity of this.#activities) {
             if (
                 activity.getAttribute("name")?.toLowerCase() == this.#activity
             ) {
