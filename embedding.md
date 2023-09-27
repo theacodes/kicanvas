@@ -95,18 +95,18 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
   - `none` - document is not interactive and behaves like an `<img>` (default)
   - `basic` - zoom, pan, and select are available.
   - `full` - complete interactive viewer, including side panels.
-- `disablefullscreen` - don't show the fullscreen button
-- `disabledownloads` - don't show the download button
-- `disablecopy` - don't show the copy button
+- `controlslist` - further customizes the available controls.
+  - `nofullscreen` - don't show the fullscreen button.
+  - `nodownload` - don't show the download button.
+  - `download` - show the download button when used with controls="none".
+  - `nosymbols` - don't show the schematic symbols panel.
+  - `nofootprints` - don't show the board footprints panel.
+  - `noobjects` - don't show the board objects panel.
+  - `noproperties` - don't show the selection properties panel.
+  - `noinfo` - don't show the document info panel.
+  - `nopreferences` - don't show the user preferences panel.
+  - `nohelp` - don't show the help panel.
 - `height` - the height of the viewer's display area, in [CSS pixels](https://drafts.csswg.org/css-values/#px) (absolute values only; [no percentages](https://html.spec.whatwg.org/multipage/embedded-content.html#dimension-attributes))
-- `panels` - a list of items that selects which panels are available in the sidebar when using `controls="full"`, valid values are:
-  - `nosymbols`
-  - `nofootprints`
-  - `noobjects`
-  - `noproperties`
-  - `noinfo`
-  - `nopreferences`
-  - `nohelp`
 - `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
 - `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`
 - `zoom` - sets the initial view into the document

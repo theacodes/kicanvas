@@ -44,6 +44,9 @@ export class KCSchematicAppElement extends KCUIElement {
     @attribute({ type: String })
     controls: "none" | "basic" | "full";
 
+    @attribute({ type: String })
+    controlslist: string;
+
     @attribute({ type: Boolean })
     sidebarcollapsed: boolean;
 

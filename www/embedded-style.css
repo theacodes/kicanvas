@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap");
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+}
+
+html,
+body {
+    height: 100vh;
+    width: 100%;
+    font-family: "Nunito", ui-rounded, "Hiragino Maru Gothic ProN", Quicksand,
+        Comfortaa, Manjari, "Arial Rounded MT Bold", Calibri, source-sans-pro,
+        sans-serif;
+    line-height: 1.5;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+main {
+    max-width: 1024px;
+    margin: 1rem auto;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+kicanvas-embed {
+    display: block;
+    width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1.414;
+    background-color: aqua;
+}
