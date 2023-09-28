@@ -98,7 +98,7 @@ export class Project extends EventTarget implements IDisposable {
                 "Board",
                 "",
             );
-            //this.#pages_by_path.set(page.project_path, page);
+            this.#pages_by_path.set(page.project_path, page);
         }
 
         return doc;
