@@ -22,7 +22,7 @@ import { SchematicViewer } from "../../../viewers/schematic/viewer";
 export class KCSchematicSymbolsPanelElement extends KCUIElement {
     viewer: SchematicViewer;
 
-    @query("kc-ui-menu", true)
+    @query("kc-ui-menu")
     private menu!: KCUIMenuElement;
 
     override connectedCallback() {
