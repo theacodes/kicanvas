@@ -8,7 +8,7 @@ import { sorted_by_numeric_strings } from "../base/array";
 import { type IDisposable } from "../base/disposable";
 import { first, map } from "../base/iterator";
 import * as log from "../base/log";
-import type { Constructor } from "../base/types";
+import { is_string, type Constructor } from "../base/types";
 import { KicadPCB, KicadSch, ProjectSettings } from "../kicad";
 import type {
     SchematicSheet,
@@ -16,7 +16,7 @@ import type {
 } from "../kicad/schematic";
 import type { VirtualFileSystem } from "./services/vfs";
 
-export class Project implements IDisposable {
+export class Project extends EventTarget implements IDisposable {
     #fs: VirtualFileSystem;
     #files_by_name: Map<string, KicadPCB | KicadSch | null> = new Map();
     #pages_by_path: Map<string, ProjectPage> = new Map();
@@ -48,6 +48,12 @@ export class Project implements IDisposable {
 
         this.#determine_schematic_hierarchy();
 
+        this.dispatchEvent(
+            new CustomEvent("load", {
+                detail: this,
+            }),
+        );
+
         log.finish();
     }
 
@@ -61,7 +67,7 @@ export class Project implements IDisposable {
             return await this.#load_doc(KicadPCB, filename);
         }
         if (filename.endsWith(".kicad_pro")) {
-            return this.#load_project(filename);
+            return this.#load_meta(filename);
         }
 
         log.warn(`Couldn't load ${filename}: unknown file type`);
@@ -92,13 +98,13 @@ export class Project implements IDisposable {
                 "Board",
                 "",
             );
-            this.#pages_by_path.set(page.project_path, page);
+            //this.#pages_by_path.set(page.project_path, page);
         }
 
         return doc;
     }
 
-    async #load_project(filename: string) {
+    async #load_meta(filename: string) {
         const text = await this.#get_file_text(filename);
         const data = JSON.parse(text);
         this.settings = ProjectSettings.load(data);
@@ -270,6 +276,42 @@ export class Project implements IDisposable {
             name = this.#pages_by_path.get(name)!.filename;
         }
         return await this.#fs.download(name);
+    }
+
+    #active_page: ProjectPage | null = null;
+
+    public get active_page() {
+        return this.#active_page;
+    }
+
+    public set_active_page(
+        page_or_path: ProjectPage | string | null | undefined,
+    ) {
+        let page;
+
+        if (is_string(page_or_path)) {
+            page = this.page_by_path(page_or_path);
+        } else {
+            page = page_or_path;
+        }
+
+        if (!page) {
+            page = this.first_page;
+        }
+
+        if (!page) {
+            throw new Error(`Unable to find ${page_or_path}`);
+        }
+
+        this.#active_page = page;
+
+        console.warn("Active page set to", page);
+
+        this.dispatchEvent(
+            new CustomEvent("change", {
+                detail: this,
+            }),
+        );
     }
 }
 
