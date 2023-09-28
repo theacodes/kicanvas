@@ -6,7 +6,7 @@
 
 import { attribute, html } from "../../../base/web-components";
 import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
-import type { KicadSch } from "../../../kicad";
+import { KicadSch } from "../../../kicad";
 import { SchematicSheet } from "../../../kicad/schematic";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import { KCSchematicViewerElement } from "./viewer";
@@ -19,7 +19,9 @@ import "../viewer-bottom-toolbar";
 import "./info-panel";
 import "./properties-panel";
 import "./symbols-panel";
-import type { ProjectPage } from "../../project";
+import type { Project, ProjectPage } from "../../project";
+import type { KCProjectPanelElement } from "../project-panel";
+import { listen } from "../../../base/events";
 
 /**
  * Internal custom element for <kc-kicanvas-shell>'s schematic viewer. Handles
@@ -29,8 +31,10 @@ import type { ProjectPage } from "../../project";
 export class KCSchematicAppElement extends KCUIElement {
     static override useShadowRoot = false;
 
+    project: Project;
     viewer_elm: KCSchematicViewerElement;
-    activity_bar_elm: KCUIActivitySideBarElement;
+    activity_bar: KCUIActivitySideBarElement;
+    project_panel: KCProjectPanelElement;
 
     constructor() {
         super();
@@ -50,28 +54,48 @@ export class KCSchematicAppElement extends KCUIElement {
     @attribute({ type: Boolean })
     sidebarcollapsed: boolean;
 
+    override connectedCallback() {
+        (async () => {
+            this.project = await this.requestContext("project");
+            super.connectedCallback();
+        })();
+    }
+
     override initialContentCallback() {
+        this.addDisposable(
+            listen(this.project, "change", async (e) => {
+                const page = this.project.active_page;
+
+                if (!page || !(page.document instanceof KicadSch)) {
+                    return;
+                }
+
+                await this.load(page);
+            }),
+        );
+
         this.addDisposable(
             this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
                 const item = e.detail.item;
 
-                // Selecting the same item twice should show the properties panel.
-                if (item && item == e.detail.previous) {
-                    this.activity_bar_elm?.change_activity("properties");
+                if (!item) {
+                    return;
+                }
 
-                    // If the user clicked on a sheet instance, send this event
-                    // upwards so kc-kicanvas-shell can load the sheet.
-                    if (item instanceof SchematicSheet) {
-                        this.dispatchEvent(
-                            new CustomEvent("file:select", {
-                                detail: {
-                                    path: `${item.sheetfile}:${item.path}/${item.uuid}`,
-                                },
-                                composed: true,
-                                bubbles: true,
-                            }),
-                        );
-                    }
+                // Handle only double-selecting/double-clicking on items.
+                if (item != e.detail.previous) {
+                    return;
+                }
+
+                // Selecting the same item twice should show the properties panel.
+                this.activity_bar?.change_activity("properties");
+
+                // However, if it's a sheet instance, switch over to the new
+                // sheet.
+                if (item instanceof SchematicSheet) {
+                    this.project.set_active_page(
+                        `${item.sheetfile}:${item.path}/${item.uuid}`,
+                    );
                 }
             }),
         );
@@ -88,11 +112,18 @@ export class KCSchematicAppElement extends KCUIElement {
             disableinteraction="${this.controls ==
             "none"}"></kc-schematic-viewer>` as KCSchematicViewerElement;
 
+        this.project_panel = html`
+            <kc-project-panel></kc-project-panel>
+        ` as KCProjectPanelElement;
+
         let resizer = null;
 
         if (controls == "full") {
-            this.activity_bar_elm = html`<kc-ui-activity-side-bar
+            this.activity_bar = html`<kc-ui-activity-side-bar
                 collapsed="${this.sidebarcollapsed}">
+                <kc-ui-activity slot="activities" name="Project" icon="folder">
+                    ${this.project_panel}
+                </kc-ui-activity>
                 <kc-ui-activity
                     slot="activities"
                     name="Symbols"
@@ -132,7 +163,7 @@ export class KCSchematicAppElement extends KCUIElement {
             <kc-ui-view class="grow">
                 ${this.viewer_elm} ${bottom_toolbar}
             </kc-ui-view>
-            ${resizer} ${this.activity_bar_elm}
+            ${resizer} ${this.activity_bar}
         </kc-ui-split-view>`;
     }
 }

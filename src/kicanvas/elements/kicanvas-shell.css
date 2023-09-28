@@ -129,11 +129,3 @@ kc-schematic-app {
 .is-hidden {
     display: none;
 }
-
-:host kc-project-panel {
-    display: none;
-}
-
-:host([loaded]) kc-project-panel {
-    display: block;
-}

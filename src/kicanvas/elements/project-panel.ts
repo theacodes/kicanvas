@@ -4,12 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { delegate } from "../../base/events";
+import { delegate, listen } from "../../base/events";
 import { no_self_recursion } from "../../base/functions";
 import { css, html } from "../../base/web-components";
 import {
     KCUIElement,
-    type KCUIDropdownElement,
+    KCUIMenuElement,
     type KCUIMenuItemElement,
 } from "../../kc-ui";
 import type { Project } from "../project";
@@ -20,10 +20,6 @@ export class KCProjectPanelElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
         css`
-            :host {
-                max-width: 60vw;
-            }
-
             .page {
                 display: flex;
                 align-items: center;
@@ -31,10 +27,23 @@ export class KCProjectPanelElement extends KCUIElement {
 
             .page span.name {
                 margin-right: 1rem;
-                flex-grow: 1;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
+            }
+
+            .page span.filename {
+                flex: 1;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                margin-left: 1rem;
+                text-align: right;
+                color: #aaa;
+            }
+
+            .page kc-ui-button {
+                margin-left: 0.5rem;
             }
 
             .page span.number {
@@ -54,21 +63,10 @@ export class KCProjectPanelElement extends KCUIElement {
             kc-ui-menu-item[selected]:hover span.number {
                 background: var(--dropdown-hover-bg);
             }
-
-            .page span.filename {
-                flex: 1;
-                margin-left: 1rem;
-                text-align: right;
-                color: #aaa;
-            }
-
-            .page kc-ui-button {
-                margin-left: 0.5rem;
-            }
         `,
     ];
 
-    #dropdown: KCUIDropdownElement;
+    #menu: KCUIMenuElement;
     #selected: string | null;
 
     project: Project;
@@ -82,6 +80,12 @@ export class KCProjectPanelElement extends KCUIElement {
 
     override initialContentCallback() {
         super.initialContentCallback();
+
+        this.addDisposable(
+            listen(this.project, "load", (e) => {
+                this.update();
+            }),
+        );
 
         this.addEventListener("kc-ui-menu:select", (e) => {
             if (this.#setting_selected) return;
@@ -111,7 +115,7 @@ export class KCProjectPanelElement extends KCUIElement {
 
         this.#setting_selected = true;
         this.#selected = name;
-        this.#dropdown.menu.selected = name;
+        this.#menu.selected = name;
         this.#setting_selected = false;
     }
 
@@ -119,21 +123,13 @@ export class KCProjectPanelElement extends KCUIElement {
 
     @no_self_recursion
     private send_selected_event() {
-        const selected_elm = this.#dropdown.menu.selected;
+        const selected_elm = this.#menu.selected;
 
         if (!selected_elm) {
             return;
         }
 
-        this.dispatchEvent(
-            new CustomEvent("file:select", {
-                detail: {
-                    path: selected_elm.name,
-                },
-                bubbles: true,
-                composed: true,
-            }),
-        );
+        this.project.set_active_page(selected_elm.name);
     }
 
     override render() {
@@ -142,6 +138,8 @@ export class KCProjectPanelElement extends KCUIElement {
         if (!this.project) {
             return html``;
         }
+
+        // TODO: Hide if only one file
 
         for (const page of this.project.pages()) {
             const icon =
@@ -163,7 +161,9 @@ export class KCProjectPanelElement extends KCUIElement {
                             ${page.name ?? page.filename}
                         </span>
                         <span class="filename">
-                            ${page.name ? page.filename : ""}
+                            ${page.name && page.name !== page.filename
+                                ? page.filename
+                                : "meepmeepmeep.kicah_sch"}
                         </span>
                         <kc-ui-button
                             variant="menu"
@@ -174,18 +174,14 @@ export class KCProjectPanelElement extends KCUIElement {
             );
         }
 
-        this.#dropdown = html`<kc-ui-dropdown slot="dropdown" auto-hide>
-            <kc-ui-menu class="dropdown">
-                <!-- <kc-ui-menu-item icon="receipt">
-                    Bill of materials
-                </kc-ui-menu-item> -->
-                ${file_btn_elms}
-            </kc-ui-menu>
-        </kc-ui-dropdown>` as KCUIDropdownElement;
+        this.#menu = html`<kc-ui-menu>
+            ${file_btn_elms}
+        </kc-ui-menu>` as KCUIMenuElement;
 
-        return html`<kc-ui-toggle-menu icon="folder" title="Project">
-            ${this.#dropdown}
-        </kc-ui-toggle-menu>`;
+        return html`<kc-ui-panel>
+            <kc-ui-panel-title title="Project"></kc-ui-panel-title>
+            <kc-ui-panel-body>${this.#menu}</kc-ui-panel-body>
+        </kc-ui-panel>`;
     }
 }
 
