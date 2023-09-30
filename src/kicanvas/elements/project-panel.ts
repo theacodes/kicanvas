@@ -87,12 +87,16 @@ export class KCProjectPanelElement extends KCUIElement {
             }),
         );
 
-        this.addEventListener("kc-ui-menu:select", (e) => {
-            if (this.#setting_selected) return;
+        this.addDisposable(
+            listen(this.project, "change", (e) => {
+                this.selected = this.project.active_page?.project_path ?? null;
+            }),
+        );
 
+        this.addEventListener("kc-ui-menu:select", (e) => {
             const source = (e as CustomEvent).detail as KCUIMenuItemElement;
             this.selected = source?.name ?? null;
-            this.send_selected_event();
+            this.change_current_project_page(this.selected);
         });
 
         delegate(this.renderRoot, "kc-ui-button", "click", (e, source) => {
@@ -105,31 +109,16 @@ export class KCProjectPanelElement extends KCUIElement {
     }
 
     get selected() {
-        return this.#selected;
+        return this.#menu.selected?.name ?? null;
     }
 
     set selected(name: string | null) {
-        if (name == this.selected) {
-            return;
-        }
-
-        this.#setting_selected = true;
-        this.#selected = name;
         this.#menu.selected = name;
-        this.#setting_selected = false;
     }
 
-    #setting_selected = false;
-
     @no_self_recursion
-    private send_selected_event() {
-        const selected_elm = this.#menu.selected;
-
-        if (!selected_elm) {
-            return;
-        }
-
-        this.project.set_active_page(selected_elm.name);
+    private change_current_project_page(name: string | null) {
+        this.project.set_active_page(name);
     }
 
     override render() {
@@ -163,7 +152,7 @@ export class KCProjectPanelElement extends KCUIElement {
                         <span class="filename">
                             ${page.name && page.name !== page.filename
                                 ? page.filename
-                                : "meepmeepmeep.kicah_sch"}
+                                : ""}
                         </span>
                         <kc-ui-button
                             variant="menu"

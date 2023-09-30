@@ -82,21 +82,22 @@ export class KCSchematicAppElement extends KCUIElement {
                     return;
                 }
 
-                // Handle only double-selecting/double-clicking on items.
+                // Only handle double-selecting/double-clicking on items.
                 if (item != e.detail.previous) {
                     return;
                 }
 
-                // Selecting the same item twice should show the properties panel.
-                this.activity_bar?.change_activity("properties");
-
-                // However, if it's a sheet instance, switch over to the new
-                // sheet.
+                // If it's a sheet instance, switch over to the new sheet.
                 if (item instanceof SchematicSheet) {
                     this.project.set_active_page(
                         `${item.sheetfile}:${item.path}/${item.uuid}`,
                     );
+                    return;
                 }
+
+                // Otherwise, selecting the same item twice should show the
+                // properties panel.
+                this.activity_bar?.change_activity("properties");
             }),
         );
     }
