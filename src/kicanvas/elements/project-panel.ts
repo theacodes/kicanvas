@@ -14,8 +14,6 @@ import {
 } from "../../kc-ui";
 import type { Project } from "../project";
 
-import "../../kc-ui";
-
 export class KCProjectPanelElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
@@ -67,8 +65,6 @@ export class KCProjectPanelElement extends KCUIElement {
     ];
 
     #menu: KCUIMenuElement;
-    #selected: string | null;
-
     project: Project;
 
     override connectedCallback() {
@@ -127,8 +123,6 @@ export class KCProjectPanelElement extends KCUIElement {
         if (!this.project) {
             return html``;
         }
-
-        // TODO: Hide if only one file
 
         for (const page of this.project.pages()) {
             const icon =
