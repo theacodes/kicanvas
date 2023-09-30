@@ -5,105 +5,83 @@
 */
 
 import { html } from "../../../base/web-components";
-import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
-import type { KicadPCB } from "../../../kicad";
-import { KiCanvasSelectEvent } from "../../../viewers/base/events";
+import { KicadPCB } from "../../../kicad";
+import type { ProjectPage } from "../../project";
+import { KCViewerAppElement } from "../common/app";
 import { KCBoardViewerElement } from "./viewer";
 
 // import dependent elements so they're registered before use.
-import "../help-panel";
-import "./viewer";
-import "../preferences-panel";
-import "../viewer-bottom-toolbar";
+import "../common/help-panel";
+import "../common/preferences-panel";
+import "../common/viewer-bottom-toolbar";
 import "./footprints-panel";
 import "./info-panel";
 import "./layers-panel";
 import "./nets-panel";
 import "./objects-panel";
 import "./properties-panel";
+import "./viewer";
 
 /**
  * Internal custom element for <kc-kicanvas-shell>'s board viewer. Handles
  * setting up the actual board viewer as well as interface controls. It's
  * basically KiCanvas's version of PCBNew.
  */
-export class KCBoardAppElement extends KCUIElement {
-    static override useShadowRoot = false;
-
-    viewer_elm: KCBoardViewerElement;
-    activity_bar_elm: KCUIActivitySideBarElement;
-
-    constructor() {
-        super();
-        this.provideLazyContext("viewer", () => this.viewer);
+export class KCBoardAppElement extends KCViewerAppElement<KCBoardViewerElement> {
+    override on_viewer_select(item?: unknown, previous?: unknown) {
+        // Selecting the same item twice should show the properties panel.
+        if (item && item == previous) {
+            this.change_activity("properties");
+        }
     }
 
-    get viewer() {
-        return this.viewer_elm.viewer;
+    override can_load(src: ProjectPage): boolean {
+        return src.document instanceof KicadPCB;
     }
 
-    override initialContentCallback() {
-        this.addDisposable(
-            this.viewer.addEventListener(KiCanvasSelectEvent.type, (e) => {
-                // Selecting the same item twice should show the properties panel.
-                if (e.detail.item && e.detail.item == e.detail.previous) {
-                    this.activity_bar_elm.change_activity("properties");
-                }
-            }),
-        );
+    override make_viewer_element(): KCBoardViewerElement {
+        return html`<kc-board-viewer></kc-board-viewer>` as KCBoardViewerElement;
     }
 
-    async load(src: KicadPCB) {
-        this.viewer_elm.load(src);
-    }
-
-    override render() {
-        this.viewer_elm =
-            html`<kc-board-viewer></kc-board-viewer>` as KCBoardViewerElement;
-
-        this.activity_bar_elm = html`<kc-ui-activity-side-bar>
-            <kc-ui-activity slot="activities" name="Layers" icon="layers">
+    override make_activities() {
+        return [
+            // Layers
+            html`<kc-ui-activity slot="activities" name="Layers" icon="layers">
                 <kc-board-layers-panel></kc-board-layers-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Objects" icon="category">
+            </kc-ui-activity>`,
+            // Objects
+            html`<kc-ui-activity
+                slot="activities"
+                name="Objects"
+                icon="category">
                 <kc-board-objects-panel></kc-board-objects-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Footprints" icon="memory">
+            </kc-ui-activity>`,
+            // Footprints
+            html`<kc-ui-activity
+                slot="activities"
+                name="Footprints"
+                icon="memory">
                 <kc-board-footprints-panel></kc-board-footprints-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Nets" icon="hub">
+            </kc-ui-activity>`,
+            // Nets
+            html`<kc-ui-activity slot="activities" name="Nets" icon="hub">
                 <kc-board-nets-panel></kc-board-nets-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Properties" icon="list">
+            </kc-ui-activity>`,
+            // Properties
+            html`<kc-ui-activity
+                slot="activities"
+                name="Properties"
+                icon="list">
                 <kc-board-properties-panel></kc-board-properties-panel>
-            </kc-ui-activity>
-            <kc-ui-activity slot="activities" name="Board info" icon="info">
+            </kc-ui-activity>`,
+            // Board info
+            html`<kc-ui-activity
+                slot="activities"
+                name="Board info"
+                icon="info">
                 <kc-board-info-panel></kc-board-info-panel>
-            </kc-ui-activity>
-            <kc-ui-activity
-                slot="activities"
-                name="Preferences"
-                icon="settings"
-                button-location="bottom">
-                <kc-preferences-panel></kc-preferences-panel>
-            </kc-ui-activity>
-            <kc-ui-activity
-                slot="activities"
-                name="Help"
-                icon="help"
-                button-location="bottom">
-                <kc-help-panel></kc-help-panel>
-            </kc-ui-activity>
-        </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
-
-        return html` <kc-ui-split-view vertical>
-            <kc-ui-view class="grow is-relative">
-                ${this.viewer_elm}
-                <kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>
-            </kc-ui-view>
-            <kc-ui-resizer></kc-ui-resizer>
-            ${this.activity_bar_elm}
-        </kc-ui-split-view>`;
+            </kc-ui-activity>`,
+        ];
     }
 }
 
