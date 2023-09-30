@@ -9,7 +9,6 @@ import { DropTarget } from "../../base/dom/drag-drop";
 import * as log from "../../base/log";
 import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement, KCUIIconElement } from "../../kc-ui";
-import { KicadPCB, KicadSch } from "../../kicad";
 import { sprites_url } from "../icons/sprites";
 import { Project } from "../project";
 import { GitHub } from "../services/github";
@@ -22,10 +21,7 @@ import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import shell_styles from "./kicanvas-shell.css";
 
 import "../icons/sprites";
-import "./kc-board/app";
-import "./kc-schematic/app";
-import "./project-panel";
-import { listen } from "../../base/events";
+import "./common/project-panel";
 
 // Setup KCUIIconElement to use icon sprites.
 KCUIIconElement.sprites_url = sprites_url;
@@ -116,20 +112,6 @@ class KiCanvasShellElement extends KCUIElement {
             location.searchParams.set("github", link);
             window.history.pushState(null, "", location);
         });
-
-        this.addDisposable(
-            listen(this.project, "change", (e) => {
-                const page = this.project.active_page;
-
-                if (page?.document instanceof KicadPCB) {
-                    this.#board_app.classList.remove("is-hidden");
-                    this.#schematic_app.classList.add("is-hidden");
-                } else if (page?.document instanceof KicadSch) {
-                    this.#board_app.classList.add("is-hidden");
-                    this.#schematic_app.classList.remove("is-hidden");
-                }
-            }),
-        );
     }
 
     private async setup_project(vfs: VirtualFileSystem) {
@@ -151,10 +133,10 @@ class KiCanvasShellElement extends KCUIElement {
 
     override render() {
         this.#schematic_app = html`
-            <kc-schematic-app class="is-hidden"></kc-schematic-app>
+            <kc-schematic-app></kc-schematic-app>
         ` as KCSchematicAppElement;
         this.#board_app = html`
-            <kc-board-app class="is-hidden"></kc-board-app>
+            <kc-board-app></kc-board-app>
         ` as KCBoardAppElement;
 
         return html`
