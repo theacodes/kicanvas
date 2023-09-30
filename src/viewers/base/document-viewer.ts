@@ -16,6 +16,7 @@ import { Grid } from "./grid";
 import type { DocumentPainter, PaintableDocument } from "./painter";
 import { ViewLayerNames, type ViewLayerSet } from "./view-layers";
 import { Viewer } from "./viewer";
+import { later } from "../../base/async";
 
 type ViewableDocument = DrawingSheetDocument &
     PaintableDocument & { filename: string };
@@ -61,27 +62,29 @@ export abstract class DocumentViewer<
         this.document = src;
         this.paint();
 
-        // Wait for a valid viewport size
-        log.message("Waiting for viewport");
-        await this.viewport.ready;
-        this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
-
-        // Position the camera and draw the scene.
-        log.message("Positioning camera");
-        this.zoom_to_page();
-
-        // Mark the viewer as loaded and notify event listeners
-        this.resolve_loaded(true);
-
-        // Deselect any selected items.
-        if (this.selected) {
-            this.selected = null;
-        }
-
-        // Draw
-        this.draw();
-
         log.finish();
+
+        // Wait for a valid viewport size
+        later(async () => {
+            log.message("Waiting for viewport");
+            await this.viewport.ready;
+            this.viewport.bounds = this.drawing_sheet.page_bbox.grow(50);
+
+            // Position the camera and draw the scene.
+            log.message("Positioning camera");
+            this.zoom_to_page();
+
+            // Mark the viewer as loaded and notify event listeners
+            this.resolve_loaded(true);
+
+            // Deselect any selected items.
+            if (this.selected) {
+                this.selected = null;
+            }
+
+            // Draw
+            this.draw();
+        });
     }
 
     public paint() {
@@ -128,6 +131,7 @@ export abstract class DocumentViewer<
     }
 
     public override zoom_to_page() {
+        console.warn(this.viewport.width, this.viewport.height);
         this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
         this.draw();
     }
