@@ -35,6 +35,7 @@ suite("text.sch_field.SchField()", function () {
         field.parent = {
             position: new Vec2(0, 0),
             transform: zero_deg_matrix,
+            is_symbol: true,
         };
 
         assert.equal(field.draw_rotation.degrees, 90);
@@ -58,6 +59,7 @@ suite("text.sch_field.SchField()", function () {
         field.parent = {
             position: new Vec2(546100, 482600),
             transform: zero_deg_matrix,
+            is_symbol: true,
         };
 
         assert.equal(field.position.x, 571500);
@@ -68,6 +70,7 @@ suite("text.sch_field.SchField()", function () {
         field.parent = {
             position: new Vec2(546100, 482600),
             transform: ninety_deg_matrix,
+            is_symbol: true,
         };
 
         assert.equal(field.position.x, 571500);
@@ -84,6 +87,7 @@ suite("text.sch_field.SchField()", function () {
         field.parent = {
             position: new Vec2(546100, 482600),
             transform: zero_deg_matrix,
+            is_symbol: true,
         };
 
         let bbox = field.bounding_box;

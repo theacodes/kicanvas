@@ -37,7 +37,7 @@ export class KCBoardViewerElement extends WithPreferences(KCUIElement) {
     override initialContentCallback() {
         (async () => {
             this.viewer = this.addDisposable(
-                new BoardViewer(this.#canvas, this.board_theme),
+                new BoardViewer(this.#canvas, true, this.board_theme),
             );
             await this.viewer.setup();
 
