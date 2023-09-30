@@ -22,6 +22,7 @@ import "./symbols-panel";
 import type { Project, ProjectPage } from "../../project";
 import type { KCProjectPanelElement } from "../project-panel";
 import { listen } from "../../../base/events";
+import { length } from "../../../base/iterator";
 
 /**
  * Internal custom element for <kc-kicanvas-shell>'s schematic viewer. Handles
@@ -62,6 +63,17 @@ export class KCSchematicAppElement extends KCUIElement {
     }
 
     override initialContentCallback() {
+        this.addDisposable(
+            listen(this.project, "load", async (e) => {
+                // Hide the project activity if there's only one file.
+                if (length(this.project.pages()) < 2) {
+                    this.querySelector(
+                        `kc-ui-activity[name="Project"]`,
+                    )?.remove();
+                }
+            }),
+        );
+
         this.addDisposable(
             listen(this.project, "change", async (e) => {
                 const page = this.project.active_page;
