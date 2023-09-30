@@ -27,3 +27,11 @@ export function isEmpty(iterable: Iterable<unknown>) {
     }
     return true;
 }
+
+export function length(iterable: Iterable<unknown>) {
+    let n = 0;
+    for (const _ of iterable) {
+        n++;
+    }
+    return n;
+}
