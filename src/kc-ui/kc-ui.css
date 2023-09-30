@@ -238,49 +238,6 @@ kc-ui-app {
     overflow: hidden;
 }
 
-kc-ui-split-view {
-    display: flex;
-    height: 100%;
-    overflow: hidden;
-}
-
-kc-ui-split-view[horizontal] {
-    flex-direction: column;
-    max-height: 100%;
-}
-
-kc-ui-split-view[vertical] {
-    flex-direction: row;
-    max-width: 100%;
-}
-
-kc-ui-view {
-    flex-grow: 1;
-    display: flex;
-    overflow: hidden;
-    flex-direction: column;
-    position: relative;
-}
-
-kc-ui-view.grow,
-kc-ui-split-view.grow {
-    flex-basis: unset;
-    flex-grow: 999;
-}
-
-kc-ui-view.shrink,
-kc-ui-split-view.shrink {
-    flex-grow: 0;
-    flex-shrink: 1;
-    width: unset;
-}
-
-kc-ui-view.fixed,
-kc-ui-split-view.fixed {
-    flex-grow: 0;
-    flex-shrink: 0;
-}
-
 /*
     Input elements
 */
@@ -306,7 +263,8 @@ textarea {
     padding: 0.25rem;
     background: var(--input-bg);
     color: var(--input-fg);
-    transition: color var(--transition-time-medium) ease,
+    transition:
+        color var(--transition-time-medium) ease,
         box-shadow var(--transition-time-medium) ease,
         outline var(--transition-time-medium) ease,
         background var(--transition-time-medium) ease,

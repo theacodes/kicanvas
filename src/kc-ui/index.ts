@@ -18,5 +18,6 @@ export * from "./panel";
 export * from "./property-list";
 export * from "./range";
 export * from "./resizer";
+export * from "./split-view";
 export * from "./text-filter-input";
 export * from "./toggle-menu";
