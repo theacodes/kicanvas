@@ -125,7 +125,3 @@ kc-schematic-app {
     height: 100%;
     flex: 1;
 }
-
-.is-hidden {
-    display: none;
-}
