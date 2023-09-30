@@ -4,7 +4,6 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { isEmpty } from "../../base/iterator";
 import { CSS, attribute, css, html } from "../../base/web-components";
 import { parseFlagAttribute } from "../../base/web-components/flag-attribute";
 import { KCUIButtonElement, KCUIElement } from "../../kc-ui";
@@ -15,6 +14,7 @@ import type { KCSchematicAppElement } from "./kc-schematic/app";
 
 import "../../kc-ui/floating-toolbar";
 import { delegate } from "../../base/events";
+import { later } from "../../base/async";
 
 /**
  *
@@ -79,7 +79,9 @@ class KiCanvasEmbedElement extends KCUIElement {
 
     override initialContentCallback() {
         this.#setup_events();
-        this.#load_src();
+        later(() => {
+            this.#load_src();
+        });
     }
 
     async #setup_events() {
@@ -111,7 +113,6 @@ class KiCanvasEmbedElement extends KCUIElement {
         try {
             await this.#project.load(vfs);
             this.loaded = true;
-            this.update();
             this.#show_page(this.#project.root_schematic_page!);
         } catch (e) {
             console.error(e);
@@ -128,11 +129,7 @@ class KiCanvasEmbedElement extends KCUIElement {
     }
 
     override render() {
-        if (!this.loaded) {
-            return html``;
-        }
-
-        if (!this.#schematic_app && !isEmpty(this.#project.schematics())) {
+        if (!this.#schematic_app) {
             this.#schematic_app = html`<kc-schematic-app
                 sidebarcollapsed
                 controls="${this.controls}"
@@ -153,13 +150,15 @@ class KiCanvasEmbedElement extends KCUIElement {
             const buttons = [];
 
             if (controlslist["download"]) {
-                buttons.push(html`<kc-ui-button
-                    slot="right"
-                    name="download"
-                    title="download"
-                    icon="download"
-                    variant="toolbar-alt">
-                </kc-ui-button>`);
+                buttons.push(
+                    html`<kc-ui-button
+                        slot="right"
+                        name="download"
+                        title="download"
+                        icon="download"
+                        variant="toolbar-alt">
+                    </kc-ui-button>`,
+                );
             }
 
             if (buttons.length) {
