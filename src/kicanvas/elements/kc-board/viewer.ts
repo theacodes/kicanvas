@@ -10,6 +10,7 @@ import type { KicadPCB } from "../../../kicad";
 import { KiCanvasLoadEvent } from "../../../viewers/base/events";
 import { BoardViewer } from "../../../viewers/board/viewer";
 import { Preferences, WithPreferences } from "../../preferences";
+import { ProjectPage } from "../../project";
 import themes from "../../themes";
 
 export class KCBoardViewerElement extends WithPreferences(KCUIElement) {
@@ -21,6 +22,9 @@ export class KCBoardViewerElement extends WithPreferences(KCUIElement) {
         type: Boolean,
     })
     public loaded: boolean;
+
+    @attribute({ type: Boolean })
+    disableinteraction: boolean;
 
     @attribute({ type: String })
     theme: string;
@@ -65,9 +69,11 @@ export class KCBoardViewerElement extends WithPreferences(KCUIElement) {
         this.selected = [];
     }
 
-    async load(src: KicadPCB) {
+    async load(src: KicadPCB | ProjectPage) {
         this.loaded = false;
-        await this.viewer.load(src);
+        await this.viewer.load(
+            src instanceof ProjectPage ? (src.document as KicadPCB) : src,
+        );
     }
 
     override render() {
@@ -77,6 +83,8 @@ export class KCBoardViewerElement extends WithPreferences(KCUIElement) {
                 :host {
                     display: block;
                     touch-action: none;
+                    width: 100%;
+                    height: 100%;
                 }
 
                 canvas {
