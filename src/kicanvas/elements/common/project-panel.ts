@@ -4,15 +4,15 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { delegate, listen } from "../../base/events";
-import { no_self_recursion } from "../../base/functions";
-import { css, html } from "../../base/web-components";
+import { delegate, listen } from "../../../base/events";
+import { no_self_recursion } from "../../../base/functions";
+import { css, html } from "../../../base/web-components";
 import {
     KCUIElement,
     KCUIMenuElement,
     type KCUIMenuItemElement,
-} from "../../kc-ui";
-import type { Project } from "../project";
+} from "../../../kc-ui";
+import type { Project } from "../../project";
 
 export class KCProjectPanelElement extends KCUIElement {
     static override styles = [

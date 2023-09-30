@@ -4,10 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css, html, query } from "../../base/web-components";
-import { KCUIElement } from "../../kc-ui";
-import { Preferences } from "../preferences";
-import themes from "../themes";
+import { css, html, query } from "../../../base/web-components";
+import { KCUIElement } from "../../../kc-ui";
+import { Preferences } from "../../preferences";
+import themes from "../../themes";
 
 const prefs = Preferences.INSTANCE;
 
@@ -31,7 +31,8 @@ export class KCPreferencesPanel extends KCUIElement {
                 background: var(--input-bg);
                 color: var(--input-fg);
                 border: var(--input-border);
-                transition: color var(--transition-time-medium) ease,
+                transition:
+                    color var(--transition-time-medium) ease,
                     box-shadow var(--transition-time-medium) ease,
                     outline var(--transition-time-medium) ease,
                     background var(--transition-time-medium) ease,

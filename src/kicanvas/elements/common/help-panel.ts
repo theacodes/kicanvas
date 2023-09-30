@@ -4,8 +4,8 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css, html } from "../../base/web-components";
-import { KCUIElement } from "../../kc-ui";
+import { css, html } from "../../../base/web-components";
+import { KCUIElement } from "../../../kc-ui";
 
 export class KCHelpPanel extends KCUIElement {
     static override styles = [

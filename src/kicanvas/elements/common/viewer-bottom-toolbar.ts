@@ -4,13 +4,13 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { css, html } from "../../base/web-components";
-import { KCUIElement, type KCUIButtonElement } from "../../kc-ui";
+import { css, html } from "../../../base/web-components";
+import { KCUIElement, type KCUIButtonElement } from "../../../kc-ui";
 import {
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
-} from "../../viewers/base/events";
-import type { Viewer } from "../../viewers/base/viewer";
+} from "../../../viewers/base/events";
+import type { Viewer } from "../../../viewers/base/viewer";
 
 export class KCViewerBottomToolbarElement extends KCUIElement {
     static override styles = [
