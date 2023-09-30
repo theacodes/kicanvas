@@ -14,7 +14,7 @@
                 "${workspaceFolder}/www/kicanvas/*.js",
                 "!**/node_modules/**"
             ],
-            //"preLaunchTask": "${defaultBuildTask}",
+            "preLaunchTask": "${defaultBuildTask}",
             "skipFiles": [
                 "<node_internals>/**",
                 "**/node_modules/**",
