@@ -87,8 +87,14 @@ export class KCUIActivitySideBarElement extends KCUIElement {
         return this.querySelectorAll<HTMLElement>("kc-ui-activity");
     }
 
+    get #activity_names() {
+        return Array.from(this.#activities).map((x) => {
+            return (x.getAttribute("name") ?? "").toLowerCase();
+        });
+    }
+
     get #default_activity_name() {
-        return this.#activities[0]?.getAttribute("name");
+        return (this.#activities[0]?.getAttribute("name") ?? "").toLowerCase();
     }
 
     @query(".activities", true)
@@ -139,6 +145,22 @@ export class KCUIActivitySideBarElement extends KCUIElement {
 
         delegate(this.renderRoot, "kc-ui-button", "click", (e, source) => {
             this.change_activity((source as KCUIButtonElement).name, true);
+        });
+
+        const observer = new MutationObserver((mutations) => {
+            this.update();
+            // If the currently active activity just got removed, change to the
+            // new default one.
+            if (
+                this.#activity &&
+                !this.#activity_names.includes(this.#activity)
+            ) {
+                this.change_activity(this.#default_activity_name);
+            }
+        });
+
+        observer.observe(this, {
+            childList: true,
         });
     }
 
@@ -202,8 +224,8 @@ export class KCUIActivitySideBarElement extends KCUIElement {
     change_activity(name: string | null | undefined, toggle = false) {
         name = name?.toLowerCase();
 
-        // Clicking on the selected activity will deselect it.
         if (this.#activity == name && toggle) {
+            // Clicking on the selected activity will deselect it.
             this.#activity = null;
         } else {
             this.#activity = name;
