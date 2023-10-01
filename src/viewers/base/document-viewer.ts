@@ -87,7 +87,7 @@ export abstract class DocumentViewer<
         });
     }
 
-    public paint() {
+    public override paint() {
         if (!this.document) {
             return;
         }
@@ -131,7 +131,6 @@ export abstract class DocumentViewer<
     }
 
     public override zoom_to_page() {
-        console.warn(this.viewport.width, this.viewport.height);
         this.viewport.camera.bbox = this.drawing_sheet.page_bbox.grow(10);
         this.draw();
     }

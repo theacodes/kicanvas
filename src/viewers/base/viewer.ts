@@ -33,7 +33,7 @@ export abstract class Viewer extends EventTarget {
 
     constructor(
         public canvas: HTMLCanvasElement,
-        protected interactive: boolean = true,
+        protected interactive = true,
     ) {
         super();
     }
@@ -135,6 +135,8 @@ export abstract class Viewer extends EventTarget {
             this.dispatchEvent(new KiCanvasLoadEvent());
         }
     }
+
+    public abstract paint(): void;
 
     protected on_draw() {
         this.renderer.clear_canvas();
