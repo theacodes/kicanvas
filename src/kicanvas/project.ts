@@ -305,8 +305,6 @@ export class Project extends EventTarget implements IDisposable {
 
         this.#active_page = page;
 
-        console.warn("Active page set to", page);
-
         this.dispatchEvent(
             new CustomEvent("change", {
                 detail: this,

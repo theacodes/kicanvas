@@ -104,12 +104,9 @@ export abstract class KCViewerAppElement<
     protected abstract can_load(src: ProjectPage): boolean;
 
     async load(src: ProjectPage) {
-        console.warn("load() with", src);
         if (this.can_load(src)) {
-            console.warn(this, "can_load", src);
             await this.#viewer_elm.load(src);
             this.hidden = false;
-            console.warn("loaded");
         } else {
             this.hidden = true;
         }
