@@ -28,6 +28,9 @@ interface ViewerElement extends HTMLElement {
     disableinteraction: boolean;
 }
 
+/**
+ * Common base class for the schematic, board, etc. apps.
+ */
 export abstract class KCViewerAppElement<
     ViewerElementT extends ViewerElement,
 > extends KCUIElement {

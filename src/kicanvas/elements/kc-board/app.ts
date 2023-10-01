@@ -23,7 +23,7 @@ import "./properties-panel";
 import "./viewer";
 
 /**
- * Internal custom element for <kc-kicanvas-shell>'s board viewer. Handles
+ * Internal "parent" element for KiCanvas's board viewer. Handles
  * setting up the actual board viewer as well as interface controls. It's
  * basically KiCanvas's version of PCBNew.
  */

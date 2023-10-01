@@ -18,8 +18,8 @@ import { KicadSch } from "../../../kicad";
 import { SchematicSheet } from "../../../kicad/schematic";
 
 /**
- * Internal custom element for <kc-kicanvas-shell>'s schematic viewer. Handles
- * setting up the actual board viewer as well as interface controls. It's
+ * Internal "parent" element for KiCanvas's schematic viewer. Handles
+ * setting up the schematic viewer as well as interface controls. It's
  * basically KiCanvas's version of EESchema.
  */
 export class KCSchematicAppElement extends KCViewerAppElement<KCSchematicViewerElement> {
