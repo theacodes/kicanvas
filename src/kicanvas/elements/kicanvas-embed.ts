@@ -15,6 +15,7 @@ import type { KCSchematicAppElement } from "./kc-schematic/app";
 import "../../kc-ui/floating-toolbar";
 import { delegate } from "../../base/events";
 import { later } from "../../base/async";
+import type { KCBoardAppElement } from "./kc-board/app";
 
 /**
  *
@@ -76,6 +77,7 @@ class KiCanvasEmbedElement extends KCUIElement {
 
     #current_page: ProjectPage;
     #schematic_app: KCSchematicAppElement;
+    #board_app: KCBoardAppElement;
 
     override initialContentCallback() {
         this.#setup_events();
@@ -112,10 +114,11 @@ class KiCanvasEmbedElement extends KCUIElement {
 
         try {
             await this.#project.load(vfs);
+
             this.loaded = true;
+            this.update();
+
             this.#show_page(this.#project.root_schematic_page!);
-        } catch (e) {
-            console.error(e);
         } finally {
             this.loading = false;
         }
@@ -123,18 +126,35 @@ class KiCanvasEmbedElement extends KCUIElement {
 
     async #show_page(page: ProjectPage) {
         this.#current_page = page;
-        if (this.#schematic_app) {
+        if (page.type == "schematic" && this.#schematic_app) {
+            await this.#schematic_app.viewerReady;
             this.#schematic_app.load(page);
+        }
+        if (page.type == "pcb" && this.#board_app) {
+            await this.#board_app.viewerReady;
+            this.#board_app.load(page);
         }
     }
 
     override render() {
-        if (!this.#schematic_app) {
+        if (!this.loaded) {
+            return html``;
+        }
+
+        if (this.#project.has_schematics && !this.#schematic_app) {
             this.#schematic_app = html`<kc-schematic-app
                 sidebarcollapsed
                 controls="${this.controls}"
                 controlslist="${this.controlslist}">
             </kc-schematic-app>` as KCSchematicAppElement;
+        }
+
+        if (this.#project.has_boards && !this.#board_app) {
+            this.#board_app = html`<kc-board-app
+                sidebarcollapsed
+                controls="${this.controls}"
+                controlslist="${this.controlslist}">
+            </kc-board-app>` as KCBoardAppElement;
         }
 
         const controlslist = parseFlagAttribute(
@@ -170,7 +190,9 @@ class KiCanvasEmbedElement extends KCUIElement {
             }
         }
 
-        return html`<main>${top_toolbar}${this.#schematic_app}</main>`;
+        return html`<main>
+            ${top_toolbar}${this.#schematic_app}${this.#board_app}
+        </main>`;
     }
 }
 

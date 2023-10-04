@@ -6,7 +6,7 @@
 
 import { sorted_by_numeric_strings } from "../base/array";
 import { type IDisposable } from "../base/disposable";
-import { first, map } from "../base/iterator";
+import { first, length, map } from "../base/iterator";
 import { Logger } from "../base/log";
 import { is_string, type Constructor } from "../base/types";
 import { KicadPCB, KicadSch, ProjectSettings } from "../kicad";
@@ -247,12 +247,20 @@ export class Project extends EventTarget implements IDisposable {
         }
     }
 
+    public get has_boards() {
+        return length(this.boards()) > 0;
+    }
+
     public *schematics() {
         for (const value of this.#files_by_name.values()) {
             if (value instanceof KicadSch) {
                 yield value;
             }
         }
+    }
+
+    public get has_schematics() {
+        return length(this.schematics()) > 0;
     }
 
     public *pages() {
