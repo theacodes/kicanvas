@@ -4,49 +4,66 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-const start_time = Date.now();
-
-function delta_time() {
-    return ((Date.now() - start_time) / 1000).toFixed(3);
+export enum LogLevel {
+    ERROR,
+    INFO,
+    DEBUG,
 }
 
-export function start(name: string) {
-    console.group(
-        `%c ${name} %c @ ${delta_time()}s`,
-        "color: CanvasText",
-        "color: GrayText",
-    );
+export class Logger {
+    constructor(
+        public readonly name: string,
+        public level: LogLevel = LogLevel.INFO,
+    ) {}
+
+    #log(method: CallableFunction, ...args: any[]) {
+        method(
+            `%c${this.name}:%c`,
+            `color: ButtonText`,
+            `color: inherit`,
+            ...args,
+        );
+    }
+
+    public debug(...args: any[]) {
+        if (this.level >= LogLevel.DEBUG) {
+            this.#log(console.debug, ...args);
+        }
+    }
+
+    public info(...args: any[]) {
+        if (this.level >= LogLevel.INFO) {
+            this.#log(console.info.bind(window.console), ...args);
+        }
+    }
+
+    public warn(...args: any[]) {
+        if (this.level >= LogLevel.ERROR) {
+            this.#log(console.warn, ...args);
+        }
+    }
+
+    public error(...args: any[]) {
+        if (this.level >= LogLevel.ERROR) {
+            this.#log(console.error, ...args);
+        }
+    }
 }
 
-export function message(message: string) {
-    console.log(
-        `%c ${message} %c @ ${delta_time()}s`,
-        `color: CanvasText`,
-        `color: GrayText`,
-    );
+const default_logger = new Logger("kicanvas");
+
+export function debug(...args: any[]) {
+    default_logger.debug(...args);
 }
 
-export function error(message: string) {
-    console.log(
-        `%c ${message} %c @ ${delta_time()}s`,
-        `color: Red`,
-        `color: GrayText`,
-    );
+export function info(...args: any[]) {
+    default_logger.info(...args);
 }
 
-export function warn(message: string) {
-    console.log(
-        `%c ${message} %c @ ${delta_time()}s`,
-        `color: CanvasText`,
-        `color: Yellow`,
-    );
+export function warn(...args: any[]) {
+    default_logger.warn(...args);
 }
 
-export function finish() {
-    console.log(
-        `%c Completed %c @ ${delta_time()}s`,
-        "color: Cyan",
-        "color: GrayText",
-    );
-    console.groupEnd();
+export function error(...args: any[]) {
+    default_logger.error(...args);
 }

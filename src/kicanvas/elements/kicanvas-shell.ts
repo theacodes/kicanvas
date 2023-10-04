@@ -6,7 +6,6 @@
 
 import { later } from "../../base/async";
 import { DropTarget } from "../../base/dom/drag-drop";
-import * as log from "../../base/log";
 import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement, KCUIIconElement } from "../../kc-ui";
 import { sprites_url } from "../icons/sprites";
@@ -118,7 +117,6 @@ class KiCanvasShellElement extends KCUIElement {
         this.loaded = false;
         this.loading = true;
 
-        log.start("<kc-kicanvas-shell>");
         try {
             await this.project.load(vfs);
             this.project.set_active_page(this.project.first_page);
@@ -127,7 +125,6 @@ class KiCanvasShellElement extends KCUIElement {
             console.error(e);
         } finally {
             this.loading = false;
-            log.finish();
         }
     }
 

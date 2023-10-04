@@ -4,10 +4,12 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import * as log from "../../base/log";
+import { Logger } from "../../base/log";
 import { Renderer } from "../../graphics";
 import type { BaseTheme } from "../../kicad";
 import { ViewLayer, ViewLayerSet } from "./view-layers";
+
+const log = new Logger("kicanvas:project");
 
 /**
  * Base class for all painters responsible for drawing a view items.
@@ -64,9 +66,9 @@ export class DocumentPainter {
     }
 
     paint(document: PaintableDocument) {
-        log.start("Painting");
+        log.debug("Painting");
 
-        log.message("Sorting paintable items into layers");
+        log.debug("Sorting paintable items into layers");
 
         for (const item of document.items()) {
             const painter = this.painter_for(item);
@@ -82,13 +84,13 @@ export class DocumentPainter {
         }
 
         for (const layer of this.paintable_layers()) {
-            log.message(
+            log.debug(
                 `Painting layer ${layer.name} with ${layer.items.length} items`,
             );
             this.paint_layer(layer);
         }
 
-        log.finish();
+        log.debug("Painting complete");
     }
 
     *paintable_layers() {

@@ -7,9 +7,11 @@
 import { as_array } from "../base/array";
 import { Color } from "../base/color";
 import { Vec2 } from "../base/math";
-import * as log from "../base/log";
+import { Logger } from "../base/log";
 import { is_number, is_string } from "../base/types";
 import { listify, type List } from "./tokenizer";
+
+const log = new Logger("kicanvas:parser");
 
 enum Kind {
     // the first token in the expr (kind ...)
@@ -303,7 +305,7 @@ export type Parseable = string | List;
 
 export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
     if (is_string(expr)) {
-        log.message(`Parsing expression with ${expr.length} chars`);
+        log.info(`Parsing expression with ${expr.length} chars`);
         expr = listify(expr);
         if (expr.length == 1 && Array.isArray(expr[0])) {
             expr = expr[0];

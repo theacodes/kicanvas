@@ -7,7 +7,7 @@
 import { sorted_by_numeric_strings } from "../base/array";
 import { type IDisposable } from "../base/disposable";
 import { first, map } from "../base/iterator";
-import * as log from "../base/log";
+import { Logger } from "../base/log";
 import { is_string, type Constructor } from "../base/types";
 import { KicadPCB, KicadSch, ProjectSettings } from "../kicad";
 import type {
@@ -15,6 +15,8 @@ import type {
     SchematicSheetInstance,
 } from "../kicad/schematic";
 import type { VirtualFileSystem } from "./services/vfs";
+
+const log = new Logger("kicanvas:project");
 
 export class Project extends EventTarget implements IDisposable {
     #fs: VirtualFileSystem;
@@ -30,7 +32,7 @@ export class Project extends EventTarget implements IDisposable {
     }
 
     public async load(fs: VirtualFileSystem) {
-        log.start(`Loading project from ${fs.constructor.name}`);
+        log.info(`Loading project from ${fs.constructor.name}`);
 
         this.settings = new ProjectSettings();
         this.#files_by_name.clear();
@@ -53,12 +55,10 @@ export class Project extends EventTarget implements IDisposable {
                 detail: this,
             }),
         );
-
-        log.finish();
     }
 
     async #load_file(filename: string) {
-        log.message(`Loading file ${filename}`);
+        log.info(`Loading file ${filename}`);
 
         if (filename.endsWith(".kicad_sch")) {
             return await this.#load_doc(KicadSch, filename);
@@ -115,7 +115,7 @@ export class Project extends EventTarget implements IDisposable {
     }
 
     #determine_schematic_hierarchy() {
-        log.message("Determining schematic hierarchy");
+        log.info("Determining schematic hierarchy");
 
         const paths_to_schematics = new Map<string, KicadSch>();
         const paths_to_sheet_instances = new Map<

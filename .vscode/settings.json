@@ -26,6 +26,7 @@
         "hpglpendiameter",
         "hpglpennumber",
         "hpglpenspeed",
+        "KCUI",
         "kicanvas",
         "listify",
         "pcbplotparams",
