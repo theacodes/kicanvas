@@ -19,6 +19,8 @@ body {
         Comfortaa, Manjari, "Arial Rounded MT Bold", Calibri, source-sans-pro,
         sans-serif;
     line-height: 1.5;
+    width: 80%;
+    margin: 0 auto;
 }
 
 img,
@@ -37,6 +39,7 @@ main {
 
 p {
     margin-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 kicanvas-embed {
@@ -45,4 +48,6 @@ kicanvas-embed {
     max-height: 100%;
     aspect-ratio: 1.414;
     background-color: aqua;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
 }
