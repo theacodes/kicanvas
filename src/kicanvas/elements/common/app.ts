@@ -21,7 +21,7 @@ import type { KCProjectPanelElement } from "./project-panel";
 import "./help-panel";
 import "./preferences-panel";
 import "./viewer-bottom-toolbar";
-import { DeferredPromise } from "../../../base/async";
+import { DeferredPromise, later } from "../../../base/async";
 
 interface ViewerElement extends HTMLElement {
     viewer: Viewer;
@@ -69,16 +69,7 @@ export abstract class KCViewerAppElement<
     }
 
     override initialContentCallback() {
-        this.addDisposable(
-            listen(this.project, "load", async (e) => {
-                // Hide the project activity if there's only one file.
-                if (length(this.project.pages()) < 2) {
-                    this.renderRoot
-                        .querySelector(`kc-ui-activity[name="Project"]`)
-                        ?.remove();
-                }
-            }),
-        );
+        later(async () => this.#maybe_hide_project_panel());
 
         // Listen for changes to the project's active page and swap out viewers
         // and activities as needed.
@@ -115,6 +106,16 @@ export abstract class KCViewerAppElement<
             this.hidden = false;
         } else {
             this.hidden = true;
+        }
+    }
+
+    async #maybe_hide_project_panel() {
+        await this.project.loaded;
+        // Hide the project activity if there's only one file.
+        if (length(this.project.pages()) < 2) {
+            this.renderRoot
+                .querySelector(`kc-ui-activity[name="Project"]`)
+                ?.remove();
         }
     }
 

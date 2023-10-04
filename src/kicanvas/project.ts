@@ -5,6 +5,7 @@
 */
 
 import { sorted_by_numeric_strings } from "../base/array";
+import { Barrier } from "../base/async";
 import { type IDisposable } from "../base/disposable";
 import { first, length, map } from "../base/iterator";
 import { Logger } from "../base/log";
@@ -24,6 +25,7 @@ export class Project extends EventTarget implements IDisposable {
     #pages_by_path: Map<string, ProjectPage> = new Map();
     #root_schematic_page?: ProjectPage;
 
+    public loaded: Barrier = new Barrier();
     public settings: ProjectSettings = new ProjectSettings();
 
     public dispose() {
@@ -49,6 +51,8 @@ export class Project extends EventTarget implements IDisposable {
         await Promise.all(promises);
 
         this.#determine_schematic_hierarchy();
+
+        this.loaded.open();
 
         this.dispatchEvent(
             new CustomEvent("load", {
