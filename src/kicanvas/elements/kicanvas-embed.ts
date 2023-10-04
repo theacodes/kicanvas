@@ -5,7 +5,6 @@
 */
 
 import { CSS, attribute, css, html } from "../../base/web-components";
-import { parseFlagAttribute } from "../../base/web-components/flag-attribute";
 import { KCUIButtonElement, KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project, ProjectPage } from "../project";
@@ -116,7 +115,7 @@ class KiCanvasEmbedElement extends KCUIElement {
             await this.#project.load(vfs);
 
             this.loaded = true;
-            this.update();
+            await this.update();
 
             this.#show_page(this.#project.root_schematic_page!);
         } finally {
@@ -157,42 +156,7 @@ class KiCanvasEmbedElement extends KCUIElement {
             </kc-board-app>` as KCBoardAppElement;
         }
 
-        const controlslist = parseFlagAttribute(
-            this.controlslist ?? "",
-            this.controls == "none"
-                ? { fullscreen: false, download: false }
-                : { fullscreen: true, download: true },
-        );
-
-        let top_toolbar;
-
-        if (this.controls == "basic" || this.controls == "none") {
-            const buttons = [];
-
-            if (controlslist["download"]) {
-                buttons.push(
-                    html`<kc-ui-button
-                        slot="right"
-                        name="download"
-                        title="download"
-                        icon="download"
-                        variant="toolbar-alt">
-                    </kc-ui-button>`,
-                );
-            }
-
-            if (buttons.length) {
-                top_toolbar = html`
-                    <kc-ui-floating-toolbar location="top">
-                        ${buttons}
-                    </kc-ui-floating-toolbar>
-                `;
-            }
-        }
-
-        return html`<main>
-            ${top_toolbar}${this.#schematic_app}${this.#board_app}
-        </main>`;
+        return html`<main>${this.#schematic_app} ${this.#board_app}</main>`;
     }
 }
 

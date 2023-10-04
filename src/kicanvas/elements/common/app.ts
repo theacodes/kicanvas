@@ -4,6 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { DeferredPromise } from "../../../base/async";
 import { listen } from "../../../base/events";
 import { length } from "../../../base/iterator";
 import {
@@ -11,17 +12,17 @@ import {
     html,
     type ElementOrFragment,
 } from "../../../base/web-components";
+import { parseFlagAttribute } from "../../../base/web-components/flag-attribute";
 import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import type { Viewer } from "../../../viewers/base/viewer";
 import type { Project, ProjectPage } from "../../project";
-import type { KCProjectPanelElement } from "./project-panel";
 
 // import dependent elements so they're registered before use.
 import "./help-panel";
 import "./preferences-panel";
+import "./project-panel";
 import "./viewer-bottom-toolbar";
-import { DeferredPromise, later } from "../../../base/async";
 
 interface ViewerElement extends HTMLElement {
     viewer: Viewer;
@@ -36,7 +37,6 @@ export abstract class KCViewerAppElement<
     ViewerElementT extends ViewerElement,
 > extends KCUIElement {
     #viewer_elm: ViewerElementT;
-    #project_panel: KCProjectPanelElement;
     #activity_bar: KCUIActivitySideBarElement;
 
     project: Project;
@@ -64,15 +64,19 @@ export abstract class KCViewerAppElement<
         this.hidden = true;
         (async () => {
             this.project = await this.requestContext("project");
+            await this.project.loaded;
             super.connectedCallback();
         })();
     }
 
     override initialContentCallback() {
-        later(async () => this.#maybe_hide_project_panel());
+        // If the project already has an active page, load it.
+        if (this.project.active_page) {
+            this.load(this.project.active_page!);
+        }
 
-        // Listen for changes to the project's active page and swap out viewers
-        // and activities as needed.
+        // Listen for changes to the project's active page and load or hide
+        // as needed.
         this.addDisposable(
             listen(this.project, "change", async (e) => {
                 const page = this.project.active_page;
@@ -109,23 +113,25 @@ export abstract class KCViewerAppElement<
         }
     }
 
-    async #maybe_hide_project_panel() {
-        await this.project.loaded;
-        // Hide the project activity if there's only one file.
-        if (length(this.project.pages()) < 2) {
-            this.renderRoot
-                .querySelector(`kc-ui-activity[name="Project"]`)
-                ?.remove();
-        }
+    #has_more_than_one_page() {
+        return length(this.project.pages()) > 1;
     }
 
     protected make_pre_activities() {
-        return [
-            // Project
-            html`<kc-ui-activity slot="activities" name="Project" icon="folder">
-                ${this.#project_panel}
-            </kc-ui-activity>`,
-        ];
+        const activities = [];
+
+        if (this.#has_more_than_one_page()) {
+            activities.push(
+                html`<kc-ui-activity
+                    slot="activities"
+                    name="Project"
+                    icon="folder">
+                    <kc-project-panel></kc-project-panel>
+                </kc-ui-activity>`,
+            );
+        }
+
+        return activities;
     }
 
     protected make_post_activities() {
@@ -160,13 +166,15 @@ export abstract class KCViewerAppElement<
 
     override render() {
         const controls = this.controls ?? "full";
+        const controlslist = parseFlagAttribute(
+            this.controlslist ?? "",
+            this.controls == "none"
+                ? { fullscreen: false, download: false }
+                : { fullscreen: true, download: true },
+        );
 
         this.#viewer_elm = this.make_viewer_element();
         this.#viewer_elm.disableinteraction = this.controls == "none";
-
-        this.#project_panel = html`
-            <kc-project-panel></kc-project-panel>
-        ` as KCProjectPanelElement;
 
         let resizer = null;
 
@@ -181,6 +189,24 @@ export abstract class KCViewerAppElement<
             resizer = html`<kc-ui-resizer></kc-ui-resizer>`;
         }
 
+        const top_toolbar_buttons = [];
+
+        if (controlslist["download"] && !this.#has_more_than_one_page()) {
+            top_toolbar_buttons.push(
+                html`<kc-ui-button
+                    slot="right"
+                    name="download"
+                    title="download"
+                    icon="download"
+                    variant="toolbar-alt">
+                </kc-ui-button>`,
+            );
+        }
+
+        const top_toolbar = html`<kc-ui-floating-toolbar location="top">
+            ${top_toolbar_buttons}
+        </kc-ui-floating-toolbar>`;
+
         let bottom_toolbar = null;
         if (controls != "none") {
             bottom_toolbar = html`<kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>`;
@@ -188,7 +214,7 @@ export abstract class KCViewerAppElement<
 
         return html`<kc-ui-split-view vertical>
             <kc-ui-view class="grow">
-                ${this.#viewer_elm} ${bottom_toolbar}
+                ${top_toolbar} ${this.#viewer_elm} ${bottom_toolbar}
             </kc-ui-view>
             ${resizer} ${this.#activity_bar}
         </kc-ui-split-view>`;
