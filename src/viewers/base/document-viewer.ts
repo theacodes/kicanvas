@@ -53,7 +53,7 @@ export abstract class DocumentViewer<
     }
 
     override async load(src: DocumentT) {
-        await this.setup_finished.wait();
+        await this.setup_finished;
 
         if (this.document == src) {
             return;
