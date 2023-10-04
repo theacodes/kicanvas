@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Deferred } from "../../base/async";
+import { Barrier } from "../../base/async";
 import { PanAndZoom } from "../../base/dom/pan-and-zoom";
 import { SizeObserver } from "../../base/dom/size-observer";
 import { Angle, BBox, Camera2, Matrix3, Vec2 } from "../../base/math";
@@ -21,13 +21,16 @@ export class Viewport {
     width: number;
     height: number;
     camera: Camera2;
-    ready = new Deferred<void>();
+    ready = new Barrier();
 
     /**
      * Create a Scene
      * @param callback - a callback used to re-draw the viewport when it changes.
      */
-    constructor(public renderer: Renderer, public callback: () => void) {
+    constructor(
+        public renderer: Renderer,
+        public callback: () => void,
+    ) {
         this.camera = new Camera2(
             new Vec2(0, 0),
             new Vec2(0, 0),
@@ -64,7 +67,7 @@ export class Viewport {
             this.camera.viewport_size = new Vec2(this.width, this.height);
 
             if (this.width && this.height) {
-                this.ready.resolve();
+                this.ready.open();
             }
         }
     }
