@@ -21,6 +21,7 @@ import type { KCProjectPanelElement } from "./project-panel";
 import "./help-panel";
 import "./preferences-panel";
 import "./viewer-bottom-toolbar";
+import { DeferredPromise } from "../../../base/async";
 
 interface ViewerElement extends HTMLElement {
     viewer: Viewer;
@@ -39,6 +40,7 @@ export abstract class KCViewerAppElement<
     #activity_bar: KCUIActivitySideBarElement;
 
     project: Project;
+    viewerReady: DeferredPromise<boolean> = new DeferredPromise<boolean>();
 
     constructor() {
         super();
@@ -107,6 +109,7 @@ export abstract class KCViewerAppElement<
     protected abstract can_load(src: ProjectPage): boolean;
 
     async load(src: ProjectPage) {
+        await this.viewerReady;
         if (this.can_load(src)) {
             await this.#viewer_elm.load(src);
             this.hidden = false;
@@ -188,5 +191,11 @@ export abstract class KCViewerAppElement<
             </kc-ui-view>
             ${resizer} ${this.#activity_bar}
         </kc-ui-split-view>`;
+    }
+
+    override renderedCallback(): void | undefined {
+        window.requestAnimationFrame(() => {
+            this.viewerReady.resolve(true);
+        });
     }
 }
