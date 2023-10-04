@@ -49,24 +49,42 @@ export function when_idle(
     };
 }
 
+const enum DeferredOutcome {
+    Resolved,
+    Rejected,
+}
+
 /**
- * A promise representing work that has not yet completed.
+ * A promise that can be resolved or rejected imperatively.
  */
-export class Deferred<T> {
-    readonly promise: Promise<T>;
+export class DeferredPromise<T> {
+    #promise: Promise<T>;
     #resolve: (value: T) => void;
     #reject: (error: Error) => void;
-    settled = false;
+    #outcome?: DeferredOutcome;
+    #value?: T | Error;
 
     constructor() {
-        this.promise = new Promise<T>((resolve, reject) => {
+        this.#promise = new Promise<T>((resolve, reject) => {
             this.#resolve = resolve;
             this.#reject = reject;
         });
     }
 
-    async wait() {
-        return await this.promise;
+    get rejected() {
+        return this.#outcome === DeferredOutcome.Rejected;
+    }
+
+    get resolved() {
+        return this.#outcome === DeferredOutcome.Resolved;
+    }
+
+    get settled() {
+        return !!this.#outcome;
+    }
+
+    get value() {
+        return this.#value;
     }
 
     then<TResult1 = T, TResult2 = never>(
@@ -79,16 +97,18 @@ export class Deferred<T> {
             | undefined
             | null,
     ): Promise<TResult1 | TResult2> {
-        return this.promise.then(onfulfilled, onrejected);
+        return this.#promise.then(onfulfilled, onrejected);
     }
 
     resolve(value: T) {
-        this.settled = true;
+        this.#outcome = DeferredOutcome.Resolved;
+        this.#value = value;
         this.#resolve(value);
     }
 
     reject(error: Error) {
-        this.settled = true;
+        this.#outcome = DeferredOutcome.Rejected;
+        this.#value = error;
         this.#reject(error);
     }
 }
@@ -96,28 +116,12 @@ export class Deferred<T> {
 /**
  * A "Barrier" for waiting for a task to complete before taking an action.
  */
-export class Barrier {
-    #isOpen: boolean;
-    #promise: Promise<boolean>;
-    #resolve!: (v: boolean) => void;
-
-    constructor() {
-        this.#isOpen = false;
-        this.#promise = new Promise<boolean>((c, e) => {
-            this.#resolve = c;
-        });
-    }
-
-    isOpen(): boolean {
-        return this.#isOpen;
+export class Barrier extends DeferredPromise<boolean> {
+    get isOpen(): boolean {
+        return this.resolved && this.value === true;
     }
 
     open(): void {
-        this.#isOpen = true;
-        this.#resolve(true);
-    }
-
-    wait(): Promise<boolean> {
-        return this.#promise;
+        this.resolve(true);
     }
 }
