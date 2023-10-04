@@ -31,6 +31,7 @@
         "listify",
         "pcbplotparams",
         "psnegative",
+        "resizer",
         "rratio",
         "sexpr",
         "svgprecision",
