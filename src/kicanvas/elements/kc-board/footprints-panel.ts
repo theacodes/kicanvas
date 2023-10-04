@@ -26,7 +26,6 @@ export class KCBoardFootprintsPanelElement extends KCUIElement {
             await this.viewer.loaded;
             this.sort_footprints();
             super.connectedCallback();
-            this.setup_events();
         })();
     }
 
@@ -41,7 +40,7 @@ export class KCBoardFootprintsPanelElement extends KCUIElement {
         );
     }
 
-    private setup_events() {
+    override initialContentCallback() {
         this.addEventListener("kc-ui-menu:select", (e) => {
             const item = (e as CustomEvent).detail as KCUIMenuItemElement;
 

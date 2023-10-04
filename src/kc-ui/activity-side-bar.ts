@@ -147,8 +147,8 @@ export class KCUIActivitySideBarElement extends KCUIElement {
             this.change_activity((source as KCUIButtonElement).name, true);
         });
 
-        const observer = new MutationObserver((mutations) => {
-            this.update();
+        const observer = new MutationObserver(async (mutations) => {
+            await this.update();
             // If the currently active activity just got removed, change to the
             // new default one.
             if (

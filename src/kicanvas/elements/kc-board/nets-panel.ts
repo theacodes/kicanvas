@@ -21,11 +21,10 @@ export class KCBoardNetsPanelElement extends KCUIElement {
             this.viewer = await this.requestLazyContext("viewer");
             await this.viewer.loaded;
             super.connectedCallback();
-            this.setup_events();
         })();
     }
 
-    private setup_events() {
+    override initialContentCallback() {
         this.addEventListener("kc-ui-menu:select", (e) => {
             const item = (e as CustomEvent).detail as KCUIMenuItemElement;
 
