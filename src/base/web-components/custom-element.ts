@@ -5,6 +5,7 @@
 */
 
 import { as_array } from "../array";
+import { DeferredPromise } from "../async";
 import { Disposables, type IDisposable } from "../disposable";
 import { adopt_styles, type CSS } from "./css";
 import { html, literal } from "./html";
@@ -32,6 +33,9 @@ export class CustomElement extends HTMLElement {
      * https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/exportparts
      */
     static exportparts: string[] = [];
+
+    protected updateComplete: DeferredPromise<boolean> =
+        new DeferredPromise<boolean>();
 
     private disposables = new Disposables();
 
@@ -85,16 +89,22 @@ export class CustomElement extends HTMLElement {
 
     renderedCallback(): void | undefined {}
 
-    update(): void | undefined {
+    update() {
+        this.updateComplete = new DeferredPromise<boolean>();
         while (this.renderRoot.firstChild) {
             this.renderRoot.firstChild.remove();
         }
         this.renderRoot.appendChild(this.render());
         this.renderedCallback();
+        window.requestAnimationFrame(() => {
+            this.updateComplete.resolve(true);
+        });
+        return this.updateComplete;
     }
 
     #renderInitialContent() {
         const static_this = this.constructor as typeof CustomElement;
+        this.updateComplete = new DeferredPromise<boolean>();
 
         if ((this.constructor as typeof CustomElement).useShadowRoot) {
             this.attachShadow({ mode: "open" });
@@ -111,6 +121,9 @@ export class CustomElement extends HTMLElement {
         this.renderRoot.appendChild(content);
         this.renderedCallback();
         this.initialContentCallback();
+        window.requestAnimationFrame(() => {
+            this.updateComplete.resolve(true);
+        });
     }
 
     protected queryAssignedElements<T extends Element = HTMLElement>(
