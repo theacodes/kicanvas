@@ -89,12 +89,12 @@ export class CustomElement extends HTMLElement {
 
     renderedCallback(): void | undefined {}
 
-    update() {
+    async update() {
         this.updateComplete = new DeferredPromise<boolean>();
         while (this.renderRoot.firstChild) {
             this.renderRoot.firstChild.remove();
         }
-        this.renderRoot.appendChild(this.render());
+        this.renderRoot.appendChild(await this.render());
         this.renderedCallback();
         window.requestAnimationFrame(() => {
             this.updateComplete.resolve(true);
@@ -117,13 +117,17 @@ export class CustomElement extends HTMLElement {
             );
         }
 
-        const content = this.render();
-        this.renderRoot.appendChild(content);
-        this.renderedCallback();
-        this.initialContentCallback();
-        window.requestAnimationFrame(() => {
-            this.updateComplete.resolve(true);
-        });
+        (async () => {
+            const content = this.render();
+            this.renderRoot.appendChild(content);
+            this.renderedCallback();
+            this.initialContentCallback();
+            window.requestAnimationFrame(() => {
+                this.updateComplete.resolve(true);
+            });
+        })();
+
+        return this.updateComplete;
     }
 
     protected queryAssignedElements<T extends Element = HTMLElement>(
