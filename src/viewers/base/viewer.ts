@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { Barrier, Deferred, later } from "../../base/async";
+import { Barrier, later } from "../../base/async";
 import { Disposables, type IDisposable } from "../../base/disposable";
 import { listen } from "../../base/events";
 import { no_self_recursion } from "../../base/functions";
@@ -24,12 +24,12 @@ export abstract class Viewer extends EventTarget {
     public viewport: Viewport;
     public layers: ViewLayerSet;
     public mouse_position: Vec2 = new Vec2(0, 0);
+    public loaded = new Barrier();
 
     protected disposables = new Disposables();
     protected setup_finished = new Barrier();
 
     #selected: BBox | null;
-    #loaded_deferred = new Deferred<boolean>();
 
     constructor(
         public canvas: HTMLCanvasElement,
@@ -125,13 +125,9 @@ export abstract class Viewer extends EventTarget {
 
     public abstract load(src: any): Promise<void>;
 
-    public get loaded() {
-        return this.#loaded_deferred.promise;
-    }
-
     protected resolve_loaded(value: boolean) {
         if (value) {
-            this.#loaded_deferred.resolve(true);
+            this.loaded.open();
             this.dispatchEvent(new KiCanvasLoadEvent());
         }
     }
