@@ -5,7 +5,7 @@
 */
 
 import { DeferredPromise } from "../../../base/async";
-import { listen } from "../../../base/events";
+import { delegate, listen } from "../../../base/events";
 import { length } from "../../../base/iterator";
 import {
     attribute,
@@ -13,7 +13,11 @@ import {
     type ElementOrFragment,
 } from "../../../base/web-components";
 import { parseFlagAttribute } from "../../../base/web-components/flag-attribute";
-import { KCUIActivitySideBarElement, KCUIElement } from "../../../kc-ui";
+import {
+    KCUIActivitySideBarElement,
+    KCUIButtonElement,
+    KCUIElement,
+} from "../../../kc-ui";
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import type { Viewer } from "../../../viewers/base/viewer";
 import type { Project, ProjectPage } from "../../project";
@@ -94,6 +98,23 @@ export abstract class KCViewerAppElement<
                 this.on_viewer_select(e.detail.item, e.detail.previous);
             }),
         );
+
+        // Handle download button.
+        delegate(this.renderRoot, "kc-ui-button", "click", (e) => {
+            const target = e.target as KCUIButtonElement;
+            console.log("button", target);
+            switch (target.name) {
+                case "download":
+                    if (this.project.active_page) {
+                        this.project.download(
+                            this.project.active_page.filename,
+                        );
+                    }
+                    break;
+                default:
+                    console.warn("Unknown button", e);
+            }
+        });
     }
 
     protected abstract on_viewer_select(

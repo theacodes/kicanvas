@@ -4,17 +4,16 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { later } from "../../base/async";
 import { CSS, attribute, css, html } from "../../base/web-components";
-import { KCUIButtonElement, KCUIElement } from "../../kc-ui";
+import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project, ProjectPage } from "../project";
 import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
+import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 
 import "../../kc-ui/floating-toolbar";
-import { delegate } from "../../base/events";
-import { later } from "../../base/async";
-import type { KCBoardAppElement } from "./kc-board/app";
 
 /**
  *
@@ -74,7 +73,6 @@ class KiCanvasEmbedElement extends KCUIElement {
     @attribute({ type: String })
     zoom: "objects" | "page" | string | null;
 
-    #current_page: ProjectPage;
     #schematic_app: KCSchematicAppElement;
     #board_app: KCBoardAppElement;
 
@@ -85,18 +83,7 @@ class KiCanvasEmbedElement extends KCUIElement {
         });
     }
 
-    async #setup_events() {
-        delegate(this.renderRoot, "kc-ui-button", "click", (e) => {
-            const target = e.target as KCUIButtonElement;
-            switch (target.name) {
-                case "download":
-                    this.#project.download(this.#current_page.filename);
-                    break;
-                default:
-                    console.warn("Unknown button", e);
-            }
-        });
-    }
+    async #setup_events() {}
 
     async #load_src() {
         if (!this.src) {
@@ -117,23 +104,13 @@ class KiCanvasEmbedElement extends KCUIElement {
             this.loaded = true;
             await this.update();
 
-            this.#show_page(this.#project.root_schematic_page!);
+            this.#project.set_active_page(this.#project.root_schematic_page!);
         } finally {
             this.loading = false;
         }
     }
 
-    async #show_page(page: ProjectPage) {
-        this.#current_page = page;
-        if (page.type == "schematic" && this.#schematic_app) {
-            await this.#schematic_app.viewerReady;
-            this.#schematic_app.load(page);
-        }
-        if (page.type == "pcb" && this.#board_app) {
-            await this.#board_app.viewerReady;
-            this.#board_app.load(page);
-        }
-    }
+    async #show_page(page: ProjectPage) {}
 
     override render() {
         if (!this.loaded) {
