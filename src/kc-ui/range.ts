@@ -26,14 +26,15 @@ export class KCUIRangeElement extends KCUIElement {
                 display: block;
                 width: 100%;
                 max-width: 100%;
-                padding-top: 0.25rem;
-                padding-bottom: 0.25rem;
+                padding-top: 0.25em;
+                padding-bottom: 0.25em;
                 -webkit-appearance: none;
                 appearance: none;
                 font: inherit;
                 cursor: grab;
                 background: transparent;
-                transition: color var(--transition-time-medium) ease,
+                transition:
+                    color var(--transition-time-medium) ease,
                     box-shadow var(--transition-time-medium) ease,
                     outline var(--transition-time-medium) ease,
                     background var(--transition-time-medium) ease,
@@ -56,9 +57,9 @@ export class KCUIRangeElement extends KCUIElement {
 
             input[type="range"]::-webkit-slider-runnable-track {
                 box-sizing: border-box;
-                height: 0.5rem;
+                height: 0.5em;
                 border: 1px solid transparent;
-                border-radius: 0.5rem;
+                border-radius: 0.5em;
                 background: var(--input-range-bg);
             }
 
@@ -74,10 +75,10 @@ export class KCUIRangeElement extends KCUIElement {
             input[type="range"]::-webkit-slider-thumb {
                 -webkit-appearance: none;
                 appearance: none;
-                height: 1rem;
-                width: 1rem;
-                border-radius: 0.5rem;
-                margin-top: -0.3rem;
+                height: 1em;
+                width: 1em;
+                border-radius: 0.5em;
+                margin-top: -0.3em;
                 background: var(--input-range-fg);
             }
 

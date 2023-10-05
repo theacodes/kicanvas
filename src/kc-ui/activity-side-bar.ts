@@ -41,7 +41,7 @@ export class KCUIActivitySideBarElement extends KCUIElement {
                 flex-direction: column;
                 background: var(--activity-bar-bg);
                 color: var(--activity-bar-fg);
-                padding: 0.2rem;
+                padding: 0.2em;
                 user-select: none;
             }
 
@@ -61,7 +61,7 @@ export class KCUIActivitySideBarElement extends KCUIElement {
                 --button-selected-bg: var(--activity-bar-active-bg);
                 --button-selected-fg: var(--activity-bar-active-fg);
                 --button-focus-outline: none;
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.25em;
             }
 
             kc-ui-button:last-child {

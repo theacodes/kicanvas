@@ -13,7 +13,7 @@ export class KCHelpPanel extends KCUIElement {
         css`
             p {
                 margin: 0;
-                padding: 0.5rem;
+                padding: 0.5em;
             }
 
             a {

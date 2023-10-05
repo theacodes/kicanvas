@@ -42,7 +42,7 @@ section.overlay h1 {
     margin: 0 auto;
     align-items: center;
     justify-content: center;
-    font-size: 5rem;
+    font-size: 5em;
     font-weight: 300;
     text-shadow: 0 0 5px var(--gradient-purple-red);
 }
@@ -53,7 +53,7 @@ section.overlay h1 img {
 
 section.overlay p {
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.5em;
     max-width: 50%;
 }
 
@@ -74,7 +74,7 @@ section.overlay a:hover {
 }
 
 section.overlay input {
-    font-size: 1.5rem;
+    font-size: 1.5em;
     color: var(--fg);
     background: var(--gradient-purple-red);
     max-width: 50%;
@@ -86,11 +86,11 @@ section.overlay input::placeholder {
 
 section.overlay p.note {
     color: var(--input-placeholder);
-    font-size: 1rem;
+    font-size: 1em;
 }
 
 section.overlay p.github img {
-    width: 2rem;
+    width: 2em;
 }
 
 kc-board-viewer,

@@ -20,14 +20,14 @@ export class KCPreferencesPanel extends KCUIElement {
                 display: block;
                 width: 100%;
                 max-width: 100%;
-                margin-top: 0.25rem;
+                margin-top: 0.25em;
                 font-family: inherit;
                 font-size: inherit;
                 font-weight: 300;
-                margin-top: 0.25rem;
-                border-radius: 0.25rem;
+                margin-top: 0.25em;
+                border-radius: 0.25em;
                 text-align: left;
-                padding: 0.25rem;
+                padding: 0.25em;
                 background: var(--input-bg);
                 color: var(--input-fg);
                 border: var(--input-border);

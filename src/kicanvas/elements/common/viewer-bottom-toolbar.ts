@@ -19,13 +19,13 @@ export class KCViewerBottomToolbarElement extends KCUIElement {
             output {
                 width: unset;
                 margin: unset;
-                padding: 0.5rem;
+                padding: 0.5em;
                 color: var(--button-toolbar-fg);
                 background: var(--button-toolbar-bg);
                 border: 1px solid var(--button-toolbar-bg);
-                border-radius: 0.25rem;
+                border-radius: 0.25em;
                 font-weight: 300;
-                font-size: 0.9rem;
+                font-size: 0.9em;
                 box-shadow: var(--input-hover-shadow);
                 user-select: none;
             }

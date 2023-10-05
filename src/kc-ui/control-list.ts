@@ -17,7 +17,7 @@ export class KCUIControlListElement extends KCUIElement {
                 flex-wrap: nowrap;
                 background: var(--list-item-bg);
                 color: var(--list-item-fg);
-                padding-top: 0.2rem;
+                padding-top: 0.2em;
             }
         `,
     ];
@@ -34,13 +34,14 @@ export class KCUIControlListItemElement extends KCUIElement {
         ...KCUIElement.styles,
         css`
             :host {
-                margin-top: 0.2rem;
+                margin-top: 0.2em;
                 display: flex;
                 flex-direction: column;
                 flex-wrap: nowrap;
                 user-select: none;
                 background-color: transparent;
-                transition: color var(--transition-time-short) ease,
+                transition:
+                    color var(--transition-time-short) ease,
                     background-color var(--transition-time-short) ease;
             }
 

@@ -37,7 +37,7 @@ export class KCUIPropertyListItemElement extends KCUIElement {
             }
 
             span {
-                padding: 0.2rem;
+                padding: 0.2em;
                 background: var(--bg);
                 text-overflow: ellipsis;
                 white-space: nowrap;

@@ -2,6 +2,8 @@
     Variables
 */
 :host {
+    font-size: var(--font-size, 16px);
+
     --transition-time-very-short: 100ms;
     --transition-time-short: 200ms;
     --transition-time-medium: 500ms;
@@ -245,7 +247,7 @@ kc-ui-app {
 label {
     display: block;
     width: 100%;
-    margin-top: 0.75rem;
+    margin-top: 0.75em;
 }
 
 input,
@@ -256,11 +258,11 @@ textarea {
     display: block;
     width: 100%;
     max-width: 100%;
-    margin-top: 0.5rem;
+    margin-top: 0.5em;
     font-family: inherit;
-    border-radius: 0.25rem;
+    border-radius: 0.25em;
     text-align: center;
-    padding: 0.25rem;
+    padding: 0.25em;
     background: var(--input-bg);
     color: var(--input-fg);
     transition:
@@ -302,10 +304,10 @@ textarea:disabled:hover {
 
 input[type="color"]::-webkit-color-swatch {
     border: 1px solid transparent;
-    border-radius: 0.25rem;
+    border-radius: 0.25em;
 }
 
 textarea {
     text-align: left;
-    padding: 0.5rem;
+    padding: 0.5em;
 }

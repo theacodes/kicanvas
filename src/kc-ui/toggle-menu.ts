@@ -30,17 +30,18 @@ export class KCUIToggleMenuElement extends KCUIElement {
                 max-width: 100%;
                 margin: unset;
                 font: inherit;
-                padding: 0.3rem 0.6rem 0.3rem 0.6rem;
+                padding: 0.3em 0.6em 0.3em 0.6em;
                 display: flex;
                 align-items: flex-end;
                 justify-content: left;
                 border: 1px solid transparent;
-                border-radius: 0.25rem;
+                border-radius: 0.25em;
                 font-weight: 300;
-                font-size: 1rem;
+                font-size: 1em;
                 background: var(--dropdown-bg);
                 color: var(--dropdown-fg);
-                transition: color var(--transition-time-medium, 500) ease,
+                transition:
+                    color var(--transition-time-medium, 500) ease,
                     background var(--transition-time-medium, 500) ease;
             }
 
@@ -52,14 +53,14 @@ export class KCUIToggleMenuElement extends KCUIElement {
             }
 
             button kc-ui-icon {
-                font-size: 1rem;
-                margin-top: 0.1rem;
-                margin-bottom: 0.1rem;
+                font-size: 1em;
+                margin-top: 0.1em;
+                margin-bottom: 0.1em;
             }
 
             button span {
                 display: none;
-                margin-left: 0.5rem;
+                margin-left: 0.5em;
             }
 
             :host([visible]) button {

@@ -36,7 +36,7 @@ export class KCUITextFilterInputElement extends KCUIElement {
                 width: 100%;
                 max-width: 100%;
                 border-radius: 0;
-                padding: 0.4rem;
+                padding: 0.4em;
                 padding-left: 1.5em;
                 text-align: left;
                 font: inherit;

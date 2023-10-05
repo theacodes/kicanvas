@@ -48,7 +48,7 @@ export class KCUIPanelTitleElement extends KCUIElement {
                 flex: 0;
                 width: 100%;
                 text-align: left;
-                padding: 0.2rem 0.8rem 0.2rem 0.4rem;
+                padding: 0.2em 0.8em 0.2em 0.4em;
                 display: flex;
                 align-items: center;
                 background: var(--panel-title-bg);
@@ -92,11 +92,11 @@ export class KCUIPanelBodyElement extends KCUIElement {
                 overflow-x: hidden;
                 flex: 1 0;
                 font-weight: 300;
-                font-size: 1rem;
+                font-size: 1em;
             }
 
             :host([padded]) {
-                padding: 0.1rem 0.8rem 0.1rem 0.4rem;
+                padding: 0.1em 0.8em 0.1em 0.4em;
             }
         `,
     ];
@@ -116,7 +116,7 @@ export class KCUIPanelLabelElement extends KCUIElement {
                 width: 100%;
                 display: flex;
                 flex-wrap: nowrap;
-                padding: 0.2rem 0.3rem;
+                padding: 0.2em 0.3em;
                 background: var(--panel-subtitle-bg);
                 color: var(--panel-subtitle-fg);
             }

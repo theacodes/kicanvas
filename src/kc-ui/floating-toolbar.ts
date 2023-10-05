@@ -24,7 +24,7 @@ export class KCUIFloatingToolbarElement extends KCUIElement {
                 position: absolute;
                 left: 0;
                 width: 100%;
-                padding: 0.5rem;
+                padding: 0.5em;
                 display: flex;
                 flex-direction: row;
                 align-items: center;
@@ -54,7 +54,7 @@ export class KCUIFloatingToolbarElement extends KCUIElement {
             }
 
             ::slotted(kc-ui-button) {
-                margin-left: 0.25rem;
+                margin-left: 0.25em;
             }
         `,
     ];

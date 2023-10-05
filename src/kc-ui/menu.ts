@@ -32,7 +32,7 @@ export class KCUIMenuElement extends KCUIElement {
             }
 
             :host(.dropdown) {
-                --list-item-padding: 0.3rem 0.6rem;
+                --list-item-padding: 0.3em 0.6em;
                 --list-item-bg: var(--dropdown-bg);
                 --list-item-fg: var(--dropdown-fg);
                 --list-item-hover-bg: var(--dropdown-hover-bg);
@@ -137,10 +137,11 @@ export class KCUIMenuItemElement extends KCUIElement {
                 display: flex;
                 align-items: center;
                 flex-wrap: nowrap;
-                padding: var(--list-item-padding, 0.2rem 0.3rem);
+                padding: var(--list-item-padding, 0.2em 0.3em);
                 user-select: none;
                 background: transparent;
-                transition: color var(--transition-time-short) ease,
+                transition:
+                    color var(--transition-time-short) ease,
                     background-color var(--transition-time-short) ease;
                 cursor: pointer;
             }
@@ -177,8 +178,8 @@ export class KCUIMenuItemElement extends KCUIElement {
             }
 
             kc-ui-icon {
-                margin-right: 0.5rem;
-                margin-left: -0.1rem;
+                margin-right: 0.5em;
+                margin-left: -0.1em;
             }
         `,
     ];
@@ -218,7 +219,7 @@ export class KCUIMenuLabelElement extends KCUIElement {
                 width: 100%;
                 display: flex;
                 flex-wrap: nowrap;
-                padding: 0.2rem 0.3rem;
+                padding: 0.2em 0.3em;
                 background: var(--panel-subtitle-bg);
                 color: var(--panel-subtitle-fg);
             }

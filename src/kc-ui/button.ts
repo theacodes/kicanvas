@@ -30,14 +30,15 @@ export class KCUIButtonElement extends KCUIElement {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                padding: 0.5rem;
+                padding: 0.5em;
                 border: 1px solid transparent;
-                border-radius: 0.25rem;
+                border-radius: 0.25em;
                 font-weight: medium;
-                font-size: 1rem;
+                font-size: 1em;
                 background: var(--button-bg);
                 color: var(--button-fg);
-                transition: color var(--transition-time-short) ease,
+                transition:
+                    color var(--transition-time-short) ease,
                     border var(--transition-time-short) ease,
                     background var(--transition-time-short) ease;
             }

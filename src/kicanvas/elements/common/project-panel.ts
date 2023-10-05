@@ -24,7 +24,7 @@ export class KCProjectPanelElement extends KCUIElement {
             }
 
             .page span.name {
-                margin-right: 1rem;
+                margin-right: 1em;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
@@ -35,13 +35,13 @@ export class KCProjectPanelElement extends KCUIElement {
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
-                margin-left: 1rem;
+                margin-left: 1em;
                 text-align: right;
                 color: #aaa;
             }
 
             .page kc-ui-button {
-                margin-left: 0.5rem;
+                margin-left: 0.5em;
             }
 
             .page span.number {
@@ -49,9 +49,9 @@ export class KCProjectPanelElement extends KCUIElement {
                 background: var(--dropdown-hover-bg);
                 border: 1px solid transparent;
                 border-radius: 0.5em;
-                font-size: 0.8rem;
-                padding: 0px 0.3rem;
-                margin-right: 0.5rem;
+                font-size: 0.8em;
+                padding: 0px 0.3em;
+                margin-right: 0.5em;
             }
 
             kc-ui-menu-item:hover span.number {

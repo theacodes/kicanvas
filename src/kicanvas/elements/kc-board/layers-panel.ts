@@ -29,12 +29,12 @@ export class KCBoardLayersPanelElement extends KCUIElement {
             kc-ui-panel-title button {
                 all: unset;
                 flex-shrink: 0;
-                margin-left: 1rem;
+                margin-left: 1em;
                 color: white;
                 border: 0 none;
                 background: transparent;
-                padding: 0 0.25rem 0 0.25rem;
-                margin-right: -0.25rem;
+                padding: 0 0.25em 0 0.25em;
+                margin-right: -0.25em;
                 display: flex;
                 align-items: center;
             }
@@ -267,7 +267,7 @@ class KCBoardLayerControlElement extends KCUIElement {
         css`
             :host {
                 box-sizing: border-box;
-                padding: 0.1rem 0.8rem 0.1rem 0.4rem;
+                padding: 0.1em 0.8em 0.1em 0.4em;
                 color: white;
                 text-align: left;
                 display: flex;
@@ -280,12 +280,12 @@ class KCBoardLayerControlElement extends KCUIElement {
                 all: unset;
                 cursor: pointer;
                 flex-shrink: 0;
-                margin-left: 1rem;
+                margin-left: 1em;
                 color: white;
                 border: 0 none;
                 background: transparent;
-                padding: 0 0.25rem 0 0.25rem;
-                margin-right: -0.25rem;
+                padding: 0 0.25em 0 0.25em;
+                margin-right: -0.25em;
                 display: flex;
                 align-items: center;
             }
@@ -293,9 +293,9 @@ class KCBoardLayerControlElement extends KCUIElement {
             .color {
                 flex-shrink: 0;
                 display: block;
-                width: 1rem;
-                height: 1rem;
-                margin-right: 0.5rem;
+                width: 1em;
+                height: 1em;
+                margin-right: 0.5em;
             }
 
             .name {
