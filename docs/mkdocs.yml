@@ -34,5 +34,6 @@ nav:
     - "Home": home.md
     - "Standalone App": index.md
     - "Embedding": embedding.md
+    - "Roadmap": roadmap.md
     - "Development": development.md
     - "License": license.md

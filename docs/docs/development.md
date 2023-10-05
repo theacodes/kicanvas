@@ -4,7 +4,7 @@ This page provides some technical background for those wishing to dig into KiCan
 
 ## Contributing
 
-Contributions are welcome! However, since KiCanvas is in a super early stage please file an issue before you start working on something so we can coordinate. Also, please read our [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome! However, since KiCanvas is in a super early stage please file an issue before you start working on something so we can coordinate. Also, please read our [Code of Conduct].
 
 ## Technical overview
 
@@ -28,3 +28,4 @@ KiCanvas's source code under `./src` is organized into the following:
 [Canvas]: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
 [WebGL]: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
 [Web Components]: https://developer.mozilla.org/en-US/docs/Web/API/Web_components
+[Code of Conduct]: https://github.com/theacodes/kicanvas/blob/main/CODE_OF_CONDUCT.md
