@@ -8,7 +8,7 @@ import fs from "node:fs";
 import { bundle } from "./bundle.js";
 
 let { options, context } = await bundle({
-    outfile: "www/kicanvas/kicanvas.js",
+    outfile: "build/kicanvas.js",
     minify: true,
     metafile: true,
 });
@@ -26,7 +26,7 @@ for (const msg of result.errors) {
     console.log("- ", msg);
 }
 
-console.log("Saving metafile to esbuild-meta.json");
-fs.writeFileSync("esbuild-meta.json", JSON.stringify(result.metafile));
+console.log("Saving metafile to build/esbuild-meta.json");
+fs.writeFileSync("build/esbuild-meta.json", JSON.stringify(result.metafile));
 
 context.dispose();

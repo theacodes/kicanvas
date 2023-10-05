@@ -7,7 +7,7 @@
 import { bundle } from "./bundle.js";
 
 let { context } = await bundle({
-    outfile: "www/kicanvas/kicanvas.js",
+    outfile: "debug/kicanvas/kicanvas.js",
     sourcemap: true,
     define: {
         DEBUG: "true",
@@ -17,7 +17,7 @@ let { context } = await bundle({
 await context.watch();
 
 let { host, port } = await context.serve({
-    servedir: "./www",
+    servedir: "./debug",
     port: 8001,
 });
 
