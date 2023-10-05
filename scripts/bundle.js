@@ -25,7 +25,10 @@ export async function bundle(options = {}) {
             ".svg": "text",
             ".kicad_wks": "text",
         },
-        plugins: [CSSMinifyPlugin],
+        define: {
+            DEBUG: "false",
+        },
+        plugins: [CSSMinifyPlugin, ESbuildProblemMatcherPlugin],
         ...options,
     };
     return { options: options, context: await esbuild.context(options) };
@@ -33,7 +36,7 @@ export async function bundle(options = {}) {
 
 // Minify CSS when used with the file loader.
 export const CSSMinifyPlugin = {
-    name: "CSSMinifyPlugin",
+    name: "css-minify",
     setup(build) {
         build.onLoad({ filter: /\.css$/ }, async (args) => {
             const f = await readFile(args.path);
@@ -42,6 +45,20 @@ export const CSSMinifyPlugin = {
                 minify: true,
             });
             return { loader: "text", contents: css.code };
+        });
+    },
+};
+
+// Enables VSCode to detect when the build starts/finishes
+const ESbuildProblemMatcherPlugin = {
+    name: "esbuild-problem-matcher",
+
+    setup(build) {
+        build.onStart(() => {
+            console.log("[watch] build started");
+        });
+        build.onEnd((result) => {
+            console.log("[watch] build finished");
         });
     },
 };
