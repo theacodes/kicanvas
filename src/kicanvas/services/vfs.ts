@@ -74,6 +74,13 @@ export class FetchFileSystem extends VirtualFileSystem {
 
         const request = new Request(url, { method: "GET" });
         const response = await fetch(request);
+
+        if (!response.ok) {
+            throw new Error(
+                `Unable to load ${url}: ${response.status} ${response.statusText}`,
+            );
+        }
+
         const blob = await response.blob();
 
         return new File([blob], name);
