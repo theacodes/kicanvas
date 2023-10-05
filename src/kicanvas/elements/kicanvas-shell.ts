@@ -130,10 +130,10 @@ class KiCanvasShellElement extends KCUIElement {
 
     override render() {
         this.#schematic_app = html`
-            <kc-schematic-app></kc-schematic-app>
+            <kc-schematic-app controls="full"></kc-schematic-app>
         ` as KCSchematicAppElement;
         this.#board_app = html`
-            <kc-board-app></kc-board-app>
+            <kc-board-app control="full"></kc-board-app>
         ` as KCBoardAppElement;
 
         return html`

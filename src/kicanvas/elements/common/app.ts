@@ -186,16 +186,16 @@ export abstract class KCViewerAppElement<
     protected abstract make_viewer_element(): ViewerElementT;
 
     override render() {
-        const controls = this.controls ?? "full";
+        const controls = this.controls ?? "none";
         const controlslist = parseFlagAttribute(
             this.controlslist ?? "",
-            this.controls == "none"
+            controls == "none"
                 ? { fullscreen: false, download: false }
                 : { fullscreen: true, download: true },
         );
 
         this.#viewer_elm = this.make_viewer_element();
-        this.#viewer_elm.disableinteraction = this.controls == "none";
+        this.#viewer_elm.disableinteraction = controls == "none";
 
         let resizer = null;
 
