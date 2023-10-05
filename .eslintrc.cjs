@@ -32,7 +32,7 @@ module.exports = {
         ],
         "@typescript-eslint/no-inferrable-types": [
             "warn",
-            { ignoreProperties: true },
+            { ignoreProperties: true, ignoreParameters: true },
         ],
         "mocha/max-top-level-suites": "off",
     },
