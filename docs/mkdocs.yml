@@ -31,5 +31,8 @@ markdown_extensions:
           custom_attrs:
               referrerpolicy: "origin"
 nav:
+    - "Home": home.md
     - "Standalone App": index.md
     - "Embedding": embedding.md
+    - "Development": development.md
+    - "License": license.md
