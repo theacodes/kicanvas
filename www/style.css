@@ -13,11 +13,13 @@
 
 html,
 body {
-    height: 100%;
-    width: 100%;
+    height: 100vh;
     font-family: "Nunito", ui-rounded, "Hiragino Maru Gothic ProN", Quicksand,
         Comfortaa, Manjari, "Arial Rounded MT Bold", Calibri, source-sans-pro,
         sans-serif;
+    line-height: 1.5;
+    width: 100%;
+    margin: 0 auto;
 }
 
 img,
@@ -29,7 +31,27 @@ svg {
     max-width: 100%;
 }
 
+main {
+    max-width: 1024px;
+    margin: 1rem auto;
+}
+
+p {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
 /* Styles for KiCanvas */
+
+kicanvas-embed {
+    display: block;
+    width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1.414;
+    background-color: aqua;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
 
 kc-kicanvas-shell {
     width: 100%;
