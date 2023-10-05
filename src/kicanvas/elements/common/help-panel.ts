@@ -33,10 +33,9 @@ export class KCHelpPanel extends KCUIElement {
                 <kc-ui-panel-body>
                     <p>
                         You're using
-                        <a href="https://github.com/theacodes/kicanvas"
-                            >KiCanvas</a
-                        >, an interactive, browser-based viewer for KiCAD
-                        schematics and boards.
+                        <a href="https://kicanvas.org/home">KiCanvas</a>, an
+                        interactive, browser-based viewer for KiCAD schematics
+                        and boards.
                     </p>
                     <p>
                         KiCanvas is very much in <strong>alpha</strong>, so
