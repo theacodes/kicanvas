@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "bashmish.es6-string-css",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-typescript-next",
+        "bierner.lit-html"
+    ]
+}
