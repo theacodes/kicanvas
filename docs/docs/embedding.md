@@ -1,7 +1,8 @@
-# \<kicanvas-embed\>: The KiCanvas embedded viewer element
+# <kicanvas-embed\>: The KiCanvas embedded viewer element
 
-> ![IMPORTANT]
-> **None of this is functional**. This is a proposed API to get feedback from users before implementation begins. The format is modeled after MDN's [HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element).
+!!! warning "Work in progress"
+
+    This is a proposed API with an incomplete implementation. Everything here is subject to change and you should be cautious if using it on your own web page.
 
 The `<kicanvas-embed>` HTML element embeds one or more KiCAD documents onto the page:
 
@@ -10,6 +11,11 @@ The `<kicanvas-embed>` HTML element embeds one or more KiCAD documents onto the 
 ```
 
 The above example shows the most basic usage of the `<kicanvas-embed>` element. It's usage is intentionally similar to the [`<video>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video) and [`<img>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img) elements. Through the use of additional [attributes](#attributes) you can control how the document is displayed, enable interactivity, and even load multiple files.
+
+
+!!! note
+
+    This page's format is modeled after MDN's [HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). It's intended to be familiar to web developers.
 
 ## Examples
 

@@ -22,3 +22,4 @@ markdown_extensions:
               referrerpolicy: "origin"
 nav:
     - "Home": index.md
+    - "Embedding": embedding.md
