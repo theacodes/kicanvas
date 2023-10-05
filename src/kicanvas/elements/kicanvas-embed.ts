@@ -8,7 +8,7 @@ import { later } from "../../base/async";
 import { CSS, attribute, css, html } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
-import { Project, ProjectPage } from "../project";
+import { Project } from "../project";
 import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
@@ -109,8 +109,6 @@ class KiCanvasEmbedElement extends KCUIElement {
             this.loading = false;
         }
     }
-
-    async #show_page(page: ProjectPage) {}
 
     override render() {
         if (!this.loaded) {
