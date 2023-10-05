@@ -1,0 +1,24 @@
+site_name: KiCanvas Documentation
+site_url: https://docs.kicanvas.org
+copyright: "© 2023 Alethea Katherine Flowers, Licensed under Creative Commons CC BY-SA 4.0"
+repo_url: "https://github.com/theacodes/kicanvas"
+edit_uri: edit/main/docs/docs
+theme:
+    name: material
+markdown_extensions:
+    - admonition
+    - def_list
+    - attr_list
+    - footnotes
+    - pymdownx.highlight
+    - pymdownx.superfences
+    - pymdownx.magiclink
+    - md_in_html
+    - toc:
+          toc_depth: 2-3
+    - markdown_link_attr_modifier:
+          new_tab: "external_only"
+          custom_attrs:
+              referrerpolicy: "origin"
+nav:
+    - "Home": index.md
