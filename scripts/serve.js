@@ -18,6 +18,7 @@ await context.watch();
 
 let { host, port } = await context.serve({
     servedir: "./www",
+    port: 8001,
 });
 
 console.log(`[serve] listening at http://${host}:${port}`);

@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "preLaunchTask": "npm: serve",
-            "url": "http://localhost:8000/embedded.html",
+            "url": "http://localhost:8001/",
             "webRoot": "${workspaceFolder}/www",
             "sourceMapPathOverrides": {
                 "..": "${workspaceFolder}/www/*"
