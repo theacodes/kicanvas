@@ -133,14 +133,14 @@ class KiCanvasShellElement extends KCUIElement {
             <kc-schematic-app controls="full"></kc-schematic-app>
         ` as KCSchematicAppElement;
         this.#board_app = html`
-            <kc-board-app control="full"></kc-board-app>
+            <kc-board-app controls="full"></kc-board-app>
         ` as KCBoardAppElement;
 
         return html`
             <kc-ui-app>
                 <section class="overlay">
                     <h1>
-                        <img src="kicanvas.png" />
+                        <img src="images/kicanvas.png" />
                         KiCanvas
                     </h1>
                     <p>
@@ -154,9 +154,8 @@ class KiCanvasShellElement extends KCUIElement {
                         <a
                             href="https://github.com/theacodes/kicanvas/issues/new/choose"
                             target="_blank">
-                            report any bugs
-                        </a>
-                        !
+                            report any bugs</a
+                        >!
                     </p>
                     <input
                         name="link"
@@ -173,7 +172,7 @@ class KiCanvasShellElement extends KCUIElement {
                             href="https://github.com/theacodes/kicanvas"
                             target="_blank"
                             title="Visit on GitHub">
-                            <img src="github-mark-white.svg" />
+                            <img src="images/github-mark-white.svg" />
                         </a>
                     </p>
                 </section>

@@ -5,6 +5,16 @@ repo_url: "https://github.com/theacodes/kicanvas"
 edit_uri: edit/main/docs/docs
 theme:
     name: material
+    custom_dir: overrides
+    logo: icon.png
+    favicon: icon.png
+    palette:
+        scheme: slate
+        primary: teal
+        accent: light blue
+    font:
+        text: Nunito
+        code: IBM Plex Mono
 markdown_extensions:
     - admonition
     - def_list
@@ -21,5 +31,5 @@ markdown_extensions:
           custom_attrs:
               referrerpolicy: "origin"
 nav:
-    - "Home": index.md
+    - "Standalone App": index.md
     - "Embedding": embedding.md

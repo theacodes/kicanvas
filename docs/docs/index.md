@@ -1,1 +1,3 @@
-# KiCanvas Documentation
+---
+template: standalone.html
+---
