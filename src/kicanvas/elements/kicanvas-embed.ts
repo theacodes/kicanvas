@@ -5,7 +5,13 @@
 */
 
 import { later } from "../../base/async";
-import { CSS, attribute, css, html } from "../../base/web-components";
+import {
+    CSS,
+    CustomElement,
+    attribute,
+    css,
+    html,
+} from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
@@ -86,11 +92,26 @@ class KiCanvasEmbedElement extends KCUIElement {
     async #setup_events() {}
 
     async #load_src() {
-        if (!this.src) {
+        const sources = [];
+
+        if (this.src) {
+            sources.push(this.src);
+        }
+
+        for (const src_elm of this.querySelectorAll<KiCanvasSourceElement>(
+            "kicanvas-source",
+        )) {
+            if (src_elm.src) {
+                sources.push(src_elm.src);
+            }
+        }
+
+        if (sources.length == 0) {
+            console.warn("No valid sources specified");
             return;
         }
 
-        const vfs = new FetchFileSystem([this.src]);
+        const vfs = new FetchFileSystem(sources);
         await this.#setup_project(vfs);
     }
 
@@ -136,3 +157,17 @@ class KiCanvasEmbedElement extends KCUIElement {
 }
 
 window.customElements.define("kicanvas-embed", KiCanvasEmbedElement);
+
+class KiCanvasSourceElement extends CustomElement {
+    constructor() {
+        super();
+        this.ariaHidden = "true";
+        this.hidden = true;
+        this.style.display = "none";
+    }
+
+    @attribute({ type: String })
+    src: string | null;
+}
+
+window.customElements.define("kicanvas-source", KiCanvasSourceElement);
