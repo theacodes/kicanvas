@@ -1,5 +1,8 @@
 # <kicanvas-embed\>: The KiCanvas embedded viewer element
 
+<!-- load kicanvas -->
+<script type="module" src="/kicanvas/kicanvas.js"></script>
+
 !!! warning "Work in progress"
 
     This is a proposed API with an incomplete implementation. Everything here is subject to change and you should be cautious if using it on your own web page.
@@ -10,7 +13,9 @@ The `<kicanvas-embed>` HTML element embeds one or more KiCAD documents onto the 
 <kicanvas-embed src="my-schematic.kicad_sch"></kicanvas-embed>
 ```
 
-The above example shows the most basic usage of the `<kicanvas-embed>` element. It's usage is intentionally similar to the [`<video>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video) and [`<img>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img) elements. Through the use of additional [attributes](#attributes) you can control how the document is displayed, enable interactivity, and even load multiple files.
+<kicanvas-embed src="/examples/simple.kicad_sch"></kicanvas-embed>
+
+The above example shows the most basic usage of the `<kicanvas-embed>` element. It's usage is intentionally similar to the [`<video>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video) and [`<img>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img) elements. Through the use of additional [attributes](#attributes) you can control how the document is displayed, control interactivity, and load multiple files.
 
 
 !!! note
