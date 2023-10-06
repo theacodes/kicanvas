@@ -24,12 +24,6 @@ markdown_extensions:
     - pymdownx.superfences
     - pymdownx.magiclink
     - md_in_html
-    - toc:
-          toc_depth: 2-3
-    - markdown_link_attr_modifier:
-          new_tab: "external_only"
-          custom_attrs:
-              referrerpolicy: "origin"
 nav:
     - "Home": home.md
     - "Standalone App": index.md
