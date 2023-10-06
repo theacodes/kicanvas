@@ -20,7 +20,10 @@ type Parent = {
  * This corresponds to and is roughly based on KiCAD's SCH_FIELD class.
  */
 export class SchField extends EDAText {
-    constructor(text: string, public parent?: Parent) {
+    constructor(
+        text: string,
+        public parent?: Parent,
+    ) {
         super(text);
     }
 

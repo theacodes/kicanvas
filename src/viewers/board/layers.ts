@@ -188,7 +188,10 @@ export class LayerSet extends BaseLayerSet {
     /**
      * Create a new LayerSet
      */
-    constructor(board: KicadPCB, public theme: BoardTheme) {
+    constructor(
+        board: KicadPCB,
+        public theme: BoardTheme,
+    ) {
         super();
 
         const board_layers = new Map();

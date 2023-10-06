@@ -9,7 +9,7 @@
         "**/*.js": {
             "when": "$(basename).ts"
         },
-        "dist/": true
+        "build/": true
     },
     "cSpell.words": [
         "Adhes",
@@ -46,4 +46,28 @@
     "debug.console.closeOnEnd": true,
     "debug.terminal.clearBeforeReusing": true,
     "typescript.tsdk": "node_modules/typescript/lib",
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+    },
 }

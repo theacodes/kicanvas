@@ -2,54 +2,47 @@
     "compilerOptions": {
         /* Visit https://aka.ms/tsconfig to read more about this file */
         /* Language and Environment */
-        "target": "es2022", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+        "target": "es2022" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
         "moduleResolution": "bundler",
         // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
         "experimentalDecorators": true,
         "useDefineForClassFields": false, // required to use experimental decorators
         /* Modules */
-        "module": "es2022", /* Specify what module code is generated. */
+        "module": "es2022" /* Specify what module code is generated. */,
         "allowImportingTsExtensions": true,
         "verbatimModuleSyntax": true,
         "allowArbitraryExtensions": true,
         /* JavaScript Support */
-        "allowJs": true, /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
-        "checkJs": true, /* Enable error reporting in type-checked JavaScript files. */
+        "allowJs": true /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,
+        "checkJs": true /* Enable error reporting in type-checked JavaScript files. */,
         /* Emit */
         // "outDir": "./build", /* Specify an output folder for all emitted files. */
         // "sourceMap": true,
-        "noEmit": true, /* Disable emitting files from a compilation. */
+        "noEmit": true /* Disable emitting files from a compilation. */,
         /* Interop Constraints */
         // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
-        "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
+        "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
         /* Type Checking */
         // "strict": true, /* Enable all strict type-checking options. */
-        "noImplicitAny": true, /* Enable error reporting for expressions and declarations with an implied 'any' type. */
-        "strictNullChecks": true, /* When type checking, take into account 'null' and 'undefined'. */
-        "strictFunctionTypes": true, /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
-        "strictBindCallApply": true, /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */
+        "noImplicitAny": true /* Enable error reporting for expressions and declarations with an implied 'any' type. */,
+        "strictNullChecks": true /* When type checking, take into account 'null' and 'undefined'. */,
+        "strictFunctionTypes": true /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */,
+        "strictBindCallApply": true /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */,
         // "strictPropertyInitialization": true,             /* Check for class properties that are declared but not set in the constructor. */
-        "noImplicitThis": true, /* Enable error reporting when 'this' is given the type 'any'. */
-        "useUnknownInCatchVariables": true, /* Default catch clause variables as 'unknown' instead of 'any'. */
-        "alwaysStrict": true, /* Ensure 'use strict' is always emitted. */
-        "noUnusedLocals": true, /* Enable error reporting when local variables aren't read. */
+        "noImplicitThis": true /* Enable error reporting when 'this' is given the type 'any'. */,
+        "useUnknownInCatchVariables": true /* Default catch clause variables as 'unknown' instead of 'any'. */,
+        "alwaysStrict": true /* Ensure 'use strict' is always emitted. */,
+        "noUnusedLocals": true /* Enable error reporting when local variables aren't read. */,
         // "noUnusedParameters": true, /* Raise an error when a function parameter isn't read. */
         // "exactOptionalPropertyTypes": true, /* Interpret optional property types as written, rather than adding 'undefined'. */
-        "noImplicitReturns": true, /* Enable error reporting for codepaths that do not explicitly return in a function. */
-        "noFallthroughCasesInSwitch": true, /* Enable error reporting for fallthrough cases in switch statements. */
-        "noUncheckedIndexedAccess": true, /* Add 'undefined' to a type when accessed using an index. */
-        "noImplicitOverride": true, /* Ensure overriding members in derived classes are marked with an override modifier. */
-        "noPropertyAccessFromIndexSignature": true, /* Enforces using indexed accessors for keys declared using an indexed type. */
+        "noImplicitReturns": true /* Enable error reporting for codepaths that do not explicitly return in a function. */,
+        "noFallthroughCasesInSwitch": true /* Enable error reporting for fallthrough cases in switch statements. */,
+        "noUncheckedIndexedAccess": true /* Add 'undefined' to a type when accessed using an index. */,
+        "noImplicitOverride": true /* Ensure overriding members in derived classes are marked with an override modifier. */,
+        "noPropertyAccessFromIndexSignature": true /* Enforces using indexed accessors for keys declared using an indexed type. */,
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
     },
-    "include": [
-        "./src/**/*",
-        "./test/**/*",
-    ],
-    "exclude": [
-        "./node_modules",
-        "./**/node_modules/*",
-        "./scripts/",
-    ],
+    "include": ["./src/**/*", "./test/**/*"],
+    "exclude": ["./node_modules", "./**/node_modules/*", "./scripts/"],
 }

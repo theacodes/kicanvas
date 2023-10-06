@@ -1,48 +1,52 @@
 {
-  "name": "kicanvas",
-  "version": "0.0.0",
-  "description": "",
-  "type": "module",
-  "directories": {
-    "test": "tests"
-  },
-  "devDependencies": {
-    "@esm-bundle/chai": "^4.3.4-fix.0",
-    "@open-wc/semantic-dom-diff": "^0.20.0",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
-    "@web/dev-server-esbuild": "^0.4.1",
-    "@web/test-runner": "^0.17.1",
-    "esbuild": "^0.19.4",
-    "esbuild-plugin-copy": "^2.1.1",
-    "eslint": "^8.50.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-mocha": "^10.2.0",
-    "prettier": "^3.0.3",
-    "svgstore": "^3.0.1",
-    "typescript": "^5.2.2",
-    "typescript-lit-html-plugin": "^0.9.0"
-  },
-  "scripts": {
-    "test": "web-test-runner --config scripts/web-test-runner.config.mjs",
-    "test:watch": "web-test-runner --config scripts/web-test-runner.config.mjs --watch",
-    "test:coverage": "web-test-runner --config scripts/web-test-runner.config.mjs --coverage",
-    "lint": "eslint --config .eslintrc.cjs src/ --ext .js,.ts",
-    "serve": "node scripts/serve.js",
-    "build": "tsc -p tsconfig.json && node scripts/build.js",
-    "build-no-check": "node scripts/build.js",
-    "clean": "rm -rf dist && rm -rf www/kicanvas",
-    "build-font": "node scripts/build-font.js",
-    "build-sprites": "node scripts/build-sprites.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/theacodes/kicanvas.js.git"
-  },
-  "author": "",
-  "license": "",
-  "bugs": {
-    "url": "https://github.com/theacodes/kicanvas.js/issues"
-  },
-  "homepage": "https://github.com/theacodes/kicanvas.js#readme"
+    "name": "kicanvas",
+    "version": "0.0.0",
+    "description": "",
+    "type": "module",
+    "directories": {
+        "test": "tests"
+    },
+    "devDependencies": {
+        "@esm-bundle/chai": "^4.3.4-fix.0",
+        "@open-wc/semantic-dom-diff": "^0.20.0",
+        "@typescript-eslint/eslint-plugin": "^6.7.3",
+        "@typescript-eslint/parser": "^6.7.3",
+        "@web/dev-server-esbuild": "^0.4.1",
+        "@web/test-runner": "^0.17.1",
+        "esbuild": "^0.19.4",
+        "esbuild-plugin-copy": "^2.1.1",
+        "eslint": "^8.50.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-mocha": "^10.2.0",
+        "prettier": "^3.0.3",
+        "svgstore": "^3.0.1",
+        "typescript": "^5.2.2",
+        "typescript-lit-html-plugin": "^0.9.0"
+    },
+    "scripts": {
+        "test:watch": "web-test-runner --config scripts/web-test-runner.config.mjs --watch",
+        "test:coverage": "web-test-runner --config scripts/web-test-runner.config.mjs --coverage",
+        "test": "web-test-runner --config scripts/web-test-runner.config.mjs",
+        "lint:eslint": "eslint --config .eslintrc.cjs src/ --ext .js,.ts",
+        "lint:types": "tsc -p tsconfig.json",
+        "lint:prettier": "prettier . --check",
+        "lint": "npm run lint:eslint && npm run lint:types && npm run lint:prettier",
+        "format": "prettier . --write",
+        "serve": "node scripts/serve.js",
+        "build:no-check": "node scripts/build.js",
+        "build:font": "node scripts/build-font.js",
+        "build:sprites": "node scripts/build-sprites.js",
+        "build": "tsc -p tsconfig.json && node scripts/build.js",
+        "clean": "rm -rf build && rm -rf debug/kicanvas"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/theacodes/kicanvas.js.git"
+    },
+    "author": "Alethea Katherine Flowers",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/theacodes/kicanvas.js/issues"
+    },
+    "homepage": "https://github.com/theacodes/kicanvas.js#readme"
 }

@@ -44,7 +44,10 @@ export class KicadPCB {
     drawings: Drawing[] = [];
     groups: Group[] = [];
 
-    constructor(public filename: string, expr: Parseable) {
+    constructor(
+        public filename: string,
+        expr: Parseable,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -274,7 +277,10 @@ export class Zone {
     filled_polygons: FilledPolygon[];
     tstamp: string;
 
-    constructor(expr: Parseable, public parent?: KicadPCB | Footprint) {
+    constructor(
+        expr: Parseable,
+        public parent?: KicadPCB | Footprint,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -608,7 +614,10 @@ export class Dimension {
     format: DimensionFormat;
     style: DimensionStyle;
 
-    constructor(expr: Parseable, public parent: KicadPCB) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadPCB,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -775,7 +784,10 @@ export class Footprint {
     models: Model[] = [];
     #bbox: BBox;
 
-    constructor(expr: Parseable, public parent: KicadPCB) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadPCB,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -960,7 +972,10 @@ export class Line extends GraphicItem {
     width: number;
     stroke: Stroke;
 
-    constructor(expr: Parseable, public override parent?: Footprint) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint,
+    ) {
         super();
 
         const static_this = this.constructor as typeof Line;
@@ -1004,7 +1019,10 @@ export class Circle extends GraphicItem {
     fill: string;
     stroke: Stroke;
 
-    constructor(expr: Parseable, public override parent?: Footprint) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint,
+    ) {
         super();
 
         const static_this = this.constructor as typeof Circle;
@@ -1055,7 +1073,10 @@ export class Arc extends GraphicItem {
     stroke: Stroke;
     #arc: MathArc;
 
-    constructor(expr: Parseable, public override parent?: Footprint) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint,
+    ) {
         super();
 
         const static_this = this.constructor as typeof Arc;
@@ -1140,7 +1161,10 @@ export class Poly extends GraphicItem {
     island: boolean;
     stroke: Stroke;
 
-    constructor(expr: Parseable, public override parent?: Footprint) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint,
+    ) {
         super();
 
         const static_this = this.constructor as typeof Poly;
@@ -1190,7 +1214,10 @@ export class Rect extends GraphicItem {
     fill: string;
     stroke: Stroke;
 
-    constructor(expr: Parseable, public override parent?: Footprint) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint,
+    ) {
         super();
 
         const static_this = this.constructor as typeof Rect;
@@ -1284,7 +1311,10 @@ export class Text {
 export class FpText extends Text {
     type: "reference" | "value" | "user";
 
-    constructor(expr: Parseable, public override parent?: Footprint) {
+    constructor(
+        expr: Parseable,
+        public override parent?: Footprint,
+    ) {
         super();
 
         Object.assign(
@@ -1351,7 +1381,10 @@ export class Pad {
     options: PadOptions;
     primitives: (GrLine | GrCircle | GrArc | GrRect | GrPoly)[];
 
-    constructor(expr: Parseable, public parent: Footprint) {
+    constructor(
+        expr: Parseable,
+        public parent: Footprint,
+    ) {
         const parsed = parse_expr(
             expr,
             P.start("pad"),

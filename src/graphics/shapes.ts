@@ -94,7 +94,10 @@ export class Polygon {
      * @param points - point cloud representing the polygon
      * @param color - fill color
      */
-    constructor(public points: Vec2[], public color: OptionalDefaultColor) {}
+    constructor(
+        public points: Vec2[],
+        public color: OptionalDefaultColor,
+    ) {}
 
     /**
      * Create a filled polygon from a bounding box.

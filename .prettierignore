@@ -1,0 +1,12 @@
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+build/
+debug/kicanvas
+docs/site
+.github/
+.vscode/
+CODE_OF_CONDUCT.md
+package-lock.json
+src/kicad/text/newstroke-glyphs.ts

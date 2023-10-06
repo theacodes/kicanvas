@@ -22,7 +22,10 @@ export class Token {
     /**
      * Create a new Token
      */
-    constructor(public type: symbol, public value: any = null) {}
+    constructor(
+        public type: symbol,
+        public value: any = null,
+    ) {}
 }
 
 function is_digit(c: string) {

@@ -282,7 +282,10 @@ export class CircleSet implements IDisposable {
      * Create a new circle set.
      * @param shader - optional override for the shader program used when drawing.
      */
-    constructor(public gl: WebGL2RenderingContext, shader?: ShaderProgram) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        shader?: ShaderProgram,
+    ) {
         this.shader = shader ?? CircleSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
@@ -351,7 +354,10 @@ export class PolylineSet implements IDisposable {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(public gl: WebGL2RenderingContext, shader?: ShaderProgram) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        shader?: ShaderProgram,
+    ) {
         this.shader = shader ?? PolylineSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader["a_position"], 2);
@@ -448,7 +454,10 @@ export class PolygonSet implements IDisposable {
      * @param {WebGL2RenderingContext} gl
      * @param {ShaderProgram?} shader - optional override for the shader program used when drawing.
      */
-    constructor(public gl: WebGL2RenderingContext, shader?: ShaderProgram) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        shader?: ShaderProgram,
+    ) {
         this.shader = shader ?? PolygonSet.shader;
         this.vao = new VertexArray(gl);
         this.position_buf = this.vao.buffer(this.shader["a_position"], 2);

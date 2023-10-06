@@ -392,7 +392,10 @@ export class Buffer implements IDisposable {
      * @param target - binding point, typically gl.ARRAY_BUFFER (the default if unspecified)
      *      or gl.ELEMENT_ARRAY_BUFFER
      */
-    constructor(public gl: WebGL2RenderingContext, target?: GLenum) {
+    constructor(
+        public gl: WebGL2RenderingContext,
+        target?: GLenum,
+    ) {
         this.gl = gl;
         this.target = target ?? gl.ARRAY_BUFFER;
 

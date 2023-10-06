@@ -78,7 +78,10 @@ export class KicadSch {
     symbol_instances?: SymbolInstances;
     sheets: SchematicSheet[] = [];
 
-    constructor(public filename: string, expr: Parseable) {
+    constructor(
+        public filename: string,
+        expr: Parseable,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -760,7 +763,10 @@ export class LibSymbols {
     symbols: LibSymbol[] = [];
     #symbols_by_name: Map<string, LibSymbol> = new Map();
 
-    constructor(expr: Parseable, public parent: KicadSch) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadSch,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -804,7 +810,10 @@ export class LibSymbol {
     #pins_by_number: Map<string, PinDefinition> = new Map();
     #properties_by_id: Map<number, Property> = new Map();
 
-    constructor(expr: Parseable, public parent?: LibSymbol | KicadSch) {
+    constructor(
+        expr: Parseable,
+        public parent?: LibSymbol | KicadSch,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -1070,7 +1079,10 @@ export class PinDefinition {
     };
     alternates?: PinAlternate[];
 
-    constructor(expr: Parseable, public parent: LibSymbol) {
+    constructor(
+        expr: Parseable,
+        public parent: LibSymbol,
+    ) {
         /*
         (pin power_in line (at -15.24 50.8 270) (length 2.54) hide
           (name "IOVDD" (effects (font (size 1.27 1.27))))
@@ -1151,7 +1163,10 @@ export class SchematicSymbol {
     };
     instances: Map<string, SchematicSymbolInstance> = new Map();
 
-    constructor(expr: Parseable, public parent: KicadSch) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadSch,
+    ) {
         /*
         (symbol (lib_id "Device:C_Small") (at 134.62 185.42 0) (unit 1)
           (in_bom yes) (on_board yes) (fields_autoplaced)
@@ -1382,7 +1397,10 @@ export class PinInstance {
     uuid: string;
     alternate: string;
 
-    constructor(expr: Parseable, public parent: SchematicSymbol) {
+    constructor(
+        expr: Parseable,
+        public parent: SchematicSymbol,
+    ) {
         /* (pin "1" (uuid ab9b91d4-020f-476d-acd8-920c7892e89a) (alternate abc)) */
         Object.assign(
             this,
@@ -1514,7 +1532,10 @@ export class SchematicSheet {
     page?: string;
     path?: string;
 
-    constructor(expr: Parseable, public parent: KicadSch) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadSch,
+    ) {
         const parsed = parse_expr(
             expr,
             P.start("sheet"),
@@ -1605,7 +1626,10 @@ export class SchematicSheetPin {
     effects: Effects;
     uuid: string;
 
-    constructor(expr: Parseable, public parent: SchematicSheet) {
+    constructor(
+        expr: Parseable,
+        public parent: SchematicSheet,
+    ) {
         Object.assign(
             this,
             parse_expr(

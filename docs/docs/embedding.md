@@ -107,12 +107,9 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
 ```html
 <kicanvas-embed>
     <kicanvas-source type="schematic">
-      (lib_symbols
-        (symbol "power:+12V" (power) (pin_names (offset 0)) (in_bom yes) (on_board yes)
-          (property "Reference" "#PWR" (at 0 -3.81 0)
-            (effects (font (size 1.27 1.27)) hide)
-          )
-          ...
+        (lib_symbols (symbol "power:+12V" (power) (pin_names (offset 0)) (in_bom
+        yes) (on_board yes) (property "Reference" "#PWR" (at 0 -3.81 0) (effects
+        (font (size 1.27 1.27)) hide) ) ...
     </kicanvas-source>
 </kicanvas-embed>
 ```
@@ -152,8 +149,8 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
 
     This functionality hasn't been implemented yet
 
-| Event Name                | Fired When                                                                                        |
-| ------------------------- | ------------------------------------------------------------------------------------------------- |
+| Event Name                   | Fired When                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------- |
 | ⚠️ `kicanvas:click`          | The user clicks or taps within the embedded document                                              |
 | ⚠️ `kicanvas:documentchange` | The currently displayed document is changed, either through user interaction or programmatically. |
 | ⚠️ `kicanvas:error`          | An error occurs while loading source files                                                        |

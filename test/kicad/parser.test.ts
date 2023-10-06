@@ -266,7 +266,10 @@ suite("kicad.parser.parse_expr(): s-expression parser", function () {
 
 class TestItem {
     args: any[];
-    constructor(public expr: any, ...args: any[]) {
+    constructor(
+        public expr: any,
+        ...args: any[]
+    ) {
         this.args = args;
     }
 }

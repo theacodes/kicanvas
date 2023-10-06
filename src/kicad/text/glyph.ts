@@ -31,7 +31,10 @@ type Stroke = Vec2[];
  * Glyphs for stroke fonts.
  */
 export class StrokeGlyph extends Glyph {
-    constructor(public strokes: Stroke[], public bbox: BBox) {
+    constructor(
+        public strokes: Stroke[],
+        public bbox: BBox,
+    ) {
         super();
     }
 
