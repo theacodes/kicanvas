@@ -33,7 +33,7 @@ jobs:
           cache-dependency-path: "package-lock.json"
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
@@ -47,7 +47,7 @@ jobs:
 
       - name: Build KiCanvas
         run: |
-          npm run build-no-check
+          npm run build:no-check
 
       - name: Build docs
         run: mkdocs build
