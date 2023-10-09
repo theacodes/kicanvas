@@ -168,7 +168,30 @@ class KiCanvasShellElement extends KCUIElement {
                         autofocus />
                     <p>or drag & drop your KiCAD files</p>
                     <p class="note">
-                        KiCanvas runs entirely within your browser, so your
+                        KiCanvas is
+                        <a
+                            href="https://github.com/theacodes/kicanvas"
+                            target="_blank"
+                            >free & open source</a
+                        >
+                        and supported by
+                        <a
+                            href="https://github.com/theacodes/kicanvas#special-thanks"
+                            >community donations</a
+                        >
+                        with significant support from
+                        <a href="https://partsbox.com/" target="_blank"
+                            >PartsBox</a
+                        >,
+                        <a href="https://blues.io/" target="_blank">Blues</a>,
+                        <a href="https://blog.mithis.net/" target="_blank"
+                            >Mithro</a
+                        >,
+                        <a href="https://github.com/jeremysf">Jeremy Gordon</a>,
+                        &
+                        <a href="https://github.com/jamesneal" target="_blank"
+                            >James Neal</a
+                        >. KiCanvas runs entirely within your browser, so your
                         files don't ever leave your machine.
                     </p>
                     <p class="github">

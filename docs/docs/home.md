@@ -87,11 +87,16 @@ KiCanvas is open source and published under the permissive MIT license. Please t
 
 ## Special thanks
 
-KiCanvas would not be possible without the incredible financial support of our [sponsors]. I'd specifically like to thank the following people for their support:
+KiCanvas would not be possible without the incredible financial support of our [sponsors]. KiCanvas received significant support from the following individual and organizations:
 
--   [@mithro](https://github.com/mithro)
--   [@jeremysf](https://github.com/jeremysf)
--   [@blues](https://github.com/blues)
+-   [PartsBox](https://partsbox.com/)
+-   [Blues](https://blues.io/)
+-   [Tim Ansell](https://github.com/mithro)
+-   [Jeremy Gordon](https://github.com/jeremysf)
+-   [James Neal](https://github.com/jamesneal)
+
+& donations and support from the following individuals:
+
 -   [@timonsku](https://github.com/timonsku)
 -   [@todbot](https://github.com/todbot)
 -   [@friggeri](https://github.com/friggeri)
@@ -102,7 +107,6 @@ KiCanvas would not be possible without the incredible financial support of our [
 -   [@guru](https://github.com/guru)
 -   [@jamesneal](https://github.com/jamesneal)
 -   [@calithameridi](https://github.com/calithameridi)
--   [@jwr](https://github.com/jwr)
 -   [@forsyth](https://github.com/forsyth)
 -   [@mattimo](https://github.com/mattimo)
 -   [@mzollin](https://github.com/mzollin)
