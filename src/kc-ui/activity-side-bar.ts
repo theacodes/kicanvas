@@ -18,6 +18,7 @@ export class KCUIActivitySideBarElement extends KCUIElement {
         ...KCUIElement.styles,
         css`
             :host {
+                flex-shrink: 0;
                 display: flex;
                 flex-direction: row;
                 height: 100%;
