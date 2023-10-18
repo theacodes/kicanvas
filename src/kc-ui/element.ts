@@ -21,6 +21,11 @@ const common_styles = css`
         display: none !important;
     }
 
+    :host {
+        scrollbar-width: thin;
+        scrollbar-color: #ae81ff #282634;
+    }
+
     ::-webkit-scrollbar {
         position: absolute;
         width: 6px;
