@@ -125,6 +125,7 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     -   `basic` - zoom, pan, and select are available.
     -   `full` - complete interactive viewer, including side panels.
 -   `controlslist` - further customizes the available controls.
+    -   `nooverlay` - don't show the "click or tap to interact" overlay.
     -   `nofullscreen` - don't show the fullscreen button. ⚠️
     -   `nodownload` - don't show the download button.
     -   `download` - show the download button when used with controls="none". ⚠️

@@ -39,6 +39,7 @@ class KiCanvasEmbedElement extends KCUIElement {
                 font-family: "Nunito", ui-rounded, "Hiragino Maru Gothic ProN",
                     Quicksand, Comfortaa, Manjari, "Arial Rounded MT Bold",
                     Calibri, source-sans-pro, sans-serif;
+                contain: layout paint;
             }
 
             main {
@@ -156,7 +157,8 @@ class KiCanvasEmbedElement extends KCUIElement {
         }
 
         const focus_overlay =
-            this.controls == "none" || this.controlslist?.includes("nooverlay")
+            (this.controls ?? "none") == "none" ||
+            this.controlslist?.includes("nooverlay")
                 ? null
                 : html`<kc-ui-focus-overlay></kc-ui-focus-overlay>`;
 
