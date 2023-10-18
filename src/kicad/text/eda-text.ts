@@ -20,7 +20,7 @@ import { StrokeFont } from "./stroke-font";
  * head around.
  *
  * Note: Just like the underlying Font class, this all expects
- * scalled internal units instead of mm!
+ * scaled internal units instead of mm!
  */
 export class EDAText {
     constructor(text: string) {
