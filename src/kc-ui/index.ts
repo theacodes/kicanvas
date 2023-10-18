@@ -12,6 +12,7 @@ export * from "./dropdown";
 export * from "./element";
 export * from "./filtered-list";
 export * from "./floating-toolbar";
+export * from "./focus-overlay";
 export * from "./icon";
 export * from "./menu";
 export * from "./panel";

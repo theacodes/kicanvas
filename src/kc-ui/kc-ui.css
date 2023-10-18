@@ -200,6 +200,10 @@
 
     --list-item-hover-bg: var(--gradient-purple-green-highlight);
     --list-item-active-bg: var(--gradient-cyan-blue-light);
+
+    --focus-overlay-bg: var(--gradient-purple-green-light);
+    --focus-overlay-opacity: 0.5;
+    --focus-overlay-fg: #f8f8f0;
 }
 
 /*
