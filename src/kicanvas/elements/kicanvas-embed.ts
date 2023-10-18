@@ -19,8 +19,6 @@ import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 
-import "../../kc-ui/floating-toolbar";
-
 /**
  *
  */
@@ -38,9 +36,12 @@ class KiCanvasEmbedElement extends KCUIElement {
                 aspect-ratio: 1.414;
                 background-color: aqua;
                 color: var(--fg);
+                font-family: "Nunito", ui-rounded, "Hiragino Maru Gothic ProN",
+                    Quicksand, Comfortaa, Manjari, "Arial Rounded MT Bold",
+                    Calibri, source-sans-pro, sans-serif;
             }
 
-            :host main {
+            main {
                 display: contents;
             }
 
@@ -154,7 +155,14 @@ class KiCanvasEmbedElement extends KCUIElement {
             </kc-board-app>` as KCBoardAppElement;
         }
 
-        return html`<main>${this.#schematic_app} ${this.#board_app}</main>`;
+        const focus_overlay =
+            this.controls == "none" || this.controlslist?.includes("nooverlay")
+                ? null
+                : html`<kc-ui-focus-overlay></kc-ui-focus-overlay>`;
+
+        return html`<main>
+            ${this.#schematic_app} ${this.#board_app} ${focus_overlay}
+        </main>`;
     }
 }
 
