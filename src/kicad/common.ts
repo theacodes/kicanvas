@@ -88,6 +88,14 @@ export class At {
             this.unlocked = parsed.unlocked ?? this.unlocked;
         }
     }
+
+    copy() {
+        const at = new At();
+        at.position = this.position.copy();
+        at.rotation = this.rotation;
+        at.unlocked = this.unlocked;
+        return at;
+    }
 }
 
 export const PaperSize = {

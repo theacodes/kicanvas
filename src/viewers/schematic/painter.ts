@@ -551,7 +551,7 @@ class SchematicSheetPainter extends SchematicItemPainter {
         if (layer.name == LayerNames.label) {
             for (const pin of ss.pins) {
                 const label = new schematic_items.HierarchicalLabel();
-                label.at = pin.at;
+                label.at = pin.at.copy();
                 label.effects = pin.effects;
                 label.text = pin.name;
                 label.shape = pin.shape;
