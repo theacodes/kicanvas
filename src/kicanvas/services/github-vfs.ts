@@ -5,7 +5,7 @@
 */
 
 import { initiate_download } from "../../base/dom/download";
-import { basename, extension } from "../../base/paths";
+import { basename, dirname, extension } from "../../base/paths";
 import { GitHub, GitHubUserContent } from "./github";
 import { VirtualFileSystem } from "./vfs";
 
@@ -42,13 +42,22 @@ export class GitHubFileSystem extends VirtualFileSystem {
 
             // Link to a single file.
             if (info.type == "blob") {
-                const guc_url = gh_user_content.convert_url(url);
-                const name = basename(guc_url);
-                files_to_urls.set(name, guc_url);
+                if (
+                    ["kicad_sch", "kicad_pcb"].includes(extension(info.path!))
+                ) {
+                    const guc_url = gh_user_content.convert_url(url);
+                    const name = basename(guc_url);
+                    files_to_urls.set(name, guc_url);
+                } else {
+                    // Link to non-kicad file, try using the containing directory.
+                    info.type = "tree";
+                    info.path = dirname(info.path!);
+                    console.log(info);
+                }
             }
 
             // Link to a directory.
-            else if (info.type == "tree") {
+            if (info.type == "tree") {
                 // Get a list of files in the directory.
                 const gh_file_list = (await gh.repos_contents(
                     info.owner,

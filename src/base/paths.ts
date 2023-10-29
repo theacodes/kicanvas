@@ -4,8 +4,18 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+export function dirname(path: string | URL) {
+    if (path instanceof URL) {
+        path = path.pathname;
+    }
+    return path.split("/").slice(0, -1).join("/");
+}
+
 export function basename(path: string | URL) {
-    return new URL(path).pathname.split("/").at(-1)!;
+    if (path instanceof URL) {
+        path = path.pathname;
+    }
+    return path.split("/").at(-1)!;
 }
 
 export function extension(path: string) {
