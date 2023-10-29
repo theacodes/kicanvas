@@ -52,7 +52,6 @@ export class GitHubFileSystem extends VirtualFileSystem {
                     // Link to non-kicad file, try using the containing directory.
                     info.type = "tree";
                     info.path = dirname(info.path!);
-                    console.log(info);
                 }
             }
 
