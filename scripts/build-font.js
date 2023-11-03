@@ -29,7 +29,7 @@ let src = await fs.readFile(INFILE, {
 
 const first_bracket = src.indexOf("{");
 
-const preamble = `/* Generated from third-pary ${INFILE} for KiCanvas. See below for original license. */`;
+const preamble = `/* Generated from third-party ${INFILE} for KiCanvas.\nSee below for original license. */`;
 const license_str = src.slice(0, src.lastIndexOf("*/", first_bracket) + 2);
 const glyph_array_str = src.slice(first_bracket + 1, src.lastIndexOf("}") - 1);
 

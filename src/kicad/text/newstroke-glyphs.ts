@@ -1,4 +1,5 @@
-/* Generated from third-pary ./third_party/newstroke/newstroke_font.cpp for KiCanvas. See below for original license. */
+/* Generated from third-party ./third_party/newstroke/newstroke_font.cpp for KiCanvas.
+See below for original license. */
 
 /*
  * newstroke_font.cpp - definitions for automatically converted font
