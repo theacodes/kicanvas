@@ -38,7 +38,7 @@ export class LabelPainter extends SchematicItemPainter {
             return;
         }
 
-        const schtext = new SchText(l.text);
+        const schtext = new SchText(l.shown_text);
         schtext.apply_at(l.at);
         schtext.apply_effects(l.effects);
 

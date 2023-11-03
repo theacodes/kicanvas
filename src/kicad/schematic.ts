@@ -15,6 +15,7 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
+    unescape_string,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 
@@ -685,6 +686,10 @@ export class Label {
         P.atom("fields_autoplaced"),
         P.pair("uuid", T.string),
     ];
+
+    get shown_text() {
+        return unescape_string(this.text);
+    }
 }
 
 export class NetLabel extends Label {
