@@ -21,7 +21,7 @@
 import * as fs from "node:fs/promises";
 
 const INFILE = "./third_party/newstroke/newstroke_font.cpp";
-const OUTFILE = "./src/text/newstroke-glyphs.ts";
+const OUTFILE = "./src/kicad/text/newstroke-glyphs.ts";
 
 let src = await fs.readFile(INFILE, {
     encoding: "utf-8",
