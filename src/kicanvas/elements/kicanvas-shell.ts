@@ -12,7 +12,8 @@ import { sprites_url } from "../icons/sprites";
 import { Project } from "../project";
 import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
-import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
+import FetchFileSystem from "../services/fetch-vfs";
+import type VirtualFileSystem from "../services/vfs";
 import { KCBoardAppElement } from "./kc-board/app";
 import { KCSchematicAppElement } from "./kc-schematic/app";
 

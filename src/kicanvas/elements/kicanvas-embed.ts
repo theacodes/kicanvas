@@ -15,7 +15,8 @@ import {
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
-import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
+import VirtualFileSystem from "../services/vfs";
+import FetchFileSystem from "../services/fetch-vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 
