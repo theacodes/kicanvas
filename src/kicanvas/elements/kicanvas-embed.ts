@@ -16,12 +16,15 @@ import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
 import VirtualFileSystem from "../services/vfs";
-import FetchFileSystem from "../services/fetch-vfs";
+import FetchFileSystem, { FetchFileSource } from "../services/fetch-vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
+import { Logger } from "../../base/log";
+
+const log = new Logger("kicanvas:embed");
 
 /**
- *
+ * The `kicanvas-embed` label
  */
 class KiCanvasEmbedElement extends KCUIElement {
     static override styles = [
@@ -97,22 +100,63 @@ class KiCanvasEmbedElement extends KCUIElement {
     async #setup_events() {}
 
     async #load_src() {
-        const sources = [];
+        const sources: FetchFileSource[] = [];
 
         if (this.src) {
-            sources.push(this.src);
+            sources.push(new FetchFileSource("uri", this.src));
         }
 
-        for (const src_elm of this.querySelectorAll<KiCanvasSourceElement>(
-            "kicanvas-source",
-        )) {
+        const sre_eles =
+            this.querySelectorAll<KiCanvasSourceElement>("kicanvas-source");
+        for (const src_elm of sre_eles) {
             if (src_elm.src) {
-                sources.push(src_elm.src);
+                // Append the source uri firstly
+                sources.push(new FetchFileSource("uri", src_elm.src));
+            } else if (src_elm.childNodes.length > 0) {
+                // If the src attribute is None, add the text children.
+                // Check the "type" attribute
+                // because the render uses file extension name to determine the sch or PCB file so we must know the "type"
+                if (src_elm.extname === null) {
+                    log.warn(
+                        'Missing "extname" attribute for kicanvas-source element.',
+                    );
+                    continue;
+                }
+                if (
+                    ["kicad_sch", "kicad_pcb", "kicad_pro"].indexOf(
+                        src_elm.extname,
+                    ) === -1
+                ) {
+                    log.warn('Invaild value of attribute "extname"');
+                    continue;
+                }
+                for (const child of src_elm.childNodes) {
+                    if (child.nodeType !== Node.TEXT_NODE) {
+                        log.warn("kicanvas-source children are not empty.");
+                        continue;
+                    }
+                    // Get the content and triming the CR,LF,space.
+                    const child_text = child.nodeValue ?? "";
+                    const source_content = child_text.trimStart();
+                    const source_filename =
+                        src_elm.originfile ?? `noname.${src_elm.extname}`;
+                    // append to the sources
+                    sources.push(
+                        new FetchFileSource(
+                            "content",
+                            source_content,
+                            source_filename,
+                        ),
+                    );
+                }
+            } else {
+                // That means this element is empty.
+                log.warn("KiCanvasSourceElement is empty.");
             }
         }
 
         if (sources.length == 0) {
-            console.warn("No valid sources specified");
+            log.warn("No valid sources specified");
             return;
         }
 
@@ -181,6 +225,12 @@ class KiCanvasSourceElement extends CustomElement {
 
     @attribute({ type: String })
     src: string | null;
+
+    @attribute({ type: String })
+    extname: string | null;
+
+    @attribute({ type: String })
+    originfile: string | null;
 }
 
 window.customElements.define("kicanvas-source", KiCanvasSourceElement);
