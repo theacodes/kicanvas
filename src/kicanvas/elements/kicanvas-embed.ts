@@ -112,16 +112,25 @@ class KiCanvasEmbedElement extends KCUIElement {
             if (src_elm.src) {
                 // Append the source uri firstly
                 sources.push(new FetchFileSource("uri", src_elm.src));
-            } else if (src_elm.childNodes.length === 1) {
-                const child = src_elm.childNodes[0]!;
-                if (child.nodeType !== Node.TEXT_NODE) {
-                    log.warn("kicanvas-source children are not empty.");
-                    continue;
-                }
+            } else if (src_elm.childNodes.length > 0) {
+                let content = "";
 
-                // Get the content and triming the CR,LF,space.
-                const child_text = child.nodeValue ?? "";
-                const content = child_text.trimStart();
+                console.log(src_elm.childNodes);
+
+                for (const child of src_elm.childNodes) {
+                    if (child.nodeType === Node.TEXT_NODE) {
+                        // Get the content and triming the CR,LF,space.
+                        const child_text = child.nodeValue ?? "";
+                        content += child_text.trimStart();
+                        // Avoid unexpected token connections
+                        content += " ";
+                    } else {
+                        log.warn(
+                            "kicanvas-source children type is not vaild and that be skiped.",
+                        );
+                        continue;
+                    }
+                }
 
                 // Determine the file extension name.
                 // That make `project.ts` determine the file type is possible.
@@ -153,10 +162,8 @@ class KiCanvasEmbedElement extends KCUIElement {
                 // append to the sources
                 sources.push(new FetchFileSource("content", content, filename));
             } else {
-                // That means this element is empty or has > 1 children.
-                log.warn(
-                    "kicanvas-source is empty or has more than one children.",
-                );
+                // That means this element is empty.
+                log.warn("kicanvas-source is empty.");
             }
         }
 
