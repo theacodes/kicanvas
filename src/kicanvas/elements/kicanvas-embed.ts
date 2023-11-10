@@ -21,7 +21,7 @@ import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 import { Logger } from "../../base/log";
 
-const log = new Logger("kicanvas:embed");
+const log = new Logger("kicanvas:embedtag");
 
 /**
  * The `kicanvas-embed` label
@@ -112,50 +112,51 @@ class KiCanvasEmbedElement extends KCUIElement {
             if (src_elm.src) {
                 // Append the source uri firstly
                 sources.push(new FetchFileSource("uri", src_elm.src));
-            } else if (src_elm.childNodes.length > 0) {
-                // If the src attribute is None, add the text children.
-                // Check the "type" attribute
-                // because the render uses file extension name to determine the sch or PCB file so we must know the "type"
-                if (src_elm.type === null) {
-                    log.warn(
-                        'Missing "extname" attribute for kicanvas-source element.',
-                    );
+            } else if (src_elm.childNodes.length === 1) {
+                const child = src_elm.childNodes[0]!;
+                if (child.nodeType !== Node.TEXT_NODE) {
+                    log.warn("kicanvas-source children are not empty.");
                     continue;
                 }
 
-                // Convert the extension name. That make `project.ts` determine the file type is possible.
+                // Get the content and triming the CR,LF,space.
+                const child_text = child.nodeValue ?? "";
+                const content = child_text.trimStart();
+
+                // Determine the file extension name.
+                // That make `project.ts` determine the file type is possible.
                 let file_extname = "";
-                if (src_elm.type === "sch") {
-                    file_extname = "kicad_sch";
-                } else if (src_elm.type === "pcb") {
-                    file_extname = "kicad_pcb";
-                } else {
-                    log.warn('Invaild value of attribute "type"');
-                    continue;
-                }
-
-                for (const child of src_elm.childNodes) {
-                    if (child.nodeType !== Node.TEXT_NODE) {
-                        log.warn("kicanvas-source children are not empty.");
+                if (src_elm.type) {
+                    if (src_elm.type === "sch") {
+                        file_extname = "kicad_sch";
+                    } else if (src_elm.type === "pcb") {
+                        file_extname = "kicad_pcb";
+                    } else {
+                        log.warn('Invaild value of attribute "type"');
                         continue;
                     }
-                    // Get the content and triming the CR,LF,space.
-                    const child_text = child.nodeValue ?? "";
-                    const source_content = child_text.trimStart();
-                    const source_filename =
-                        src_elm.originname ?? `noname.${file_extname}`;
-                    // append to the sources
-                    sources.push(
-                        new FetchFileSource(
-                            "content",
-                            source_content,
-                            source_filename,
-                        ),
-                    );
+                } else {
+                    // "type" attribute is null, Try to determined the file type.
+                    // sch: (kicad_sch ....
+                    // pcb: (kicad_pcb ....
+                    if (content.startsWith("(kicad_sch")) {
+                        file_extname = "kicad_sch";
+                    } else if (content.startsWith("(kicad_pcb")) {
+                        file_extname = "kicad_pcb";
+                    } else {
+                        log.warn('Cannot determine the file "type"');
+                        continue;
+                    }
                 }
+                const filename = src_elm.originname ?? `noname.${file_extname}`;
+                log.info(`Determined the inline source as "${filename}"`);
+                // append to the sources
+                sources.push(new FetchFileSource("content", content, filename));
             } else {
-                // That means this element is empty.
-                log.warn("KiCanvasSourceElement is empty.");
+                // That means this element is empty or has > 1 children.
+                log.warn(
+                    "kicanvas-source is empty or has more than one children.",
+                );
             }
         }
 

@@ -134,7 +134,7 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
   - `nopreferences` - don't show the user preferences panel. ⚠️
   - `nohelp` - don't show the help panel. ⚠️
 - `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
-- `type` - the type of inline source. Available values include `sch` and `pcb`. It cannot be empty when using the inline source. When the `src` attribute is not empty and the inline source exists, the `src` attribute specified file will be loaded.
+- `type` - the type of inline source. Available values include `sch` and `pcb`. When the `src` attribute is not empty and the inline source exists, the `src` attribute specified file will be loaded and be determined. Otherwise, the file type will be determined by this attribute. If this attribute is empty, the loader will try determined type by the first few characters.
 - `originname` - the origin file name. Due to the KiCad dependence on the file name, when using an inline source specify it is a good choice (e.g. using the extern render for Gitea). The default name is `noname` when using the inline source, or file name in the URL when using the `src` attribute.
 - `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
 - `zoom` - sets the initial view into the document. ⚠️
