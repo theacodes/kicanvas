@@ -118,10 +118,7 @@ class KiCanvasEmbedElement extends KCUIElement {
                 for (const child of src_elm.childNodes) {
                     if (child.nodeType === Node.TEXT_NODE) {
                         // Get the content and triming the CR,LF,space.
-                        const child_text = child.nodeValue ?? "";
-                        content += child_text.trimStart();
-                        // Avoid unexpected token connections
-                        content += " ";
+                        content += child.nodeValue ?? "";
                     } else {
                         log.warn(
                             "kicanvas-source children type is not vaild and that be skiped.",
@@ -129,6 +126,8 @@ class KiCanvasEmbedElement extends KCUIElement {
                         continue;
                     }
                 }
+
+                content = content.trimStart();
 
                 // Determine the file extension name.
                 // That make `project.ts` determine the file type is possible.
