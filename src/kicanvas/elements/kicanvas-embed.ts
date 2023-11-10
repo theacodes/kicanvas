@@ -116,20 +116,24 @@ class KiCanvasEmbedElement extends KCUIElement {
                 // If the src attribute is None, add the text children.
                 // Check the "type" attribute
                 // because the render uses file extension name to determine the sch or PCB file so we must know the "type"
-                if (src_elm.extname === null) {
+                if (src_elm.type === null) {
                     log.warn(
                         'Missing "extname" attribute for kicanvas-source element.',
                     );
                     continue;
                 }
-                if (
-                    ["kicad_sch", "kicad_pcb", "kicad_pro"].indexOf(
-                        src_elm.extname,
-                    ) === -1
-                ) {
-                    log.warn('Invaild value of attribute "extname"');
+
+                // Convert the extension name. That make `project.ts` determine the file type is possible.
+                let file_extname = "";
+                if (src_elm.type === "sch") {
+                    file_extname = "kicad_sch";
+                } else if (src_elm.type === "pcb") {
+                    file_extname = "kicad_pcb";
+                } else {
+                    log.warn('Invaild value of attribute "type"');
                     continue;
                 }
+
                 for (const child of src_elm.childNodes) {
                     if (child.nodeType !== Node.TEXT_NODE) {
                         log.warn("kicanvas-source children are not empty.");
@@ -139,7 +143,7 @@ class KiCanvasEmbedElement extends KCUIElement {
                     const child_text = child.nodeValue ?? "";
                     const source_content = child_text.trimStart();
                     const source_filename =
-                        src_elm.originfile ?? `noname.${src_elm.extname}`;
+                        src_elm.originname ?? `noname.${file_extname}`;
                     // append to the sources
                     sources.push(
                         new FetchFileSource(
@@ -227,10 +231,10 @@ class KiCanvasSourceElement extends CustomElement {
     src: string | null;
 
     @attribute({ type: String })
-    extname: string | null;
+    type: string | null;
 
     @attribute({ type: String })
-    originfile: string | null;
+    originname: string | null;
 }
 
 window.customElements.define("kicanvas-source", KiCanvasSourceElement);
