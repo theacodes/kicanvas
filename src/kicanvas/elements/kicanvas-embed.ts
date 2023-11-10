@@ -115,8 +115,6 @@ class KiCanvasEmbedElement extends KCUIElement {
             } else if (src_elm.childNodes.length > 0) {
                 let content = "";
 
-                console.log(src_elm.childNodes);
-
                 for (const child of src_elm.childNodes) {
                     if (child.nodeType === Node.TEXT_NODE) {
                         // Get the content and triming the CR,LF,space.
