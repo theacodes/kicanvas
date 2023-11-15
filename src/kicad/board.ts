@@ -1322,6 +1322,7 @@ export class FpText extends Text {
             parse_expr(
                 expr,
                 P.start("fp_text"),
+                P.atom("locked"),
                 P.positional("type", T.string),
                 P.positional("text", T.string),
                 ...Text.common_expr_defs,
@@ -1342,6 +1343,7 @@ export class GrText extends Text {
             parse_expr(
                 expr,
                 P.start("gr_text"),
+                P.atom("locked"),
                 P.positional("text", T.string),
                 ...Text.common_expr_defs,
             ),
