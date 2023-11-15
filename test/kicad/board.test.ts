@@ -13,12 +13,14 @@ import properties_pcb_src from "./files/properties.kicad_pcb";
 import paper_pcb_src from "./files/paper.kicad_pcb";
 import shapes_pcb_src from "./files/shapes.kicad_pcb";
 import text_pcb_src from "./files/text.kicad_pcb";
+import text_locked_pcb_src from "./files/text-locked.kicad_pcb";
 import traces_pcb_src from "./files/traces.kicad_pcb";
 import dimensions_pcb_src from "./files/dimensions.kicad_pcb";
 import zones_pcb_src from "./files/zones.kicad_pcb";
 import vias_pcb_src from "./files/vias.kicad_pcb";
 import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
 import footprint_pads_pcb_src from "./files/footprint-pads.kicad_pcb";
+import footprint_text_locked_pcb_src from "./files/footprint-text-locked.kicad_pcb";
 import { first } from "../../src/base/iterator";
 
 suite("kicad.board.KicadPCB(): board parsing", function () {
@@ -313,6 +315,50 @@ suite("kicad.board.KicadPCB(): board parsing", function () {
                 },
             },
         } as any);
+    });
+
+    test("with locked gr_text", function () {
+        const pcb = new board.KicadPCB(
+            "text-locked.kicad_pcb",
+            text_locked_pcb_src,
+        );
+
+        assert.equal(pcb.drawings.length, 2);
+
+        assert.include(pcb.drawings[0], {
+            text: "Text locked",
+            locked: true,
+        });
+
+        assert.include(pcb.drawings[1], {
+            text: "Text unlocked",
+            locked: false,
+        });
+    });
+
+    test("with locked fp_text", function () {
+        const pcb = new board.KicadPCB(
+            "footprint-text-locked.kicad_pcb",
+            footprint_text_locked_pcb_src,
+        );
+
+        assert.equal(pcb.footprints.length, 1);
+
+        const footprint = pcb.footprints[0]!;
+
+        assert.equal(footprint.drawings.length, 2);
+
+        assert.include(footprint.drawings[0], {
+            text: "Locked text",
+            locked: true,
+            type: "reference",
+        });
+
+        assert.include(footprint.drawings[1], {
+            text: "Unlocked text",
+            locked: false,
+            type: "value",
+        });
     });
 
     test("with traces", function () {
