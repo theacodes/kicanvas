@@ -1310,6 +1310,7 @@ export class Text {
 
 export class FpText extends Text {
     type: "reference" | "value" | "user";
+    locked: boolean = false;
 
     constructor(
         expr: Parseable,
@@ -1322,6 +1323,7 @@ export class FpText extends Text {
             parse_expr(
                 expr,
                 P.start("fp_text"),
+                P.atom("locked"),
                 P.positional("type", T.string),
                 P.positional("text", T.string),
                 ...Text.common_expr_defs,
@@ -1331,6 +1333,8 @@ export class FpText extends Text {
 }
 
 export class GrText extends Text {
+    locked: boolean = false;
+
     constructor(
         expr: Parseable,
         public override parent: Footprint | Dimension | KicadPCB,
@@ -1342,6 +1346,7 @@ export class GrText extends Text {
             parse_expr(
                 expr,
                 P.start("gr_text"),
+                P.atom("locked"),
                 P.positional("text", T.string),
                 ...Text.common_expr_defs,
             ),
