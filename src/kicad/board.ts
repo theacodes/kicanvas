@@ -1310,9 +1310,6 @@ export class Text {
 
 export class FpText extends Text {
     type: "reference" | "value" | "user";
-
-    // I don't know the how locked attribute (unlocked attribute in the `At` class) affects rendering
-    // maybe it needs to be changed something.
     locked: boolean = false;
 
     constructor(
