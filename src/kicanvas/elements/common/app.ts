@@ -41,7 +41,7 @@ export abstract class KCViewerAppElement<
     ViewerElementT extends ViewerElement,
 > extends KCUIElement {
     #viewer_elm: ViewerElementT;
-    #activity_bar: KCUIActivitySideBarElement;
+    #activity_bar: KCUIActivitySideBarElement | null;
 
     project: Project;
     viewerReady: DeferredPromise<boolean> = new DeferredPromise<boolean>();
@@ -180,7 +180,7 @@ export abstract class KCViewerAppElement<
     protected abstract make_activities(): ElementOrFragment[];
 
     protected change_activity(name?: string) {
-        this.#activity_bar.change_activity(name);
+        this.#activity_bar?.change_activity(name);
     }
 
     protected abstract make_viewer_element(): ViewerElementT;
@@ -208,6 +208,9 @@ export abstract class KCViewerAppElement<
                 ${pre_activities} ${activities} ${post_activities}
             </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
             resizer = html`<kc-ui-resizer></kc-ui-resizer>`;
+        } else {
+            // NO activity bar
+            this.#activity_bar = null;
         }
 
         const top_toolbar_buttons = [];
