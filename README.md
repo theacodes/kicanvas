@@ -6,7 +6,7 @@ https://user-images.githubusercontent.com/250995/233475339-43c89a26-c825-4999-9d
 
 **NOTE**: KiCanvas is currently in **early alpha**. There will be bugs and missing features. Please take a look at [known issues](#known-issues) and [file an issue] if you run into trouble.
 
-You can also use KiCanvas on your own websites using the [embedding API]. It's written in modern vanilla [TypeScript] and uses the [Canvas] element and [WebGL] for rendering. You can learn more on the [development page](development.md).
+You can also use KiCanvas on your own websites using the [embedding API]. It's written in modern vanilla [TypeScript] and uses the [Canvas] element and [WebGL] for rendering. You can learn more on the [development page][development documentation].
 
 KiCanvas is developed by [Thea Flowers](https://thea.codes) with financial support from her [sponsors].
 
