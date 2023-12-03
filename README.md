@@ -40,7 +40,7 @@ In general, please check the [GitHub issues] page before filing new issues. Some
 
 Take a look at our [FAQ] page for commonly asked questions and answers.
 
-[FAQ]: https://kicanvas.org/faq
+[FAQ]: https://kicanvas.org/home/#faq
 
 ## License and contributing
 
