@@ -354,22 +354,28 @@ class PropertyPainter extends SchematicItemPainter {
             color = this.theme.sheet_fields;
         }
 
-        switch (p.name) {
-            case "Reference":
-                color = this.theme.reference;
-                break;
-            case "Value":
-                color = this.theme.value;
-                break;
-            case "Sheet name":
-                color = this.theme.sheet_name;
-                break;
-            case "Sheet file":
-                color = this.theme.sheet_filename;
-                break;
-        }
+        const font_color = p.effects.font.color;
+        if (font_color.is_transparent_black) {
+            // The color was not specified.
+            switch (p.name) {
+                case "Reference":
+                    color = this.theme.reference;
+                    break;
+                case "Value":
+                    color = this.theme.value;
+                    break;
+                case "Sheet name":
+                    color = this.theme.sheet_name;
+                    break;
+                case "Sheet file":
+                    color = this.theme.sheet_filename;
+                    break;
+            }
 
-        color = this.dim_if_needed(color);
+            color = this.dim_if_needed(color);
+        } else {
+            color = this.dim_if_needed(font_color);
+        }
 
         const parent = p.parent as schematic_items.SchematicSymbol;
         const transform = this.view_painter.current_symbol_transform;
