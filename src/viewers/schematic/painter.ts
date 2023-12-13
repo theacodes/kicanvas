@@ -317,7 +317,14 @@ class TextPainter extends SchematicItemPainter {
         schtext.apply_at(t.at);
         schtext.apply_effects(t.effects);
 
-        schtext.attributes.color = this.dim_if_needed(this.theme.note);
+        const font_color = t.effects.font.color;
+        if (font_color.is_transparent_black) {
+            // The color was not specified.
+            const text_color = this.theme.note;
+            schtext.attributes.color = this.dim_if_needed(text_color);
+        } else {
+            schtext.attributes.color = this.dim_if_needed(font_color);
+        }
 
         this.gfx.state.push();
         StrokeFont.default().draw(
