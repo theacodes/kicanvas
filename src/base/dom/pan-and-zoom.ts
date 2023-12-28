@@ -55,9 +55,11 @@ export class PanAndZoom {
         this.target.addEventListener("touchmove", (e: TouchEvent) => {
             if (e.touches.length === 2) {
                 if (startDistance !== null) {
-                    const currentDistance = this.#getDistanceBetweenTouches(e.touches);
+                    const currentDistance = this.#getDistanceBetweenTouches(
+                        e.touches,
+                    );
                     if (Math.abs(startDistance - currentDistance) < 10) {
-                        const scale = currentDistance / startDistance * 4;
+                        const scale = (currentDistance / startDistance) * 4;
                         if (startDistance < currentDistance) {
                             this.#handle_zoom(scale * -1, null);
                         } else {
