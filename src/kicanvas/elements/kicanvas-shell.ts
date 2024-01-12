@@ -12,7 +12,8 @@ import { sprites_url } from "../icons/sprites";
 import { Project } from "../project";
 import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
-import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
+import FetchFileSystem, { FetchFileSource } from "../services/fetch-vfs";
+import type VirtualFileSystem from "../services/vfs";
 import { KCBoardAppElement } from "./kc-board/app";
 import { KCSchematicAppElement } from "./kc-schematic/app";
 
@@ -82,7 +83,9 @@ class KiCanvasShellElement extends KCUIElement {
 
         later(async () => {
             if (this.src) {
-                const vfs = new FetchFileSystem([this.src]);
+                const vfs = new FetchFileSystem([
+                    new FetchFileSource("uri", this.src),
+                ]);
                 await this.setup_project(vfs);
                 return;
             }

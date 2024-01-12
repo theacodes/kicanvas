@@ -15,12 +15,16 @@ import {
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
-import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
+import VirtualFileSystem from "../services/vfs";
+import FetchFileSystem, { FetchFileSource } from "../services/fetch-vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
+import { Logger } from "../../base/log";
+
+const log = new Logger("kicanvas:embedtag");
 
 /**
- *
+ * The `kicanvas-embed` label
  */
 class KiCanvasEmbedElement extends KCUIElement {
     static override styles = [
@@ -96,22 +100,72 @@ class KiCanvasEmbedElement extends KCUIElement {
     async #setup_events() {}
 
     async #load_src() {
-        const sources = [];
+        const sources: FetchFileSource[] = [];
 
         if (this.src) {
-            sources.push(this.src);
+            sources.push(new FetchFileSource("uri", this.src));
         }
 
-        for (const src_elm of this.querySelectorAll<KiCanvasSourceElement>(
-            "kicanvas-source",
-        )) {
+        const sre_eles =
+            this.querySelectorAll<KiCanvasSourceElement>("kicanvas-source");
+        for (const src_elm of sre_eles) {
             if (src_elm.src) {
-                sources.push(src_elm.src);
+                // Append the source uri firstly
+                sources.push(new FetchFileSource("uri", src_elm.src));
+            } else if (src_elm.childNodes.length > 0) {
+                let content = "";
+
+                for (const child of src_elm.childNodes) {
+                    if (child.nodeType === Node.TEXT_NODE) {
+                        // Get the content and triming the CR,LF,space.
+                        content += child.nodeValue ?? "";
+                    } else {
+                        log.warn(
+                            "kicanvas-source children type is not vaild and that be skiped.",
+                        );
+                        continue;
+                    }
+                }
+
+                content = content.trimStart();
+
+                // Determine the file extension name.
+                // That make `project.ts` determine the file type is possible.
+                let file_extname = "";
+                if (src_elm.type) {
+                    if (src_elm.type === "sch") {
+                        file_extname = "kicad_sch";
+                    } else if (src_elm.type === "pcb") {
+                        file_extname = "kicad_pcb";
+                    } else {
+                        log.warn('Invaild value of attribute "type"');
+                        continue;
+                    }
+                } else {
+                    // "type" attribute is null, Try to determined the file type.
+                    // sch: (kicad_sch ....
+                    // pcb: (kicad_pcb ....
+                    if (content.startsWith("(kicad_sch")) {
+                        file_extname = "kicad_sch";
+                    } else if (content.startsWith("(kicad_pcb")) {
+                        file_extname = "kicad_pcb";
+                    } else {
+                        log.warn('Cannot determine the file "type"');
+                        continue;
+                    }
+                }
+                const filename = src_elm.originname ?? `noname.${file_extname}`;
+                log.info(`Determined the inline source as "${filename}"`);
+                // append to the sources
+                sources.push(new FetchFileSource("content", content, filename));
+            } else {
+                // That means this element is empty.
+                log.warn("kicanvas-source is empty.");
             }
         }
 
         if (sources.length == 0) {
-            console.warn("No valid sources specified");
+            log.warn("No valid sources specified");
             return;
         }
 
@@ -180,6 +234,12 @@ class KiCanvasSourceElement extends CustomElement {
 
     @attribute({ type: String })
     src: string | null;
+
+    @attribute({ type: String })
+    type: string | null;
+
+    @attribute({ type: String })
+    originname: string | null;
 }
 
 window.customElements.define("kicanvas-source", KiCanvasSourceElement);
