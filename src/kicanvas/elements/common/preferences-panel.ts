@@ -63,7 +63,14 @@ export class KCPreferencesPanel extends KCUIElement {
 
     override initialContentCallback() {
         this.renderRoot.addEventListener("input", (e) => {
-            prefs.theme = themes.by_name(this.theme_control.value);
+            const target = e.target as HTMLInputElement;
+
+            if (target.name === "theme") {
+                prefs.theme = themes.by_name(this.theme_control.value);
+            }
+            if (target.name === "align-controls-kicad") {
+                prefs.alignControlsWithKiCad = target.checked;
+            }
             prefs.save();
         });
     }
@@ -89,6 +96,15 @@ export class KCPreferencesPanel extends KCUIElement {
                             </select>
                         </kc-ui-control>
                     </kc-ui-control-list>
+                    <kc-ui-control>
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="align-controls-kicad"
+                                checked="${prefs.alignControlsWithKiCad}" />
+                            Align controls with KiCad
+                        </label>
+                    </kc-ui-control>
                 </kc-ui-panel-body>
             </kc-ui-panel>
         `;
