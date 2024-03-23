@@ -5,6 +5,7 @@
 */
 
 import { BBox, Camera2, Vec2 } from "../math";
+import { Preferences } from "../../kicanvas/preferences";
 
 const line_delta_multiplier = 8;
 const page_delta_multiplier = 24;
@@ -12,6 +13,7 @@ const zoom_speed = 0.005;
 const pan_speed = 1;
 
 export type PanAndZoomCallback = () => void;
+const prefs = Preferences.INSTANCE;
 
 /**
  * Interactive Pan and Zoom helper
@@ -35,6 +37,19 @@ export class PanAndZoom {
         public max_zoom = 10,
         public bounds?: BBox,
     ) {
+        Preferences.INSTANCE.addEventListener(
+            "kicanvas:preferences:change",
+            () => {
+                //this.updateSettings(Preferences.INSTANCE);
+                console.log(
+                    "Preferences changed:",
+                    prefs.alignControlsWithKiCad,
+                );
+            },
+        );
+
+        //this.updateSettings(Preferences.INSTANCE);
+
         this.target.addEventListener(
             "wheel",
             (e: WheelEvent) => this.#on_wheel(e),
@@ -84,6 +99,38 @@ export class PanAndZoom {
             startDistance = null;
             startPosition = null;
         });
+
+        let dragStartPosition: Vec2 | null = null;
+        let dragging = false;
+
+        this.target.addEventListener("mousedown", (e: MouseEvent) => {
+            if (e.button === 1 || e.button === 2) {
+                e.preventDefault();
+                dragging = true;
+                dragStartPosition = new Vec2(e.clientX, e.clientY);
+            }
+        });
+
+        this.target.addEventListener("mousemove", (e: MouseEvent) => {
+            if (dragging && dragStartPosition !== null) {
+                const currentPosition = new Vec2(e.clientX, e.clientY);
+                const delta = currentPosition.sub(dragStartPosition);
+                this.#handle_pan(-delta.x, -delta.y);
+                dragStartPosition = currentPosition;
+            }
+        });
+
+        this.target.addEventListener("mouseup", (e: MouseEvent) => {
+            if (e.button === 1 || e.button === 2) {
+                dragging = false;
+                dragStartPosition = null;
+            }
+        });
+
+        // コンテキストメニューの表示を防ぐためのイベントハンドラを追加
+        this.target.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+        });
     }
 
     #getDistanceBetweenTouches(touches: TouchList) {
@@ -102,8 +149,14 @@ export class PanAndZoom {
         let dy = e.deltaY;
 
         // shift modifier flips the X and Y axes (horizontal scroll)
-        if (dx == 0 && e.shiftKey) {
-            [dx, dy] = [dy, dx];
+        if (!prefs.alignControlsWithKiCad) {
+            if (dx == 0 && e.shiftKey) {
+                [dx, dy] = [dy, dx];
+            }
+        } else {
+            if (dx == 0 && e.ctrlKey) {
+                [dx, dy] = [dy, dx];
+            }
         }
 
         // work around line/page scrolling
@@ -119,14 +172,25 @@ export class PanAndZoom {
         dx = Math.sign(dx) * Math.min(page_delta_multiplier, Math.abs(dx));
         dy = Math.sign(dy) * Math.min(page_delta_multiplier, Math.abs(dy));
 
-        // pinch zoom
-        if (e.ctrlKey) {
-            this.#rect = this.target.getBoundingClientRect();
-            this.#handle_zoom(dy, this.#relative_mouse_pos(e));
-        }
-        // pan
-        else {
-            this.#handle_pan(dx, dy);
+        if (!prefs.alignControlsWithKiCad) {
+            // pinch zoom
+            if (e.ctrlKey) {
+                this.#rect = this.target.getBoundingClientRect();
+                this.#handle_zoom(dy, this.#relative_mouse_pos(e));
+            }
+            // pan
+            else {
+                this.#handle_pan(dx, dy);
+            }
+        } else {
+            if (e.shiftKey || e.ctrlKey) {
+                this.#handle_pan(-dx, dy);
+            }
+            // pinch zoom
+            else {
+                this.#rect = this.target.getBoundingClientRect();
+                this.#handle_zoom(dy, this.#relative_mouse_pos(e));
+            }
         }
 
         this.target.dispatchEvent(
