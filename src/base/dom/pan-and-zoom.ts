@@ -37,19 +37,6 @@ export class PanAndZoom {
         public max_zoom = 10,
         public bounds?: BBox,
     ) {
-        Preferences.INSTANCE.addEventListener(
-            "kicanvas:preferences:change",
-            () => {
-                //this.updateSettings(Preferences.INSTANCE);
-                console.log(
-                    "Preferences changed:",
-                    prefs.alignControlsWithKiCad,
-                );
-            },
-        );
-
-        //this.updateSettings(Preferences.INSTANCE);
-
         this.target.addEventListener(
             "wheel",
             (e: WheelEvent) => this.#on_wheel(e),
@@ -127,7 +114,7 @@ export class PanAndZoom {
             }
         });
 
-        // コンテキストメニューの表示を防ぐためのイベントハンドラを追加
+        // Prevent the browser's default context menu.
         this.target.addEventListener("contextmenu", (e) => {
             e.preventDefault();
         });
