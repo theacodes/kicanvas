@@ -94,7 +94,6 @@ export class KCUIFocusOverlay extends KCUIElement {
 
         this.#intersection_observer = new IntersectionObserver((entries) => {
             for (const entry of entries) {
-                console.log(entry);
                 if (!entry.isIntersecting) {
                     this.classList.remove("has-focus");
                 }

@@ -125,6 +125,7 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     -   `basic` - zoom, pan, and select are available.
     -   `full` - complete interactive viewer, including side panels.
 -   `controlslist` - further customizes the available controls.
+
     -   `nooverlay` - don't show the "click or tap to interact" overlay.
     -   `nofullscreen` - don't show the fullscreen button. ⚠️
     -   `nodownload` - don't show the download button.
@@ -136,7 +137,11 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     -   `noinfo` - don't show the document info panel. ⚠️
     -   `nopreferences` - don't show the user preferences panel. ⚠️
     -   `nohelp` - don't show the help panel. ⚠️
+
 -   `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
+-   `type` - the type of inline source. Available values include `sch` and `pcb`. When the `src` attribute is not empty and the inline source exists, the `src` attribute specified file will be loaded and be determined. Otherwise, the file type will be determined by this attribute. If this attribute is empty, the loader will try determined type by the first few characters.
+-   `originname` - the origin file name. Due to the KiCad dependence on the file name, when using an inline source specify it is a good choice (e.g. using the extern render for Gitea). The default name is `noname` when using the inline source, or file name in the URL when using the `src` attribute.
+
 -   `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
 -   `zoom` - sets the initial view into the document. ⚠️
     -   `objects` - zooms to show all visible objects (default). ⚠️

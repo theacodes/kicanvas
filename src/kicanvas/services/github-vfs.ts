@@ -7,7 +7,7 @@
 import { initiate_download } from "../../base/dom/download";
 import { basename, dirname, extension } from "../../base/paths";
 import { GitHub, GitHubUserContent } from "./github";
-import { VirtualFileSystem } from "./vfs";
+import VirtualFileSystem from "./vfs";
 
 const kicad_extensions = ["kicad_pcb", "kicad_pro", "kicad_sch"];
 const gh_user_content = new GitHubUserContent();

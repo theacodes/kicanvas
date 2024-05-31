@@ -15,7 +15,7 @@ import type {
     SchematicSheet,
     SchematicSheetInstance,
 } from "../kicad/schematic";
-import type { VirtualFileSystem } from "./services/vfs";
+import type VirtualFileSystem from "./services/vfs";
 
 const log = new Logger("kicanvas:project");
 
