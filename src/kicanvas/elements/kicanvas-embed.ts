@@ -83,6 +83,8 @@ class KiCanvasEmbedElement extends KCUIElement {
     @attribute({ type: String })
     zoom: "objects" | "page" | string | null;
 
+    custom_resolver: ((name: string) => URL) | null = null;
+
     #schematic_app: KCSchematicAppElement;
     #board_app: KCBoardAppElement;
 
@@ -115,7 +117,7 @@ class KiCanvasEmbedElement extends KCUIElement {
             return;
         }
 
-        const vfs = new FetchFileSystem(sources);
+        const vfs = new FetchFileSystem(sources, this.custom_resolver);
         await this.#setup_project(vfs);
     }
 

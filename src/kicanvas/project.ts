@@ -42,13 +42,32 @@ export class Project extends EventTarget implements IDisposable {
 
         this.#fs = fs;
 
-        const promises = [];
+        let promises = [];
 
         for (const filename of this.#fs.list()) {
             promises.push(this.#load_file(filename));
         }
 
         await Promise.all(promises);
+
+        while (promises.length) {
+            // 'Recursively' resolve all schematics until none are remaining
+            promises = [];
+            for (const schematic of this.schematics()) {
+                for (const sheet of schematic.sheets) {
+                    const sheet_sch = this.#files_by_name.get(
+                        sheet.sheetfile ?? "",
+                    ) as KicadSch;
+
+                    if (!sheet_sch && sheet.sheetfile) {
+                        // Missing schematic, attempt to fetch
+                        promises.push(this.#load_file(sheet.sheetfile));
+                    }
+
+                }
+            }
+            await Promise.all(promises);
+        }
 
         this.#determine_schematic_hierarchy();
 
