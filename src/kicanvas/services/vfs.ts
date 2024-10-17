@@ -55,7 +55,7 @@ export class FetchFileSystem extends VirtualFileSystem {
 
     #resolve(filepath: string | URL): URL {
         if (typeof filepath === 'string') {
-            let cached_url = this.urls.get(filepath);
+            const cached_url = this.urls.get(filepath);
             if (cached_url) {
                 return cached_url;  
             } else {
