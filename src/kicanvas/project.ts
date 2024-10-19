@@ -63,7 +63,6 @@ export class Project extends EventTarget implements IDisposable {
                         // Missing schematic, attempt to fetch
                         promises.push(this.#load_file(sheet.sheetfile));
                     }
-
                 }
             }
             await Promise.all(promises);

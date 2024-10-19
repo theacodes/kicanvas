@@ -54,12 +54,12 @@ export class FetchFileSystem extends VirtualFileSystem {
     }
 
     #resolve(filepath: string | URL): URL {
-        if (typeof filepath === 'string') {
+        if (typeof filepath === "string") {
             const cached_url = this.urls.get(filepath);
             if (cached_url) {
-                return cached_url;  
+                return cached_url;
             } else {
-                const url = this.resolver(filepath)
+                const url = this.resolver(filepath);
                 const name = basename(url);
                 this.urls.set(name, url);
                 return url;
@@ -68,13 +68,16 @@ export class FetchFileSystem extends VirtualFileSystem {
         return filepath;
     }
 
-    constructor(urls: (string | URL)[], resolve_file: ((name: string) => URL) | null = null) {
+    constructor(
+        urls: (string | URL)[],
+        resolve_file: ((name: string) => URL) | null = null,
+    ) {
         super();
 
-        this.resolver = resolve_file ?? this.#default_resolver
+        this.resolver = resolve_file ?? this.#default_resolver;
 
         for (const item of urls) {
-            this.#resolve(item)
+            this.#resolve(item);
         }
     }
 
