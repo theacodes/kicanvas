@@ -46,14 +46,38 @@ export abstract class VirtualFileSystem {
  */
 export class FetchFileSystem extends VirtualFileSystem {
     private urls: Map<string, URL> = new Map();
+    private resolver!: (name: string) => URL;
 
-    constructor(urls: (string | URL)[]) {
+    #default_resolver(name: string): URL {
+        const url = new URL(name, window.location.toString());
+        return url;
+    }
+
+    #resolve(filepath: string | URL): URL {
+        if (typeof filepath === "string") {
+            const cached_url = this.urls.get(filepath);
+            if (cached_url) {
+                return cached_url;
+            } else {
+                const url = this.resolver(filepath);
+                const name = basename(url);
+                this.urls.set(name, url);
+                return url;
+            }
+        }
+        return filepath;
+    }
+
+    constructor(
+        urls: (string | URL)[],
+        resolve_file: ((name: string) => URL) | null = null,
+    ) {
         super();
 
+        this.resolver = resolve_file ?? this.#default_resolver;
+
         for (const item of urls) {
-            const url = new URL(item, window.location.toString());
-            const name = basename(url);
-            this.urls.set(name, url);
+            this.#resolve(item);
         }
     }
 
@@ -66,7 +90,7 @@ export class FetchFileSystem extends VirtualFileSystem {
     }
 
     public override async get(name: string): Promise<File> {
-        const url = this.urls.get(name);
+        const url = this.#resolve(name);
 
         if (!url) {
             throw new Error(`File ${name} not found!`);
