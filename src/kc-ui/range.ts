@@ -62,13 +62,27 @@ export class KCUIRangeElement extends KCUIElement {
                 border-radius: 0.5em;
                 background: var(--input-range-bg);
             }
+            input[type="range"]::-moz-range-track {
+                box-sizing: border-box;
+                height: 0.5em;
+                border: 1px solid transparent;
+                border-radius: 0.5em;
+                background: var(--input-range-bg);
+            }
 
             input[type="range"]:hover::-webkit-slider-runnable-track,
             input[type="range"]:focus::-webkit-slider-runnable-track {
                 border: 1px solid var(--input-range-hover-bg);
             }
+            input[type="range"]:hover::-moz-range-track,
+            input[type="range"]:focus::-moz-range-track {
+                border: 1px solid var(--input-range-hover-bg);
+            }
 
             input[type="range"]:disabled::-webkit-slider-runnable-track {
+                background: var(--input-range-disabled-bg);
+            }
+            input[type="range"]:disabled::-moz-range-track {
                 background: var(--input-range-disabled-bg);
             }
 
@@ -81,8 +95,19 @@ export class KCUIRangeElement extends KCUIElement {
                 margin-top: -0.3em;
                 background: var(--input-range-fg);
             }
+            input[type="range"]::-moz-range-thumb {
+                border: none;
+                height: 1em;
+                width: 1em;
+                border-radius: 100%;
+                margin-top: -0.3em;
+                background: var(--input-range-fg);
+            }
 
             input[type="range"]:focus::-webkit-slider-thumb {
+                box-shadow: var(--input-range-handle-shadow);
+            }
+            input[type="range"]:focus::-moz-range-thumb {
                 box-shadow: var(--input-range-handle-shadow);
             }
         `,
