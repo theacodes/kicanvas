@@ -14,6 +14,8 @@ import {
 } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
+import type { BoardViewer } from "../../viewers/board/viewer";
+import type { SchematicViewer } from "../../viewers/schematic/viewer";
 import { Project } from "../project";
 import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
@@ -95,7 +97,10 @@ class KiCanvasEmbedElement extends KCUIElement {
         });
     }
 
-    async #setup_events() {}
+    async #setup_events() {
+        //Setup the deep link handler
+        window.addEventListener('hashchange', handleDeepLink);
+    }
 
     async #load_src() {
         const sources = [];
@@ -160,13 +165,42 @@ class KiCanvasEmbedElement extends KCUIElement {
 
         const focus_overlay =
             (this.controls ?? "none") == "none" ||
-            this.controlslist?.includes("nooverlay")
+                this.controlslist?.includes("nooverlay")
                 ? null
                 : html`<kc-ui-focus-overlay></kc-ui-focus-overlay>`;
 
         return html`<main>
             ${this.#schematic_app} ${this.#board_app} ${focus_overlay}
         </main>`;
+    }
+
+
+    async deepLinkSelect(ref: string) {
+        //We assure the filetype
+        console.log("Active Page:", this.#project.active_page);
+
+
+        switch (this.#project.active_page?.type) {
+            case "pcb":
+                const boardView = this.#board_app.viewer as BoardViewer;
+                boardView.select(ref);
+                boardView.zoom_to_selection()
+                break;
+
+            case "schematic":
+                const schView = this.#schematic_app.viewer as SchematicViewer;
+                schView.select(ref);
+                schView.zoom_to_selection()
+                break;
+
+            default:
+                console.log("Unknown file type");
+                break;
+        }
+
+
+
+
     }
 }
 
@@ -195,3 +229,27 @@ document.body.appendChild(
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&family=Nunito:wght@300;400;500;600;700&display=swap"
         crossorigin="anonymous" />`,
 );
+
+function handleDeepLink() {
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        const parts = hash.split(":");
+        if (!parts) {
+            console.log("Incorrect reference format");
+            return null;
+        }
+        let id: string = parts[0] as string;
+        let ref: string = parts[1] as string;
+
+        console.log('ID:', id, 'Reference:', ref);
+        const element = document.getElementById(id) as KiCanvasEmbedElement; //this should get us the kicanvas element
+        if (element instanceof KiCanvasEmbedElement) { //If embed element exists trigger its select
+            console.log(element);
+            element.scrollIntoView({ behavior: 'smooth' });
+            element.deepLinkSelect(ref); //Sends selection of file:component
+        } else {
+            console.log("Element is not a kicanvasEmbedElement");
+        }
+    }
+    return null;
+}
