@@ -175,22 +175,27 @@ class KiCanvasEmbedElement extends KCUIElement {
     }
 
 
-    async deepLinkSelect(ref: string) {
+    async deepLinkSelect(filename: string, reference: string) {
         //We assure the filetype
         console.log("Active Page:", this.#project.active_page);
-
-
-        switch (this.#project.active_page?.type) {
+        let page = this.#project.page_by_name(filename);
+        switch (page?.type) {
             case "pcb":
+                this.#project.set_active_page(page);
                 const boardView = this.#board_app.viewer as BoardViewer;
-                boardView.select(ref);
-                boardView.zoom_to_selection()
+                boardView.resolve_loaded(false); //This fixes the viewer reload bug where you cant select element if coming from the same viewer as the loaded Barrier isnt renewed
+                await boardView.loaded;
+                boardView.select(reference);
+                boardView.zoom_to_selection();
                 break;
 
             case "schematic":
+                this.#project.set_active_page(page);
                 const schView = this.#schematic_app.viewer as SchematicViewer;
-                schView.select(ref);
-                schView.zoom_to_selection()
+                schView.resolve_loaded(false);//This fixes the viewer reload bug where you cant select element if coming from the same viewer as the loaded Barrier isnt renewed
+                await schView.loaded;
+                schView.select(reference);
+                schView.zoom_to_selection();
                 break;
 
             default:
@@ -233,23 +238,23 @@ document.body.appendChild(
 function handleDeepLink() {
     const hash = window.location.hash.substring(1);
     if (hash) {
-        const parts = hash.split(":");
-        if (!parts) {
-            console.log("Incorrect reference format");
-            return null;
-        }
-        let id: string = parts[0] as string;
-        let ref: string = parts[1] as string;
-
-        console.log('ID:', id, 'Reference:', ref);
-        const element = document.getElementById(id) as KiCanvasEmbedElement; //this should get us the kicanvas element
-        if (element instanceof KiCanvasEmbedElement) { //If embed element exists trigger its select
-            console.log(element);
-            element.scrollIntoView({ behavior: 'smooth' });
-            element.deepLinkSelect(ref); //Sends selection of file:component
+        const regex = /^(?<id>[^:]+):(?<file>[^:]+):(?<reference>[^:]+)$/;
+        const match = hash.match(regex);
+        if (match && match.groups) {
+            const { id, file, reference } = match.groups;
+            console.log("ID:", id, " File:", file, " Reference:", reference);
+            const element = document.getElementById(id as string) as KiCanvasEmbedElement; //this should get us the kicanvas element
+            if (element instanceof KiCanvasEmbedElement) { //If embed element exists trigger its select
+                console.log(element);
+                element.scrollIntoView({ behavior: 'smooth' });
+                element.deepLinkSelect(file as string, reference as string); //Sends 
+            } else {
+                console.log("Element is not a kicanvasEmbedElement");
+            }
         } else {
-            console.log("Element is not a kicanvasEmbedElement");
+            console.log("Invalid format");
         }
+
     }
     return null;
 }
