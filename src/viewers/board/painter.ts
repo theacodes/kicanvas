@@ -40,7 +40,7 @@ abstract class BoardItemPainter extends ItemPainter {
         return (this.view_painter as BoardPainter).filter_net;
     }
 
-    protected isFillValid(fill: string ): boolean {
+    protected isFillValid(fill: string): boolean {
         return Boolean(fill && fill !== "none" && fill !== "no");
     }
 }
