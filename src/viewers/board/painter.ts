@@ -39,6 +39,10 @@ abstract class BoardItemPainter extends ItemPainter {
     get filter_net(): number | null {
         return (this.view_painter as BoardPainter).filter_net;
     }
+
+    protected isFillValid(fill: string): boolean {
+        return Boolean(fill && fill !== "none" && fill !== "no");
+    }
 }
 
 class LinePainter extends BoardItemPainter {
@@ -77,7 +81,7 @@ class RectPainter extends BoardItemPainter {
 
         this.gfx.line(new Polyline(points, r.width, color));
 
-        if (r.fill && r.fill != "none") {
+        if (this.isFillValid(r.fill)) {
             this.gfx.polygon(new Polygon(points, color));
         }
     }
@@ -104,7 +108,7 @@ class PolyPainter extends BoardItemPainter {
             this.gfx.line(new Polyline([...p.pts, p.pts[0]!], p.width, color));
         }
 
-        if (p.fill && p.fill != "none") {
+        if (this.isFillValid(p.fill)) {
             this.gfx.polygon(new Polygon(p.pts, color));
         }
     }
@@ -147,7 +151,7 @@ class CirclePainter extends BoardItemPainter {
             c.width,
         );
 
-        if (c.fill && c.fill != "none") {
+        if (this.isFillValid(c.fill)) {
             this.gfx.circle(
                 new Circle(arc.center, arc.radius + (c.width ?? 0), color),
             );
