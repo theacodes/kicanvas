@@ -180,6 +180,10 @@ export class LineSegment {
             ),
         );
     }
+
+    get bbox(): BBox {
+        return BBox.from_points([this.start, this.end]);
+    }
 }
 
 export class ArcSegment {
@@ -219,6 +223,10 @@ export class ArcSegment {
             ),
         );
     }
+
+    get bbox(): BBox {
+        return BBox.from_points([this.start, this.mid, this.end]);
+    }
 }
 
 export class Via {
@@ -253,6 +261,13 @@ export class Via {
                 P.pair("tstamp", T.string),
             ),
         );
+    }
+
+    get bbox(): BBox {
+        return BBox.from_points([
+            this.at.position.sub(new Vec2(this.size / 2, this.size / 2)),
+            this.at.position.add(new Vec2(this.size / 2, this.size / 2)),
+        ]);
     }
 }
 
@@ -319,6 +334,10 @@ export class Zone {
                 P.pair("tstamp", T.string),
             ),
         );
+    }
+
+    get bbox(): BBox {
+        return BBox.from_points(this.polygons.flatMap((poly) => poly.pts));
     }
 }
 
@@ -916,6 +935,10 @@ export class Footprint {
      * This does not take into account text drawings.
      */
     get bbox() {
+        return this.get_bbox((item) => !(item instanceof FpText));
+    }
+
+    get_bbox(filter: (item: FootprintDrawings) => boolean) {
         if (!this.#bbox) {
             // Based on FOOTPRINT::GetBoundingBox, excludes text items.
 
@@ -935,11 +958,12 @@ export class Footprint {
             ).rotate_self(Angle.deg_to_rad(this.at.rotation));
 
             for (const item of this.drawings) {
-                if (item instanceof FpText) {
+                if (!filter(item)) {
                     continue;
                 }
 
-                bbox = BBox.combine([bbox, item.bbox.transform(matrix)]);
+                const item_bbox = item.bbox.transform(matrix);
+                bbox = BBox.combine([bbox, item_bbox]);
             }
 
             bbox.context = this;
@@ -949,7 +973,7 @@ export class Footprint {
     }
 }
 
-class GraphicItem {
+export class GraphicItem {
     parent?: Footprint;
     layer: string;
     tstamp: string;
@@ -1305,6 +1329,46 @@ export class Text {
 
     get shown_text() {
         return expand_text_vars(this.text, this.parent);
+    }
+
+    get bbox(): BBox {
+        const size = this.effects.font.size;
+        const at_pos = this.at.position;
+        const chars = this.shown_text.length;
+        const w = size.x * chars;
+        const h = size.y;
+        const justify = this.effects.justify;
+        let low_x;
+        let high_x;
+        let low_y;
+        let high_y;
+        if (justify.horizontal === "left") {
+            low_x = at_pos.x;
+            high_x = at_pos.x + w;
+        } else if (justify.horizontal === "right") {
+            low_x = at_pos.x - w;
+            high_x = at_pos.x;
+        } else {
+            low_x = at_pos.x - w / 2;
+            high_x = at_pos.x + w / 2;
+        }
+        if (justify.vertical === "top") {
+            low_y = at_pos.y;
+            high_y = at_pos.y + h;
+        } else if (justify.vertical === "bottom") {
+            low_y = at_pos.y - h;
+            high_y = at_pos.y;
+        } else {
+            low_y = at_pos.y - h / 2;
+            high_y = at_pos.y + h / 2;
+        }
+
+        //TODO mirror?
+
+        return BBox.from_points([
+            new Vec2(low_x, low_y),
+            new Vec2(high_x, high_y),
+        ]);
     }
 }
 
