@@ -123,6 +123,31 @@ suite("kicad.tokenizer.tokenize(): s-expression tokenizer", function () {
             CLOSE_TOKEN,
         ]);
     });
+
+    test("with embedded data containing pipes", function () {
+        const tokens = tokenizer.tokenize(
+            "(data |KLUv/aCvzgcAAAAQiVBORw0KGgoAAAANSUhEUgAABiAAAANoCAYAAABJLCIrAAAABHNCSVQICAgI)",
+        );
+        assert_tokens(tokens, [
+            OPEN_TOKEN,
+            [ATOM, "data"],
+            [
+                ATOM,
+                "|KLUv/aCvzgcAAAAQiVBORw0KGgoAAAANSUhEUgAABiAAAANoCAYAAABJLCIrAAAABHNCSVQICAgI",
+            ],
+            CLOSE_TOKEN,
+        ]);
+    });
+
+    test("with pipe character in middle of atom", function () {
+        const tokens = tokenizer.tokenize("(test |middle|end)");
+        assert_tokens(tokens, [
+            OPEN_TOKEN,
+            [ATOM, "test"],
+            [ATOM, "|middle|end"],
+            CLOSE_TOKEN,
+        ]);
+    });
 });
 
 suite("kicad.tokenizer.listify()", function () {
