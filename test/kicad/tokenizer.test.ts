@@ -131,7 +131,10 @@ suite("kicad.tokenizer.tokenize(): s-expression tokenizer", function () {
         assert_tokens(tokens, [
             OPEN_TOKEN,
             [ATOM, "data"],
-            [ATOM, "|KLUv/aCvzgcAAAAQiVBORw0KGgoAAAANSUhEUgAABiAAAANoCAYAAABJLCIrAAAABHNCSVQICAgI"],
+            [
+                ATOM,
+                "|KLUv/aCvzgcAAAAQiVBORw0KGgoAAAANSUhEUgAABiAAAANoCAYAAABJLCIrAAAABHNCSVQICAgI",
+            ],
             CLOSE_TOKEN,
         ]);
     });
