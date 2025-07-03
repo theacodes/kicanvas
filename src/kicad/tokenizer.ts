@@ -64,6 +64,7 @@ function is_atom(c: string) {
             "=",
             "~",
             "$",
+            "|",
         ].includes(c)
     );
 }
@@ -109,7 +110,7 @@ export function* tokenize(input: string) {
                 state = State.number;
                 start_idx = i;
                 continue;
-            } else if (is_alpha(c) || ["*", "&", "$", "/", "%"].includes(c)) {
+            } else if (is_alpha(c) || ["*", "&", "$", "/", "%", "|"].includes(c)) {
                 state = State.atom;
                 start_idx = i;
                 continue;
