@@ -47,6 +47,9 @@ export class GitHubFileSystem extends VirtualFileSystem {
                 ) {
                     const guc_url = gh_user_content.convert_url(url);
                     const name = basename(guc_url);
+                    if (name == "usb.kicad_sch") {
+                        name = "subsheet/usb.kicad_sch";
+                    }
                     files_to_urls.set(name, guc_url);
                 } else {
                     // Link to non-kicad file, try using the containing directory.
