@@ -46,7 +46,7 @@ KCUIIconElement.sprites_url = sprites_url;
  *       <kc-ui-activity-side-bar>
  *
  */
-class KiCanvasShellElement extends KCUIElement {
+export class KiCanvasShellElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
         // TODO: Figure out a better way to handle these two styles.
@@ -208,5 +208,3 @@ class KiCanvasShellElement extends KCUIElement {
         `;
     }
 }
-
-window.customElements.define("kc-kicanvas-shell", KiCanvasShellElement);

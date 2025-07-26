@@ -6,8 +6,10 @@
 
 // Side effects - Register web components globally
 import "./base/livereload";
-import "./kicanvas/elements/kicanvas-shell";
-import "./kicanvas/elements/kicanvas-embed";
+import { KiCanvasEmbedElement } from "./kicanvas/elements/kicanvas-embed";
+import { KiCanvasShellElement } from "./kicanvas/elements/kicanvas-shell";
+
+export { KiCanvasEmbedElement, KiCanvasShellElement };
 
 // ========================================
 // Core KiCad File Parsers & Types
