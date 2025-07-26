@@ -208,3 +208,5 @@ export class KiCanvasShellElement extends KCUIElement {
         `;
     }
 }
+
+window.customElements.define("kc-kicanvas-shell", KiCanvasShellElement);
