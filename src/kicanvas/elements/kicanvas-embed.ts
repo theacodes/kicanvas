@@ -22,7 +22,7 @@ import type { KCSchematicAppElement } from "./kc-schematic/app";
 /**
  *
  */
-class KiCanvasEmbedElement extends KCUIElement {
+export class KiCanvasEmbedElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
         new CSS(kc_ui_styles),
@@ -172,7 +172,7 @@ class KiCanvasEmbedElement extends KCUIElement {
 
 window.customElements.define("kicanvas-embed", KiCanvasEmbedElement);
 
-class KiCanvasSourceElement extends CustomElement {
+export class KiCanvasSourceElement extends CustomElement {
     constructor() {
         super();
         this.ariaHidden = "true";

@@ -1,0 +1,22 @@
+# Source files (users get the built version)
+src/
+test/
+scripts/
+debug/
+docs/
+
+# Config files
+tsconfig.json
+.eslintrc.cjs
+.vscode/
+.github/
+
+# Build artifacts we don't need in npm
+build/test/
+build/third_party/
+esbuild-meta.json
+
+# Development files
+*.log
+coverage/
+node_modules/ 
