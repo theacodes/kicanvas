@@ -1,8 +1,22 @@
 {
     "name": "kicanvas",
     "version": "0.0.0",
-    "description": "",
+    "description": "KiCanvas - Web-based KiCad file viewer",
     "type": "module",
+    "main": "./build/kicanvas.js",
+    "types": "./build/src/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./build/src/index.d.ts",
+            "import": "./build/kicanvas.js"
+        }
+    },
+    "files": [
+        "build/kicanvas.js",
+        "build/src/**/*.d.ts",
+        "README.md",
+        "LICENSE.md"
+    ],
     "directories": {
         "test": "tests"
     },
@@ -14,7 +28,7 @@
         "@typescript-eslint/parser": "^6.10.0",
         "@web/dev-server-esbuild": "^1.0.0",
         "@web/test-runner": "^0.18.0",
-        "esbuild": "^0.19.5",
+        "esbuild": "^0.25.8",
         "esbuild-plugin-copy": "^2.1.1",
         "eslint": "^8.53.0",
         "eslint-config-prettier": "^9.0.0",
@@ -38,7 +52,9 @@
         "build:font": "node scripts/build-font.js",
         "build:sprites": "node scripts/build-sprites.js",
         "build": "tsc -p tsconfig.json && node scripts/build.js",
-        "clean": "rm -rf build && rm -rf debug/kicanvas"
+        "clean": "rm -rf build && rm -rf debug/kicanvas",
+        "prepublishOnly": "npm run clean && npm run build",
+        "pack": "npm run prepublishOnly && npm pack"
     },
     "repository": {
         "type": "git",

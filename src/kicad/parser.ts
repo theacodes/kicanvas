@@ -13,7 +13,7 @@ import { listify, type List } from "./tokenizer";
 
 const log = new Logger("kicanvas:parser");
 
-enum Kind {
+export enum Kind {
     // the first token in the expr (kind ...)
     start,
     // (1 2 3) -> {name: value}

@@ -8,8 +8,7 @@
     "files.exclude": {
         "**/*.js": {
             "when": "$(basename).ts"
-        },
-        "build/": true
+        }
     },
     "cSpell.words": [
         "Adhes",

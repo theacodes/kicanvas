@@ -34,10 +34,9 @@ export class CustomElement extends HTMLElement {
      */
     static exportparts: string[] = [];
 
-    protected updateComplete: DeferredPromise<boolean> =
-        new DeferredPromise<boolean>();
+    updateComplete: DeferredPromise<boolean> = new DeferredPromise<boolean>();
 
-    private disposables = new Disposables();
+    disposables = new Disposables();
 
     constructor() {
         super();
@@ -130,7 +129,7 @@ export class CustomElement extends HTMLElement {
         return this.updateComplete;
     }
 
-    protected queryAssignedElements<T extends Element = HTMLElement>(
+    queryAssignedElements<T extends Element = HTMLElement>(
         slot_name?: string,
         selector?: string,
     ) {
