@@ -15,7 +15,12 @@ import {
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
-import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
+import {
+    FetchFileSystem,
+    VirtualFileSystem,
+    MemoryFileSystem,
+    CombinedFileSystem,
+} from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 
@@ -98,27 +103,70 @@ class KiCanvasEmbedElement extends KCUIElement {
     async #setup_events() {}
 
     async #load_src() {
-        const sources = [];
+        const url_sources: (string | URL)[] = [];
+        const inline_entries: Record<string, string> = {};
+        const counters: Record<string, number> = {};
 
         if (this.src) {
-            sources.push(this.src);
+            url_sources.push(this.src);
         }
 
         for (const src_elm of this.querySelectorAll<KiCanvasSourceElement>(
             "kicanvas-source",
         )) {
             if (src_elm.src) {
-                sources.push(src_elm.src);
+                url_sources.push(src_elm.src);
+                continue;
             }
+
+            const content = src_elm.textContent?.trim();
+            if (!content) {
+                continue;
+            }
+
+            let filename = src_elm.name?.trim();
+            if (!filename || filename.length == 0) {
+                const type = (src_elm.type ?? "schematic").toLowerCase();
+                let ext = "kicad_sch";
+                if (type == "board") {
+                    ext = "kicad_pcb";
+                } else if (type == "project") {
+                    ext = "kicad_pro";
+                }
+                counters[ext] = (counters[ext] ?? 0) + 1;
+                const index = counters[ext];
+                filename = `inline_${index}.${ext}`;
+            }
+
+            inline_entries[filename] = content;
         }
 
-        if (sources.length == 0) {
+        if (
+            url_sources.length == 0 &&
+            Object.keys(inline_entries).length == 0
+        ) {
             console.warn("No valid sources specified");
             return;
         }
 
-        const vfs = new FetchFileSystem(sources, this.custom_resolver);
-        await this.#setup_project(vfs);
+        // Prefer loading inline sources; combine with URLs if both provided.
+        if (Object.keys(inline_entries).length && url_sources.length) {
+            const vfs = new CombinedFileSystem([
+                new MemoryFileSystem(inline_entries),
+                new FetchFileSystem(url_sources, this.custom_resolver),
+            ]);
+            await this.#setup_project(vfs);
+            return;
+        }
+
+        if (Object.keys(inline_entries).length) {
+            await this.#setup_project(new MemoryFileSystem(inline_entries));
+            return;
+        }
+
+        await this.#setup_project(
+            new FetchFileSystem(url_sources, this.custom_resolver),
+        );
     }
 
     async #setup_project(vfs: VirtualFileSystem) {
@@ -182,6 +230,14 @@ class KiCanvasSourceElement extends CustomElement {
 
     @attribute({ type: String })
     src: string | null;
+
+    // Optional filename to use when providing inline content
+    @attribute({ type: String })
+    name: string | null;
+
+    // Hint for inline content type: schematic|board|project
+    @attribute({ type: String })
+    type: "schematic" | "board" | "project" | null;
 }
 
 window.customElements.define("kicanvas-source", KiCanvasSourceElement);

@@ -98,21 +98,28 @@ You can switch between the displayed files using the project panel on the right 
 
 ### Inline source
 
-!!! warning "Not yet implemented"
-
-    This functionality hasn't been implemented yet
-
-This example shows how to use `<kicanvas-source>` along with inline KiCAD data. In this case, it's a symbol copied from a schematic and pasted into the HTML source:
+You can embed KiCAD file contents directly inside `<kicanvas-source>`. Provide either a `name` (filename) or a `type` hint so KiCanvas knows the file type.
 
 ```html
 <kicanvas-embed>
+    <!-- With a type hint (defaults: schematic -> .kicad_sch, board -> .kicad_pcb, project -> .kicad_pro) -->
     <kicanvas-source type="schematic">
         (lib_symbols (symbol "power:+12V" (power) (pin_names (offset 0)) (in_bom
         yes) (on_board yes) (property "Reference" "#PWR" (at 0 -3.81 0) (effects
-        (font (size 1.27 1.27)) hide) ) ...
+        (font (size 1.27 1.27)) hide)))
+    </kicanvas-source>
+
+    <!-- Or explicitly name the file to match hierarchical references -->
+    <kicanvas-source name="child.kicad_sch">
+        (kicad_sch (version 20211014) ...)
     </kicanvas-source>
 </kicanvas-embed>
 ```
+
+Notes:
+
+-   If `name` is omitted, a default name like `inline_1.kicad_sch` is assigned based on `type`.
+-   Inline sources can be mixed with URL sources; when both are provided, inline files override URL files with the same basename.
 
 ## Attributes
 
