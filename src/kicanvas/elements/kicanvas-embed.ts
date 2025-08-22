@@ -149,24 +149,22 @@ class KiCanvasEmbedElement extends KCUIElement {
             return;
         }
 
+        // Construct VFS based on provided sources, then setup project once.
+        let vfs: VirtualFileSystem;
+
         // Prefer loading inline sources; combine with URLs if both provided.
         if (Object.keys(inline_entries).length && url_sources.length) {
-            const vfs = new CombinedFileSystem([
+            vfs = new CombinedFileSystem([
                 new MemoryFileSystem(inline_entries),
                 new FetchFileSystem(url_sources, this.custom_resolver),
             ]);
-            await this.#setup_project(vfs);
-            return;
+        } else if (Object.keys(inline_entries).length) {
+            vfs = new MemoryFileSystem(inline_entries);
+        } else {
+            vfs = new FetchFileSystem(url_sources, this.custom_resolver);
         }
 
-        if (Object.keys(inline_entries).length) {
-            await this.#setup_project(new MemoryFileSystem(inline_entries));
-            return;
-        }
-
-        await this.#setup_project(
-            new FetchFileSystem(url_sources, this.custom_resolver),
-        );
+        return await this.#setup_project(vfs);
     }
 
     async #setup_project(vfs: VirtualFileSystem) {
