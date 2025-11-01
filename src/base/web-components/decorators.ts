@@ -39,7 +39,7 @@ export function attribute<Type = unknown, TypeHint = unknown>(options: {
 
                 if (!running_on_change) {
                     running_on_change = true;
-                    options.on_change?.(old, value);
+                    options.on_change?.call(this, old, value);
                     running_on_change = false;
                 }
             },

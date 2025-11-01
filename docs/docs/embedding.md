@@ -137,7 +137,7 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     -   `nopreferences` - don't show the user preferences panel. ⚠️
     -   `nohelp` - don't show the help panel. ⚠️
 -   `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
--   `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
+-   `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`.
 -   `zoom` - sets the initial view into the document. ⚠️
     -   `objects` - zooms to show all visible objects (default). ⚠️
     -   `page` - zooms to show the entire page. ⚠️

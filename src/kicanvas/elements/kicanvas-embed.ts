@@ -77,7 +77,22 @@ class KiCanvasEmbedElement extends KCUIElement {
     @attribute({ type: String })
     controlslist: string | null;
 
-    @attribute({ type: String })
+    @attribute({
+        type: String,
+        on_change: function (
+            this: KiCanvasEmbedElement,
+            old_value: string | null,
+            new_value: string | null,
+        ) {
+            // When theme attribute changes, propagate to app elements
+            if (this.schematic_app && old_value !== new_value && new_value) {
+                this.schematic_app.theme = new_value;
+            }
+            if (this.board_app && old_value !== new_value && new_value) {
+                this.board_app.theme = new_value;
+            }
+        },
+    })
     theme: string | null;
 
     @attribute({ type: String })
@@ -85,8 +100,8 @@ class KiCanvasEmbedElement extends KCUIElement {
 
     custom_resolver: ((name: string) => URL) | null = null;
 
-    #schematic_app: KCSchematicAppElement;
-    #board_app: KCBoardAppElement;
+    protected schematic_app: KCSchematicAppElement;
+    protected board_app: KCBoardAppElement;
 
     override initialContentCallback() {
         this.#setup_events();
@@ -142,19 +157,21 @@ class KiCanvasEmbedElement extends KCUIElement {
             return html``;
         }
 
-        if (this.#project.has_schematics && !this.#schematic_app) {
-            this.#schematic_app = html`<kc-schematic-app
+        if (this.#project.has_schematics && !this.schematic_app) {
+            this.schematic_app = html`<kc-schematic-app
                 sidebarcollapsed
                 controls="${this.controls}"
-                controlslist="${this.controlslist}">
+                controlslist="${this.controlslist}"
+                theme="${this.theme}">
             </kc-schematic-app>` as KCSchematicAppElement;
         }
 
-        if (this.#project.has_boards && !this.#board_app) {
-            this.#board_app = html`<kc-board-app
+        if (this.#project.has_boards && !this.board_app) {
+            this.board_app = html`<kc-board-app
                 sidebarcollapsed
                 controls="${this.controls}"
-                controlslist="${this.controlslist}">
+                controlslist="${this.controlslist}"
+                theme="${this.theme}">
             </kc-board-app>` as KCBoardAppElement;
         }
 
@@ -165,7 +182,7 @@ class KiCanvasEmbedElement extends KCUIElement {
                 : html`<kc-ui-focus-overlay></kc-ui-focus-overlay>`;
 
         return html`<main>
-            ${this.#schematic_app} ${this.#board_app} ${focus_overlay}
+            ${this.schematic_app} ${this.board_app} ${focus_overlay}
         </main>`;
     }
 }
