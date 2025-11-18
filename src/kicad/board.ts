@@ -843,6 +843,7 @@ export class Footprint {
             this.#pads_by_number.set(pad.number, pad);
         }
 
+        // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_footprint_text
         for (const d of this.drawings) {
             if (!(d instanceof FpText)) {
                 continue;
@@ -853,6 +854,19 @@ export class Footprint {
             }
             if (d.type == "value") {
                 this.value = d.text;
+            }
+        }
+
+        // KiCad correctly parses both definitions
+        //     (fp_text reference XXXX) and (property "Reference" "XXXX")
+        // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_symbol_properties
+        for (const [prop_name, prop_value] of Object.entries(this.properties)) {
+            if (this.reference === undefined && prop_name == "Reference") {
+                this.reference = prop_value;
+            }
+
+            if (this.value === undefined && prop_name == "Value") {
+                this.value = prop_value;
             }
         }
     }
