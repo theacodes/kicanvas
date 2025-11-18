@@ -14,6 +14,7 @@ import wires_sch_src from "./files/wires.kicad_sch";
 import labels_sch_src from "./files/labels.kicad_sch";
 import drawings_sch_src from "./files/drawings.kicad_sch";
 import symbols_sch_src from "./files/symbols.kicad_sch";
+import symbols_kicad8_sch_src from "./files/symbols_kicad8.kicad_sch";
 
 suite("kicad.schematic.KicadSch(): schematic parsing", function () {
     test("with empty schematic file", function () {
@@ -562,6 +563,33 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
         assert_deep_partial(symbols[4], {
             lib_id: "Device:C_Polarized_US",
             mirror: "x",
+        });
+    });
+
+    // check the KiCad8 symbol attributes
+    test("with KiCad8 exclude_from_sim attribute", function () {
+        const sch = new schematic.KicadSch(
+            "test.kicad8_sch",
+            symbols_kicad8_sch_src,
+        );
+
+        const symbols = Array.from(sch.symbols.values());
+        assert.equal(symbols.length, 2);
+
+        assert.include(symbols[0], {
+            exclude_from_sim: false,
+        });
+
+        assert.include(symbols[1], {
+            exclude_from_sim: true,
+        });
+
+        assert_deep_partial(symbols[0]?.properties.get("Reference"), {
+            text: "C2",
+        });
+
+        assert_deep_partial(symbols[1]?.properties.get("Reference"), {
+            text: "C1",
         });
     });
 });

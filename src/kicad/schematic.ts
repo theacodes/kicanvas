@@ -806,6 +806,7 @@ export class LibSymbol {
     };
     in_bom = false;
     on_board = false;
+    exclude_from_sim = false;
     properties: Map<string, Property> = new Map();
     children: LibSymbol[] = [];
     drawings: Drawing[] = [];
@@ -835,6 +836,7 @@ export class LibSymbol {
                 ),
                 P.pair("in_bom", T.boolean),
                 P.pair("on_board", T.boolean),
+                P.pair("exclude_from_sim", T.boolean),
                 P.mapped_collection(
                     "properties",
                     "property",
@@ -1156,6 +1158,7 @@ export class SchematicSymbol {
     convert: number;
     in_bom = false;
     on_board = false;
+    exclude_from_sim = false;
     dnp = false;
     fields_autoplaced = false;
     properties: Map<string, Property> = new Map();
@@ -1174,7 +1177,7 @@ export class SchematicSymbol {
     ) {
         /*
         (symbol (lib_id "Device:C_Small") (at 134.62 185.42 0) (unit 1)
-          (in_bom yes) (on_board yes) (fields_autoplaced)
+          (in_bom yes) (on_board yes) (exclude_from_sim no) (fields_autoplaced)
           (uuid 42d20c56-7e92-459e-8ba3-25545a76a4e9)
           (property "Reference" "C311" (id 0) (at 137.16 182.8862 0)
             (effects (font (size 1.27 1.27)) (justify left)))
@@ -1196,6 +1199,7 @@ export class SchematicSymbol {
             P.pair("convert", T.number),
             P.pair("in_bom", T.boolean),
             P.pair("on_board", T.boolean),
+            P.pair("exclude_from_sim", T.boolean),
             P.pair("dnp", T.boolean),
             P.atom("fields_autoplaced"),
             P.pair("uuid", T.string),
