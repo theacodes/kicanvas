@@ -21,6 +21,7 @@ import vias_pcb_src from "./files/vias.kicad_pcb";
 import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
 import footprint_pads_pcb_src from "./files/footprint-pads.kicad_pcb";
 import footprint_text_locked_pcb_src from "./files/footprint-text-locked.kicad_pcb";
+import footprint_symbol_properties_pcb_src from "./files/footprint-properties.kicad_pcb";
 import { first } from "../../src/base/iterator";
 
 suite("kicad.board.KicadPCB(): board parsing", function () {
@@ -1044,5 +1045,44 @@ suite("kicad.board.Footprint()", function () {
             solder_mask_margin: 0.5,
             clearance: 0.5,
         } as Partial<board.Pad>);
+    });
+
+    test("with footprint symbol properties", function () {
+        const pcb = new board.KicadPCB(
+            "test.kicad_pcb",
+            footprint_symbol_properties_pcb_src,
+        );
+        assert.equal(pcb.footprints.length, 1);
+
+        const fp0 = pcb.footprints[0]!;
+
+        assert.isDefined(fp0.properties["Reference"]);
+        const ref_prop = fp0.properties["Reference"]!;
+
+        assert.deepInclude(ref_prop, {
+            has_symbol_prop: true,
+            value: "C1",
+            id: 0,
+            unlocked: false,
+            hide: false,
+            at: { position: { x: 0, y: -1.43 }, rotation: 0, unlocked: false },
+            layer: "F.SilkS",
+            effects: {
+                font: {
+                    face: undefined,
+                    size: { x: 1, y: 1 },
+                    thickness: 0.15,
+                    italic: false,
+                    bold: false,
+                    color: { r: 0, g: 0, b: 0, a: 0 },
+                },
+                justify: {
+                    horizontal: "center",
+                    vertical: "center",
+                    mirror: false,
+                },
+                hide: false,
+            },
+        } as Partial<board.SymbolProperty>);
     });
 });
