@@ -776,7 +776,7 @@ export class Footprint {
         allow_solder_mask_bridges: false,
         allow_missing_courtyard: false,
     };
-    properties: Record<string, string> = {};
+    properties: Record<string, SymbolProperty> = {};
     drawings: FootprintDrawings[] = [];
     pads: Pad[] = [];
     #pads_by_number = new Map<string, Pad>();
@@ -826,7 +826,7 @@ export class Footprint {
                     P.atom("allow_solder_mask_bridges"),
                     P.atom("allow_missing_courtyard"),
                 ),
-                P.dict("properties", "property", T.string),
+                P.dict("properties", "property", T.item(SymbolProperty, this)),
                 P.collection("drawings", "fp_line", T.item(FpLine, this)),
                 P.collection("drawings", "fp_circle", T.item(FpCircle, this)),
                 P.collection("drawings", "fp_arc", T.item(FpArc, this)),
@@ -860,13 +860,13 @@ export class Footprint {
         // KiCad correctly parses both definitions
         //     (fp_text reference XXXX) and (property "Reference" "XXXX")
         // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_symbol_properties
-        for (const [prop_name, prop_value] of Object.entries(this.properties)) {
+        for (const [prop_name, prop] of Object.entries(this.properties)) {
             if (this.reference === undefined && prop_name == "Reference") {
-                this.reference = prop_value;
+                this.reference = prop.value;
             }
 
             if (this.value === undefined && prop_name == "Value") {
-                this.value = prop_value;
+                this.value = prop.value;
             }
         }
     }
@@ -913,8 +913,8 @@ export class Footprint {
             }
         }
 
-        if (this.properties[name] !== undefined) {
-            return this.properties[name]!;
+        if (this.properties["name"] !== undefined) {
+            return this.properties[name]!.value;
         }
 
         return this.parent.resolve_text_var(name);
@@ -960,6 +960,17 @@ export class Footprint {
             this.#bbox = bbox;
         }
         return this.#bbox;
+    }
+}
+
+class SymbolProperty {
+    value: string;
+
+    constructor(
+        expr: Parseable,
+        public parent: Footprint,
+    ) {
+        Object.assign(this, parse_expr(expr, P.positional("value", T.string)));
     }
 }
 

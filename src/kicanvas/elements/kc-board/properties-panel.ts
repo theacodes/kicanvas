@@ -54,9 +54,11 @@ export class KCBoardPropertiesPanelElement extends KCUIElement {
         } else {
             const itm = this.selected_item;
 
-            const properties = Object.entries(itm.properties).map(([k, v]) => {
-                return entry(k, v);
-            });
+            const properties = Object.entries(itm.properties).map(
+                ([k, prop]) => {
+                    return entry(k, prop.value);
+                },
+            );
 
             entries = html`
                 ${header("Basic properties")}

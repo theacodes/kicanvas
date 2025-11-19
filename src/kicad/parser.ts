@@ -222,7 +222,7 @@ export const P = {
             fn: (obj: Obj, name: string, e: ListOrAtom) => {
                 const el = e as [string, string, any];
                 const rec = obj[name] ?? {};
-                rec[el[1]] = typefn(obj, name, el[2]);
+                rec[el[1]] = typefn(obj, name, el.slice(2));
                 return rec;
             },
         };
