@@ -731,7 +731,14 @@ export class DimensionStyle {
     }
 }
 
-type FootprintDrawings = FpLine | FpCircle | FpArc | FpPoly | FpRect | FpText;
+type FootprintDrawings =
+    | FpLine
+    | FpCircle
+    | FpArc
+    | FpPoly
+    | FpRect
+    | FpText
+    | SymbolProperty;
 
 export class Footprint {
     at: At;
@@ -879,6 +886,10 @@ export class Footprint {
         yield* this.drawings ?? [];
         yield* this.zones ?? [];
         yield* this.pads.values() ?? [];
+
+        yield* Object.values(this.properties).filter(
+            (prop) => prop.has_symbol_prop,
+        );
     }
 
     resolve_text_var(name: string): string | undefined {
@@ -913,7 +924,7 @@ export class Footprint {
             }
         }
 
-        if (this.properties["name"] !== undefined) {
+        if (this.properties[name] !== undefined) {
             return this.properties[name]!.value;
         }
 
@@ -949,7 +960,7 @@ export class Footprint {
             ).rotate_self(Angle.deg_to_rad(this.at.rotation));
 
             for (const item of this.drawings) {
-                if (item instanceof FpText) {
+                if (item instanceof FpText || item instanceof SymbolProperty) {
                     continue;
                 }
 
@@ -963,14 +974,60 @@ export class Footprint {
     }
 }
 
-class SymbolProperty {
+export class SymbolProperty {
+    has_symbol_prop: boolean;
+
+    // generic properties
+    // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_properties
     value: string;
+
+    // symbol properties
+    // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_symbol_properties
+    id: number = 0;
+    unlocked = false;
+    hide = false;
+    at: At = new At();
+    effects: Effects = new Effects();
+    layer: string = "F.SilkS";
+    uuid?: string;
 
     constructor(
         expr: Parseable,
         public parent: Footprint,
     ) {
-        Object.assign(this, parse_expr(expr, P.positional("value", T.string)));
+        // for some reasons, I cannot get kicad_version here
+        // const is_newer = parent.parent.version >= 20240108;
+        const is_newer = expr instanceof Array && expr.length > 3;
+
+        if (is_newer) {
+            this.has_symbol_prop = true;
+            // parsed as 'symbol_property' node
+            Object.assign(
+                this,
+                parse_expr(
+                    expr,
+                    P.positional("value", T.string),
+                    P.pair("id", T.number),
+                    P.item("at", At),
+                    P.pair("layer", T.string),
+                    P.pair("uuid", T.string),
+                    P.atom("unlocked"),
+                    P.atom("hide"),
+                    P.item("effects", Effects),
+                ),
+            );
+        } else {
+            this.has_symbol_prop = false;
+            // parsed as 'property' node
+            Object.assign(
+                this,
+                parse_expr(expr, P.positional("value", T.string)),
+            );
+        }
+    }
+
+    get shown_text() {
+        return expand_text_vars(this.value, this.parent);
     }
 }
 
