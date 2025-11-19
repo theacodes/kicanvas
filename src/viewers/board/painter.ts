@@ -645,6 +645,55 @@ class FpTextPainter extends BoardItemPainter {
     }
 }
 
+class PropertyTextPainter extends BoardItemPainter {
+    classes = [board_items.SymbolProperty];
+
+    layers_for(t: board_items.SymbolProperty) {
+        return [t.layer];
+    }
+
+    paint(layer: ViewLayer, t: board_items.SymbolProperty) {
+        if (this.filter_net) return;
+
+        if (t.hide || !t.shown_text || !t.has_symbol_prop) {
+            return;
+        }
+
+        const edatext = new EDAText(t.shown_text);
+
+        edatext.apply_effects(t.effects);
+        edatext.apply_at(t.at);
+
+        edatext.attributes.color = layer.color;
+
+        // Looks like the rotation angle for KiCad's symbol attribute rendering
+        // is standalone, so we need to sub it from parent's rotation angle.
+        if (t.parent) {
+            const rot = t.parent.at.rotation;
+            edatext.text_angle.degrees -= rot;
+        }
+
+        // keep the text upright if needed
+        if (edatext.attributes.keep_upright) {
+            while (edatext.text_angle.degrees > 90) {
+                edatext.text_angle.degrees -= 180;
+            }
+            while (edatext.text_angle.degrees <= -90) {
+                edatext.text_angle.degrees += 180;
+            }
+        }
+
+        this.gfx.state.push();
+        StrokeFont.default().draw(
+            this.gfx,
+            edatext.shown_text,
+            edatext.text_pos,
+            edatext.attributes,
+        );
+        this.gfx.state.pop();
+    }
+}
+
 class DimensionPainter extends BoardItemPainter {
     classes = [board_items.Dimension];
 
@@ -984,6 +1033,7 @@ export class BoardPainter extends DocumentPainter {
             new FootprintPainter(this, gfx),
             new GrTextPainter(this, gfx),
             new FpTextPainter(this, gfx),
+            new PropertyTextPainter(this, gfx),
             new DimensionPainter(this, gfx),
         ];
     }

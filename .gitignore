@@ -4,3 +4,5 @@ dist/
 www/kicanvas
 coverage/
 esbuild-meta.json
+
+.DS_Store

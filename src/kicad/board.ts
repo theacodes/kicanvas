@@ -731,7 +731,14 @@ export class DimensionStyle {
     }
 }
 
-type FootprintDrawings = FpLine | FpCircle | FpArc | FpPoly | FpRect | FpText;
+type FootprintDrawings =
+    | FpLine
+    | FpCircle
+    | FpArc
+    | FpPoly
+    | FpRect
+    | FpText
+    | SymbolProperty;
 
 export class Footprint {
     at: At;
@@ -776,7 +783,7 @@ export class Footprint {
         allow_solder_mask_bridges: false,
         allow_missing_courtyard: false,
     };
-    properties: Record<string, string> = {};
+    properties: Record<string, SymbolProperty> = {};
     drawings: FootprintDrawings[] = [];
     pads: Pad[] = [];
     #pads_by_number = new Map<string, Pad>();
@@ -826,7 +833,7 @@ export class Footprint {
                     P.atom("allow_solder_mask_bridges"),
                     P.atom("allow_missing_courtyard"),
                 ),
-                P.dict("properties", "property", T.string),
+                P.dict("properties", "property", T.item(SymbolProperty, this)),
                 P.collection("drawings", "fp_line", T.item(FpLine, this)),
                 P.collection("drawings", "fp_circle", T.item(FpCircle, this)),
                 P.collection("drawings", "fp_arc", T.item(FpArc, this)),
@@ -860,13 +867,13 @@ export class Footprint {
         // KiCad correctly parses both definitions
         //     (fp_text reference XXXX) and (property "Reference" "XXXX")
         // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_symbol_properties
-        for (const [prop_name, prop_value] of Object.entries(this.properties)) {
+        for (const [prop_name, prop] of Object.entries(this.properties)) {
             if (this.reference === undefined && prop_name == "Reference") {
-                this.reference = prop_value;
+                this.reference = prop.value;
             }
 
             if (this.value === undefined && prop_name == "Value") {
-                this.value = prop_value;
+                this.value = prop.value;
             }
         }
     }
@@ -879,6 +886,10 @@ export class Footprint {
         yield* this.drawings ?? [];
         yield* this.zones ?? [];
         yield* this.pads.values() ?? [];
+
+        yield* Object.values(this.properties).filter(
+            (prop) => prop.has_symbol_prop,
+        );
     }
 
     resolve_text_var(name: string): string | undefined {
@@ -914,7 +925,7 @@ export class Footprint {
         }
 
         if (this.properties[name] !== undefined) {
-            return this.properties[name]!;
+            return this.properties[name]!.value;
         }
 
         return this.parent.resolve_text_var(name);
@@ -949,7 +960,7 @@ export class Footprint {
             ).rotate_self(Angle.deg_to_rad(this.at.rotation));
 
             for (const item of this.drawings) {
-                if (item instanceof FpText) {
+                if (item instanceof FpText || item instanceof SymbolProperty) {
                     continue;
                 }
 
@@ -960,6 +971,63 @@ export class Footprint {
             this.#bbox = bbox;
         }
         return this.#bbox;
+    }
+}
+
+export class SymbolProperty {
+    has_symbol_prop: boolean;
+
+    // generic properties
+    // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_properties
+    value: string;
+
+    // symbol properties
+    // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_symbol_properties
+    id: number = 0;
+    unlocked = false;
+    hide = false;
+    at: At = new At();
+    effects: Effects = new Effects();
+    layer: string = "F.SilkS";
+    uuid?: string;
+
+    constructor(
+        expr: Parseable,
+        public parent: Footprint,
+    ) {
+        // for some reasons, I cannot get kicad_version here
+        // const is_newer = parent.parent.version >= 20240108;
+        const is_newer = expr instanceof Array && expr.length > 3;
+
+        if (is_newer) {
+            this.has_symbol_prop = true;
+            // parsed as 'symbol_property' node
+            Object.assign(
+                this,
+                parse_expr(
+                    expr,
+                    P.positional("value", T.string),
+                    P.pair("id", T.number),
+                    P.item("at", At),
+                    P.pair("layer", T.string),
+                    P.pair("uuid", T.string),
+                    P.atom("unlocked"),
+                    P.atom("hide"),
+                    P.item("effects", Effects),
+                ),
+            );
+        } else {
+            this.has_symbol_prop = false;
+            // parsed as 'property' node
+            Object.assign(
+                this,
+                parse_expr(expr, P.positional("value", T.string)),
+            );
+        }
+    }
+
+    get shown_text() {
+        return expand_text_vars(this.value, this.parent);
     }
 }
 
