@@ -91,14 +91,15 @@ suite("kicad.parser.parse_expr(): s-expression parser", function () {
 
     test(".dict()", function () {
         const res = parse_expr(
-            listify("(def a 1) (def b 2) (def c (3 4))"),
+            listify("(def a 1) (def b 2) (def c (3 4)) (def d 5 6 7)"),
             P.dict("defs", "def"),
         );
         assert.deepEqual(res, {
             defs: {
-                a: 1,
-                b: 2,
-                c: [3, 4],
+                a: [1],
+                b: [2],
+                c: [[3, 4]],
+                d: [5, 6, 7],
             },
         });
     });
