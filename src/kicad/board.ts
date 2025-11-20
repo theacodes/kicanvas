@@ -13,6 +13,7 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
+    type UniqueIDObject,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 import type { List } from "./tokenizer";
@@ -146,14 +147,15 @@ export class Property {
     }
 }
 
-export class LineSegment {
+export class LineSegment implements UniqueIDObject {
     start: Vec2;
     end: Vec2;
     width: number;
     layer: string;
     net: number;
     locked = false;
-    tstamp: string;
+    uuid?: string;
+    tstamp?: string;
 
     constructor(expr: Parseable) {
         /*
@@ -176,9 +178,14 @@ export class LineSegment {
                 P.pair("layer", T.string),
                 P.pair("net", T.number),
                 P.atom("locked"),
+                P.pair("uuid", T.string),
                 P.pair("tstamp", T.string),
             ),
         );
+    }
+
+    get uuid_text(): string | undefined {
+        return this.uuid ?? this.tstamp;
     }
 }
 
@@ -221,7 +228,7 @@ export class ArcSegment {
     }
 }
 
-export class Via {
+export class Via implements UniqueIDObject {
     type: "blind" | "micro" | "through-hole" = "through-hole";
     at: At;
     size: number;
@@ -232,7 +239,8 @@ export class Via {
     locked = false;
     free = false;
     net: number;
-    tstamp: string;
+    tstamp?: string;
+    uuid?: string;
 
     constructor(expr: Parseable) {
         Object.assign(
@@ -251,12 +259,17 @@ export class Via {
                 P.atom("remove_unused_layers"),
                 P.atom("keep_end_layers"),
                 P.pair("tstamp", T.string),
+                P.pair("uuid", T.string),
             ),
         );
     }
+
+    get uuid_text(): string | undefined {
+        return this.uuid ?? this.tstamp;
+    }
 }
 
-export class Zone {
+export class Zone implements UniqueIDObject {
     locked = false;
     net: number;
     net_name: string;
@@ -275,7 +288,8 @@ export class Zone {
     fill: ZoneFill;
     polygons: Poly[];
     filled_polygons: FilledPolygon[];
-    tstamp: string;
+    tstamp?: string;
+    uuid?: string;
 
     constructor(
         expr: Parseable,
@@ -317,8 +331,13 @@ export class Zone {
                     T.item(FilledPolygon),
                 ),
                 P.pair("tstamp", T.string),
+                P.pair("uuid", T.string),
             ),
         );
+    }
+
+    get uuid_text(): string | undefined {
+        return this.uuid ?? this.tstamp;
     }
 }
 
@@ -601,11 +620,12 @@ export class Net {
     }
 }
 
-export class Dimension {
+export class Dimension implements UniqueIDObject {
     locked = false;
     type: "aligned" | "leader" | "center" | "orthogonal" | "radial";
     layer: string;
-    tstamp: string;
+    tstamp?: string;
+    uuid?: string;
     pts: Vec2[];
     height: number;
     orientation: number;
@@ -627,6 +647,7 @@ export class Dimension {
                 P.pair("type", T.string),
                 P.pair("layer", T.string),
                 P.pair("tstamp", T.string),
+                P.pair("uuid", T.string),
                 P.list("pts", T.vec2),
                 P.pair("height", T.number),
                 P.pair("orientation", T.number),
@@ -648,6 +669,10 @@ export class Dimension {
 
     get end(): Vec2 {
         return this.pts.at(-1) ?? new Vec2(0, 0);
+    }
+
+    get uuid_text(): string | undefined {
+        return this.uuid;
     }
 }
 
@@ -740,7 +765,7 @@ type FootprintDrawings =
     | FpText
     | SymbolProperty;
 
-export class Footprint {
+export class Footprint implements UniqueIDObject {
     at: At;
     reference: string;
     value: string;
@@ -751,12 +776,15 @@ export class Footprint {
     placed = false;
     layer: string;
     tedit: string;
-    tstamp: string;
+    tstamp?: string;
+    uuid?: string;
     descr: string;
     tags: string;
     path: string;
     autoplace_cost90: number;
     autoplace_cost180: number;
+    sheetname?: string;
+    sheetfile?: string;
     solder_mask_margin: number;
     solder_paste_margin: number;
     solder_paste_ratio: number;
@@ -808,6 +836,9 @@ export class Footprint {
                 P.pair("layer", T.string),
                 P.pair("tedit", T.string),
                 P.pair("tstamp", T.string),
+                P.pair("uuid", T.string),
+                P.pair("sheetname", T.string),
+                P.pair("sheetfile", T.string),
                 P.item("at", At),
                 P.pair("descr", T.string),
                 P.pair("tags", T.string),
@@ -878,8 +909,8 @@ export class Footprint {
         }
     }
 
-    get uuid() {
-        return this.tstamp;
+    get uuid_text(): string | undefined {
+        return this.uuid;
     }
 
     *items(): Generator<FootprintDrawings | Pad | Zone, void, undefined> {
@@ -974,7 +1005,7 @@ export class Footprint {
     }
 }
 
-export class SymbolProperty {
+export class SymbolProperty implements UniqueIDObject {
     has_symbol_prop: boolean;
 
     // generic properties
@@ -1029,13 +1060,22 @@ export class SymbolProperty {
     get shown_text() {
         return expand_text_vars(this.value, this.parent);
     }
+
+    get uuid_text(): string | undefined {
+        return this.uuid;
+    }
 }
 
-class GraphicItem {
+class GraphicItem implements UniqueIDObject {
     parent?: Footprint;
     layer: string;
-    tstamp: string;
+    uuid?: string;
+    tstamp?: string;
     locked = false;
+
+    get uuid_text(): string | undefined {
+        return this.uuid ?? this.tstamp;
+    }
 
     /**
      * Get the nominal bounding box for the item. This does not include any
@@ -1072,6 +1112,7 @@ export class Line extends GraphicItem {
                 P.vec2("start"),
                 P.vec2("end"),
                 P.pair("width", T.number),
+                P.pair("uuid", T.string),
                 P.pair("tstamp", T.string),
                 P.item("stroke", Stroke),
             ),
@@ -1120,6 +1161,7 @@ export class Circle extends GraphicItem {
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
                 P.pair("layer", T.string),
+                P.pair("uuid", T.string),
                 P.pair("tstamp", T.string),
                 P.item("stroke", Stroke),
             ),
@@ -1173,6 +1215,7 @@ export class Arc extends GraphicItem {
             P.vec2("end"),
             P.pair("angle", T.number),
             P.pair("width", T.number),
+            P.pair("uuid", T.string),
             P.pair("tstamp", T.string),
             P.item("stroke", Stroke),
         );
@@ -1262,6 +1305,7 @@ export class Poly extends GraphicItem {
                 P.list("pts", T.vec2),
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
+                P.pair("uuid", T.string),
                 P.pair("tstamp", T.string),
                 P.item("stroke", Stroke),
             ),
@@ -1315,6 +1359,7 @@ export class Rect extends GraphicItem {
                 P.pair("layer", T.string),
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
+                P.pair("uuid", T.string),
                 P.pair("tstamp", T.string),
                 P.item("stroke", Stroke),
             ),
@@ -1359,7 +1404,7 @@ export class TextRenderCache {
     }
 }
 
-export class Text {
+export class Text implements UniqueIDObject {
     parent?: Footprint | Dimension | KicadPCB;
     text: string;
     at: At;
@@ -1367,7 +1412,8 @@ export class Text {
     unlocked = false;
     hide = false;
     effects = new Effects();
-    tstamp: string;
+    tstamp?: string;
+    uuid?: string;
     render_cache: TextRenderCache;
 
     static common_expr_defs = [
@@ -1381,12 +1427,17 @@ export class Text {
             P.atom("knockout"),
         ),
         P.pair("tstamp", T.string),
+        P.pair("uuid", T.string),
         P.item("effects", Effects),
         P.item("render_cache", TextRenderCache),
     ];
 
     get shown_text() {
         return expand_text_vars(this.text, this.parent);
+    }
+
+    get uuid_text(): string | undefined {
+        return this.uuid;
     }
 }
 
@@ -1436,7 +1487,7 @@ export class GrText extends Text {
     }
 }
 
-export class Pad {
+export class Pad implements UniqueIDObject {
     number: string; // I hate this
     type: "thru_hole" | "smd" | "connect" | "np_thru_hole" = "thru_hole";
     shape: "circle" | "rect" | "oval" | "trapezoid" | "roundrect" | "custom";
@@ -1467,6 +1518,9 @@ export class Pad {
     net: Net;
     options: PadOptions;
     primitives: (GrLine | GrCircle | GrArc | GrRect | GrPoly)[];
+    uuid?: string;
+    tstamp?: string;
+    remove_unused_layers: boolean = false;
 
     constructor(
         expr: Parseable,
@@ -1506,6 +1560,8 @@ export class Pad {
             P.pair("thermal_bridge_angle", T.number),
             P.pair("zone_connect", T.number),
             P.pair("tstamp", T.string),
+            P.pair("uuid", T.string),
+            P.pair("remove_unused_layers", T.boolean),
             P.item("drill", PadDrill),
             P.item("net", Net),
             P.item("options", PadOptions),
@@ -1524,6 +1580,10 @@ export class Pad {
         );
 
         Object.assign(this, parsed);
+    }
+
+    get uuid_text(): string | undefined {
+        return this.uuid;
     }
 }
 
