@@ -672,7 +672,7 @@ export class Dimension implements HasUniqueID {
     }
 
     get unique_id(): string | undefined {
-        return this.uuid;
+        return this.uuid ?? this.tstamp;
     }
 }
 
@@ -910,7 +910,7 @@ export class Footprint implements HasUniqueID {
     }
 
     get unique_id(): string | undefined {
-        return this.uuid;
+        return this.uuid ?? this.tstamp;
     }
 
     *items(): Generator<FootprintDrawings | Pad | Zone, void, undefined> {
@@ -1437,7 +1437,7 @@ export class Text implements HasUniqueID {
     }
 
     get unique_id(): string | undefined {
-        return this.uuid;
+        return this.uuid ?? this.tstamp;
     }
 }
 
@@ -1583,7 +1583,7 @@ export class Pad implements HasUniqueID {
     }
 
     get unique_id(): string | undefined {
-        return this.uuid;
+        return this.uuid ?? this.tstamp;
     }
 }
 
