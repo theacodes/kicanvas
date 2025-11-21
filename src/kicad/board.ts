@@ -13,7 +13,7 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
-    type UniqueIDObject,
+    type HasUniqueID,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 import type { List } from "./tokenizer";
@@ -122,7 +122,7 @@ export class KicadPCB {
 
     find_footprint(uuid_or_ref: string): Footprint | null {
         for (const fp of this.footprints) {
-            if (fp.uuid_text == uuid_or_ref || fp.reference == uuid_or_ref) {
+            if (fp.unique_id == uuid_or_ref || fp.reference == uuid_or_ref) {
                 return fp;
             }
         }
@@ -147,7 +147,7 @@ export class Property {
     }
 }
 
-export class LineSegment implements UniqueIDObject {
+export class LineSegment implements HasUniqueID {
     start: Vec2;
     end: Vec2;
     width: number;
@@ -184,7 +184,7 @@ export class LineSegment implements UniqueIDObject {
         );
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
     }
 }
@@ -228,7 +228,7 @@ export class ArcSegment {
     }
 }
 
-export class Via implements UniqueIDObject {
+export class Via implements HasUniqueID {
     type: "blind" | "micro" | "through-hole" = "through-hole";
     at: At;
     size: number;
@@ -264,12 +264,12 @@ export class Via implements UniqueIDObject {
         );
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
     }
 }
 
-export class Zone implements UniqueIDObject {
+export class Zone implements HasUniqueID {
     locked = false;
     net: number;
     net_name: string;
@@ -336,7 +336,7 @@ export class Zone implements UniqueIDObject {
         );
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
     }
 }
@@ -620,7 +620,7 @@ export class Net {
     }
 }
 
-export class Dimension implements UniqueIDObject {
+export class Dimension implements HasUniqueID {
     locked = false;
     type: "aligned" | "leader" | "center" | "orthogonal" | "radial";
     layer: string;
@@ -671,7 +671,7 @@ export class Dimension implements UniqueIDObject {
         return this.pts.at(-1) ?? new Vec2(0, 0);
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid;
     }
 }
@@ -765,7 +765,7 @@ type FootprintDrawings =
     | FpText
     | SymbolProperty;
 
-export class Footprint implements UniqueIDObject {
+export class Footprint implements HasUniqueID {
     at: At;
     reference: string;
     value: string;
@@ -909,7 +909,7 @@ export class Footprint implements UniqueIDObject {
         }
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid;
     }
 
@@ -1005,7 +1005,7 @@ export class Footprint implements UniqueIDObject {
     }
 }
 
-export class SymbolProperty implements UniqueIDObject {
+export class SymbolProperty implements HasUniqueID {
     has_symbol_prop: boolean;
 
     // generic properties
@@ -1061,19 +1061,19 @@ export class SymbolProperty implements UniqueIDObject {
         return expand_text_vars(this.value, this.parent);
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid;
     }
 }
 
-class GraphicItem implements UniqueIDObject {
+class GraphicItem implements HasUniqueID {
     parent?: Footprint;
     layer: string;
     uuid?: string;
     tstamp?: string;
     locked = false;
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
     }
 
@@ -1404,7 +1404,7 @@ export class TextRenderCache {
     }
 }
 
-export class Text implements UniqueIDObject {
+export class Text implements HasUniqueID {
     parent?: Footprint | Dimension | KicadPCB;
     text: string;
     at: At;
@@ -1436,7 +1436,7 @@ export class Text implements UniqueIDObject {
         return expand_text_vars(this.text, this.parent);
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid;
     }
 }
@@ -1487,7 +1487,7 @@ export class GrText extends Text {
     }
 }
 
-export class Pad implements UniqueIDObject {
+export class Pad implements HasUniqueID {
     number: string; // I hate this
     type: "thru_hole" | "smd" | "connect" | "np_thru_hole" = "thru_hole";
     shape: "circle" | "rect" | "oval" | "trapezoid" | "roundrect" | "custom";
@@ -1582,7 +1582,7 @@ export class Pad implements UniqueIDObject {
         Object.assign(this, parsed);
     }
 
-    get uuid_text(): string | undefined {
+    get unique_id(): string | undefined {
         return this.uuid;
     }
 }

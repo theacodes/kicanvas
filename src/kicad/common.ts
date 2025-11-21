@@ -34,8 +34,8 @@ export function unescape_string(str: string): string {
 }
 
 /** Object with a unique ID (UUID or tstamp). */
-export interface UniqueIDObject {
-    get uuid_text(): string | undefined;
+export interface HasUniqueID {
+    get unique_id(): string | undefined;
 }
 
 export type HasResolveTextVars = {

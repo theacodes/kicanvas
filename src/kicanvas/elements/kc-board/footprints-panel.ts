@@ -99,7 +99,7 @@ export class KCBoardFootprintsPanelElement extends KCUIElement {
             const match_text = `${fp.library_link} ${fp.descr} ${fp.layer} ${ref} ${val} ${fp.tags}`;
 
             const entry = html`<kc-ui-menu-item
-                name="${fp.uuid_text}"
+                name="${fp.unique_id}"
                 data-match-text="${match_text}">
                 <span class="narrow">${ref}</span><span>${val}</span>
             </kc-ui-menu-item>`;
