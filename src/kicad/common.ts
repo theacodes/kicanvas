@@ -337,6 +337,14 @@ export class Stroke {
             ),
         );
     }
+
+    static default_value(): Stroke {
+        return {
+            width: 0,
+            type: "default",
+            color: Color.transparent_black,
+        };
+    }
 }
 
 /** Stroke and additional parameters for dashed lines. */
@@ -344,6 +352,14 @@ export class StrokeParams {
     stroke: Stroke;
     dashed_line_gap_ratio: number;
     dashed_line_dash_ratio: number;
+
+    static default_value(): StrokeParams {
+        return {
+            stroke: Stroke.default_value(),
+            dashed_line_gap_ratio: 3,
+            dashed_line_dash_ratio: 12,
+        };
+    }
 }
 
 export interface HasStrokeParams {

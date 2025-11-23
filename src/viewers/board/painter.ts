@@ -13,6 +13,7 @@
 import { Angle, Arc, Matrix3, Vec2 } from "../../base/math";
 import * as log from "../../base/log";
 import { Circle, Color, Polygon, Polyline, Renderer } from "../../graphics";
+import { StrokeParams } from "../../kicad/common.ts";
 import * as board_items from "../../kicad/board";
 import { EDAText, StrokeFont } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";
@@ -45,7 +46,49 @@ abstract class BoardItemPainter extends ItemPainter {
     }
 }
 
-class LinePainter extends BoardItemPainter {
+abstract class GraphicItemPainter extends BoardItemPainter {
+    /** Split a polyline into multiple lines and draw it. */
+    protected styled_line(
+        lines: Vec2[],
+        width: number,
+        color: Color,
+        stroke_style: StrokeParams,
+    ) {
+        const stroke_type = stroke_style.stroke;
+
+        // solid line
+        if (stroke_type.type === "solid" || stroke_type.type === "default") {
+            this.gfx.line(lines, width, color);
+            return;
+        }
+
+        // dot, dash, dash_dot, dash_dot_dot
+        for (const [start, end] of GraphicItemPainter.windowed2_iter(lines)) {
+            this.styled_line_helper(start, end!, width, color, stroke_style);
+        }
+    }
+
+    private styled_line_helper(
+        start: Vec2,
+        end: Vec2,
+        width: number,
+        color: Color,
+        stroke_style: StrokeParams,
+    ) {
+        this.gfx.line([start, end], width, color);
+    }
+
+    /** [1, 2, 3, 4, 5] -> [(1, 2), (2, 3), (3, 4), (4, 5), ...] */
+    private static *windowed2_iter<T>(
+        items: T[],
+    ): Generator<[T, T | undefined]> {
+        for (let i = 0; i < items.length - 1; i++) {
+            yield [items[i]!, items[i + 1]!];
+        }
+    }
+}
+
+class LinePainter extends GraphicItemPainter {
     classes = [board_items.GrLine, board_items.FpLine];
 
     layers_for(item: board_items.GrLine | board_items.FpLine) {
@@ -56,11 +99,11 @@ class LinePainter extends BoardItemPainter {
         if (this.filter_net) return;
 
         const points = [s.start, s.end];
-        this.gfx.line(new Polyline(points, s.width, layer.color));
+        this.styled_line(points, s.width, layer.color, s.stroke_params);
     }
 }
 
-class RectPainter extends BoardItemPainter {
+class RectPainter extends GraphicItemPainter {
     classes = [board_items.GrRect, board_items.FpRect];
 
     layers_for(item: board_items.GrRect | board_items.FpRect) {
@@ -79,7 +122,7 @@ class RectPainter extends BoardItemPainter {
             r.start,
         ];
 
-        this.gfx.line(new Polyline(points, r.width, color));
+        this.styled_line(points, r.width, color, r.stroke_params);
 
         if (this.isFillValid(r.fill)) {
             this.gfx.polygon(new Polygon(points, color));
@@ -87,7 +130,7 @@ class RectPainter extends BoardItemPainter {
     }
 }
 
-class PolyPainter extends BoardItemPainter {
+class PolyPainter extends GraphicItemPainter {
     classes = [board_items.Poly, board_items.GrPoly, board_items.FpPoly];
 
     layers_for(
@@ -105,7 +148,12 @@ class PolyPainter extends BoardItemPainter {
         const color = layer.color;
 
         if (p.width) {
-            this.gfx.line(new Polyline([...p.pts, p.pts[0]!], p.width, color));
+            this.styled_line(
+                [...p.pts, p.pts[0]!],
+                p.width,
+                color,
+                p.stroke_params,
+            );
         }
 
         if (this.isFillValid(p.fill)) {
@@ -114,7 +162,7 @@ class PolyPainter extends BoardItemPainter {
     }
 }
 
-class ArcPainter extends BoardItemPainter {
+class ArcPainter extends GraphicItemPainter {
     classes = [board_items.GrArc, board_items.FpArc];
 
     layers_for(item: board_items.GrArc | board_items.FpArc) {
@@ -126,11 +174,12 @@ class ArcPainter extends BoardItemPainter {
 
         const arc = a.arc;
         const points = arc.to_polyline();
+        // TODO: stroke style
         this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
 
-class CirclePainter extends BoardItemPainter {
+class CirclePainter extends GraphicItemPainter {
     classes = [board_items.GrCircle, board_items.FpCircle];
 
     layers_for(item: board_items.GrCircle | board_items.FpCircle) {
@@ -157,6 +206,7 @@ class CirclePainter extends BoardItemPainter {
             );
         } else {
             const points = arc.to_polyline();
+            // TODO: stroke style
             this.gfx.line(new Polyline(points, arc.width, color));
         }
     }

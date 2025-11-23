@@ -1075,7 +1075,7 @@ class GraphicItem implements HasUniqueID, HasStrokeParams {
     uuid?: string;
     tstamp?: string;
     locked = false;
-    stroke: Stroke;
+    stroke: Stroke = Stroke.default_value();
 
     get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
