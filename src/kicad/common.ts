@@ -338,3 +338,14 @@ export class Stroke {
         );
     }
 }
+
+/** Stroke and additional parameters for dashed lines. */
+export class StrokeParams {
+    stroke: Stroke;
+    dashed_line_gap_ratio: number;
+    dashed_line_dash_ratio: number;
+}
+
+export interface HasStrokeParams {
+    get stroke_params(): StrokeParams;
+}

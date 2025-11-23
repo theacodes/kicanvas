@@ -13,7 +13,9 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
+    StrokeParams,
     type HasUniqueID,
+    type HasStrokeParams,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 import type { List } from "./tokenizer";
@@ -78,11 +80,11 @@ export class KicadPCB {
                 P.collection("segments", "arc", T.item(ArcSegment)),
                 P.collection("vias", "via", T.item(Via)),
                 P.collection("drawings", "dimension", T.item(Dimension, this)),
-                P.collection("drawings", "gr_line", T.item(GrLine)),
-                P.collection("drawings", "gr_circle", T.item(GrCircle)),
-                P.collection("drawings", "gr_arc", T.item(GrArc)),
-                P.collection("drawings", "gr_poly", T.item(GrPoly)),
-                P.collection("drawings", "gr_rect", T.item(GrRect)),
+                P.collection("drawings", "gr_line", T.item(GrLine, this)),
+                P.collection("drawings", "gr_circle", T.item(GrCircle, this)),
+                P.collection("drawings", "gr_arc", T.item(GrArc, this)),
+                P.collection("drawings", "gr_poly", T.item(GrPoly, this)),
+                P.collection("drawings", "gr_rect", T.item(GrRect, this)),
                 P.collection("drawings", "gr_text", T.item(GrText, this)),
                 P.collection("groups", "group", T.item(Group)),
             ),
@@ -1066,15 +1068,37 @@ export class SymbolProperty implements HasUniqueID {
     }
 }
 
-class GraphicItem implements HasUniqueID {
-    parent?: Footprint;
+/** Base class for Line, Circle, and others which has 'stroke' property. */
+class GraphicItem implements HasUniqueID, HasStrokeParams {
+    parent?: Footprint | KicadPCB;
     layer: string;
     uuid?: string;
     tstamp?: string;
     locked = false;
+    stroke: Stroke;
 
     get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
+    }
+
+    get stroke_params(): StrokeParams {
+        let pcb = undefined;
+        if (this.parent instanceof KicadPCB) {
+            pcb = this.parent;
+        } else if (this.parent instanceof Footprint) {
+            pcb = this.parent.parent;
+        }
+
+        // get plot_cfg from pcb
+        const plot_cfg = pcb?.setup?.pcbplotparams;
+
+        // dashed_line_gap_ratio = 3, dashed_line_dash_ratio = 12
+        // is the default values from kicad
+        return {
+            stroke: this.stroke,
+            dashed_line_gap_ratio: plot_cfg?.dashed_line_gap_ratio ?? 3,
+            dashed_line_dash_ratio: plot_cfg?.dashed_line_dash_ratio ?? 12,
+        };
     }
 
     /**
@@ -1092,11 +1116,10 @@ export class Line extends GraphicItem {
     start: Vec2;
     end: Vec2;
     width: number;
-    stroke: Stroke;
 
     constructor(
         expr: Parseable,
-        public override parent?: Footprint,
+        public override parent?: Footprint | KicadPCB,
     ) {
         super();
 
@@ -1140,11 +1163,10 @@ export class Circle extends GraphicItem {
     end: Vec2;
     width: number;
     fill: string;
-    stroke: Stroke;
 
     constructor(
         expr: Parseable,
-        public override parent?: Footprint,
+        public override parent?: Footprint | KicadPCB,
     ) {
         super();
 
@@ -1194,12 +1216,11 @@ export class Arc extends GraphicItem {
     mid: Vec2;
     end: Vec2;
     width: number;
-    stroke: Stroke;
     #arc: MathArc;
 
     constructor(
         expr: Parseable,
-        public override parent?: Footprint,
+        public override parent?: Footprint | KicadPCB,
     ) {
         super();
 
@@ -1284,11 +1305,10 @@ export class Poly extends GraphicItem {
     width: number;
     fill: string;
     island: boolean;
-    stroke: Stroke;
 
     constructor(
         expr: Parseable,
-        public override parent?: Footprint,
+        public override parent?: Footprint | KicadPCB,
     ) {
         super();
 
@@ -1338,11 +1358,10 @@ export class Rect extends GraphicItem {
     end: Vec2;
     width: number;
     fill: string;
-    stroke: Stroke;
 
     constructor(
         expr: Parseable,
-        public override parent?: Footprint,
+        public override parent?: Footprint | KicadPCB,
     ) {
         super();
 
