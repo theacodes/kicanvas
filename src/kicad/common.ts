@@ -337,4 +337,55 @@ export class Stroke {
             ),
         );
     }
+
+    static default_value(): Stroke {
+        return {
+            width: 0,
+            type: "default",
+            color: Color.transparent_black,
+        };
+    }
+}
+
+/** Stroke and additional parameters for dashed lines. */
+export class StrokeParams {
+    stroke: Stroke;
+    dashed_line_gap_ratio: number;
+    dashed_line_dash_ratio: number;
+
+    /** ISO 128-2 line correction factor */
+    private static line_correction = 1.0;
+
+    /** Calculate the length of a dot in a dashed line. */
+    static dot_length(line: number): number {
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/common/render_settings.cpp#L73
+        return Math.max(1.0 - StrokeParams.line_correction, 0.2) * line;
+    }
+
+    /** Calculate the length of a gap in a dashed line. */
+    static gap_length(line: number, stroke: StrokeParams): number {
+        const gap_ratio = stroke.dashed_line_gap_ratio;
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/common/render_settings.cpp#L81
+        return Math.max(gap_ratio + StrokeParams.line_correction, 1.0) * line;
+    }
+
+    /** Calculate the length of a dash in a dashed line. */
+    static dash_length(line: number, stroke: StrokeParams): number {
+        const dash_ratio = stroke.dashed_line_dash_ratio;
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/common/render_settings.cpp#L67
+        return Math.max(dash_ratio - StrokeParams.line_correction, 1.0) * line;
+    }
+
+    /** Solid line, gap: 3, dash: 12. */
+    static default_value(): StrokeParams {
+        return {
+            stroke: Stroke.default_value(),
+            dashed_line_gap_ratio: 3,
+            dashed_line_dash_ratio: 12,
+        };
+    }
+}
+
+export interface HasStrokeParams {
+    get stroke_params(): StrokeParams;
 }
