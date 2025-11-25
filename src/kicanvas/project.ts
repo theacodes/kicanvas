@@ -301,6 +301,15 @@ export class Project extends EventTarget implements IDisposable {
         return this.#pages_by_path.get(project_path);
     }
 
+    public page_by_name(filename: string) {
+        for (const page of this.#pages_by_path.values()) {
+            if (page.filename === filename) {
+                return page;
+            }
+        }
+        return null;
+    }
+
     public async download(name: string) {
         if (this.#pages_by_path.has(name)) {
             name = this.#pages_by_path.get(name)!.filename;
@@ -351,7 +360,7 @@ export class ProjectPage {
         public sheet_path: string,
         public name?: string,
         public page?: string,
-    ) {}
+    ) { }
 
     /**
      * A unique identifier for this page within the project,
