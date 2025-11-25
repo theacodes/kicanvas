@@ -54,6 +54,10 @@ abstract class GraphicItemPainter extends BoardItemPainter {
         color: Color,
         stroke_style: StrokeParams,
     ) {
+        // reference implementation:
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/common/stroke_params.cpp#L48
+        // https://gitlab.com/kicad/code/develop/-/blob/master/pcbnew/pcb_painter.cpp#L2236
+
         const stroke_type = stroke_style.stroke;
 
         // solid line
@@ -75,7 +79,61 @@ abstract class GraphicItemPainter extends BoardItemPainter {
         color: Color,
         stroke_style: StrokeParams,
     ) {
-        this.gfx.line([start, end], width, color);
+        const line_vec = end.sub(start);
+        const line_len = line_vec.magnitude;
+        const line_dir_vec = line_vec.normalize();
+
+        const dot_len = StrokeParams.dot_length(width);
+        const gap_len = StrokeParams.gap_length(width, stroke_style);
+        const dash_len = StrokeParams.dash_length(width, stroke_style);
+
+        // generate line pattern
+        let line_pattern: number[] = [];
+        switch (stroke_style.stroke.type) {
+            case "dash":
+                line_pattern = [dash_len, gap_len];
+                break;
+            case "dot":
+                line_pattern = [dot_len, gap_len];
+                break;
+            case "dash_dot":
+                line_pattern = [dash_len, gap_len, dot_len, gap_len];
+                break;
+            case "dash_dot_dot":
+                line_pattern = [
+                    dash_len,
+                    gap_len,
+                    dot_len,
+                    gap_len,
+                    dot_len,
+                    gap_len,
+                ];
+                break;
+            default:
+                // unreachable
+                return;
+        }
+
+        // draw lines
+        let draw_len = 0.0;
+        let pattern_index = 0;
+        while (draw_len < line_len) {
+            const pattern = line_pattern[pattern_index]!;
+
+            const segment_len = Math.min(pattern, line_len - draw_len);
+
+            if (pattern_index % 2 === 0 && segment_len > 0) {
+                const seg_start = start.add(line_dir_vec.multiply(draw_len));
+                const seg_end = seg_start.add(
+                    line_dir_vec.multiply(segment_len),
+                );
+
+                this.gfx.line([seg_start, seg_end], width, color);
+            }
+
+            draw_len += segment_len;
+            pattern_index = (pattern_index + 1) % line_pattern.length;
+        }
     }
 
     /** [1, 2, 3, 4, 5] -> [(1, 2), (2, 3), (3, 4), (4, 5), ...] */
@@ -114,11 +172,14 @@ class RectPainter extends GraphicItemPainter {
         if (this.filter_net) return;
 
         const color = layer.color;
+
+        // use the same order as kicad
+        // https://gitlab.com/kicad/code/develop/-/blob/master/common/eda_shape.cpp#L1616
         const points = [
             r.start,
-            new Vec2(r.start.x, r.end.y),
-            r.end,
             new Vec2(r.end.x, r.start.y),
+            r.end,
+            new Vec2(r.start.x, r.end.y),
             r.start,
         ];
 
