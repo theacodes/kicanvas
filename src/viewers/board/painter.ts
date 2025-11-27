@@ -15,7 +15,7 @@ import * as log from "../../base/log";
 import { Circle, Color, Polygon, Polyline, Renderer } from "../../graphics";
 import { StrokeParams } from "../../kicad/common.ts";
 import * as board_items from "../../kicad/board";
-import { EDAText, StrokeFont } from "../../kicad/text";
+import { EDAText, StrokeFont, TextAttributes } from "../../kicad/text";
 import { DocumentPainter, ItemPainter } from "../base/painter";
 import { ViewLayerNames } from "../base/view-layers";
 import {
@@ -146,6 +146,46 @@ abstract class GraphicItemPainter extends BoardItemPainter {
     }
 }
 
+abstract class NetNameItemPainter extends BoardItemPainter {
+    /**  Drawing the netname on `center` in region `region` */
+    protected draw_net_name(
+        net_name: string,
+        center: Vec2,
+        text_width: number,
+        max_font_size: number,
+        color: Color,
+    ) {
+        const text_attr = new TextAttributes();
+
+        const text_center = center.copy().multiply(10000);
+
+        // Keep the font size consistent for short text.
+        const stroke_width = text_width / Math.max(net_name.length, 3);
+
+        // Use a smaller text size to improve visibility.
+        const netname_font_size =
+            Math.min(max_font_size, stroke_width) * 10000 * 0.95;
+
+        text_attr.color = color;
+        text_attr.bold = true;
+        text_attr.size = new Vec2(netname_font_size, netname_font_size);
+        text_attr.stroke_width = netname_font_size / 8;
+
+        StrokeFont.default().draw(this.gfx, net_name, text_center, text_attr);
+    }
+
+    /** Get displayed netname, e.g. "Sheet/Name" -> "Name" */
+    protected static displayed_netname(
+        netname: string | undefined,
+    ): string | undefined {
+        if (!netname) return undefined;
+
+        const level_names = netname.split("/");
+
+        return level_names.slice(-1)[0]!;
+    }
+}
+
 class LinePainter extends GraphicItemPainter {
     classes = [board_items.GrLine, board_items.FpLine];
 
@@ -273,7 +313,7 @@ class CirclePainter extends GraphicItemPainter {
     }
 }
 
-class TraceSegmentPainter extends BoardItemPainter {
+class TraceSegmentPainter extends NetNameItemPainter {
     classes = [board_items.LineSegment];
 
     layers_for(item: board_items.LineSegment) {
@@ -290,7 +330,7 @@ class TraceSegmentPainter extends BoardItemPainter {
     }
 }
 
-class TraceArcPainter extends BoardItemPainter {
+class TraceArcPainter extends NetNameItemPainter {
     classes = [board_items.ArcSegment];
 
     layers_for(item: board_items.ArcSegment) {
@@ -308,7 +348,7 @@ class TraceArcPainter extends BoardItemPainter {
     }
 }
 
-class ViaPainter extends BoardItemPainter {
+class ViaPainter extends NetNameItemPainter {
     classes = [board_items.Via];
 
     layers_for(v: board_items.Via): string[] {
@@ -421,7 +461,7 @@ class ZonePainter extends BoardItemPainter {
     }
 }
 
-class PadPainter extends BoardItemPainter {
+class PadPainter extends NetNameItemPainter {
     classes = [board_items.Pad];
 
     layers_for(pad: board_items.Pad): string[] {
@@ -498,7 +538,66 @@ class PadPainter extends BoardItemPainter {
             layer.name == LayerNames.pad_holes ||
             layer.name == LayerNames.non_plated_holes;
 
-        if (is_hole_layer && pad.drill != null) {
+        const is_netname_layer =
+            layer.name == LayerNames.pads_front_netname ||
+            layer.name == LayerNames.pads_back_netname ||
+            layer.name == LayerNames.pad_holes_netname;
+
+        const net_name = PadPainter.pad_netname(pad);
+
+        if (is_netname_layer) {
+            // see also:
+            // https://gitlab.com/kicad/code/kicad/-/blob/master/pcbnew/pcb_painter.cpp#L1379
+            const pad_size = PadPainter.get_pad_orth_size(pad);
+
+            // calcuate the maxium text size and rotation angle
+            let max_width = pad_size.x;
+            let max_font_size = pad_size.y;
+            let text_rotated = -pad.parent.at.rotation;
+            if (pad_size.x < pad_size.y * 0.95) {
+                text_rotated += 90;
+                max_width = pad_size.y;
+                max_font_size = pad_size.x;
+            }
+
+            max_font_size = Math.min(max_font_size, 10);
+
+            // calcuate the offset for pad number and net name if necessary
+            let y_offset_pad_num = 0;
+            let y_offset_pad_net = 0;
+            if (net_name !== undefined && pad.number !== "") {
+                // 3 can get the better visibility than kicad default value 2.5
+                max_font_size = max_font_size / 3;
+                y_offset_pad_net = max_font_size / 1.4;
+                y_offset_pad_num = max_font_size / 1.7;
+            }
+
+            // apply the text rotation
+            const rotate_mat = Matrix3.rotation(Angle.deg_to_rad(text_rotated));
+            this.gfx.state.multiply(rotate_mat);
+
+            // render the pad_number
+            if (pad.number !== "") {
+                this.draw_net_name(
+                    pad.number,
+                    new Vec2(0, -y_offset_pad_num),
+                    max_width,
+                    max_font_size,
+                    color,
+                );
+            }
+
+            // render netname
+            if (net_name !== undefined) {
+                this.draw_net_name(
+                    net_name,
+                    new Vec2(0, y_offset_pad_net),
+                    max_width,
+                    max_font_size,
+                    color,
+                );
+            }
+        } else if (is_hole_layer && pad.drill != null) {
             if (!pad.drill.oval) {
                 const drill_pos = center.add(pad.drill.offset);
                 this.gfx.circle(
@@ -658,6 +757,39 @@ class PadPainter extends BoardItemPainter {
 
         this.gfx.state.pop();
     }
+
+    /** Get displayed netname for a pad, if it's no_connect, return "X" */
+    private static pad_netname(pad: board_items.Pad): string | undefined {
+        // display "X" for no_connect pads
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/pcbnew/pcb_painter.cpp#L1305
+        if (pad.pintype !== undefined && pad.pintype.includes("no_connect")) {
+            return "X";
+        }
+
+        return PadPainter.displayed_netname(pad.netname);
+    }
+
+    /** Get pad outline size */
+    private static get_pad_orth_size(pad: board_items.Pad): Vec2 {
+        const pad_size = pad.size.copy();
+
+        const obj_angle = pad.parent.at.rotation + 36000;
+
+        // swap x, y if pad is not 0 deg or 180 deg
+        if (obj_angle % 180 !== 0) {
+            [pad_size.x, pad_size.y] = [pad_size.y, pad_size.x];
+        }
+
+        // Don't allow a 45° rotation to bloat a pad's bounding box unnecessarily
+        const limit = Math.min(pad_size.x, pad_size.y) * 1.1;
+
+        if (pad_size.x > limit && pad_size.y > limit) {
+            pad_size.x = limit;
+            pad_size.y = limit;
+        }
+
+        return pad_size;
+    }
 }
 
 class GrTextPainter extends BoardItemPainter {
@@ -785,13 +917,7 @@ class PropertyTextPainter extends BoardItemPainter {
         edatext.apply_at(t.at);
 
         edatext.attributes.color = layer.color;
-
-        // Looks like the rotation angle for KiCad's symbol attribute rendering
-        // is standalone, so we need to sub it from parent's rotation angle.
-        if (t.parent) {
-            const rot = t.parent.at.rotation;
-            edatext.text_angle.degrees -= rot;
-        }
+        edatext.attributes.keep_upright = !t.at.unlocked;
 
         // keep the text upright if needed
         if (edatext.attributes.keep_upright) {
@@ -801,6 +927,13 @@ class PropertyTextPainter extends BoardItemPainter {
             while (edatext.text_angle.degrees <= -90) {
                 edatext.text_angle.degrees += 180;
             }
+        }
+
+        // Looks like the rotation angle for KiCad's symbol attribute rendering
+        // is standalone, so we need to sub it from parent's rotation angle.
+        if (t.parent) {
+            const rot = t.parent.at.rotation;
+            edatext.text_angle.degrees -= rot;
         }
 
         this.gfx.state.push();
