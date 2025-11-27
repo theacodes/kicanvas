@@ -14,6 +14,7 @@ import {
     TitleBlock,
     expand_text_vars,
     StrokeParams,
+    type HasNetName,
     type HasUniqueID,
     type HasStrokeParams,
 } from "./common";
@@ -75,10 +76,10 @@ export class KicadPCB {
                     "footprint",
                     T.item(Footprint, this),
                 ),
-                P.collection("zones", "zone", T.item(Zone)),
-                P.collection("segments", "segment", T.item(LineSegment)),
-                P.collection("segments", "arc", T.item(ArcSegment)),
-                P.collection("vias", "via", T.item(Via)),
+                P.collection("zones", "zone", T.item(Zone, this)),
+                P.collection("segments", "segment", T.item(LineSegment, this)),
+                P.collection("segments", "arc", T.item(ArcSegment, this)),
+                P.collection("vias", "via", T.item(Via, this)),
                 P.collection("drawings", "dimension", T.item(Dimension, this)),
                 P.collection("drawings", "gr_line", T.item(GrLine, this)),
                 P.collection("drawings", "gr_circle", T.item(GrCircle, this)),
@@ -89,6 +90,9 @@ export class KicadPCB {
                 P.collection("groups", "group", T.item(Group)),
             ),
         );
+
+        // sort the array by net_number
+        this.nets.sort((a, b) => a.number - b.number);
     }
 
     *items() {
@@ -130,6 +134,10 @@ export class KicadPCB {
         }
         return null;
     }
+
+    get_netname_by_number(net_number: number): string | undefined {
+        return this.nets[net_number]?.name;
+    }
 }
 
 export class Property {
@@ -149,7 +157,7 @@ export class Property {
     }
 }
 
-export class LineSegment implements HasUniqueID {
+export class LineSegment implements HasUniqueID, HasNetName {
     start: Vec2;
     end: Vec2;
     width: number;
@@ -159,7 +167,10 @@ export class LineSegment implements HasUniqueID {
     uuid?: string;
     tstamp?: string;
 
-    constructor(expr: Parseable) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadPCB,
+    ) {
         /*
         (segment
             (start 119.1 82.943)
@@ -189,9 +200,13 @@ export class LineSegment implements HasUniqueID {
     get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
     }
+
+    get netname(): string | undefined {
+        return this.parent.get_netname_by_number(this.net);
+    }
 }
 
-export class ArcSegment {
+export class ArcSegment implements HasUniqueID, HasNetName {
     start: Vec2;
     mid: Vec2;
     end: Vec2;
@@ -199,9 +214,13 @@ export class ArcSegment {
     layer: string;
     net: number;
     locked = false;
-    tstamp: string;
+    tstamp?: string;
+    uuid?: string;
 
-    constructor(expr: Parseable) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadPCB,
+    ) {
         /*
         (arc
             (start 115.25 59.05)
@@ -225,12 +244,21 @@ export class ArcSegment {
                 P.pair("net", T.number),
                 P.atom("locked"),
                 P.pair("tstamp", T.string),
+                P.pair("uuid", T.string),
             ),
         );
     }
+
+    get unique_id(): string | undefined {
+        return this.uuid ?? this.tstamp;
+    }
+
+    get netname(): string | undefined {
+        return this.parent.get_netname_by_number(this.net);
+    }
 }
 
-export class Via implements HasUniqueID {
+export class Via implements HasUniqueID, HasNetName {
     type: "blind" | "micro" | "through-hole" = "through-hole";
     at: At;
     size: number;
@@ -244,7 +272,10 @@ export class Via implements HasUniqueID {
     tstamp?: string;
     uuid?: string;
 
-    constructor(expr: Parseable) {
+    constructor(
+        expr: Parseable,
+        public parent: KicadPCB,
+    ) {
         Object.assign(
             this,
             parse_expr(
@@ -268,6 +299,10 @@ export class Via implements HasUniqueID {
 
     get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
+    }
+
+    get netname(): string | undefined {
+        return this.parent.get_netname_by_number(this.net);
     }
 }
 
@@ -1506,7 +1541,7 @@ export class GrText extends Text {
     }
 }
 
-export class Pad implements HasUniqueID {
+export class Pad implements HasUniqueID, HasNetName {
     number: string; // I hate this
     type: "thru_hole" | "smd" | "connect" | "np_thru_hole" = "thru_hole";
     shape: "circle" | "rect" | "oval" | "trapezoid" | "roundrect" | "custom";
@@ -1603,6 +1638,11 @@ export class Pad implements HasUniqueID {
 
     get unique_id(): string | undefined {
         return this.uuid ?? this.tstamp;
+    }
+
+    get netname(): string | undefined {
+        // assert: pcb.net[this.net.number] !== undefined
+        return this.net?.name;
     }
 }
 
