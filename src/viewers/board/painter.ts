@@ -450,12 +450,21 @@ class PadPainter extends BoardItemPainter {
         switch (pad.type) {
             case "thru_hole":
                 layers.push(LayerNames.pad_holewalls);
+                layers.push(LayerNames.pad_holes_netname);
                 layers.push(LayerNames.pad_holes);
                 break;
             case "np_thru_hole":
                 layers.push(LayerNames.non_plated_holes);
                 break;
             case "smd":
+                // only use pads_front_netname/pads_back_netname in SMD pads
+                // the thru_hole pad uses the pad_holes_netname layer
+                if (layers.includes(LayerNames.pads_front)) {
+                    layers.push(LayerNames.pads_front_netname);
+                } else if (layers.includes(LayerNames.pads_back)) {
+                    layers.push(LayerNames.pads_back_netname);
+                }
+                break;
             case "connect":
                 break;
             default:

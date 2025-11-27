@@ -40,9 +40,11 @@ export enum LayerNames {
     anchors = ":Anchors",
     non_plated_holes = ":NonPlatedHoles",
     via_holes = ":Via:Holes",
+    pad_holes_netname = ":Pad:Holes:NetName",
     pad_holes = ":Pad:Holes",
     pad_holewalls = ":Pad:HoleWalls",
     via_holewalls = ":Via:HoleWalls",
+    pads_front_netname = ":Pads:Front:NetName",
     pads_front = ":Pads:Front",
     f_cu = "F.Cu",
     f_mask = "F.Mask",
@@ -81,6 +83,7 @@ export enum LayerNames {
     in28_cu = "In28.Cu",
     in29_cu = "In29.Cu",
     in30_cu = "In30.Cu",
+    pads_back_netname = ":Pads:Back:NetName",
     pads_back = ":Pads:Back",
     b_cu = "B.Cu",
     b_mask = "B.Mask",
@@ -216,12 +219,25 @@ export class LayerSet extends BaseLayerSet {
             }
 
             // Pad layers require that the front or back layer is visible.
-            if (layer_name == LayerNames.pads_front) {
+            if (
+                layer_name == LayerNames.pads_front ||
+                layer_name == LayerNames.pads_front_netname
+            ) {
                 visible = () => this.by_name(LayerNames.f_cu)!.visible;
                 interactive = true;
             }
-            if (layer_name == LayerNames.pads_back) {
+
+            if (
+                layer_name == LayerNames.pads_back ||
+                layer_name == LayerNames.pads_back_netname
+            ) {
                 visible = () => this.by_name(LayerNames.b_cu)!.visible;
+                interactive = true;
+            }
+
+            // Pad hole netname require that the pad holes layer is visible
+            if (layer_name == LayerNames.pad_holes_netname) {
+                visible = () => this.by_name(LayerNames.pad_holes)!.visible;
                 interactive = true;
             }
 
@@ -309,6 +325,15 @@ export class LayerSet extends BaseLayerSet {
                 return (this.theme["background"] as Color) ?? Color.white;
             case LayerNames.pad_holewalls:
                 return (this.theme["pad_through_hole"] as Color) ?? Color.white;
+            case LayerNames.pads_front_netname:
+                // TODO theme?
+                return Color.white.with_alpha(0.8);
+            case LayerNames.pads_back_netname:
+                // TODO theme?
+                return Color.white.with_alpha(0.8);
+            case LayerNames.pad_holes_netname:
+                // TODO theme?
+                return Color.white.with_alpha(0.8);
         }
 
         let name = layer_name;
@@ -415,12 +440,15 @@ export class LayerSet extends BaseLayerSet {
     }
 
     *pad_layers() {
+        yield this.by_name(LayerNames.pads_front_netname)!;
         yield this.by_name(LayerNames.pads_front)!;
+        yield this.by_name(LayerNames.pads_back_netname)!;
         yield this.by_name(LayerNames.pads_back)!;
     }
 
     *pad_hole_layers() {
         yield this.by_name(LayerNames.pad_holes)!;
+        yield this.by_name(LayerNames.pad_holes_netname)!;
         yield this.by_name(LayerNames.pad_holewalls)!;
     }
 
