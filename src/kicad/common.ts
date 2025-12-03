@@ -389,3 +389,8 @@ export class StrokeParams {
 export interface HasStrokeParams {
     get stroke_params(): StrokeParams;
 }
+
+/** Items which has netname */
+export interface HasNetName {
+    get netname(): string | undefined;
+}
