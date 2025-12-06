@@ -1333,7 +1333,37 @@ export class FpArc extends Arc {
     static override expr_start = "fp_arc";
 }
 
-export type PolyPtsItem = Vec2;
+export class PolyArc {
+    start: Vec2;
+    mid: Vec2;
+    end: Vec2;
+    #arc: MathArc;
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("arc"),
+                P.vec2("start"),
+                P.vec2("mid"),
+                P.vec2("end"),
+            ),
+        );
+
+        this.#arc = MathArc.from_three_points(this.start, this.mid, this.end);
+    }
+
+    get arc() {
+        return this.#arc;
+    }
+
+    get bbox(): BBox {
+        return this.#arc.bbox;
+    }
+}
+
+export type PolyPtsItem = Vec2 | PolyArc;
 
 export class Poly extends GraphicItem {
     static expr_start = "polygon";
@@ -1343,7 +1373,7 @@ export class Poly extends GraphicItem {
     fill: string;
     island: boolean;
 
-    #bbox: BBox;
+    #polyline_pts: Vec2[];
 
     constructor(
         expr: Parseable,
@@ -1361,7 +1391,10 @@ export class Poly extends GraphicItem {
                 P.atom("locked"),
                 P.pair("layer", T.string),
                 P.atom("island"),
-                P.list("pts", T.choice(["xy", T.vec2])),
+                P.list(
+                    "pts",
+                    T.choice(["xy", T.vec2], ["arc", T.item(PolyArc)]),
+                ),
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
                 P.pair("uuid", T.string),
@@ -1372,17 +1405,26 @@ export class Poly extends GraphicItem {
 
         this.width ??= this.stroke?.width || 0;
 
-        // cache bbox to avoid recalculation
-        this.#bbox = this.calc_bbox();
+        // Convert all PolyArc to Vec2
+        // The `arc` node in pts is undocumented in the following link:
+        // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_footprint_polygon
+        // But it is used in the kicad code, it just converts the arc to a polyline
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/libs/kimath/src/geometry/shape_line_chain.cpp#L1613
+        this.#polyline_pts = this.pts.flatMap((pt) => {
+            if (pt instanceof Vec2) {
+                return [pt];
+            } else {
+                return pt.arc.to_polyline();
+            }
+        });
+    }
+
+    get polyline() {
+        return this.#polyline_pts;
     }
 
     override get bbox(): BBox {
-        return this.#bbox;
-    }
-
-    private calc_bbox(): BBox {
-        const bbox_vec2 = BBox.from_points(this.pts);
-        return bbox_vec2;
+        return BBox.from_points(this.#polyline_pts);
     }
 }
 
