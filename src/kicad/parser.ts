@@ -103,6 +103,26 @@ export const T = {
         const el = e as [string, number, number, number, number?];
         return new Color(el[1] / 255, el[2] / 255, el[3] / 255, el[4]);
     },
+    /**
+     * Choice one type processor by prefix
+     *
+     * Example: `choice[("xy", T.vec2), ("color", T.color)]`
+     *  - if input is `(xy 1 2)`, use `T.vec2` to parse input
+     *  - if input is `(color 1 2 3)`, use `T.color` to parse input
+     */
+    choice(...fns: [prefix: string, TypeProcessor][]): TypeProcessor {
+        return (obj: Obj, name: string, e: ListOrAtom) => {
+            const e_str = e as string[];
+
+            for (const [prefix, fn] of fns) {
+                if (prefix === e_str[0]) {
+                    return fn(obj, name, e);
+                }
+            }
+
+            throw new Error(`No matched for ${e}`);
+        };
+    },
 };
 
 /**

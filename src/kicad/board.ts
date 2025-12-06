@@ -1333,13 +1333,17 @@ export class FpArc extends Arc {
     static override expr_start = "fp_arc";
 }
 
+export type PolyPtsItem = Vec2;
+
 export class Poly extends GraphicItem {
     static expr_start = "polygon";
 
-    pts: Vec2[];
+    pts: PolyPtsItem[];
     width: number;
     fill: string;
     island: boolean;
+
+    #bbox: BBox;
 
     constructor(
         expr: Parseable,
@@ -1357,7 +1361,7 @@ export class Poly extends GraphicItem {
                 P.atom("locked"),
                 P.pair("layer", T.string),
                 P.atom("island"),
-                P.list("pts", T.vec2),
+                P.list("pts", T.choice(["xy", T.vec2])),
                 P.pair("width", T.number),
                 P.pair("fill", T.string),
                 P.pair("uuid", T.string),
@@ -1367,10 +1371,18 @@ export class Poly extends GraphicItem {
         );
 
         this.width ??= this.stroke?.width || 0;
+
+        // cache bbox to avoid recalculation
+        this.#bbox = this.calc_bbox();
     }
 
     override get bbox(): BBox {
-        return BBox.from_points(this.pts);
+        return this.#bbox;
+    }
+
+    private calc_bbox(): BBox {
+        const bbox_vec2 = BBox.from_points(this.pts);
+        return bbox_vec2;
     }
 }
 
