@@ -87,17 +87,13 @@ section.overlay input::placeholder {
 section.overlay .link_button {
     color: #81eeff;
     background: transparent;
-
     font-size: 1em;
     font-weight: normal;
     text-decoration: underline;
-
     outline: none;
     border: none;
     box-sizing: border-box;
-
-    transition:
-        color var(--transition-time-medium) ease;
+    transition: color var(--transition-time-medium) ease;
 }
 
 section.overlay .link_button:focus {
