@@ -84,6 +84,30 @@ section.overlay input::placeholder {
     color: var(--fg);
 }
 
+section.overlay .link_button {
+    color: #81eeff;
+    background: transparent;
+
+    font-size: 1em;
+    font-weight: normal;
+    text-decoration: underline;
+
+    outline: none;
+    border: none;
+    box-sizing: border-box;
+
+    transition:
+        color var(--transition-time-medium) ease;
+}
+
+section.overlay .link_button:focus {
+    border: var(--button-focus-outline);
+}
+
+section.overlay .link_button:hover {
+    color: var(--fg);
+}
+
 section.overlay p.note {
     color: var(--input-placeholder);
     font-size: 1em;

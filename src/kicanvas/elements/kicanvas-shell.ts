@@ -6,6 +6,7 @@
 
 import { later } from "../../base/async";
 import { DropTarget } from "../../base/dom/drag-drop";
+import { FilePicker } from "../../base/dom/file-picker";
 import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement, KCUIIconElement } from "../../kc-ui";
 import { sprites_url } from "../icons/sprites";
@@ -76,6 +77,9 @@ class KiCanvasShellElement extends KCUIElement {
     @query(`input[name="link"]`, true)
     public link_input: HTMLInputElement;
 
+    @query(`button[name="open_local"]`, true)
+    public open_file_button: HTMLButtonElement;
+
     override initialContentCallback() {
         const url_params = new URLSearchParams(document.location.search);
         const github_paths = url_params.getAll("github");
@@ -110,6 +114,12 @@ class KiCanvasShellElement extends KCUIElement {
             const location = new URL(window.location.href);
             location.searchParams.set("github", link);
             window.history.pushState(null, "", location);
+        });
+
+        this.open_file_button.addEventListener("click", async (e) => {
+            FilePicker.pick(async (vfs) => {
+                await this.setup_project(vfs);
+            });
         });
     }
 
@@ -166,7 +176,13 @@ class KiCanvasShellElement extends KCUIElement {
                         type="text"
                         placeholder="Paste a GitHub link..."
                         autofocus />
-                    <p>or drag & drop your KiCAD files</p>
+                    <p>
+                        or drag & drop your KiCAD files, or<button
+                            name="open_local"
+                            class="link_button">
+                            open from local
+                        </button>
+                    </p>
                     <p class="note">
                         KiCanvas is
                         <a

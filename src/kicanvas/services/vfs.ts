@@ -197,3 +197,35 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         initiate_download(await this.get(name));
     }
 }
+
+/**
+ * Virtual file system for local files
+ */
+export class LocalFileSystem extends VirtualFileSystem {
+    constructor(private files: File[]) {
+        super();
+    }
+
+    override *list() {
+        for (const entry of this.files) {
+            yield entry.name;
+        }
+    }
+
+    override async has(name: string): Promise<boolean> {
+        return this.files.find((f) => f.name == name) !== undefined;
+    }
+
+    override async get(name: string): Promise<File> {
+        const file = this.files.find((f) => f.name == name);
+        if (file) {
+            return file;
+        } else {
+            throw new Error(`File ${name} not found`);
+        }
+    }
+
+    override async download(name: string) {
+        initiate_download(await this.get(name));
+    }
+}
