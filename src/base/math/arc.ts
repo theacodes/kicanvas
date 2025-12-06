@@ -36,20 +36,28 @@ export class Arc {
         center.x /= u;
         center.y /= u;
         const radius = center.sub(mid).magnitude;
-        const start_radial = start.sub(center);
-        const mid_radial = mid.sub(center);
-        const end_radial = end.sub(center);
-        const start_angle = start_radial.angle;
-        const mid_angle = mid_radial.angle;
-        let end_angle = end_radial.angle;
 
-        const angle1 = mid_angle.sub(start_angle).normalize180();
-        const angle2 = end_angle.sub(mid_angle).normalize180();
-        const arc_angle = angle1.add(angle2);
+        const start_angle = start.sub(center).angle;
+        const mid_angle = mid.sub(center).angle;
+        const end_angle = end.sub(center).angle;
 
-        end_angle = start_angle.add(arc_angle);
+        // start -> mid -> end, calcuate the arc angle
+        let arc_angle;
+        const start_to_mid = mid_angle.sub(start_angle).normalize();
+        const start_to_end = end_angle.sub(start_angle).normalize();
 
-        return new Arc(center, radius, start_angle, end_angle, width);
+        if (start_to_mid.degrees < start_to_end.degrees) {
+            // minor arc, angle = start_to_end
+            arc_angle = start_to_end;
+        } else {
+            // major arc, angle = 360 - start_to_end
+            arc_angle = Angle.from_degrees(360).sub(start_to_end);
+        }
+
+        const arc_start = start_angle;
+        const arc_end = start_angle.add(arc_angle);
+
+        return new Arc(center, radius, arc_start, arc_end, width);
     }
 
     static from_center_start_end(
