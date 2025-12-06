@@ -9,6 +9,11 @@ import { BBox } from "./bbox";
 import { Vec2 } from "./vec2";
 
 /**
+ * Arc direction
+ */
+export type ArcDirection = "clockwise" | "counter-clockwise";
+
+/**
  * A circular arc
  */
 export class Arc {
@@ -21,6 +26,7 @@ export class Arc {
         public start_angle: Angle,
         public end_angle: Angle,
         public width: number,
+        public direction: ArcDirection = "clockwise",
     ) {}
 
     /**
@@ -41,7 +47,7 @@ export class Arc {
         const mid_angle = mid.sub(center).angle;
         const end_angle = end.sub(center).angle;
 
-        // start -> mid -> end, calcuate the arc angle
+        // calcuate the arc angle
         let arc_angle;
         const start_to_mid = mid_angle.sub(start_angle).normalize();
         const start_to_end = end_angle.sub(start_angle).normalize();
@@ -54,10 +60,25 @@ export class Arc {
             arc_angle = Angle.from_degrees(360).sub(start_to_end);
         }
 
-        const arc_start = start_angle;
-        const arc_end = start_angle.add(arc_angle);
+        // although kicad always create a clockwise arc,
+        // but we can import a counter-clockwise arc from other EDA/CAD using KiCad
+        let arc_start;
+        let direction: ArcDirection;
 
-        return new Arc(center, radius, arc_start, arc_end, width);
+        const mid_to_start = mid.sub(start);
+        const end_to_mid = end.sub(mid);
+
+        if (mid_to_start.cross(end_to_mid) < 0) {
+            arc_start = end_angle.normalize();
+            direction = "counter-clockwise";
+        } else {
+            arc_start = start_angle.normalize();
+            direction = "clockwise";
+        }
+
+        const arc_end = arc_start.add(arc_angle);
+
+        return new Arc(center, radius, arc_start, arc_end, width, direction);
     }
 
     static from_center_start_end(
@@ -149,10 +170,20 @@ export class Arc {
             );
         }
 
+        let last_angle;
+        if (this.direction === "counter-clockwise") {
+            // for a counter-clockwise arc, it was drawn from the endpoint to the start
+            // so we need reverse the points
+            points.reverse();
+            last_angle = start;
+        } else {
+            last_angle = end;
+        }
+
         // Add the last point if needed.
         const last_point = new Vec2(
-            this.center.x + Math.cos(end) * this.radius,
-            this.center.y + Math.sin(end) * this.radius,
+            this.center.x + Math.cos(last_angle) * this.radius,
+            this.center.y + Math.sin(last_angle) * this.radius,
         );
 
         if (!last_point.equals(points[points.length - 1])) {
