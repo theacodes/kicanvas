@@ -6,7 +6,7 @@
 
 import { Color } from "../base/color";
 import { Vec2 } from "../base/math";
-import { P, T, parse_expr, type Parseable } from "./parser";
+import { P, T, parse_expr, log, type Parseable } from "./parser";
 
 export function unescape_string(str: string): string {
     const escape_vars = {
@@ -52,18 +52,33 @@ export function expand_text_vars(
         return text;
     }
 
-    text = text.replaceAll(
-        /(\$\{(.+?)\})/g,
-        (substring: string, all: string, name: string) => {
-            const val = resolveable.resolve_text_var(name);
+    // replace all text variables
+    let last_len;
+    let retry_count = 8;
+    const resolved: string[] = [];
+    do {
+        last_len = resolved.length;
+        retry_count -= 1;
 
-            if (val === undefined) {
-                return all;
-            }
+        text = text.replaceAll(
+            /(\$\{(.+?)\})/g,
+            (substring: string, all: string, name: string) => {
+                if (resolved.includes(name)) {
+                    log.warn(`Cycle reference "${name}" in text "${text}"`);
+                    return all;
+                }
 
-            return val;
-        },
-    );
+                const val = resolveable.resolve_text_var(name);
+                if (val === undefined) {
+                    return all;
+                }
+
+                resolved.push(name);
+
+                return val;
+            },
+        );
+    } while (last_len !== resolved.length || retry_count === 0);
 
     return text;
 }
