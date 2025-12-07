@@ -11,7 +11,7 @@ import { Logger } from "../base/log";
 import { is_number, is_string } from "../base/types";
 import { listify, type List } from "./tokenizer";
 
-const log = new Logger("kicanvas:parser");
+export const log = new Logger("kicanvas:parser");
 
 enum Kind {
     // the first token in the expr (kind ...)
