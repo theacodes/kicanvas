@@ -22,6 +22,7 @@ import footprint_graphics_pcb_src from "./files/footprint-graphics.kicad_pcb";
 import footprint_pads_pcb_src from "./files/footprint-pads.kicad_pcb";
 import footprint_text_locked_pcb_src from "./files/footprint-text-locked.kicad_pcb";
 import footprint_symbol_properties_pcb_src from "./files/footprint-properties.kicad_pcb";
+import shape_polygon_arc_pcb_src from "./files/shape_polygon_arc.kicad_pcb";
 import { first } from "../../src/base/iterator";
 
 suite("kicad.board.KicadPCB(): board parsing", function () {
@@ -626,6 +627,32 @@ suite("kicad.board.KicadPCB(): board parsing", function () {
             free: true,
             net: 0,
         } as Partial<board.Via>);
+    });
+
+    test("with polygon", function () {
+        const pcb = new board.KicadPCB(
+            "test.kicad_pcb",
+            shape_polygon_arc_pcb_src,
+        );
+        assert.equal(pcb.drawings.length, 1);
+
+        const poly1 = pcb.drawings[0]!;
+
+        assert(poly1 instanceof board.GrPoly);
+        assert.deepInclude(poly1, {
+            pts: [
+                {
+                    start: { x: 0, y: 0 },
+                    mid: { x: 5, y: -5 },
+                    end: { x: 1, y: 0 },
+                },
+                { x: 1, y: 1 },
+                { x: 0, y: 1 },
+            ],
+            layer: "F.Cu",
+            width: 0.2,
+            fill: "none",
+        } as Partial<board.GrPoly>);
     });
 });
 

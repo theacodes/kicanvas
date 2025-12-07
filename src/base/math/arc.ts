@@ -9,6 +9,11 @@ import { BBox } from "./bbox";
 import { Vec2 } from "./vec2";
 
 /**
+ * Arc direction
+ */
+export type ArcDirection = "clockwise" | "counter-clockwise";
+
+/**
  * A circular arc
  */
 export class Arc {
@@ -21,6 +26,7 @@ export class Arc {
         public start_angle: Angle,
         public end_angle: Angle,
         public width: number,
+        public direction: ArcDirection = "clockwise",
     ) {}
 
     /**
@@ -36,20 +42,43 @@ export class Arc {
         center.x /= u;
         center.y /= u;
         const radius = center.sub(mid).magnitude;
-        const start_radial = start.sub(center);
-        const mid_radial = mid.sub(center);
-        const end_radial = end.sub(center);
-        const start_angle = start_radial.angle;
-        const mid_angle = mid_radial.angle;
-        let end_angle = end_radial.angle;
 
-        const angle1 = mid_angle.sub(start_angle).normalize180();
-        const angle2 = end_angle.sub(mid_angle).normalize180();
-        const arc_angle = angle1.add(angle2);
+        const start_angle = start.sub(center).angle;
+        const mid_angle = mid.sub(center).angle;
+        const end_angle = end.sub(center).angle;
 
-        end_angle = start_angle.add(arc_angle);
+        // calcuate the arc angle
+        let arc_angle;
+        const start_to_mid = mid_angle.sub(start_angle).normalize();
+        const start_to_end = end_angle.sub(start_angle).normalize();
 
-        return new Arc(center, radius, start_angle, end_angle, width);
+        if (start_to_mid.degrees < start_to_end.degrees) {
+            // minor arc, angle = start_to_end
+            arc_angle = start_to_end;
+        } else {
+            // major arc, angle = 360 - start_to_end
+            arc_angle = Angle.from_degrees(360).sub(start_to_end);
+        }
+
+        // although kicad always create a clockwise arc,
+        // but we can import a counter-clockwise arc from other EDA/CAD using KiCad
+        let arc_start;
+        let direction: ArcDirection;
+
+        const mid_to_start = mid.sub(start);
+        const end_to_mid = end.sub(mid);
+
+        if (mid_to_start.cross(end_to_mid) < 0) {
+            arc_start = end_angle.normalize();
+            direction = "counter-clockwise";
+        } else {
+            arc_start = start_angle.normalize();
+            direction = "clockwise";
+        }
+
+        const arc_end = arc_start.add(arc_angle);
+
+        return new Arc(center, radius, arc_start, arc_end, width, direction);
     }
 
     static from_center_start_end(
@@ -141,10 +170,20 @@ export class Arc {
             );
         }
 
+        let last_angle;
+        if (this.direction === "counter-clockwise") {
+            // for a counter-clockwise arc, it was drawn from the endpoint to the start
+            // so we need reverse the points
+            points.reverse();
+            last_angle = start;
+        } else {
+            last_angle = end;
+        }
+
         // Add the last point if needed.
         const last_point = new Vec2(
-            this.center.x + Math.cos(end) * this.radius,
-            this.center.y + Math.sin(end) * this.radius,
+            this.center.x + Math.cos(last_angle) * this.radius,
+            this.center.y + Math.sin(last_angle) * this.radius,
         );
 
         if (!last_point.equals(points[points.length - 1])) {

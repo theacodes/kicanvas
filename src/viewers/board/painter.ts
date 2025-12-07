@@ -250,7 +250,7 @@ class PolyPainter extends GraphicItemPainter {
 
         if (p.width) {
             this.styled_line(
-                [...p.pts, p.pts[0]!],
+                [...p.polyline, p.polyline[0]!],
                 p.width,
                 color,
                 p.stroke_params,
@@ -258,7 +258,7 @@ class PolyPainter extends GraphicItemPainter {
         }
 
         if (this.isFillValid(p.fill)) {
-            this.gfx.polygon(new Polygon(p.pts, color));
+            this.gfx.polygon(new Polygon(p.polyline, color));
         }
     }
 }
@@ -456,7 +456,7 @@ class ZonePainter extends BoardItemPainter {
                 continue;
             }
 
-            this.gfx.polygon(new Polygon(p.pts, layer.color));
+            this.gfx.polygon(new Polygon(p.polyline, layer.color));
         }
     }
 }
