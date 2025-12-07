@@ -197,3 +197,97 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         initiate_download(await this.get(name));
     }
 }
+
+/**
+ * Virtual file system for in-memory files
+ */
+export class MemoryFileSystem extends VirtualFileSystem {
+    private files: Map<string, File> = new Map();
+
+    constructor(entries: Record<string, string | Blob | ArrayBuffer | File>) {
+        super();
+
+        for (const [key, value] of Object.entries(entries ?? {})) {
+            const name = basename(key);
+            let file: File;
+            if (value instanceof File) {
+                file = value;
+            } else if (value instanceof Blob) {
+                file = new File([value], name);
+            } else if (value instanceof ArrayBuffer) {
+                file = new File([value], name);
+            } else {
+                // assume string
+                file = new File([value ?? ""], name, { type: "text/plain" });
+            }
+            this.files.set(name, file);
+        }
+    }
+
+    public override *list() {
+        yield* this.files.keys();
+    }
+
+    public override async has(name: string): Promise<boolean> {
+        if (this.files.has(name)) {
+            return true;
+        }
+        const base = basename(name);
+        return this.files.has(base);
+    }
+
+    public override async get(name: string): Promise<File> {
+        const file = this.files.get(name) ?? this.files.get(basename(name));
+        if (!file) {
+            throw new Error(`File ${name} not found!`);
+        }
+        return file;
+    }
+
+    public async download(name: string) {
+        initiate_download(await this.get(name));
+    }
+}
+
+/**
+ * Combines multiple VFS backends. The first VFS has priority when names collide.
+ */
+export class CombinedFileSystem extends VirtualFileSystem {
+    constructor(private file_systems: VirtualFileSystem[]) {
+        super();
+    }
+
+    public override *list() {
+        const seen = new Set<string>();
+        for (const fs of this.file_systems) {
+            for (const name of fs.list()) {
+                if (!seen.has(name)) {
+                    seen.add(name);
+                    yield name;
+                }
+            }
+        }
+    }
+
+    public override async has(name: string): Promise<boolean> {
+        for (const fs of this.file_systems) {
+            if (await fs.has(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override async get(name: string): Promise<File> {
+        for (const fs of this.file_systems) {
+            if (await fs.has(name)) {
+                return fs.get(name);
+            }
+        }
+        throw new Error(`File ${name} not found!`);
+    }
+
+    public async download(name: string) {
+        initiate_download(await this.get(name));
+    }
+}
