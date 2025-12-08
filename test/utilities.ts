@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { assert } from "@esm-bundle/chai";
+import { assert } from "chai";
 
 type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer I>

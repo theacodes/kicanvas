@@ -16,9 +16,9 @@ let { context } = await bundle({
 
 await context.watch();
 
-let { host, port } = await context.serve({
+let { hosts, port } = await context.serve({
     servedir: "./debug",
     port: 8001,
 });
 
-console.log(`[serve] listening at http://${host}:${port}`);
+console.log(`[serve] listening at http://${hosts[0]}:${port}`);

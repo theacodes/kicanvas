@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { assert } from "@esm-bundle/chai";
+import { assert } from "chai";
 import * as schematic from "../../src/kicad/schematic";
 import { assert_deep_partial } from "../utilities";
 

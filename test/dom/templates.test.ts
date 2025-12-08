@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 import { chaiDomDiff } from "@open-wc/semantic-dom-diff";
-import { use, assert } from "@esm-bundle/chai";
+import { use, assert } from "chai";
 import { html, literal } from "../../src/base/web-components/html";
 
 use(chaiDomDiff);

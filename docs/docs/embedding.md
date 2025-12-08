@@ -120,29 +120,29 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
 
     Attributes marked with a ⚠️ are either not yet implemented or not completely implemented.
 
--   `controls` - determines if the document is interactive (pan, zoom, etc.) and which controls are available.
-    -   `none` - document is not interactive and behaves like an `<img>` (default)
-    -   `basic` - zoom, pan, and select are available.
-    -   `full` - complete interactive viewer, including side panels.
--   `controlslist` - further customizes the available controls.
-    -   `nooverlay` - don't show the "click or tap to interact" overlay.
-    -   `nofullscreen` - don't show the fullscreen button. ⚠️
-    -   `nodownload` - don't show the download button.
-    -   `download` - show the download button when used with controls="none". ⚠️
-    -   `nosymbols` - don't show the schematic symbols panel. ⚠️
-    -   `nofootprints` - don't show the board footprints panel. ⚠️
-    -   `noobjects` - don't show the board objects panel. ⚠️
-    -   `noproperties` - don't show the selection properties panel. ⚠️
-    -   `noinfo` - don't show the document info panel. ⚠️
-    -   `nopreferences` - don't show the user preferences panel. ⚠️
-    -   `nohelp` - don't show the help panel. ⚠️
--   `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
--   `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
--   `zoom` - sets the initial view into the document. ⚠️
-    -   `objects` - zooms to show all visible objects (default). ⚠️
-    -   `page` - zooms to show the entire page. ⚠️
-    -   `x y w h` - zooms to the given area, similar to the SVG `viewBox` attribute. For example, `10 10 100 100`. ⚠️
-    -   `<list of references>` - zooms to include the given symbols or footprints. For example `C101 D101 Q101`. ⚠️
+- `controls` - determines if the document is interactive (pan, zoom, etc.) and which controls are available.
+    - `none` - document is not interactive and behaves like an `<img>` (default)
+    - `basic` - zoom, pan, and select are available.
+    - `full` - complete interactive viewer, including side panels.
+- `controlslist` - further customizes the available controls.
+    - `nooverlay` - don't show the "click or tap to interact" overlay.
+    - `nofullscreen` - don't show the fullscreen button. ⚠️
+    - `nodownload` - don't show the download button.
+    - `download` - show the download button when used with controls="none". ⚠️
+    - `nosymbols` - don't show the schematic symbols panel. ⚠️
+    - `nofootprints` - don't show the board footprints panel. ⚠️
+    - `noobjects` - don't show the board objects panel. ⚠️
+    - `noproperties` - don't show the selection properties panel. ⚠️
+    - `noinfo` - don't show the document info panel. ⚠️
+    - `nopreferences` - don't show the user preferences panel. ⚠️
+    - `nohelp` - don't show the help panel. ⚠️
+- `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
+- `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
+- `zoom` - sets the initial view into the document. ⚠️
+    - `objects` - zooms to show all visible objects (default). ⚠️
+    - `page` - zooms to show the entire page. ⚠️
+    - `x y w h` - zooms to the given area, similar to the SVG `viewBox` attribute. For example, `10 10 100 100`. ⚠️
+    - `<list of references>` - zooms to include the given symbols or footprints. For example `C101 D101 Q101`. ⚠️
 
 ## Events
 

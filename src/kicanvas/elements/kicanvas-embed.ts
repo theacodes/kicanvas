@@ -36,7 +36,8 @@ class KiCanvasEmbedElement extends KCUIElement {
                 aspect-ratio: 1.414;
                 background-color: aqua;
                 color: var(--fg);
-                font-family: "Nunito", ui-rounded, "Hiragino Maru Gothic ProN",
+                font-family:
+                    "Nunito", ui-rounded, "Hiragino Maru Gothic ProN",
                     Quicksand, Comfortaa, Manjari, "Arial Rounded MT Bold",
                     Calibri, source-sans-pro, sans-serif;
                 contain: layout paint;

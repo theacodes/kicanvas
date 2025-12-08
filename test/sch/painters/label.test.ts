@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { assert } from "@esm-bundle/chai";
+import { assert } from "chai";
 import { Angle, Vec2 } from "../../../src/base/math";
 import { NullRenderer } from "../../../src/graphics/null-renderer";
 import { GlobalLabel, HierarchicalLabel } from "../../../src/kicad/schematic";

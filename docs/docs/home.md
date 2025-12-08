@@ -25,9 +25,9 @@ KiCanvas is developed by [Thea Flowers](https://thea.codes) with financial suppo
 
 In general, please check the [GitHub issues] page before filing new issues. Some high-level things that we known won't work:
 
--   Any KiCAD 5 files, KiCanvas can only parse files from KiCAD 6 and later.
--   Some KiCAD 7 features might not be fully implemented, such as custom fonts in schematics.
--   Browsers other than desktop Chrome, Firefox, and Safari may run into issues, as we aren't currently running automated tests against other browsers. We welcome issues related to browser compatibility, just make sure it hasn't already been reported.
+- Any KiCAD 5 files, KiCanvas can only parse files from KiCAD 6 and later.
+- Some KiCAD 7 features might not be fully implemented, such as custom fonts in schematics.
+- Browsers other than desktop Chrome, Firefox, and Safari may run into issues, as we aren't currently running automated tests against other browsers. We welcome issues related to browser compatibility, just make sure it hasn't already been reported.
 
 [GitHub issues]: https://github.com/theacodes/kicanvas/issues
 
@@ -73,9 +73,9 @@ No, KiCanvas is explicitly read-only and due to that assumption being baked in i
 
 > How can I help?
 
--   **Try it out**: Test out your projects, schematics, and boards with KiCanvas and report issues.
--   **Contribute code**: Since KiCanvas is still pretty early in its development, code contributions are harder to coordinate. Please file an issue or reach out before trying to contribute code, since I don't want you to waste your time.
--   **Sponsor**: This project is lead by a single person financially supported through [sponsors].
+- **Try it out**: Test out your projects, schematics, and boards with KiCanvas and report issues.
+- **Contribute code**: Since KiCanvas is still pretty early in its development, code contributions are harder to coordinate. Please file an issue or reach out before trying to contribute code, since I don't want you to waste your time.
+- **Sponsor**: This project is lead by a single person financially supported through [sponsors].
 
 ## Contributing
 
@@ -89,24 +89,24 @@ KiCanvas is open source and published under the permissive MIT license. Please t
 
 KiCanvas would not be possible without the incredible financial support of our [sponsors]. KiCanvas received significant support from the following individual and organizations:
 
--   [PartsBox](https://partsbox.com/)
--   [Blues](https://blues.io/)
--   [Tim Ansell](https://github.com/mithro)
--   [Jeremy Gordon](https://github.com/jeremysf)
--   [James Neal](https://github.com/jamesneal)
+- [PartsBox](https://partsbox.com/)
+- [Blues](https://blues.io/)
+- [Tim Ansell](https://github.com/mithro)
+- [Jeremy Gordon](https://github.com/jeremysf)
+- [James Neal](https://github.com/jamesneal)
 
 & donations and support from the following individuals:
 
--   [@timonsku](https://github.com/timonsku)
--   [@todbot](https://github.com/todbot)
--   [@friggeri](https://github.com/friggeri)
--   [@voidmar](https://github.com/voidmar)
--   [@casundra](https://github.com/casundra)
--   [@ntpopgetdope](https://github.com/ntpopgetdope)
--   [@ehughes](https://github.com/ehughes)
--   [@guru](https://github.com/guru)
--   [@jamesneal](https://github.com/jamesneal)
--   [@calithameridi](https://github.com/calithameridi)
--   [@forsyth](https://github.com/forsyth)
--   [@mattimo](https://github.com/mattimo)
--   [@mzollin](https://github.com/mzollin)
+- [@timonsku](https://github.com/timonsku)
+- [@todbot](https://github.com/todbot)
+- [@friggeri](https://github.com/friggeri)
+- [@voidmar](https://github.com/voidmar)
+- [@casundra](https://github.com/casundra)
+- [@ntpopgetdope](https://github.com/ntpopgetdope)
+- [@ehughes](https://github.com/ehughes)
+- [@guru](https://github.com/guru)
+- [@jamesneal](https://github.com/jamesneal)
+- [@calithameridi](https://github.com/calithameridi)
+- [@forsyth](https://github.com/forsyth)
+- [@mattimo](https://github.com/mattimo)
+- [@mzollin](https://github.com/mzollin)

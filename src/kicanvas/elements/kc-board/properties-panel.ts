@@ -73,8 +73,8 @@ export class KCBoardPropertiesPanelElement extends KCUIElement {
                     itm.attr.through_hole
                         ? "through hole"
                         : itm.attr.smd
-                        ? "smd"
-                        : "unspecified",
+                          ? "smd"
+                          : "unspecified",
                 )}
                 ${entry("Pads", itm.pads.length)}
                 ${entry("Library link", itm.library_link)}

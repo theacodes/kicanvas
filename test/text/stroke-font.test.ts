@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { AssertionError, assert } from "@esm-bundle/chai";
+import { AssertionError, assert } from "chai";
 
 import { Angle, Vec2 } from "../../src/base/math";
 import { Polyline } from "../../src/graphics";

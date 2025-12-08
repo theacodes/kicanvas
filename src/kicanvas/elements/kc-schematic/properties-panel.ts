@@ -89,8 +89,8 @@ export class KCSchematicPropertiesPanelElement extends KCUIElement {
                     item.mirror == "x"
                         ? "Around X axis"
                         : item.mirror == "y"
-                        ? "Around Y axis"
-                        : "Not mirrored",
+                          ? "Around Y axis"
+                          : "Not mirrored",
                 )}
                 ${header("Instance properties")}
                 ${entry("Library link", item.lib_name ?? item.lib_id)}
