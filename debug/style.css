@@ -14,9 +14,9 @@
 html,
 body {
     height: 100vh;
-    font-family: "Nunito", ui-rounded, "Hiragino Maru Gothic ProN", Quicksand,
-        Comfortaa, Manjari, "Arial Rounded MT Bold", Calibri, source-sans-pro,
-        sans-serif;
+    font-family:
+        "Nunito", ui-rounded, "Hiragino Maru Gothic ProN", Quicksand, Comfortaa,
+        Manjari, "Arial Rounded MT Bold", Calibri, source-sans-pro, sans-serif;
     line-height: 1.5;
     width: 100%;
     margin: 0 auto;

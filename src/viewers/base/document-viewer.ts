@@ -31,7 +31,7 @@ export abstract class DocumentViewer<
 > extends Viewer {
     public document: DocumentT;
     public drawing_sheet: DrawingSheet;
-    public declare layers: ViewLayerSetT;
+    declare public layers: ViewLayerSetT;
     public theme: ThemeT;
 
     protected painter: PainterT;
