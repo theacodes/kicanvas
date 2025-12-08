@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { assert } from "@esm-bundle/chai";
+import { assert } from "chai";
 import * as board from "../../src/kicad/board";
 import * as common from "../../src/kicad/common";
 

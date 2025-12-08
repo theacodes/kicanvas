@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { assert } from "@esm-bundle/chai";
+import { assert } from "chai";
 
 import { Angle, Matrix3, Vec2 } from "../../src/base/math";
 import { SchField } from "../../src/kicad/text";

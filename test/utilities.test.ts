@@ -4,7 +4,7 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
-import { AssertionError, assert } from "@esm-bundle/chai";
+import { AssertionError, assert } from "chai";
 import * as utilities from "./utilities";
 
 suite("test.utilities", function () {
