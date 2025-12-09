@@ -59,6 +59,7 @@ export class KicadSch {
     project?: Project;
     version: number;
     generator?: string;
+    generator_version?: string;
     uuid: string;
     paper?: Paper;
     title_block = new TitleBlock();

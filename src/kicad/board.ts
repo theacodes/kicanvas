@@ -34,7 +34,11 @@ export class KicadPCB {
     project?: Project;
     version: number;
     generator?: string;
-    general?: { thickness: number };
+    generator_version?: string;
+    general? = {
+        thickness: 1.6,
+        legacy_teardrops: false,
+    };
     paper?: Paper;
     title_block = new TitleBlock();
     setup?: Setup;
@@ -59,7 +63,13 @@ export class KicadPCB {
                 P.start("kicad_pcb"),
                 P.pair("version", T.number),
                 P.pair("generator", T.string),
-                P.object("general", {}, P.pair("thickness", T.number)),
+                P.pair("generator_version", T.string),
+                P.object(
+                    "general",
+                    {},
+                    P.pair("thickness", T.number),
+                    P.pair("legacy_teardrops", T.boolean),
+                ),
                 P.item("paper", Paper),
                 P.item("title_block", TitleBlock),
                 P.list("layers", T.item(Layer)),
@@ -1763,9 +1773,10 @@ export class Model {
     }
 }
 
-export class Group {
+export class Group implements HasUniqueID {
     name: string;
-    id: string;
+    id?: string;
+    uuid?: string;
     locked = false;
     members: string[];
 
@@ -1778,8 +1789,13 @@ export class Group {
                 P.positional("name", T.string),
                 P.atom("locked"),
                 P.pair("id", T.string),
+                P.pair("uuid", T.string),
                 P.list("members", T.string),
             ),
         );
+    }
+
+    get unique_id(): string | undefined {
+        return this.uuid ?? this.id;
     }
 }
