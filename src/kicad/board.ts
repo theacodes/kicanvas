@@ -13,6 +13,7 @@ import {
     Stroke,
     TitleBlock,
     expand_text_vars,
+    EmbeddedFile,
     StrokeParams,
     type HasNetName,
     type HasUniqueID,
@@ -51,6 +52,8 @@ export class KicadPCB {
     vias: Via[] = [];
     drawings: Drawing[] = [];
     groups: Group[] = [];
+    embedded_fonts: boolean = false;
+    embedded_files: EmbeddedFile[] = [];
 
     constructor(
         public filename: string,
@@ -98,6 +101,8 @@ export class KicadPCB {
                 P.collection("drawings", "gr_rect", T.item(GrRect, this)),
                 P.collection("drawings", "gr_text", T.item(GrText, this)),
                 P.collection("groups", "group", T.item(Group)),
+                P.pair("embedded_fonts", T.boolean),
+                P.list("embedded_files", T.item(EmbeddedFile)),
             ),
         );
 
@@ -864,6 +869,8 @@ export class Footprint implements HasUniqueID {
     #pads_by_number = new Map<string, Pad>();
     zones: Zone[] = [];
     models: Model[] = [];
+    embedded_fonts: boolean = false;
+    embedded_files: EmbeddedFile[] = [];
     #bbox: BBox;
 
     constructor(
@@ -921,6 +928,8 @@ export class Footprint implements HasUniqueID {
                 P.collection("zones", "zone", T.item(Zone, this)),
                 P.collection("models", "model", T.item(Model)),
                 P.collection("pads", "pad", T.item(Pad, this)),
+                P.pair("embedded_fonts", T.boolean),
+                P.list("embedded_files", T.item(EmbeddedFile)),
             ),
         );
 
