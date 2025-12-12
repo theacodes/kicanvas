@@ -14,7 +14,7 @@ The `<kicanvas-embed>` HTML element embeds one or more KiCAD documents onto the 
 <kicanvas-embed src="my-schematic.kicad_sch"></kicanvas-embed>
 ```
 
-`<kicanvas-embed src="/examples/simple.kicad_sch"></kicanvas-embed>`
+<kicanvas-embed src="/examples/simple.kicad_sch"></kicanvas-embed>
 
 The above example shows the most basic usage of the `<kicanvas-embed>` element. It's usage is intentionally similar to the [`<video>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video) and [`<img>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img) elements. Through the use of additional [attributes](#attributes) you can control how the document is displayed, control interactivity, and load multiple files.
 
@@ -104,7 +104,7 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
 ```html
 <kicanvas-embed>
     <!-- Use it directly -->
-    <kicanvas-source type="schematic">
+    <kicanvas-source>
         (kicad_sch (version 20230121) (generator eeschema) (uuid
         5d5ad125-5ef1-42a1-a410-a0c4ab262ca6) (paper "A4") (title_block (title
         "KiCanvas inline sources") (date "2023-11-11") ) (lib_symbols ) (text
@@ -117,6 +117,18 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     <kicanvas-source src="/examples/simple.kicad_sch"></kicanvas-source>
 </kicanvas-embed>
 ```
+
+<kicanvas-embed controls="full">
+    <kicanvas-source src="/examples/simple.kicad_sch"></kicanvas-source>
+    <kicanvas-source name="inline.kicad_sch">
+        (kicad_sch (version 20230121) (generator eeschema) (uuid
+        5d5ad125-5ef1-42a1-a410-a0c4ab262ca6) (paper "A4") (title_block (title
+        "KiCanvas inline sources") (date "2023-11-11") ) (lib_symbols ) (text
+        "Inline source file" (at 90 100 0) (effects (font (size 5 5) (thickness 1)
+        bold) (justify left bottom)) (uuid 27eb63d7-7111-4c0e-9985-c1ed90138e31)
+        ) (sheet_instances (path "/" (page "1")) ) )
+    </kicanvas-source>
+</kicanvas-embed>
 
 ## Attributes
 

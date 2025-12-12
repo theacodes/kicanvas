@@ -237,8 +237,9 @@ class KiCanvasSourceElement extends CustomElement {
                 // Get the content and triming the CR,LF,space.
                 content += child.nodeValue ?? "";
             } else {
-                log.warn("kicanvas-source children are invaild.");
-                return undefined;
+                log.warn(
+                    `kicanvas-source children ${child.nodeType} are invaild.`,
+                );
             }
         }
 
@@ -262,6 +263,11 @@ class KiCanvasSourceElement extends CustomElement {
             const ext = KiCanvasSourceElement.get_file_ext(typ);
 
             file_name = (default_name ?? "noname") + ext;
+        }
+
+        if (content.length === 0) {
+            log.warn(`kicanvas-source content ${file_name} is empty.`);
+            return undefined;
         }
 
         const file_blob = new Blob([content], { type: "text/plain" });
