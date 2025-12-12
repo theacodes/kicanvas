@@ -229,3 +229,47 @@ export class LocalFileSystem extends VirtualFileSystem {
         initiate_download(await this.get(name));
     }
 }
+
+/**
+ * Merge two virtual file systems into one
+ */
+export class MergedFileSystem extends VirtualFileSystem {
+    constructor(
+        private fs1: VirtualFileSystem | null,
+        private fs2: VirtualFileSystem | null,
+    ) {
+        super();
+    }
+
+    override *list() {
+        if (this.fs1) {
+            yield* this.fs1.list();
+        }
+
+        if (this.fs2) {
+            yield* this.fs2.list();
+        }
+    }
+
+    override async has(name: string): Promise<boolean> {
+        return this.fs1?.has(name) || this.fs2?.has(name) || false;
+    }
+
+    override async get(name: string): Promise<File> {
+        if (this.fs1 && (await this.fs1.has(name))) {
+            return await this.fs1.get(name);
+        } else if (this.fs2 && (await this.fs2.has(name))) {
+            return await this.fs2.get(name);
+        } else {
+            throw new Error(`File ${name} not found`);
+        }
+    }
+
+    override async download(name: string) {
+        if (this.fs1 && (await this.fs1.has(name))) {
+            await this.fs1.download(name);
+        } else if (this.fs2 && (await this.fs2.has(name))) {
+            await this.fs2.download(name);
+        }
+    }
+}

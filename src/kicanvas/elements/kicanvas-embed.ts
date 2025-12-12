@@ -16,7 +16,12 @@ import {
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
-import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
+import {
+    FetchFileSystem,
+    LocalFileSystem,
+    MergedFileSystem,
+    VirtualFileSystem,
+} from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 
@@ -109,6 +114,8 @@ class KiCanvasEmbedElement extends KCUIElement {
             url_src.push(this.src);
         }
 
+        let inline_count = 0;
+
         for (const src_elm of this.querySelectorAll<KiCanvasSourceElement>(
             "kicanvas-source",
         )) {
@@ -117,17 +124,38 @@ class KiCanvasEmbedElement extends KCUIElement {
                 url_src.push(src_elm.src);
             } else if (src_elm.is_inline_source()) {
                 // inline source
-                const file = src_elm.load_inline_source();
-                inline_file.push(file);
+                const default_name = `inline_${inline_count}`;
+                inline_count += 1;
+
+                const file = src_elm.load_inline_source(default_name);
+
+                if (file) {
+                    log.info(
+                        `Determined inline source ${file.name}, ${file.size} bytes`,
+                    );
+
+                    inline_file.push(file);
+                }
             }
         }
 
-        if (url_src.length == 0) {
-            console.warn("No valid sources specified");
+        // maybe we have a better way to merge two VFS
+        // we need load file from File blobs and URLs
+
+        const url_vfs =
+            url_src.length === 0
+                ? null
+                : new FetchFileSystem(url_src, this.custom_resolver);
+
+        const inline_vfs =
+            inline_file.length === 0 ? null : new LocalFileSystem(inline_file);
+
+        if (url_vfs === null && inline_vfs === null) {
+            log.warn("No valid sources specified");
             return;
         }
 
-        const vfs = new FetchFileSystem(url_src, this.custom_resolver);
+        const vfs = new MergedFileSystem(url_vfs, inline_vfs);
         await this.#setup_project(vfs);
     }
 
