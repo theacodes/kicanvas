@@ -129,7 +129,29 @@ class KiCanvasShellElement extends KCUIElement {
 
         try {
             await this.project.load(vfs);
-            this.project.set_active_page(this.project.first_page);
+            // Determine which page to activate based on URL query parameter "sheet"
+            const url_params = new URLSearchParams(window.location.search);
+            const sheet_param = url_params.get("sheet");
+            let target_page = this.project.first_page;
+            if (sheet_param) {
+                // Try to find a matching page
+                for (const page of this.project.pages()) {
+                    console.log(page.page, page.name, page.project_path);
+                    if (page.page === sheet_param) {
+                        target_page = page;
+                        break;
+                    }
+                    if (page.name?.toLowerCase().includes(sheet_param.toLowerCase())) {
+                        target_page = page;
+                        break;
+                    }
+                    if (page.project_path.includes(sheet_param)) {
+                        target_page = page;
+                        break;
+                    }
+                }
+            }
+            this.project.set_active_page(target_page);
             this.loaded = true;
         } catch (e) {
             console.error(e);

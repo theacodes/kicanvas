@@ -65,6 +65,7 @@ export class KCProjectPanelElement extends KCUIElement {
     ];
 
     #menu: KCUIMenuElement;
+    #selected_name: string | null = null;
     project: Project;
 
     override connectedCallback() {
@@ -105,11 +106,14 @@ export class KCProjectPanelElement extends KCUIElement {
     }
 
     get selected() {
-        return this.#menu.selected?.name ?? null;
+        return this.#menu?.selected?.name ?? this.#selected_name;
     }
 
     set selected(name: string | null) {
-        this.#menu.selected = name;
+        this.#selected_name = name;
+        if (this.#menu) {
+            this.#menu.selected = name;
+        }
     }
 
     @no_self_recursion
@@ -122,6 +126,12 @@ export class KCProjectPanelElement extends KCUIElement {
 
         if (!this.project) {
             return html``;
+        }
+
+        // Update selected_name from active page if not already set
+        const active_path = this.project.active_page?.project_path ?? null;
+        if (active_path !== null && this.#selected_name !== active_path) {
+            this.#selected_name = active_path;
         }
 
         for (const page of this.project.pages()) {
@@ -160,6 +170,10 @@ export class KCProjectPanelElement extends KCUIElement {
         this.#menu = html`<kc-ui-menu>
             ${file_btn_elms}
         </kc-ui-menu>` as KCUIMenuElement;
+
+        if (this.#selected_name !== null) {
+            this.#menu.selected = this.#selected_name;
+        }
 
         return html`<kc-ui-panel>
             <kc-ui-panel-title title="Project"></kc-ui-panel-title>
