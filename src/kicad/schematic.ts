@@ -1404,7 +1404,7 @@ export class SchematicSymbolInstance {
 export class PinInstance {
     number: string;
     uuid: string;
-    alternate: string;
+    alternate?: string;
 
     constructor(
         expr: Parseable,
