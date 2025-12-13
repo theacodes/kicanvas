@@ -562,6 +562,15 @@ class PadPainter extends NetNameItemPainter {
 
             max_font_size = Math.min(max_font_size, 10);
 
+            // keep the text upright
+            const pad_rotate = pad.at.rotation;
+            while (pad_rotate + text_rotated > 90) {
+                text_rotated -= 180;
+            }
+            while (pad_rotate + text_rotated <= -90) {
+                text_rotated += 180;
+            }
+
             // calcuate the offset for pad number and net name if necessary
             let y_offset_pad_num = 0;
             let y_offset_pad_net = 0;
