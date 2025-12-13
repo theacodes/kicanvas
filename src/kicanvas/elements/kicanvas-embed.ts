@@ -155,7 +155,7 @@ class KiCanvasEmbedElement extends KCUIElement {
             return;
         }
 
-        const vfs = new MergedFileSystem(url_vfs, inline_vfs);
+        const vfs = new MergedFileSystem([url_vfs, inline_vfs]);
         await this.#setup_project(vfs);
     }
 
