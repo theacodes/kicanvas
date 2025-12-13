@@ -162,6 +162,30 @@ function is_virtual_for(physical_layer: string, layer_name: string) {
     );
 }
 
+function is_pad_layer_for(physical_layer: string, layer_name: string) {
+    let pad_layer_prefix = ":invaild";
+
+    if (physical_layer === LayerNames.f_cu) {
+        pad_layer_prefix = ":Pads:Front";
+    } else if (physical_layer === LayerNames.b_cu) {
+        pad_layer_prefix = ":Pads:Back";
+    }
+
+    // TODO:
+    // for the thru_hole pads, it includes all copper layers,
+    // and we cannot determine here.
+    // It just work on F.Cu and B.Cu
+    const is_thru_hole =
+        layer_name === LayerNames.pad_holes_netname ||
+        layer_name === LayerNames.pad_holes ||
+        layer_name === LayerNames.non_plated_holes;
+
+    const is_pad_copper = layer_name.startsWith(pad_layer_prefix);
+    const is_pad_thru_hole = is_thru_hole && is_copper(physical_layer);
+
+    return is_pad_copper || is_pad_thru_hole;
+}
+
 function is_copper(name: string) {
     return name.endsWith(".Cu");
 }
@@ -479,7 +503,10 @@ export class LayerSet extends BaseLayerSet {
         }
 
         const matching_layers = this.query(
-            (l) => l.name == layer_name || is_virtual_for(layer_name, l.name),
+            (l) =>
+                l.name == layer_name ||
+                is_virtual_for(layer_name, l.name) ||
+                is_pad_layer_for(layer_name, l.name),
         );
 
         super.highlight(matching_layers);
