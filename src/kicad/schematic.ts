@@ -14,6 +14,7 @@ import {
     Paper,
     Stroke,
     TitleBlock,
+    EmbeddedFile,
     expand_text_vars,
     unescape_string,
 } from "./common";
@@ -59,6 +60,7 @@ export class KicadSch {
     project?: Project;
     version: number;
     generator?: string;
+    generator_version?: string;
     uuid: string;
     paper?: Paper;
     title_block = new TitleBlock();
@@ -78,6 +80,8 @@ export class KicadSch {
     sheet_instances?: SheetInstances;
     symbol_instances?: SymbolInstances;
     sheets: SchematicSheet[] = [];
+    embedded_fonts: boolean = false;
+    embedded_files: EmbeddedFile[] = [];
 
     constructor(
         public filename: string,
@@ -90,6 +94,7 @@ export class KicadSch {
                 P.start("kicad_sch"),
                 P.pair("version", T.number),
                 P.pair("generator", T.string),
+                P.pair("generator_version", T.string),
                 P.pair("uuid", T.string),
                 P.item("paper", Paper),
                 P.item("title_block", TitleBlock),
@@ -126,6 +131,8 @@ export class KicadSch {
                 P.item("sheet_instances", SheetInstances),
                 P.item("symbol_instances", SymbolInstances),
                 P.collection("sheets", "sheet", T.item(SchematicSheet, this)),
+                P.pair("embedded_fonts", T.boolean),
+                P.list("embedded_files", T.item(EmbeddedFile)),
             ),
         );
 
@@ -812,6 +819,8 @@ export class LibSymbol {
     drawings: Drawing[] = [];
     pins: PinDefinition[] = [];
     units: Map<number, LibSymbol[]> = new Map();
+    embedded_fonts = false;
+    embedded_files: EmbeddedFile[] = [];
 
     #pins_by_number: Map<string, PinDefinition> = new Map();
     #properties_by_id: Map<number, Property> = new Map();
@@ -852,6 +861,8 @@ export class LibSymbol {
                 P.collection("drawings", "rectangle", T.item(Rectangle, this)),
                 P.collection("drawings", "text", T.item(LibText, this)),
                 P.collection("drawings", "textbox", T.item(TextBox, this)),
+                P.pair("embedded_fonts", T.boolean),
+                P.collection("embedded_files", "file", T.item(EmbeddedFile)),
             ),
         );
 

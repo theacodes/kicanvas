@@ -362,6 +362,48 @@ export class Stroke {
     }
 }
 
+export enum EmbeddedFileType {
+    Datasheet = "datasheet",
+    Font = "font",
+    Model = "model",
+    Worksheet = "worksheet",
+    Other = "other",
+}
+
+export class EmbeddedFile {
+    name: string;
+    type: EmbeddedFileType;
+    data?: string;
+    checksum: string;
+
+    constructor(expr: Parseable) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("file"),
+                P.pair("name", T.string),
+                P.pair("type", T.string),
+                P.pair("data", T.string),
+                P.pair("checksum", T.string),
+            ),
+        );
+    }
+
+    async decompress_file(): Promise<File | undefined> {
+        // see also:
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/common/embedded_files.cpp#L253
+        if (!this.data) {
+            // need be found in the board file
+            return undefined;
+        }
+
+        // TODO
+
+        return undefined;
+    }
+}
+
 /** Stroke and additional parameters for dashed lines. */
 export class StrokeParams {
     stroke: Stroke;
