@@ -581,6 +581,14 @@ class PadPainter extends NetNameItemPainter {
                 y_offset_pad_num = max_font_size / 1.7;
             }
 
+            // keep the text centered
+            if (pad.drill?.offset) {
+                this.gfx.state.matrix.translate_self(
+                    pad.drill.offset.x,
+                    pad.drill.offset.y,
+                );
+            }
+
             // apply the text rotation
             const rotate_mat = Matrix3.rotation(Angle.deg_to_rad(text_rotated));
             this.gfx.state.multiply(rotate_mat);
@@ -608,7 +616,7 @@ class PadPainter extends NetNameItemPainter {
             }
         } else if (is_hole_layer && pad.drill != null) {
             if (!pad.drill.oval) {
-                const drill_pos = center.add(pad.drill.offset);
+                const drill_pos = center;
                 this.gfx.circle(
                     new Circle(drill_pos, pad.drill.diameter / 2, color),
                 );
@@ -730,9 +738,7 @@ class PadPainter extends NetNameItemPainter {
                             half_size.y - half_width,
                         );
 
-                        const pad_pos = center.add(
-                            pad.drill?.offset || new Vec2(0, 0),
-                        );
+                        const pad_pos = center;
                         const pad_start = pad_pos.sub(half_len);
                         const pad_end = pad_pos.add(half_len);
 

@@ -495,6 +495,7 @@ export class Setup {
     solder_mask_min_width: number;
     pad_to_paste_clearance: number;
     pad_to_paste_clearance_ratio: number;
+    allow_soldermask_bridges_in_footprints = false;
     aux_axis_origin: Vec2;
     grid_origin: Vec2;
     pcbplotparams: PCBPlotParams;
@@ -510,6 +511,7 @@ export class Setup {
                 P.pair("solder_mask_min_width", T.number),
                 P.pair("pad_to_paste_clearance", T.number),
                 P.pair("pad_to_paste_clearance_ratio", T.number),
+                P.pair("allow_soldermask_bridges_in_footprints", T.boolean),
                 P.vec2("aux_axis_origin"),
                 P.vec2("grid_origin"),
                 P.item("pcbplotparams", PCBPlotParams),
@@ -537,6 +539,10 @@ export class PCBPlotParams {
     hpglpennumber: number;
     hpglpenspeed: number;
     hpglpendiameter: number;
+    pdf_front_fp_property_popups = true;
+    pdf_back_fp_property_popups = true;
+    pdf_metadata = true;
+    pdf_single_document = false;
     dxfpolygonmode = false;
     dxfimperialunits = false;
     dxfusepcbnewfont = false;
@@ -547,6 +553,11 @@ export class PCBPlotParams {
     plotinvisibletext = false;
     sketchpadsonfab = false;
     subtractmaskfromsilk = false;
+    plot_black_and_white = true;
+    plotpadnumbers = false;
+    hidednponfab = false;
+    sketchdnponfab = true;
+    crossoutdnponfab = true;
     outputformat: number;
     mirror = false;
     drillshape: number;
@@ -579,6 +590,10 @@ export class PCBPlotParams {
                 P.pair("hpglpennumber", T.number),
                 P.pair("hpglpenspeed", T.number),
                 P.pair("hpglpendiameter", T.number),
+                P.pair("pdf_front_fp_property_popups", T.boolean),
+                P.pair("pdf_back_fp_property_popups", T.boolean),
+                P.pair("pdf_metadata", T.boolean),
+                P.pair("pdf_single_document", T.boolean),
                 P.pair("dxfpolygonmode", T.boolean),
                 P.pair("dxfimperialunits", T.boolean),
                 P.pair("dxfusepcbnewfont", T.boolean),
@@ -589,6 +604,11 @@ export class PCBPlotParams {
                 P.pair("plotinvisibletext", T.boolean),
                 P.pair("sketchpadsonfab", T.boolean),
                 P.pair("subtractmaskfromsilk", T.boolean),
+                P.pair("plotpadnumbers", T.boolean),
+                P.pair("plot_black_and_white", T.boolean),
+                P.pair("hidednponfab", T.boolean),
+                P.pair("sketchdnponfab", T.boolean),
+                P.pair("crossoutdnponfab", T.boolean),
                 P.pair("outputformat", T.number),
                 P.pair("mirror", T.boolean),
                 P.pair("drillshape", T.number),
@@ -871,6 +891,7 @@ export class Footprint implements HasUniqueID {
     models: Model[] = [];
     embedded_fonts: boolean = false;
     embedded_files: EmbeddedFile[] = [];
+    net_tie_pad_groups?: string;
     #bbox: BBox;
 
     constructor(
@@ -906,6 +927,7 @@ export class Footprint implements HasUniqueID {
                 P.pair("zone_connect", T.number),
                 P.pair("thermal_width", T.number),
                 P.pair("thermal_gap", T.number),
+                P.pair("net_tie_pad_groups", T.string),
                 P.object(
                     "attr",
                     this.attr,
