@@ -148,7 +148,9 @@ class KiCanvasShellElement extends KCUIElement {
                         target_page = page;
                         break;
                     }
-                    if (page.project_path.includes(sheet_param)) {
+                    const match = page.project_path.match(/^([^:]+)/)!; // If there's a colon, only take the part before it
+                    const filenamePart = match[1]
+                    if (filenamePart == sheet_param) {
                         target_page = page;
                         break;
                     }
