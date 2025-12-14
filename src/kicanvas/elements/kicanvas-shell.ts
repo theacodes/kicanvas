@@ -136,12 +136,15 @@ class KiCanvasShellElement extends KCUIElement {
             if (sheet_param) {
                 // Try to find a matching page
                 for (const page of this.project.pages()) {
-                    console.log(page.page, page.name, page.project_path);
                     if (page.page === sheet_param) {
                         target_page = page;
                         break;
                     }
-                    if (page.name?.toLowerCase().includes(sheet_param.toLowerCase())) {
+                    if (
+                        page.name
+                            ?.toLowerCase()
+                            .includes(sheet_param.toLowerCase())
+                    ) {
                         target_page = page;
                         break;
                     }
