@@ -5,6 +5,7 @@
 */
 
 import { later } from "../../base/async";
+import { Logger } from "../../base/log";
 import {
     CSS,
     CustomElement,
@@ -15,12 +16,19 @@ import {
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
 import { Project } from "../project";
-import { FetchFileSystem, VirtualFileSystem } from "../services/vfs";
+import {
+    FetchFileSystem,
+    LocalFileSystem,
+    MergedFileSystem,
+    VirtualFileSystem,
+} from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
 
+const log = new Logger("kicanvas:embedtag");
+
 /**
- *
+ * kicanvas-embed tag
  */
 class KiCanvasEmbedElement extends KCUIElement {
     static override styles = [
@@ -99,26 +107,55 @@ class KiCanvasEmbedElement extends KCUIElement {
     async #setup_events() {}
 
     async #load_src() {
-        const sources = [];
+        const url_src = [];
+        const inline_file = [];
 
         if (this.src) {
-            sources.push(this.src);
+            url_src.push(this.src);
         }
+
+        let inline_count = 0;
 
         for (const src_elm of this.querySelectorAll<KiCanvasSourceElement>(
             "kicanvas-source",
         )) {
             if (src_elm.src) {
-                sources.push(src_elm.src);
+                // URL
+                url_src.push(src_elm.src);
+            } else if (src_elm.is_inline_source()) {
+                // inline source
+                const default_name = `inline_${inline_count}`;
+                inline_count += 1;
+
+                const file = src_elm.load_inline_source(default_name);
+
+                if (file) {
+                    log.info(
+                        `Determined inline source ${file.name}, ${file.size} bytes`,
+                    );
+
+                    inline_file.push(file);
+                }
             }
         }
 
-        if (sources.length == 0) {
-            console.warn("No valid sources specified");
+        // maybe we have a better way to merge two VFS
+        // we need load file from File blobs and URLs
+
+        const url_vfs =
+            url_src.length === 0
+                ? null
+                : new FetchFileSystem(url_src, this.custom_resolver);
+
+        const inline_vfs =
+            inline_file.length === 0 ? null : new LocalFileSystem(inline_file);
+
+        if (url_vfs === null && inline_vfs === null) {
+            log.warn("No valid sources specified");
             return;
         }
 
-        const vfs = new FetchFileSystem(sources, this.custom_resolver);
+        const vfs = new MergedFileSystem([url_vfs, inline_vfs]);
         await this.#setup_project(vfs);
     }
 
@@ -173,6 +210,13 @@ class KiCanvasEmbedElement extends KCUIElement {
 
 window.customElements.define("kicanvas-embed", KiCanvasEmbedElement);
 
+enum KiCanvasSourceType {
+    Schematic = "schematic",
+    Board = "board",
+    Project = "project",
+    Worksheet = "worksheet",
+}
+
 class KiCanvasSourceElement extends CustomElement {
     constructor() {
         super();
@@ -181,8 +225,95 @@ class KiCanvasSourceElement extends CustomElement {
         this.style.display = "none";
     }
 
+    is_inline_source(): boolean {
+        return this.src === null && this.childNodes.length > 0;
+    }
+
+    load_inline_source(default_name: string | null = null): File | undefined {
+        let content = "";
+
+        for (const child of this.childNodes) {
+            if (child.nodeType === Node.TEXT_NODE) {
+                // Get the content and triming the CR,LF,space.
+                content += child.nodeValue ?? "";
+            } else {
+                log.warn(
+                    `kicanvas-source children ${child.nodeType} are invaild.`,
+                );
+            }
+        }
+
+        content = content.trimStart();
+
+        // determine the file name
+        let file_name;
+        if (this.name) {
+            file_name = this.name;
+        } else {
+            const typ =
+                this.type ?? KiCanvasSourceElement.determine_file_type(content);
+
+            if (typ === undefined) {
+                log.warn(
+                    `Unknown file type, content: ${content.slice(0, 64)}...`,
+                );
+                return undefined;
+            }
+
+            const ext = KiCanvasSourceElement.get_file_ext(typ);
+
+            file_name = (default_name ?? "noname") + ext;
+        }
+
+        if (content.length === 0) {
+            log.warn(`kicanvas-source content ${file_name} is empty.`);
+            return undefined;
+        }
+
+        const file_blob = new Blob([content], { type: "text/plain" });
+        const file = new File([file_blob], file_name);
+
+        return file;
+    }
+
+    private static determine_file_type(
+        content: string,
+    ): KiCanvasSourceType | undefined {
+        if (content.startsWith("(kicad_sch")) {
+            return KiCanvasSourceType.Schematic;
+        } else if (content.startsWith("(kicad_pcb")) {
+            return KiCanvasSourceType.Board;
+        } else if (content.startsWith("(kicad_wks")) {
+            return KiCanvasSourceType.Worksheet;
+        } else if (content.startsWith("{")) {
+            // project? maybe we need try parsing the json
+            return KiCanvasSourceType.Project;
+        }
+
+        return undefined;
+    }
+
+    private static get_file_ext(typ: KiCanvasSourceType): string {
+        switch (typ) {
+            case KiCanvasSourceType.Schematic:
+                return ".kicad_sch";
+            case KiCanvasSourceType.Board:
+                return ".kicad_pcb";
+            case KiCanvasSourceType.Worksheet:
+                return ".kicad_wks";
+            case KiCanvasSourceType.Project:
+                return ".kicad_prj";
+        }
+    }
+
     @attribute({ type: String })
     src: string | null;
+
+    @attribute({ type: String })
+    type: KiCanvasSourceType | null;
+
+    @attribute({ type: String })
+    name: string | null;
 }
 
 window.customElements.define("kicanvas-source", KiCanvasSourceElement);

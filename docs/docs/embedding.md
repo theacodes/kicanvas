@@ -1,6 +1,7 @@
 # <kicanvas-embed\>: The KiCanvas embedded viewer element
 
 <!-- load kicanvas -->
+
 <script type="module" src="/kicanvas/kicanvas.js"></script>
 
 !!! warning "Work in progress"
@@ -98,21 +99,36 @@ You can switch between the displayed files using the project panel on the right 
 
 ### Inline source
 
-!!! warning "Not yet implemented"
-
-    This functionality hasn't been implemented yet
-
 This example shows how to use `<kicanvas-source>` along with inline KiCAD data. In this case, it's a symbol copied from a schematic and pasted into the HTML source:
 
 ```html
 <kicanvas-embed>
-    <kicanvas-source type="schematic">
-        (lib_symbols (symbol "power:+12V" (power) (pin_names (offset 0)) (in_bom
-        yes) (on_board yes) (property "Reference" "#PWR" (at 0 -3.81 0) (effects
-        (font (size 1.27 1.27)) hide) ) ...
+    <!-- Use it directly -->
+    <kicanvas-source>
+        (kicad_sch (version 20230121) (generator eeschema) (uuid
+        5d5ad125-5ef1-42a1-a410-a0c4ab262ca6) (paper "A4") (title_block (title
+        "KiCanvas inline sources") (date "2023-11-11") ) (lib_symbols ) (text
+        "Hello World !!!" (at 90 100 0) (effects (font (size 5 5) (thickness 1)
+        bold) (justify left bottom)) (uuid 27eb63d7-7111-4c0e-9985-c1ed90138e31)
+        ) (sheet_instances (path "/" (page "1")) ) )
     </kicanvas-source>
+
+    <!-- Or mixed with `src` tag -->
+    <kicanvas-source src="/examples/simple.kicad_sch"></kicanvas-source>
 </kicanvas-embed>
 ```
+
+<kicanvas-embed controls="full">
+    <kicanvas-source src="/examples/simple.kicad_sch"></kicanvas-source>
+    <kicanvas-source name="inline.kicad_sch">
+        (kicad_sch (version 20230121) (generator eeschema) (uuid
+        5d5ad125-5ef1-42a1-a410-a0c4ab262ca6) (paper "A4") (title_block (title
+        "KiCanvas inline sources") (date "2023-11-11") ) (lib_symbols ) (text
+        "Inline source file" (at 90 100 0) (effects (font (size 5 5) (thickness 1)
+        bold) (justify left bottom)) (uuid 27eb63d7-7111-4c0e-9985-c1ed90138e31)
+        ) (sheet_instances (path "/" (page "1")) ) )
+    </kicanvas-source>
+</kicanvas-embed>
 
 ## Attributes
 
@@ -137,6 +153,8 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     - `nopreferences` - don't show the user preferences panel. ⚠️
     - `nohelp` - don't show the help panel. ⚠️
 - `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
+- `type` - when providing the file source inline, this explicitly sets the file type. If not specified, KiCanvas will attempt to determine the type automatically. If specified, it should be one of `schematic`, `board`, `project`, or `worksheet`.
+- `name` - when providing the file source inline, this explicitly sets the file name. This is typically only necessary when there are multiple files within a project, as KiCAD uses the file name to link schematic sheets, drawing sheets, and PCBs together. If unspecified, KiCanvas will generate a file name like `inline_0.kicad_sch`.
 - `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
 - `zoom` - sets the initial view into the document. ⚠️
     - `objects` - zooms to show all visible objects (default). ⚠️
@@ -150,11 +168,11 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
 
     This functionality hasn't been implemented yet
 
-| Event Name                   | Fired When                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------- |
-| ⚠️ `kicanvas:click`          | The user clicks or taps within the embedded document                                              |
-| ⚠️ `kicanvas:documentchange` | The currently displayed document is changed, either through user interaction or programmatically. |
-| ⚠️ `kicanvas:error`          | An error occurs while loading source files                                                        |
-| ⚠️ `kicanvas:load`           | All sources files have been successfully loaded                                                   |
-| ⚠️ `kicanvas:loadstart`      | KiCanvas begins loading source files                                                              |
-| ⚠️ `kicanvas:select`         | The user selects (or deselects) an object within the document                                     |
+| Event Name                  | Fired When                                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------------- |
+| ⚠️`kicanvas:click`          | The user clicks or taps within the embedded document                                              |
+| ⚠️`kicanvas:documentchange` | The currently displayed document is changed, either through user interaction or programmatically. |
+| ⚠️`kicanvas:error`          | An error occurs while loading source files                                                        |
+| ⚠️`kicanvas:load`           | All sources files have been successfully loaded                                                   |
+| ⚠️`kicanvas:loadstart`      | KiCanvas begins loading source files                                                              |
+| ⚠️`kicanvas:select`         | The user selects (or deselects) an object within the document                                     |

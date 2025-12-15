@@ -5,4 +5,5 @@ www/kicanvas
 coverage/
 esbuild-meta.json
 
+.pyenv
 .DS_Store
