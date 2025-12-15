@@ -265,7 +265,7 @@ export class LayerSet extends BaseLayerSet {
                 interactive = true;
             }
 
-            // Copper layers require additional virual layers for zones and
+            // Copper layers require additional virtual layers for zones and
             // blind/buried vias. Those are generated here.
             // Zone virtual layers for copper layers require that the referenced
             // copper layer is visible.
@@ -378,7 +378,7 @@ export class LayerSet extends BaseLayerSet {
     }
 
     /**
-     * @yields layers that coorespond to board layers that should be
+     * @yields layers that correspond to board layers that should be
      *      displayed in the layer selection UI
      */
     *in_ui_order() {

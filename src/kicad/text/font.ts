@@ -465,7 +465,7 @@ export abstract class Font {
 
     /** Breaks text up into words, accounting for markup.
      *
-     * Corresponds to KiCAD's FONT::workbreakMarkup
+     * Corresponds to KiCAD's FONT::wordbreakMarkup
      *
      * As per KiCAD, a word can represent an actual word or a run of text
      * with subscript, superscript, or overbar applied.

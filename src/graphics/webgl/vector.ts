@@ -6,7 +6,7 @@
 
 /**
  * Low-level library for efficiently rendering sets of basic geometric
- * primitives using WebGL. Think of it as a really hard to use version
+ * primitives using WebGL. Think of it as a really hard-to-use version
  * of SVG. This is the underlying code used by WebGL2Renderer to actually
  * turn abstract primitives into WebGL stuff.
  *
@@ -16,7 +16,7 @@
  * The core principle here is primitive sets. These sets collect all the data
  * necessary to render *multiple* primitives. Primitive sets are write-once.
  * Call set() with a list of primitive objects to tesselate them and upload
- * their data to the GPU. Use draw() to have the GPU render the tesselated
+ * their data to the GPU. Use draw() to have the GPU render the tessellated
  * geometry. Use dispose() to free GPU resources.
  *
  */
@@ -156,7 +156,7 @@ class Tesselator {
     }
 
     /**
-     * Tesselate a circle into a quad
+     * Tessellate a circle into a quad
      * @returns four points representing the quad
      */
     static tesselate_circle(circle: Circle): [Vec2, Vec2, Vec2, Vec2] {
@@ -172,7 +172,7 @@ class Tesselator {
     }
 
     /**
-     * Tesselate an array of circles into renderable data
+     * Tessellate an array of circles into renderable data
      */
     static tesselate_circles(circles: Circle[]) {
         const vertex_count = circles.length * this.vertices_per_quad;
@@ -377,7 +377,7 @@ export class PolylineSet implements IDisposable {
     }
 
     /**
-     * Tesselate an array of polylines and upload them to the GPU.
+     * Tessellate an array of polylines and upload them to the GPU.
      */
     set(lines: Polyline[]) {
         if (!lines.length) {
@@ -477,7 +477,7 @@ export class PolygonSet implements IDisposable {
     /**
      * Convert an array of triangle vertices to polylines.
      *
-     * This is a helper function for debugging. It allows easily drawing the
+     * This is a helper function for debugging. It allows for easy drawing of the
      * outlines of the results of triangulation.
      *
      */
@@ -497,7 +497,7 @@ export class PolygonSet implements IDisposable {
     }
 
     /**
-     * Tesselate (triangulate) and upload a list of polygons to the GPU.
+     * Tessellate (triangulate) and upload a list of polygons to the GPU.
      */
     set(polygons: Polygon[]) {
         let total_vertex_data_length = 0;
@@ -555,7 +555,7 @@ export class PolygonSet implements IDisposable {
  * GPU, and draw them together. This is conceptually a "layer", all primitives
  * are drawn at the same depth.
  *
- * Like the underlying primitive sets, this is intended to be write once. Once
+ * Like the underlying primitive sets, this is intended to be written to once. Once
  * you call commit() the primitive data is released from working RAM and exists
  * only in the GPU buffers. To modify the data, you'd dispose() of this layer
  * and create a new one.
@@ -636,7 +636,7 @@ export class PrimitiveSet implements IDisposable {
     }
 
     /**
-     * Tesselate all collected primitives and upload their data to the GPU.
+     * Tessellate all collected primitives and upload their data to the GPU.
      */
     commit() {
         if (this.#polygons.length) {

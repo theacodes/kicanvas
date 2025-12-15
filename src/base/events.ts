@@ -7,7 +7,7 @@
 import type { IDisposable } from "./disposable";
 
 /**
- * Adds an event listener and wraps it as a Disposable. When disposed, the
+ * Adds an event listener and wraps it as a Disposable. When disposed of, the
  * event listener is removed from the target.
  */
 export function listen<K extends keyof GlobalEventHandlersEventMap>(

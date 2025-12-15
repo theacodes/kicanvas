@@ -94,7 +94,7 @@ function prepare_template_html(
 }
 
 /**
- * Walks through the give DOM tree and replaces placeholders with values.
+ * Walks through the given DOM tree and replaces placeholders with values.
  */
 function apply_values_to_tree(tree: DocumentFragment, values: unknown[]) {
     const walker = document.createTreeWalker(
@@ -143,11 +143,11 @@ function apply_content_value(node: Node | null, text: Text, values: unknown[]) {
         if (!part) {
             continue;
         }
-        // Even parts are text nodes.
+        // Even numbered parts are text nodes.
         if (i % 2 == 0) {
             node.insertBefore(new Text(part), text);
         }
-        // Odd parts are placeholders.
+        // Odd numbered parts are placeholders.
         else {
             for (const value of convert_value_for_content(
                 values[parseInt(part, 10)],
@@ -158,7 +158,7 @@ function apply_content_value(node: Node | null, text: Text, values: unknown[]) {
         }
     }
 
-    // clear the text data instead of removing the node, since removing it will
+    // Clear the text data instead of removing the node, since removing it will
     // break the tree walker.
     text.data = "";
 }

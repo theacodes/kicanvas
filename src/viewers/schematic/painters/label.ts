@@ -14,8 +14,8 @@ import { SchematicItemPainter } from "./base";
 /**
  * Implements KiCAD rendering logic for net, global, and hierarchical labels.
  *
- * This is similar in scope to the SymbolPin, EDAText class and its children,
- * it's designed to recreate KiCAD's behavior as closely as possible.
+ * This is similar in scope to the SymbolPin, EDAText class and its children.
+ * It's designed to recreate KiCAD's behavior as closely as possible.
  *
  * This logic is adapted from:
  * - SCH_LABEL_BASE
@@ -155,7 +155,7 @@ export class GlobalLabelPainter extends LabelPainter {
         let vert = text_height * 0.0715;
 
         if (["input", "bidirectional", "tri_state"].includes(label.shape)) {
-            // accommodate triangular shaped tail
+            // Accommodate triangular shaped tail
             horz += text_height * 0.75;
         }
 

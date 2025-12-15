@@ -25,7 +25,7 @@ export class Viewport {
 
     /**
      * Create a Scene
-     * @param callback - a callback used to re-draw the viewport when it changes.
+     * @param callback - a callback used to redraw the viewport when it changes.
      */
     constructor(
         public renderer: Renderer,

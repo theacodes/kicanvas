@@ -12,7 +12,7 @@ import { ViewLayer, ViewLayerSet } from "./view-layers";
 const log = new Logger("kicanvas:project");
 
 /**
- * Base class for all painters responsible for drawing a view items.
+ * Base class for all painters responsible for drawing view items.
  */
 export abstract class ItemPainter {
     /**
@@ -39,7 +39,7 @@ export interface PaintableDocument {
 }
 
 /**
- * Base class for painting a complete document, for example, an entire schematic or board.
+ * Base class for painting a complete document, for example an entire schematic or board.
  */
 export class DocumentPainter {
     #painters: Map<unknown, ItemPainter> = new Map();

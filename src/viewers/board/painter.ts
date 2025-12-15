@@ -87,7 +87,7 @@ abstract class GraphicItemPainter extends BoardItemPainter {
         const gap_len = StrokeParams.gap_length(width, stroke_style);
         const dash_len = StrokeParams.dash_length(width, stroke_style);
 
-        // generate line pattern
+        // Generate line pattern
         let line_pattern: number[] = [];
         switch (stroke_style.stroke.type) {
             case "dash":
@@ -110,11 +110,11 @@ abstract class GraphicItemPainter extends BoardItemPainter {
                 ];
                 break;
             default:
-                // unreachable
+                // Unreachable
                 return;
         }
 
-        // draw lines
+        // Draw lines
         let draw_len = 0.0;
         let pattern_index = 0;
         while (draw_len < line_len) {
@@ -147,7 +147,7 @@ abstract class GraphicItemPainter extends BoardItemPainter {
 }
 
 abstract class NetNameItemPainter extends BoardItemPainter {
-    /**  Drawing the netname on `center` in region `region` */
+    // Drawing the netname on `center` in region `region`
     protected draw_net_name(
         net_name: string,
         center: Vec2,
@@ -174,7 +174,7 @@ abstract class NetNameItemPainter extends BoardItemPainter {
         StrokeFont.default().draw(this.gfx, net_name, text_center, text_attr);
     }
 
-    /** Get displayed netname, e.g. "Sheet/Name" -> "Name" */
+    // Get displayed netname, e.g. "Sheet/Name" -> "Name"
     protected static displayed_netname(
         netname: string | undefined,
     ): string | undefined {
@@ -353,7 +353,7 @@ class ViaPainter extends NetNameItemPainter {
 
     layers_for(v: board_items.Via): string[] {
         if (v.layers) {
-            // blind/buried vias have two layers - the start and end layer,
+            // Blind/buried vias have two layers - the start and end layer,
             // and should only be drawn on the layers they're actually on.
             const layers = [];
 
@@ -497,8 +497,8 @@ class PadPainter extends NetNameItemPainter {
                 layers.push(LayerNames.non_plated_holes);
                 break;
             case "smd":
-                // only use pads_front_netname/pads_back_netname in SMD pads
-                // the thru_hole pad uses the pad_holes_netname layer
+                // Only use pads_front_netname/pads_back_netname in SMD pads.
+                // Thru_hole pads uses the pad_holes_netname layer
                 if (layers.includes(LayerNames.pads_front)) {
                     layers.push(LayerNames.pads_front_netname);
                 } else if (layers.includes(LayerNames.pads_back)) {
@@ -546,11 +546,11 @@ class PadPainter extends NetNameItemPainter {
         const net_name = PadPainter.pad_netname(pad);
 
         if (is_netname_layer) {
-            // see also:
+            // See also:
             // https://gitlab.com/kicad/code/kicad/-/blob/master/pcbnew/pcb_painter.cpp#L1379
             const pad_size = PadPainter.get_pad_orth_size(pad);
 
-            // calcuate the maxium text size and rotation angle
+            // Calculate the maximum text size and rotation angle
             let max_width = pad_size.x;
             let max_font_size = pad_size.y;
             let text_rotated = -pad.parent.at.rotation;
@@ -562,7 +562,7 @@ class PadPainter extends NetNameItemPainter {
 
             max_font_size = Math.min(max_font_size, 10);
 
-            // keep the text upright
+            // Keep the text upright
             const pad_rotate = pad.at.rotation;
             while (pad_rotate + text_rotated > 90) {
                 text_rotated -= 180;
@@ -571,17 +571,17 @@ class PadPainter extends NetNameItemPainter {
                 text_rotated += 180;
             }
 
-            // calcuate the offset for pad number and net name if necessary
+            // Calculate the offset for pad number and net name if necessary
             let y_offset_pad_num = 0;
             let y_offset_pad_net = 0;
             if (net_name !== undefined && pad.number !== "") {
-                // 3 can get the better visibility than kicad default value 2.5
+                // 3 gives better visibility than kicad's default value of 2.5
                 max_font_size = max_font_size / 3;
                 y_offset_pad_net = max_font_size / 1.4;
                 y_offset_pad_num = max_font_size / 1.7;
             }
 
-            // keep the text centered
+            // Keep the text centered
             if (pad.drill?.offset) {
                 this.gfx.state.matrix.translate_self(
                     pad.drill.offset.x,
@@ -589,11 +589,11 @@ class PadPainter extends NetNameItemPainter {
                 );
             }
 
-            // apply the text rotation
+            // Apply the text rotation
             const rotate_mat = Matrix3.rotation(Angle.deg_to_rad(text_rotated));
             this.gfx.state.multiply(rotate_mat);
 
-            // render the pad_number
+            // Render the pad_number
             if (pad.number !== "") {
                 this.draw_net_name(
                     pad.number,
@@ -604,7 +604,7 @@ class PadPainter extends NetNameItemPainter {
                 );
             }
 
-            // render netname
+            // Render netname
             if (net_name !== undefined) {
                 this.draw_net_name(
                     net_name,
@@ -675,7 +675,7 @@ class PadPainter extends NetNameItemPainter {
                     break;
                 case "roundrect":
                 case "trapezoid":
-                    // KiCAD approximates rounded rectangle using four line segments
+                    // KiCAD approximates rounded rectangles using four line segments
                     // with their width set to the round radius. Clever bastards.
                     // Since our polylines aren't filled, we'll add both a polygon
                     // and a polyline.
@@ -773,9 +773,9 @@ class PadPainter extends NetNameItemPainter {
         this.gfx.state.pop();
     }
 
-    /** Get displayed netname for a pad, if it's no_connect, return "X" */
+    // Get displayed netname for a pad, if it's no_connect, return "X"
     private static pad_netname(pad: board_items.Pad): string | undefined {
-        // display "X" for no_connect pads
+        // Display "X" for no_connect pads
         // https://gitlab.com/kicad/code/kicad/-/blob/master/pcbnew/pcb_painter.cpp#L1305
         if (pad.pintype !== undefined && pad.pintype.includes("no_connect")) {
             return "X";
@@ -784,13 +784,13 @@ class PadPainter extends NetNameItemPainter {
         return PadPainter.displayed_netname(pad.netname);
     }
 
-    /** Get pad outline size */
+    // Get pad outline size
     private static get_pad_orth_size(pad: board_items.Pad): Vec2 {
         const pad_size = pad.size.copy();
 
         const obj_angle = pad.parent.at.rotation + 36000;
 
-        // swap x, y if pad is not 0 deg or 180 deg
+        // Swap x with y if pad is not 0 deg or 180 deg
         if (obj_angle % 180 !== 0) {
             [pad_size.x, pad_size.y] = [pad_size.y, pad_size.x];
         }
@@ -934,7 +934,7 @@ class PropertyTextPainter extends BoardItemPainter {
         edatext.attributes.color = layer.color;
         edatext.attributes.keep_upright = !t.at.unlocked;
 
-        // keep the text upright if needed
+        // Keep the text upright if needed
         if (edatext.attributes.keep_upright) {
             while (edatext.text_angle.degrees > 90) {
                 edatext.text_angle.degrees -= 180;
@@ -945,7 +945,7 @@ class PropertyTextPainter extends BoardItemPainter {
         }
 
         // Looks like the rotation angle for KiCad's symbol attribute rendering
-        // is standalone, so we need to sub it from parent's rotation angle.
+        // is standalone, so we need to subtract it from its parent's rotation angle.
         if (t.parent) {
             const rot = t.parent.at.rotation;
             edatext.text_angle.degrees -= rot;

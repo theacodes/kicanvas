@@ -84,7 +84,7 @@ export class Angle {
     }
 
     /**
-     * Returns a new Angle representing the different of this angle and the given angle.
+     * Returns a new Angle representing the difference between this angle and the given angle.
      */
     sub(other: AngleLike) {
         const diff = this.radians - new Angle(other).radians;

@@ -34,8 +34,8 @@ export class SchField extends EDAText {
         return this.text;
     }
 
-    /** Get effective rotation when drawing, taking into the parent position
-     * orientation, and transformation.
+    /** Get effective rotation when drawing, taking into account the parent
+     * position orientation, and transformation.
      */
     get draw_rotation() {
         let this_deg = this.text_angle.degrees;
@@ -95,7 +95,7 @@ export class SchField extends EDAText {
         begin = this.text_angle.rotate_point(begin, pos);
         end = this.text_angle.rotate_point(end, pos);
 
-        // adjust bounding box based on symbol tranform
+        // adjust bounding box based on symbol transform
 
         // Symbols have the y axis direction flipped, so the bounding
         // box must also be flipped.

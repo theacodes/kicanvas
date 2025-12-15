@@ -106,7 +106,7 @@ export class Camera2 {
     }
 
     /**
-     * Apply this camera to a 2d canvas
+     * Apply this camera to a 2D canvas
      *
      * A simple convenience method that sets the canvas's transform to
      * the camera's transformation matrix.

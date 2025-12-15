@@ -219,7 +219,7 @@ export class StrokeFont extends Font {
             );
         }
 
-        // Note: KiCanvas treats underline and overbar as mututally exclusive,
+        // Note: KiCanvas treats underline and overbar as mutually exclusive,
         // but technically KiCAD can show both at the same time. I wasn't able
         // to find an actual real world case of this.
         if (has_bar) {

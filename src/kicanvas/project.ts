@@ -51,7 +51,7 @@ export class Project extends EventTarget implements IDisposable {
         await Promise.all(promises);
 
         while (promises.length) {
-            // 'Recursively' resolve all schematics until none are remaining
+            // 'Recursively' resolve all schematics until none remain
             promises = [];
             for (const schematic of this.schematics()) {
                 for (const sheet of schematic.sheets) {
@@ -110,7 +110,7 @@ export class Project extends EventTarget implements IDisposable {
         this.#files_by_name.set(filename, doc);
 
         if (doc instanceof KicadPCB) {
-            // Go ahead and add PCBs to the list of pages. Schematics will
+            // Add PCBs to the list of pages. Schematics will
             // get added during #determine_schematic_hierarchy.
             const page = new ProjectPage(
                 this,
@@ -194,7 +194,7 @@ export class Project extends EventTarget implements IDisposable {
         }
 
         // If we found a root page, we can build out the list of pages by
-        // walking through paths_to_sheet with root as page one.
+        // walking through paths_to_sheet with the root as page one.
         let pages = [];
 
         if (root) {

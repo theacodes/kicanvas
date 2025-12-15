@@ -47,7 +47,7 @@ export class Arc {
         const mid_angle = mid.sub(center).angle;
         const end_angle = end.sub(center).angle;
 
-        // calcuate the arc angle
+        // calculate the arc angle
         let arc_angle;
         const start_to_mid = mid_angle.sub(start_angle).normalize();
         const start_to_end = end_angle.sub(start_angle).normalize();
@@ -60,8 +60,8 @@ export class Arc {
             arc_angle = Angle.from_degrees(360).sub(start_to_end);
         }
 
-        // although kicad always create a clockwise arc,
-        // but we can import a counter-clockwise arc from other EDA/CAD using KiCad
+        // although KiCad always creates clockwise arcs, the file may contain
+        // counter-clockwise arcs through imports from other EDA/CAD programs
         let arc_start;
         let direction: ArcDirection;
 

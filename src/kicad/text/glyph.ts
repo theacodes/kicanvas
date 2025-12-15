@@ -9,7 +9,7 @@ import { Angle, BBox, Vec2 } from "../../base/math";
 /**
  * Glyph abstract base class
  *
- * Shared between stroke and outline fonts, altough outline fonts aren't
+ * Shared between stroke and outline fonts, although outline fonts aren't
  * currently implemented.
  */
 export abstract class Glyph {

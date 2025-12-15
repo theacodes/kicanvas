@@ -6,7 +6,7 @@
         "moduleResolution": "bundler",
         // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
         "experimentalDecorators": true,
-        "useDefineForClassFields": false, // required to use experimental decorators
+        "useDefineForClassFields": false, // Required to use experimental decorators
         /* Modules */
         "module": "es2022" /* Specify what module code is generated. */,
         "allowImportingTsExtensions": true,

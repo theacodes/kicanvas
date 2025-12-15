@@ -14,7 +14,7 @@ import { EDAText } from "./eda-text";
  *
  * This class is also used by the LabelPainter and PinPainter, specifically
  * for apply set_spin_style_from_angle. It might be possible to remove this
- * class altogether in favor of just have that method somewhere.
+ * class altogether in favor of just having that method somewhere.
  */
 export class SchText extends EDAText {
     constructor(text: string) {

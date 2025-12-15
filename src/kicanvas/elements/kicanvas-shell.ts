@@ -28,7 +28,7 @@ KCUIIconElement.sprites_url = sprites_url;
 
 /**
  * <kc-kicanvas-shell> is the main entrypoint for the standalone KiCanvas
- * application- it's the thing you see when you go to kicanvas.org.
+ * application: It's the thing you see when you go to kicanvas.org.
  *
  * The shell is responsible for managing the currently loaded Project and
  * switching between the different viewer apps (<kc-schematic-app>,
@@ -50,7 +50,7 @@ KCUIIconElement.sprites_url = sprites_url;
 class KiCanvasShellElement extends KCUIElement {
     static override styles = [
         ...KCUIElement.styles,
-        // TODO: Figure out a better way to handle these two styles.
+        // TODO: Find a better way to handle these two styles.
         new CSS(kc_ui_styles),
         new CSS(shell_styles),
     ];
