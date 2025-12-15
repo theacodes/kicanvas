@@ -88,7 +88,7 @@ export class Matrix3 {
     }
 
     /**
-     * @returns a new matrix representing a 2d orthographic projection
+     * @returns a new matrix representing a 2D orthographic projection
      */
     static orthographic(width: number, height: number): Matrix3 {
         // prettier-ignore
@@ -147,7 +147,7 @@ export class Matrix3 {
     }
 
     /**
-     * Transforms a list of vector by a given matrix, which may be null.
+     * Transforms a list of vectors by a given matrix, which may be null.
      */
     static transform_all(mat: Matrix3 | null, vecs: Vec2[]): Vec2[] {
         if (!mat) {
@@ -237,7 +237,7 @@ export class Matrix3 {
     }
 
     /**
-     * @returns A new matrix representing a 2d translation
+     * @returns A new matrix representing a 2D translation
      */
     static translation(x: number, y: number): Matrix3 {
         // prettier-ignore
@@ -265,7 +265,7 @@ export class Matrix3 {
     }
 
     /**
-     * @returns {Matrix3} A new matrix representing a 2d scale
+     * @returns {Matrix3} A new matrix representing a 2D scale
      */
     static scaling(x: number, y: number): Matrix3 {
         // prettier-ignore
@@ -293,7 +293,7 @@ export class Matrix3 {
     }
 
     /**
-     * @returns A new matrix representing a 2d rotation
+     * @returns A new matrix representing a 2D rotation
      */
     static rotation(angle: AngleLike): Matrix3 {
         const theta = new Angle(angle).radians;

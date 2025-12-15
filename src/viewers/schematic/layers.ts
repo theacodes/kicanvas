@@ -18,22 +18,22 @@ export enum LayerNames {
     interactive = ":Interactive",
     // DNP and other marks.
     marks = ":Marks",
-    // reference, value, other symbol fields
+    // Reference, value, other symbol fields
     symbol_field = ":Symbol:Field",
-    // hierarchical, global, and local labels
+    // Hierarchical, global, and local labels
     label = ":Label",
-    // regular junctions, bus junctions, no connects
+    // Regular junctions, bus junctions, no connects
     junction = ":Junction",
-    // wires and buses
+    // Wires and buses
     wire = ":Wire",
-    // symbol outlines, pin names, pin numbers
+    // Symbol outlines, pin names, pin numbers
     symbol_foreground = ":Symbol:Foreground",
     // Text, rectangles, etc. not inside of symbols.
     notes = ":Notes",
     bitmap = ":Bitmap",
-    // symbol pins
+    // Symbol pins
     symbol_pin = ":Symbol:Pin",
-    // symbol body fill
+    // Symbol body fill
     symbol_background = ":Symbol:Background",
     drawing_sheet = BaseLayerNames.drawing_sheet,
     grid = BaseLayerNames.grid,

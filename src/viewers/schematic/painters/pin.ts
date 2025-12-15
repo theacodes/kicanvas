@@ -20,11 +20,11 @@ import { SchematicItemPainter } from "./base";
 /**
  * Implements KiCAD rendering logic for symbol pins.
  *
- * This is similar in scope to the EDAText class and its children, it's
+ * This is similar in scope to the EDAText class and its children.  It's
  * designed to recreate KiCAD's behavior as closely as possible.
  *
  * The logic here is based a few small bits of LIB_PIN and EDA_ITEM, with the
- * ast majority adapted from SCH_PAINTER::draw( const LIB_PIN, ...) - which is
+ * vast majority adapted from SCH_PAINTER::draw( const LIB_PIN, ...), which is
  * a massive method at over 400 lines!
  *
  */
@@ -520,7 +520,7 @@ export const PinLabelInternals = {
     },
 
     /**
-     * Places a label inside the symbol body- or to put it another way,
+     * Places a label inside the symbol body.  Or to put it another way,
      * places it to the left side of a pin that's on the right side of a symbol
      */
     place_inside(

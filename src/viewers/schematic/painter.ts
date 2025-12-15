@@ -430,7 +430,7 @@ class PropertyPainter extends SchematicItemPainter {
         ]);
 
         if (layer.name == LayerNames.interactive) {
-            // drawing text is expensive, just draw the bbox for the interactive layer.
+            // Drawing text is expensive, just draw the bbox for the interactive layer.
             this.gfx.line(new Polyline(Array.from(bbox_pts), 0.1, Color.white));
         } else {
             this.gfx.state.push();

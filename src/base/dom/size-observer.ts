@@ -9,7 +9,7 @@ import type { IDisposable } from "../disposable";
 type ResizeObserverCallback = (target: HTMLElement) => void;
 
 /**
- * Wrapper over ResizeObserver that implmenets IDisposable
+ * Wrapper over ResizeObserver that implements IDisposable
  */
 export class SizeObserver implements IDisposable {
     #observer: ResizeObserver;

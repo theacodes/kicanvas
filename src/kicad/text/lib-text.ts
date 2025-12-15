@@ -125,7 +125,7 @@ export class LibText extends EDAText {
 
     /**
      * Internal utility method for offsetting the text position based on the
-     * horizontal and vertical justifcation.
+     * horizontal and vertical justification.
      */
     normalize_justification(inverse: boolean) {
         let delta = new Vec2(0, 0);
@@ -193,7 +193,7 @@ export class LibText extends EDAText {
     /**
      * Mirrors the text horizontally.
      *
-     * Deals with re-assigning the horizontal justification, as mirroring
+     * Deals with reassigning the horizontal justification, as mirroring
      * left aligned text is the same as changing it to right aligned.
      */
     mirror_horizontally(center: Vec2) {
@@ -217,7 +217,7 @@ export class LibText extends EDAText {
     /**
      * Mirrors the text vertically.
      *
-     * Deals with re-assigning the vertical justification, as mirroring
+     * Deals with reassigning the vertical justification, as mirroring
      * top aligned text is the same as changing it to bottom aligned.
      */
     mirror_vertically(center: Vec2) {

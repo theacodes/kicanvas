@@ -30,9 +30,9 @@ export abstract class SchematicItemPainter extends ItemPainter {
     }
 
     protected dim_color(color: Color) {
-        // See SCH_PAINTER::getRenderColor, this desaturates the color and
+        // See SCH_PAINTER::getRenderColor.  This desaturates the color and
         // mixes it 50% with the background color. While you might think 50%
-        // alpha would be fine, it ends up showing the grid and other stuff
+        // alpha would work fine, it ends up showing the grid and other stuff
         // behind it.
         color = color.desaturate();
         return color.mix(this.theme.background, 0.5);

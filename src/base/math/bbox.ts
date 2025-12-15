@@ -110,7 +110,7 @@ export class BBox {
     }
 
     /**
-     * @returns true if the bbox has a non-zero area
+     * @returns true if the BBox has a non-zero area
      */
     get valid() {
         return (

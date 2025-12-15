@@ -10,7 +10,7 @@ import { BBox, Vec2 } from "../../base/math";
 import { Color, RenderLayer } from "../../graphics";
 
 /**
- * Common view layer names across all viewers.
+ * View layer names shared by all viewers.
  */
 export enum ViewLayerNames {
     overlay = ":Overlay",
@@ -21,8 +21,8 @@ export enum ViewLayerNames {
 /**
  * View layers
  *
- * KiCanvas's structure uses view layers to gather schematic or board items.
- * These view layers are used render parts of each item in the correct order
+ * KiCanvas's structure uses view layers to gather schematic and board items.
+ * These view layers are used to render parts of each item in the correct order
  * (back to front) as well as provide bounding box queries.
  *
  * For the board viewer, some layers correspond to physical board layers
@@ -63,12 +63,13 @@ export class ViewLayer implements IDisposable {
     graphics?: RenderLayer;
 
     /**
-     * True is this layer contains interactive items that are findable via
+     * True if this layer contains interactive items that are findable via
      * ViewLayerSet.query_point
      */
     interactive: boolean = false;
 
-    /** A map of board items to bounding boxes
+    /**
+     * A map of board items to bounding boxes
      * A board item can have graphics on multiple layers, the bounding box provided
      * here is only valid for this layer.
      */
@@ -76,7 +77,7 @@ export class ViewLayer implements IDisposable {
 
     /**
      * Create a new Layer.
-     * @param  ayer_set - the LayerSet that this Layer belongs to
+     * @param layer_set - the LayerSet that this Layer belongs to
      * @param name - this layer's name
      * @param visible - controls whether the layer is visible when rendering, may be a function returning a boolean.
      */

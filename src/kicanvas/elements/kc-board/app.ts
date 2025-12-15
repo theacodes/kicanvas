@@ -10,7 +10,7 @@ import type { ProjectPage } from "../../project";
 import { KCViewerAppElement } from "../common/app";
 import { KCBoardViewerElement } from "./viewer";
 
-// import dependent elements so they're registered before use.
+// Import dependent elements so they're registered before use.
 import "../common/help-panel";
 import "../common/preferences-panel";
 import "../common/viewer-bottom-toolbar";

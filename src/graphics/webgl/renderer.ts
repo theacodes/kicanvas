@@ -95,7 +95,7 @@ export class WebGL2Renderer extends Renderer {
     override clear_canvas() {
         if (this.gl == null) throw new Error("Uninitialized");
 
-        // Upate canvas size and projection matrix if needed
+        // Update canvas size and projection matrix if needed
         this.update_canvas_size();
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

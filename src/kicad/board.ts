@@ -1144,7 +1144,7 @@ export class SymbolProperty implements HasUniqueID {
     }
 }
 
-/** Base class for Line, Circle, and others which has 'stroke' property. */
+/** Base class for Line, Circle, and others which have 'stroke' property. */
 class GraphicItem implements HasUniqueID, HasStrokeParams {
     parent?: Footprint | KicadPCB;
     layer: string;

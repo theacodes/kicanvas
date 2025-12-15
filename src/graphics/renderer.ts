@@ -108,7 +108,7 @@ export abstract class Renderer implements IDisposable {
     /**
      * Finish a layer of graphics.
      *
-     * Performs any additional work needed such as tesselation and buffer
+     * Performs any additional work needed such as tessellation and buffer
      * management.
      */
     abstract end_layer(): RenderLayer;

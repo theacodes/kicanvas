@@ -447,7 +447,7 @@ export interface HasStrokeParams {
     get stroke_params(): StrokeParams;
 }
 
-/** Items which has netname */
+/** Items which have a netname */
 export interface HasNetName {
     get netname(): string | undefined;
 }

@@ -67,7 +67,7 @@ const default_attribute_converter = {
                 return `${value}`;
             default:
                 throw new Error(
-                    `Can not convert type "${type}" and value "${value} to attribute`,
+                    `Cannot convert type "${type}" and value "${value} to attribute`,
                 );
         }
     },
@@ -81,7 +81,7 @@ const default_attribute_converter = {
                 return value === null ? null : Number(value);
             default:
                 throw new Error(
-                    `Can not convert type "${type}" and value "${value} to attribute`,
+                    `Cannot convert type "${type}" and value "${value} to attribute`,
                 );
         }
     },

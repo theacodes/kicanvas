@@ -28,7 +28,7 @@ KiCanvas is very early in its development and there's a ton of stuff that hasn't
 
 ## Known issues
 
-In general, please check the [GitHub issues] page before filing new issues. Some high-level things that we known won't work:
+In general, please check the [GitHub issues] page before filing new issues. Some high-level things that we know won't work:
 
 - Any KiCAD 5 files, KiCanvas can only parse files from KiCAD 6 and later.
 - Some KiCAD 7 features might not be fully implemented, such as custom fonts in schematics.

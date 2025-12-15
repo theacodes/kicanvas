@@ -24,12 +24,12 @@ export class GridLOD {
 /**
  * Grid drawing helper
  *
- * The grid is one of few things in KiCanvas that's dynamic- it needs to change
- * depending on the camera's viewport. Since it needs to update when the user
- * is actively moving the camera care has to be taken to avoid performance
+ * The grid is one of only a few things in KiCanvas that's dynamic: It needs
+ * to change depending on the camera's viewport. Since it needs to update when the
+ * user is actively moving the camera, care has to be taken to avoid performance
  * issues due to the amount of geometry that needs to be generated.
  *
- * This grid helper avoid regenerating grid geometry unless necessary. It keeps
+ * This grid helper avoids regenerating grid geometry unless necessary. It keeps
  * track of the last camera bbox it generated geometry for and doesn't
  * regenerate unless the new bbox is outside of that area. It also uses GridLOD
  * to generate less geometry when zoomed out.
@@ -63,7 +63,7 @@ export class Grid {
             }
         }
 
-        // If the camera is too far zoomed out, don't bother drawing the grid.
+        // If the camera is zoomed too far out, don't bother drawing the grid.
         if (!lod) {
             this.reset();
             return;
@@ -77,7 +77,7 @@ export class Grid {
             return;
         }
 
-        // grow the bbox 20% to improve performance of panning.
+        // Grow the bbox 20% to improve performance when panning.
         bbox = bbox.grow(bbox.w * 0.2);
 
         this.#last_grid_lod = lod;

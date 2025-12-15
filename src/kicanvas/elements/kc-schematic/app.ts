@@ -8,7 +8,7 @@ import { html } from "../../../base/web-components";
 import { KCViewerAppElement } from "../common/app";
 import { KCSchematicViewerElement } from "./viewer";
 
-// import dependent elements so they're registered before use.
+// Import dependent elements so they're registered before use.
 import "./info-panel";
 import "./properties-panel";
 import "./symbols-panel";
@@ -37,7 +37,7 @@ export class KCSchematicAppElement extends KCViewerAppElement<KCSchematicViewerE
             return;
         }
 
-        // Otherwise, selecting the same item twice should show the
+        // Otherwise, selecting the same item twice will show the
         // properties panel.
         this.change_activity("properties");
     }

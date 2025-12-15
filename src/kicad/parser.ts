@@ -104,7 +104,7 @@ export const T = {
         return new Color(el[1] / 255, el[2] / 255, el[3] / 255, el[4]);
     },
     /**
-     * Choice one type processor by prefix
+     * Choose a type processor by prefix
      *
      * Example: `choice[("xy", T.vec2), ("color", T.color)]`
      *  - if input is `(xy 1 2)`, use `T.vec2` to parse input
@@ -310,7 +310,7 @@ export const P = {
         return P.expr(name, T.item(item_type, ...args));
     },
     /**
-     * Accepts an expression that describes a 2d vector. For example,
+     * Accepts an expression that describes a 2D vector. For example,
      * ((xy 1 2)) with vec2("xy") would end up with {xy: Vec2(1, 2)}.
      */
     vec2(name: string) {
@@ -356,7 +356,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
 
         if (!acceptable_start_strings.includes(first)) {
             throw new Error(
-                `Expression must start with ${start_def.name} found ${first} in ${expr}`,
+                `Expression must start with ${start_def.name}, but found ${first} in ${expr}`,
             );
         }
 
@@ -380,7 +380,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
 
             if (!def) {
                 log.warn(
-                    `no def for bare element ${element} at position ${n} in expression ${expr}`,
+                    `Bare element ${element} is undefined at position ${n} in expression ${expr}`,
                 );
                 continue;
             }
@@ -395,7 +395,7 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
 
         if (!def) {
             log.warn(
-                `No def found for element ${element} in expression ${expr}`,
+                `No definition found for element ${element} in expression ${expr}`,
             );
             continue;
         }

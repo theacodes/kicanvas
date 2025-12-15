@@ -209,7 +209,7 @@ export abstract class KCViewerAppElement<
             </kc-ui-activity-side-bar>` as KCUIActivitySideBarElement;
             resizer = html`<kc-ui-resizer></kc-ui-resizer>`;
         } else {
-            // NO activity bar
+            // No activity bar
             this.#activity_bar = null;
         }
 
