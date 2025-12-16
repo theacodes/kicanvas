@@ -13,7 +13,7 @@
 				"panel": "dedicated"
 			},
 			"group": {
-				"kind": "build",
+				"kind": "build"
 			},
 			"problemMatcher": {
 				"owner": "custom",
@@ -32,7 +32,7 @@
 						"regexp": "\\[watch\\] build started"
 					},
 					"endsPattern": {
-						"regexp": "\\[watch\\] build finished",
+						"regexp": "\\[watch\\] build finished"
 					}
 				}
 			}
