@@ -11,12 +11,12 @@ import { StrokeFont } from "./stroke-font";
 
 /** Primary text mixin
  *
- * KiCAD uses EDA_TEXT as a sort of grab-bag of various things needed to render
+ * KiCad uses EDA_TEXT as a sort of grab-bag of various things needed to render
  * text across both Eeschema and Pcbnew. There is a lot of meandering code
  * because it has mostly been worked on piecemeal over the years, so there's
  * some stuff that is a little weird and some code that does almost the same
  * thing as other code. I've done my best to keep the structure clean while
- * carefully matching KiCAD's behavior, but it's still a lot to wrap your
+ * carefully matching KiCad's behavior, but it's still a lot to wrap your
  * head around.
  *
  * Note: Just like the underlying Font class, this all expects
@@ -30,7 +30,7 @@ export class EDAText {
     /**
      * Apply "effects" parsed from schematic or board files.
      *
-     * KiCAD uses Effects to encapsulate all of the various text
+     * KiCad uses Effects to encapsulate all of the various text
      * options, this translates it into TextAttributes used by Font.
      */
     apply_effects(effects: Effects) {
@@ -48,7 +48,7 @@ export class EDAText {
     /**
      * Apply "at" parsed from schematic or board files.
      *
-     * KiCAD uses At to encapsulate both position and rotation. How this is
+     * KiCad uses At to encapsulate both position and rotation. How this is
      * actually applied various based on the actual text item.
      */
     apply_at(at: At) {
@@ -292,7 +292,7 @@ function get_normal_thickness(text_width: number): number {
 
 /** Prevents text from being too thick and overlapping
  *
- * As per KiCAD's Clamp_Text_PenSize, this limits normal text to
+ * As per KiCad's Clamp_Text_PenSize, this limits normal text to
  * 18% and bold text to 25%.
  */
 function clamp_thickness(

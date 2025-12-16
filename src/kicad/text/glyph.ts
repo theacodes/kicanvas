@@ -46,7 +46,7 @@ export class StrokeGlyph extends Glyph {
         mirror: boolean,
         origin: Vec2,
     ): StrokeGlyph {
-        // Note: our bbox calculation differs from KiCAD's, however,
+        // Note: our bbox calculation differs from KiCad's, however,
         // when I wrote this it seems to be consistent in terms of final
         // outcome.
         const bb = this.bbox.copy();

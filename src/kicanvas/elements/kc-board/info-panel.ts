@@ -48,7 +48,7 @@ export class KCBoardInfoPanelElement extends KCUIElement {
                         ${entry("Width", ds.width, "mm")}
                         ${entry("Height", ds.height, "mm")}
                         ${header("Board properties")}
-                        ${entry("KiCAD version", board.version)}
+                        ${entry("KiCad version", board.version)}
                         ${entry("Generator", board.generator)}
                         ${entry(
                             "Thickness",

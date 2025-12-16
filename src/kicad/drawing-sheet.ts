@@ -121,7 +121,7 @@ export class DrawingSheet {
                 // Sheet path (hierarchical path)
                 return "/";
             case "KICAD_VERSION":
-                // KiCAD Version
+                // KiCad Version
                 return "KiCanvas Alpha";
         }
         return this.document?.resolve_text_var(name);

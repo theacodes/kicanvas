@@ -9,14 +9,14 @@ Here's a non-exhaustive roadmap:
     - [x] kicad_pcb parser
     - [x] kicad_wks parser
     - [x] kicad_pro parser
-    - [x] Rendering KiCAD 6 schematics
-    - [x] Rendering KiCAD 6 boards
-    - [x] Rendering KiCAD 6 text
+    - [x] Rendering KiCad 6 schematics
+    - [x] Rendering KiCad 6 boards
+    - [x] Rendering KiCad 6 text
     - [x] Rendering worksheets
     - [x] Loading hierarchical schematics
-    - [x] Rendering KiCAD 7 schematics
-    - [x] Rendering KiCAD 7 boards
-    - [x] Rendering KiCAD 7 text
+    - [x] Rendering KiCad 7 schematics
+    - [x] Rendering KiCad 7 boards
+    - [x] Rendering KiCad 7 text
     - [ ] Rendering bitmap objects
     - [ ] Rendering custom fonts
 - [ ] Viewer functionality
@@ -36,7 +36,7 @@ Here's a non-exhaustive roadmap:
     - [x] Board object visibility controls
     - [ ] Board trace selection
     - [ ] Board zone selection
-    - [ ] Copy selected item for pasting into KiCAD
+    - [ ] Copy selected item for pasting into KiCad
     - [x] Theming
     - [ ] Onion view
 - [x] Standalone web application (kicanvas.org)

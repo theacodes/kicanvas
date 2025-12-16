@@ -62,7 +62,7 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
 
         assert.equal(sch.wires.length, 11);
 
-        // note: KiCAD saves stuff out of order, so the numbers here
+        // note: KiCad saves stuff out of order, so the numbers here
         // are goofy. They reflect the visual order of the wires/buses.
         const wire1 = sch.wires[7];
         assert_deep_partial(wire1, {

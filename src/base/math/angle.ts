@@ -32,7 +32,7 @@ export class Angle {
     /** Round degrees to two decimal places
      *
      * A lot of math involving angles is done with degrees to two decimal places
-     * instead of radians to match KiCAD's behavior and to avoid floating point
+     * instead of radians to match KiCad's behavior and to avoid floating point
      * nonsense.
      */
     static round(degrees: number): number {

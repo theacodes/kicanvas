@@ -158,7 +158,7 @@ class KiCanvasShellElement extends KCUIElement {
                         <strong>interactive</strong>
                         ,
                         <strong>browser-based</strong>
-                        viewer for KiCAD schematics and boards. You can learn
+                        viewer for KiCad schematics and boards. You can learn
                         more from the
                         <a href="https://kicanvas.org/home" target="_blank"
                             >docs</a
@@ -177,7 +177,7 @@ class KiCanvasShellElement extends KCUIElement {
                         placeholder="Paste a GitHub link..."
                         autofocus />
                     <p>
-                        or drag & drop your KiCAD files, or<button
+                        or drag & drop your KiCad files, or<button
                             name="open_local"
                             class="link_button">
                             open from local

@@ -34,7 +34,7 @@ export class KCHelpPanel extends KCUIElement {
                     <p>
                         You're using
                         <a href="https://kicanvas.org/home">KiCanvas</a>, an
-                        interactive, browser-based viewer for KiCAD schematics
+                        interactive, browser-based viewer for KiCad schematics
                         and boards.
                     </p>
                     <p>

@@ -1,6 +1,6 @@
 # KiCanvas
 
-[KiCanvas] is an **interactive**, **browser-based** viewer for [KiCAD] schematics and boards. You can try it out for yourself at [kicanvas.org](https://kicanvas.org).
+[KiCanvas] is an **interactive**, **browser-based** viewer for [KiCad] schematics and boards. You can try it out for yourself at [kicanvas.org](https://kicanvas.org).
 
 <video src="https://user-images.githubusercontent.com/250995/233475339-43c89a26-c825-4999-9d0a-7bde690c96ca.mp4" controls="true"></video>
 
@@ -13,7 +13,7 @@ You can also use KiCanvas on your own websites using the [embedding API](embeddi
 KiCanvas is developed by [Thea Flowers](https://thea.codes) with financial support from her [sponsors].
 
 [KiCanvas]: http://kicanvas.org/home/
-[KiCAD]: https://kicad.org
+[KiCad]: https://kicad.org
 [file an issue]: https://github.com/theacodes/kicanvas/issues/new/choose
 [TypeScript]: https://typescript.dev
 [Canvas]: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
@@ -25,8 +25,8 @@ KiCanvas is developed by [Thea Flowers](https://thea.codes) with financial suppo
 
 In general, please check the [GitHub issues] page before filing new issues. Some high-level things that we known won't work:
 
-- Any KiCAD 5 files, KiCanvas can only parse files from KiCAD 6 and later.
-- Some KiCAD 7 features might not be fully implemented, such as custom fonts in schematics.
+- Any KiCad 5 files, KiCanvas can only parse files from KiCad 6 and later.
+- Some KiCad 7 features might not be fully implemented, such as custom fonts in schematics.
 - Browsers other than desktop Chrome, Firefox, and Safari may run into issues, as we aren't currently running automated tests against other browsers. We welcome issues related to browser compatibility, just make sure it hasn't already been reported.
 
 [GitHub issues]: https://github.com/theacodes/kicanvas/issues
@@ -43,15 +43,15 @@ Yes, but, it's all very early stages. See [embedding](embedding.md) for more det
 
 > Do I need to use a plugin to show my files in KiCanvas
 
-Nope, not at all. KiCanvas reads KiCAD files directly.
+Nope, not at all. KiCanvas reads KiCad files directly.
 
-> Are you going to support KiCAD 7 features? Custom fonts?
+> Are you going to support KiCad 7 features? Custom fonts?
 
-Yes. I'm actively working on bringing KiCanvas up to parity with KiCanvas 7, including custom fonts. For the time being, KiCAD 7 files should parse and load in KiCanvas, however, KiCanvas may not render some KiCAD 7 features correctly.
+Yes. I'm actively working on bringing KiCanvas up to parity with KiCad 7, including custom fonts. For the time being, KiCad 7 files should parse and load in KiCanvas, however, KiCanvas may not render some KiCad 7 features correctly.
 
 > Will KiCanvas support something like [InteractiveHtmlBom]?
 
-Yes, KiCanvas will eventually let you view PCBs in "Assembly guide" mode. This won't require any extra KiCAD plugins or anything.
+Yes, KiCanvas will eventually let you view PCBs in "Assembly guide" mode. This won't require any extra KiCad plugins or anything.
 
 [InteractiveHtmlBom]: https://github.com/openscopeproject/InteractiveHtmlBom
 
@@ -59,15 +59,15 @@ Yes, KiCanvas will eventually let you view PCBs in "Assembly guide" mode. This w
 
 Because KiCanvas's developer-facing APIs for embedding and parsing are not yet ready. I don't want to publish it only to immediately break users as I rapidly iterate and change things. These developer APIs are my next priority after getting rendering to a good state. Stay tuned.
 
-> Why don't you support KiCAD 5 files?
+> Why don't you support KiCad 5 files?
 
-KiCAD 5 files are a completely different format from V6 and onwards. Implementing parsers for that format would take a lot of time and I'm not interested in doing it.
+KiCad 5 files are a completely different format from V6 and onwards. Implementing parsers for that format would take a lot of time and I'm not interested in doing it.
 
 > Why didn't you use [x] library/framework?
 
 From the outset I wanted KiCanvas to be dependency-free. KiCanvas should not pull in any additional libraries that may interfere with the page its embedding on.
 
-> Lol are you going to port all of KiCAD to the browser?
+> Lol are you going to port all of KiCad to the browser?
 
 No, KiCanvas is explicitly read-only and due to that assumption being baked in it wouldn't serve as a good base for a browser-based editor.
 

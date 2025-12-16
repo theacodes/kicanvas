@@ -1,6 +1,6 @@
 # KiCanvas
 
-[KiCanvas] is an **interactive**, **browser-based** viewer for [KiCAD] schematics and boards. You can try it out for yourself at https://kicanvas.org.
+[KiCanvas] is an **interactive**, **browser-based** viewer for [KiCad] schematics and boards. You can try it out for yourself at https://kicanvas.org.
 
 https://user-images.githubusercontent.com/250995/233475339-43c89a26-c825-4999-9d0a-7bde690c96ca.mp4
 
@@ -11,7 +11,7 @@ You can also use KiCanvas on your own websites using the [embedding API]. It's w
 KiCanvas is developed by [Thea Flowers](https://thea.codes) with financial support from her [sponsors].
 
 [KiCanvas]: https://kicanvas.org
-[KiCAD]: https://kicad.org
+[KiCad]: https://kicad.org
 [file an issue]: https://github.com/theacodes/kicanvas/issues/new/choose
 [embedding API]: https://kicanvas.org/embedding
 [TypeScript]: https://typescript.dev
@@ -30,8 +30,8 @@ KiCanvas is very early in its development and there's a ton of stuff that hasn't
 
 In general, please check the [GitHub issues] page before filing new issues. Some high-level things that we know won't work:
 
-- Any KiCAD 5 files, KiCanvas can only parse files from KiCAD 6 and later.
-- Some KiCAD 7 features might not be fully implemented, such as custom fonts in schematics.
+- Any KiCad 5 files, KiCanvas can only parse files from KiCad 6 and later.
+- Some KiCad 7 features might not be fully implemented, such as custom fonts in schematics.
 - Browsers other than desktop Chrome, Firefox, and Safari may run into issues, as we aren't currently running automated tests against other browsers. We welcome issues related to browser compatibility, just make sure it hasn't already been reported.
 
 [GitHub issues]: https://github.com/theacodes/kicanvas/issues

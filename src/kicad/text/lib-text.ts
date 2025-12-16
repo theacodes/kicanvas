@@ -12,7 +12,7 @@ import { EDAText } from "./eda-text";
  * text and doesn't include fields, pin names, or pin numbers.
  *
  * Note: the methods normalize_text, rotate, mirror_horizontal, and
- * mirror_vertical are all implemented in order to match KiCAD's behavior, see
+ * mirror_vertical are all implemented in order to match KiCad's behavior, see
  * apply_symbol_transformations().
  *
  */
@@ -52,7 +52,7 @@ export class LibText extends EDAText {
     /**
      * Returns the center of the text's BBox in world coordinates.
      *
-     * This contains the positioning logic KiCAD performs in
+     * This contains the positioning logic KiCad performs in
      * SCH_PAINTER::Draw(LIB_TEXT). It made more sense for it to be here for
      * us.
      */
@@ -93,12 +93,12 @@ export class LibText extends EDAText {
      * Applies symbol transformation (rotation, position, mirror).
      *
      * Uses the rotate() and mirror_*() methods to properly orient and position
-     * symbol text, since KiCAD does not directly use a symbol's transformation
-     * to orient text. Instead, KiCAD deep copies the library symbol then calls
+     * symbol text, since KiCad does not directly use a symbol's transformation
+     * to orient text. Instead, KiCad deep copies the library symbol then calls
      * rotate() on text items multiple times based on the symbol instance's
      * rotation. This makes it non-trivial to directly set the text's location
      * and orientation, so we adopt their somewhat convoluted method. See
-     * KiCAD's sch_painter.cpp::orientSymbol.
+     * KiCad's sch_painter.cpp::orientSymbol.
      */
     apply_symbol_transformations(transforms: {
         position: Vec2;
@@ -167,7 +167,7 @@ export class LibText extends EDAText {
     /**
      * Rotate the text
      *
-     * KiCAD's rotation of LIB_TEXT objects is somewhat convoluted, but
+     * KiCad's rotation of LIB_TEXT objects is somewhat convoluted, but
      * essentially the text is moved to the center of its current bounding box,
      * rotated around the center, and then offset from the center of the
      * bounding box based on the text justification.

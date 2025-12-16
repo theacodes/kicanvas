@@ -95,7 +95,7 @@ suite("sch.painters.pin.PinPainter", function () {
 
 suite("sch.painters.pin.PinShapeInternals", function () {
     test(".stem()", function () {
-        // Reference data from KiCAD debugging
+        // Reference data from KiCad debugging
         let stem;
 
         stem = PinShapeInternals.stem(new Vec2(1714500, 876300), "left", 25400);
@@ -129,7 +129,7 @@ suite("sch.painters.pin.PinShapeInternals", function () {
 });
 
 suite("sch.painters.pin.PinLabelInternals", function () {
-    // Reference data from KiCAD debugging
+    // Reference data from KiCad debugging
     const text_margin = 1016;
     const pin_thickness = 1524;
     const text_thickness = 1524;

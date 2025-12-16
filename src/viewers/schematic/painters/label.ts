@@ -12,10 +12,10 @@ import { LayerNames, ViewLayer } from "../layers";
 import { SchematicItemPainter } from "./base";
 
 /**
- * Implements KiCAD rendering logic for net, global, and hierarchical labels.
+ * Implements KiCad rendering logic for net, global, and hierarchical labels.
  *
  * This is similar in scope to the SymbolPin, EDAText class and its children.
- * It's designed to recreate KiCAD's behavior as closely as possible.
+ * It's designed to recreate KiCad's behavior as closely as possible.
  *
  * This logic is adapted from:
  * - SCH_LABEL_BASE

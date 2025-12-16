@@ -5,9 +5,9 @@
 */
 
 /**
- * Transforms KiCAD's newstroke font into a format KiCanvas can use.
+ * Transforms KiCad's newstroke font into a format KiCanvas can use.
  *
- * Newstroke is distributed as a .cpp file and a old-format KiCAD library,
+ * Newstroke is distributed as a .cpp file and a old-format KiCad library,
  * this script transforms it into a .ts file so it can be easily imported
  * into KiCanvas
  *

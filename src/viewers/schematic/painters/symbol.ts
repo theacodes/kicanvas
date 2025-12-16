@@ -155,15 +155,15 @@ export type SymbolTransform = {
 /**
  * Determines the symbol position, orientation, and mirroring
  *
- * This is based on SCH_PAINTER::orientSymbol, where KiCAD does some fun logic
+ * This is based on SCH_PAINTER::orientSymbol, where KiCad does some fun logic
  * to place a symbol instance. This tries to replicate that.
  */
 function get_symbol_transform(
     symbol: schematic_items.SchematicSymbol,
 ): SymbolTransform {
-    // Note: KiCAD uses a 2x2 transformation matrix for symbol orientation. It's
+    // Note: KiCad uses a 2x2 transformation matrix for symbol orientation. It's
     // literally the only place that uses this wacky matrix. We approximate it
-    // with carefully crafted Matrix3s. KiCAD's symbol matrix is defined as
+    // with carefully crafted Matrix3s. KiCad's symbol matrix is defined as
     //      [x1, x2]
     //      [y1, y2]
     // which cooresponds to a Matrix3 of

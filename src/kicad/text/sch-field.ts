@@ -17,7 +17,7 @@ type Parent = {
  * Represents a symbol (or sheet) "field", such as the reference, value, or
  * other properties shown along with the symbol.
  *
- * This corresponds to and is roughly based on KiCAD's SCH_FIELD class.
+ * This corresponds to and is roughly based on KiCad's SCH_FIELD class.
  */
 export class SchField extends EDAText {
     constructor(
@@ -42,11 +42,11 @@ export class SchField extends EDAText {
         const parent_transform = this.parent?.transform ?? Matrix3.identity();
 
         // Note: this checks the parent's rotation based on its transform.
-        // KiCAD represents transforms with a simple 2x2 matrix which
+        // KiCad represents transforms with a simple 2x2 matrix which
         // can be made from a Matrix3 using:
         // kicad_matrix = [
         //      m.elements[0], m.elements[1], m.elements[3], m.elements[4]];
-        // KiCAD sets the transform of a symbol instance in
+        // KiCad sets the transform of a symbol instance in
         // SCH_SEXPR_PARSER::parseSchematicSymbol() to one of four values
         // depending on the orientation:
         //
