@@ -31,7 +31,7 @@ suite("sch.painters.label.LabelPainter()", function () {
     const schtext = new SchText("abc");
 
     test(".get_text_offset()", function () {
-        // Reference values from KiCAD debugging
+        // Reference values from KiCad debugging
         schtext.text_size.set(12700, 12700);
         assert.equal(painter.get_text_offset(schtext), 1905);
 
@@ -40,7 +40,7 @@ suite("sch.painters.label.LabelPainter()", function () {
     });
 
     test(".get_box_expansion()", function () {
-        // Reference values from KiCAD debugging
+        // Reference values from KiCad debugging
         schtext.text_size.set(12700, 12700);
         assert.equal(painter.get_box_expansion(schtext), 4763);
 
@@ -51,7 +51,7 @@ suite("sch.painters.label.LabelPainter()", function () {
     test(".get_schematic_text_offset()", function () {
         let offset: Vec2;
 
-        // Reference values from KiCAD debugging
+        // Reference values from KiCad debugging
         schtext.text_size.set(12700, 12700);
         offset = painter.get_schematic_text_offset(null!, schtext);
         assert.equal(offset.x, 0);
@@ -83,7 +83,7 @@ suite("sch.painters.label.GlobalLabelPainter()", function () {
         let offset: Vec2;
         schtext.text_size.set(12700, 12700);
 
-        // Reference values from KiCAD debugging
+        // Reference values from KiCad debugging
         offset = painter.get_schematic_text_offset(label, schtext);
         assert.equal(offset.x, 4763);
         assert.equal(offset.y, 908);
@@ -118,7 +118,7 @@ suite("sch.painters.label.GlobalLabelPainter()", function () {
         let offset: Vec2;
         schtext.text_size.set(12700, 12700);
 
-        // Reference values from KiCAD debugging
+        // Reference values from KiCad debugging
         offset = painter.get_schematic_text_offset(label, schtext);
         assert.equal(offset.x, 14288);
         assert.equal(offset.y, 908);
@@ -145,7 +145,7 @@ suite("sch.painters.label.HierarchicalLabelPainter()", function () {
 
         let offset: Vec2;
 
-        // Reference values from KiCAD debugging
+        // Reference values from KiCad debugging
         schtext.text_size.set(12700, 12700);
         offset = painter.get_schematic_text_offset(label, schtext);
         assert.equal(offset.x, 14605);

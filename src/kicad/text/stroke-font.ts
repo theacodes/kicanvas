@@ -14,7 +14,7 @@ import * as newstroke from "./newstroke-glyphs";
  *
  * Stroke font are "Hershey" fonts comprised of strokes.
  *
- * This class is adapted from KiCAD's STROKE_FONT.
+ * This class is adapted from KiCad's STROKE_FONT.
  */
 export class StrokeFont extends Font {
     static readonly overbar_position_factor = 1.4;
@@ -100,7 +100,7 @@ export class StrokeFont extends Font {
             bold,
             italic,
         );
-        // KiCAD grows the bounding box a little for stroke fonts to
+        // KiCad grows the bounding box a little for stroke fonts to
         // accommodate descenders and such.
         const padding = thickness * 1.25 * 2;
         extents.x += padding;
@@ -117,7 +117,7 @@ export class StrokeFont extends Font {
     }
 
     override get_interline(glyph_height: number, line_spacing = 1): number {
-        // KiCAD doesn't include glyph thickness for interline spacing in
+        // KiCad doesn't include glyph thickness for interline spacing in
         // order to keep the spacing between bold and normal text the same.
         return glyph_height * line_spacing * StrokeFont.interline_pitch_ratio;
     }
@@ -206,7 +206,7 @@ export class StrokeFont extends Font {
         let has_bar = false;
         const bar_offset = new Vec2(0, 0);
 
-        // KiCAD shortens the overbar slightly
+        // KiCad shortens the overbar slightly
         const bar_trim = glyph_size.x * 0.1;
 
         if (style.overbar) {
@@ -220,7 +220,7 @@ export class StrokeFont extends Font {
         }
 
         // Note: KiCanvas treats underline and overbar as mutually exclusive,
-        // but technically KiCAD can show both at the same time. I wasn't able
+        // but technically KiCad can show both at the same time. I wasn't able
         // to find an actual real world case of this.
         if (has_bar) {
             if (style.italic) {
@@ -287,10 +287,10 @@ function decode_coord(c: [string, string]): [number, number] {
 /**
  * Parses a newstroke glyph
  *
- * Newstroke is distributed as a .cpp file and a old-format KiCAD library,
+ * Newstroke is distributed as a .cpp file and a old-format KiCad library,
  * this script reads a JS-ified version.
  *
- * The code here is based on KiCAD's STROKE_FONT::LoadNewStrokeFont
+ * The code here is based on KiCad's STROKE_FONT::LoadNewStrokeFont
  *
  *  Notes:
  *  - Coordinate values are coded as ASCII characters relative to "R".

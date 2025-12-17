@@ -55,7 +55,7 @@ export class KCSchematicInfoPanel extends KCUIElement {
                         ${entry("Width", ds.width, "mm")}
                         ${entry("Height", ds.height, "mm")}
                         ${header("Schematic properties")}
-                        ${entry("KiCAD version", schematic.version)}
+                        ${entry("KiCad version", schematic.version)}
                         ${entry("Generator", schematic.generator)}
                         ${entry("Title", schematic.title_block?.title)}
                         ${entry("Date", schematic.title_block?.date)}

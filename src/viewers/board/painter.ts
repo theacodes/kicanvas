@@ -213,7 +213,7 @@ class RectPainter extends GraphicItemPainter {
 
         const color = layer.color;
 
-        // use the same order as kicad
+        // use the same order as KiCad
         // https://gitlab.com/kicad/code/develop/-/blob/master/common/eda_shape.cpp#L1616
         const points = [
             r.start,
@@ -465,7 +465,7 @@ class PadPainter extends NetNameItemPainter {
     classes = [board_items.Pad];
 
     layers_for(pad: board_items.Pad): string[] {
-        // TODO: Port KiCAD's logic over.
+        // TODO: Port KiCad's logic over.
         const layers: string[] = [];
 
         for (const layer of pad.layers) {
@@ -675,7 +675,7 @@ class PadPainter extends NetNameItemPainter {
                     break;
                 case "roundrect":
                 case "trapezoid":
-                    // KiCAD approximates rounded rectangles using four line segments
+                    // KiCad approximates rounded rectangles using four line segments
                     // with their width set to the round radius. Clever bastards.
                     // Since our polylines aren't filled, we'll add both a polygon
                     // and a polyline.
@@ -1187,7 +1187,7 @@ class DimensionPainter extends BoardItemPainter {
         this.gfx.line([ext_start, ext_end], thickness, layer.color);
 
         // Draw crossbar
-        // TODO: KiCAD checks to see if the text overlaps the crossbar and
+        // TODO: KiCad checks to see if the text overlaps the crossbar and
         // conditionally splits or hides the crossbar.
         this.gfx.line([xbar_start, xbar_end], thickness, layer.color);
 

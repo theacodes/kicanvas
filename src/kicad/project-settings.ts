@@ -9,7 +9,7 @@ import { merge } from "../base/object";
 /**
  * Holds configuration and settings from a .kicad_pro file.
  *
- * See KiCAD's PROJECT_FILE class
+ * See KiCad's PROJECT_FILE class
  */
 export class ProjectSettings {
     public board: BoardSettings = new BoardSettings();

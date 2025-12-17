@@ -31,7 +31,7 @@ This project contains copies or makes use of other works. These works and their 
 license and terms are:
 
 - Earcut by Mapbox, licensed under the ISC license. Retrived from https://github.com/mapbox/earcut.
-- Newstroke by Vladimir Uryvaev, Lingdong Huang, Adobe, and KiCAD contributors. Originally licensed under Creative Commons CC0 1.0, amended with an MIT-like license, and utilizes glyphs that are licensed under the SIL Open Font License Version 1.1.
+- Newstroke by Vladimir Uryvaev, Lingdong Huang, Adobe, and KiCad contributors. Originally licensed under Creative Commons CC0 1.0, amended with an MIT-like license, and utilizes glyphs that are licensed under the SIL Open Font License Version 1.1.
 - Material Symbols by Google, licensed under the Apache License, Version 2.0. Retrieved from https://github.com/google/material-design-icons.
 - Nunito by Vernon Adams, Manvel Shmavonyan, licensed under the Open Font License. Retrieved from https://fonts.google.com/specimen/Nunito/about
 - Bellota by Kemie Guaida, licensed under the Open Font License. Retrieved from https://fonts.google.com/specimen/Bellota/about

@@ -1169,7 +1169,7 @@ class GraphicItem implements HasUniqueID, HasStrokeParams {
         const plot_cfg = pcb?.setup?.pcbplotparams;
 
         // dashed_line_gap_ratio = 3, dashed_line_dash_ratio = 12
-        // is the default values from kicad
+        // is the default values from KiCad
         return {
             stroke: this.stroke,
             dashed_line_gap_ratio: plot_cfg?.dashed_line_gap_ratio ?? 3,

@@ -478,7 +478,7 @@ export class Bezier extends GraphicItem {
     pts: Vec2[];
 
     constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
-        /* TODO: this was added in KiCAD 7 */
+        /* TODO: this was added in KiCad 7 */
         super(parent);
         Object.assign(
             this,
@@ -661,7 +661,7 @@ export class TextBox extends GraphicItem {
     effects = new Effects();
 
     constructor(expr: Parseable, parent?: LibSymbol | SchematicSymbol) {
-        /* TODO: This was added in KiCAD 7 */
+        /* TODO: This was added in KiCad 7 */
         super(parent);
         Object.assign(
             this,
@@ -957,7 +957,7 @@ export class LibSymbol {
     }
 
     get unit(): number {
-        // KiCAD encodes the symbol unit into the name, for example,
+        // KiCad encodes the symbol unit into the name, for example,
         // MCP6001_1_1 is unit 1 and MCP6001_2_1 is unit 2.
         // Unit 0 is common to all units.
         // See SCH_SEXPR_PARSER::ParseSymbol.
@@ -970,7 +970,7 @@ export class LibSymbol {
     }
 
     get style(): number {
-        // KiCAD "De Morgan" body styles are indicated with a number greater
+        // KiCad "De Morgan" body styles are indicated with a number greater
         // than one at the end of the symbol name.
         // MCP6001_1_1 is the normal body and and MCP6001_1_2 is the alt style.
         // Style 0 is common to all styles.

@@ -20,7 +20,7 @@ suite("text.font.Font()", function () {
             new TextStyle(),
         );
 
-        // TODO: Validate sizes with KiCAD data.
+        // TODO: Validate sizes with KiCad data.
         assert.equal(words.length, 5);
         assert.equal(words[0]!.word, "hello");
         assert.equal(words[1]!.word, "world");
@@ -34,7 +34,7 @@ suite("text.font.Font()", function () {
             new TextStyle(),
         );
 
-        // Note: width reference values pulled from KiCAD debugging
+        // Note: width reference values pulled from KiCad debugging
         assert.equal(words.length, 6);
         assert.equal(words[0]!.word, "hello");
         assert.equal(Math.round(words[0]!.width), 47170);

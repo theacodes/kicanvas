@@ -96,7 +96,7 @@ export class Vec2 {
     }
 
     /**
-     * KiCAD has to be weird about this, ofc.
+     * KiCad has to be weird about this, ofc.
      */
     get kicad_angle(): Angle {
         // See explicit EDA_ANGLE( const VECTOR2D& aVector )

@@ -8,7 +8,7 @@
 
     KiCanvas is in **alpha**. This is a proposed API with an incomplete implementation. Everything here is subject to change and you should be cautious if using it on your own web page.
 
-The `<kicanvas-embed>` HTML element embeds one or more KiCAD documents onto the page:
+The `<kicanvas-embed>` HTML element embeds one or more KiCad documents onto the page:
 
 ```html
 <kicanvas-embed src="my-schematic.kicad_sch"></kicanvas-embed>
@@ -99,7 +99,7 @@ You can switch between the displayed files using the project panel on the right 
 
 ### Inline source
 
-This example shows how to use `<kicanvas-source>` along with inline KiCAD data. In this case, it's a symbol copied from a schematic and pasted into the HTML source:
+This example shows how to use `<kicanvas-source>` along with inline KiCad data. In this case, it's a symbol copied from a schematic and pasted into the HTML source:
 
 ```html
 <kicanvas-embed>
@@ -154,7 +154,7 @@ This example shows how to use `<kicanvas-source>` along with inline KiCAD data. 
     - `nohelp` - don't show the help panel. ⚠️
 - `src` - the URL of the document to embed. If you want to show multiple documents within a single viewer, you can use multiple child `<kicanvas-source>` elements.
 - `type` - when providing the file source inline, this explicitly sets the file type. If not specified, KiCanvas will attempt to determine the type automatically. If specified, it should be one of `schematic`, `board`, `project`, or `worksheet`.
-- `name` - when providing the file source inline, this explicitly sets the file name. This is typically only necessary when there are multiple files within a project, as KiCAD uses the file name to link schematic sheets, drawing sheets, and PCBs together. If unspecified, KiCanvas will generate a file name like `inline_0.kicad_sch`.
+- `name` - when providing the file source inline, this explicitly sets the file name. This is typically only necessary when there are multiple files within a project, as KiCad uses the file name to link schematic sheets, drawing sheets, and PCBs together. If unspecified, KiCanvas will generate a file name like `inline_0.kicad_sch`.
 - `theme` - sets the color theme to use, valid values are `kicad` and `witchhazel`. ⚠️
 - `zoom` - sets the initial view into the document. ⚠️
     - `objects` - zooms to show all visible objects (default). ⚠️

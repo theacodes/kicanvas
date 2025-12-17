@@ -119,7 +119,7 @@ export class Color {
     }
 
     desaturate() {
-        // From KiCAD's COLOR4D::Desaturate
+        // From KiCad's COLOR4D::Desaturate
         if (this.r == this.g && this.r == this.b) {
             return this;
         }

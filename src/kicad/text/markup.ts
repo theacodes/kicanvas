@@ -5,9 +5,9 @@
 */
 
 /**
- * KiCAD text markup parser
+ * KiCad text markup parser
  *
- * KiCAD uses basic text markup to express subscript, superscript, and overbar
+ * KiCad uses basic text markup to express subscript, superscript, and overbar
  * text. For example "normal ^{superscript} _{subscript} ~{overbar}".
  */
 export class Markup {

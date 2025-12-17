@@ -1,6 +1,6 @@
 #! /usr/bin/awk -f
 #
-# awk script to convert KiCAD font.
+# awk script to convert KiCad font.
 
 BEGIN {
 	print "/* Automatically converted font */"
@@ -183,7 +183,7 @@ function gaccent(b,g,anc,cx) {
 	if(!(cname(g) in fontnst)) {
 		missed += 1
 	}
-	
+
 	if(anc=="" || anc=="#") anc=""
 	ofx = offsetx(b,g,anc)
 	ofy = offsety(b,g,anc)

@@ -396,7 +396,7 @@ class PropertyPainter extends SchematicItemPainter {
         schfield.apply_effects(p.effects);
         schfield.attributes.angle = Angle.from_degrees(p.at.rotation);
 
-        // Position is tricky. KiCAD's parser calls into SCH_FIELD::SetPosition
+        // Position is tricky. KiCad's parser calls into SCH_FIELD::SetPosition
         // when parsing which sets the position relative to the parent transform
         // but KiCanvas doesn't do any of that. So we have to do that transform
         // here.

@@ -20,7 +20,7 @@ const font = StrokeFont.default();
 
 suite("text.stroke_font.StrokeFont()", function () {
     test(".get_glyph()", function () {
-        // Expected values here are pulled from KiCAD's memory after loading Newstroke.
+        // Expected values here are pulled from KiCad's memory after loading Newstroke.
 
         // space should have no strokes, but still have a bounding box.
         const space = font.get_glyph(" ");
@@ -56,7 +56,7 @@ suite("text.stroke_font.StrokeFont()", function () {
     });
 
     test(".get_interline()", function () {
-        // Expected values here are pulled from KiCAD via debugging calls to respective StrokeFont methods.
+        // Expected values here are pulled from KiCad via debugging calls to respective StrokeFont methods.
 
         assert.closeTo(font.get_interline(38100, 1), 61722, 0.5);
         assert.closeTo(font.get_interline(12700, 1), 20574, 0.5);
@@ -72,7 +72,7 @@ suite("text.stroke_font.StrokeFont()", function () {
     });
 
     test(".get_text_as_glyphs()", function () {
-        // Expected values pulled from KiCAD via debugging to StrokeFont::GetTextAsGlyphs
+        // Expected values pulled from KiCad via debugging to StrokeFont::GetTextAsGlyphs
 
         const text = "text";
         const size = new Vec2(12700, 12700);
@@ -137,7 +137,7 @@ suite("text.stroke_font.StrokeFont()", function () {
     });
 
     test(".get_text_as_glyphs() with rotated, italic", function () {
-        // Expected values pulled from KiCAD via debugging to StrokeFont::GetTextAsGlyphs
+        // Expected values pulled from KiCad via debugging to StrokeFont::GetTextAsGlyphs
 
         const text = "hello";
         const size = new Vec2(12700, 12700);
@@ -285,7 +285,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         const layer = renderer.end_layer();
         const shapes = layer.shapes;
 
-        // Reference data from KiCAD debugging.
+        // Reference data from KiCad debugging.
         assert.equal(shapes.length, 5);
 
         let stroke = (shapes[0] as Polyline).points;
@@ -358,7 +358,7 @@ suite("text.stroke_font.StrokeFont()", function () {
         const layer = renderer.end_layer();
         const shapes = layer.shapes;
 
-        // Reference data from KiCAD debugging.
+        // Reference data from KiCad debugging.
         assert.equal(shapes.length, 5);
 
         let stroke = (shapes[0] as Polyline).points;

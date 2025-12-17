@@ -18,10 +18,10 @@ import { LayerNames, ViewLayer } from "../layers";
 import { SchematicItemPainter } from "./base";
 
 /**
- * Implements KiCAD rendering logic for symbol pins.
+ * Implements KiCad rendering logic for symbol pins.
  *
  * This is similar in scope to the EDAText class and its children.  It's
- * designed to recreate KiCAD's behavior as closely as possible.
+ * designed to recreate KiCad's behavior as closely as possible.
  *
  * The logic here is based a few small bits of LIB_PIN and EDA_ITEM, with the
  * vast majority adapted from SCH_PAINTER::draw( const LIB_PIN, ...), which is
@@ -78,9 +78,9 @@ export class PinPainter extends SchematicItemPainter {
     /**
      * Applies symbol transformation (rotation, position, mirror).
      *
-     * KiCAD doesn't directly set the transformation for symbol items, instead,
+     * KiCad doesn't directly set the transformation for symbol items, instead,
      * it indirectly sets them through individual rotations and transforms.
-     * See KiCAD's sch_painter.cpp::orientSymbol.
+     * See KiCad's sch_painter.cpp::orientSymbol.
      */
     static apply_symbol_transformations(
         pin: PinInfo,
@@ -297,7 +297,7 @@ type PinOrientation = "right" | "left" | "up" | "down";
 /**
  * Converts a rotation to a pin orientation.
  *
- * KiCAD saves pin orientation as a rotation, but presents it to the UI and
+ * KiCad saves pin orientation as a rotation, but presents it to the UI and
  * does placement based on the "orientation" which is simply left, right, up,
  * or down.
  */

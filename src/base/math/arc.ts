@@ -159,7 +159,7 @@ export class Arc {
             [end, start] = [start, end];
         }
 
-        // TODO: Pull KiCAD's logic for this, since it adds more segments the
+        // TODO: Pull KiCad's logic for this, since it adds more segments the
         // larger the arc is.
         for (let theta = start; theta < end; theta += Math.PI / 32) {
             points.push(
@@ -239,7 +239,7 @@ export class Arc {
 /**
  * Figure out the center point of a circular arc given three points along the circle.
  *
- * Ported from KiCAD's KiMATH trigo
+ * Ported from KiCad's KiMATH trigo
  */
 function arc_center_from_three_points(start: Vec2, mid: Vec2, end: Vec2): Vec2 {
     const sqrt_1_2 = Math.SQRT1_2;

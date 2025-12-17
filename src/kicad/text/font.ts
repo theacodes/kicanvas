@@ -14,13 +14,13 @@ import { Markup, MarkupNode } from "./markup";
  * Defines the interface and common methods used for both
  * stroke fonts and (eventually) outline fonts.
  *
- * Note: KiCAD always passes any coordinates or sizes in scaled internal units
+ * Note: KiCad always passes any coordinates or sizes in scaled internal units
  * (1 UI = 1 nm for PCBNew and 1 UI = 100 nm for EESchema). That is, 1.27 mm is
- * represented as 12700 IU for EESchema and 1270000 IU for PCBNew. See KiCAD's
+ * represented as 12700 IU for EESchema and 1270000 IU for PCBNew. See KiCad's
  * EDA_UNITS for more details. Importantly, this means this code will likely
  * not work as expected if you use unscaled units!
  *
- * This is largely adapted from KiCAD's KIFONT::FONT base class and beaten
+ * This is largely adapted from KiCad's KIFONT::FONT base class and beaten
  * to death with a TypeScript hammer.
  */
 export abstract class Font {
@@ -54,7 +54,7 @@ export abstract class Font {
     /**
      * Computes the width and height of a single line of marked up text.
      *
-     * Corresponds to KiCAD's FONT::StringBoundaryLimits
+     * Corresponds to KiCad's FONT::StringBoundaryLimits
      *
      * Used by EDAText.get_text_box(), which, inexplicably, doesn't use
      * get_line_bbox() for what I can only assume is historical reasons.
@@ -94,7 +94,7 @@ export abstract class Font {
      * Adds additional line breaks to the given marked up text in order to limit
      * the overall width to the given column_width.
      *
-     * Note: this behaves like KiCAD's FONT::LinebreakText in that it only
+     * Note: this behaves like KiCad's FONT::LinebreakText in that it only
      * breaks on spaces, it does not break within superscript, subscript, or
      * overbar, and it doesn't bother with justification.
      *
@@ -191,7 +191,7 @@ export abstract class Font {
      *
      * Multitext text must be split before calling this function.
      *
-     * Corresponds to KiCAD's Font::DrawSingleLineText
+     * Corresponds to KiCad's Font::DrawSingleLineText
      *
      * Used by draw()
      */
@@ -241,7 +241,7 @@ export abstract class Font {
     /**
      * Computes the bounding box for a single line of text.
      *
-     * Corresponds to KiCAD's FONT::boundingBoxSingleLine
+     * Corresponds to KiCad's FONT::boundingBoxSingleLine
      *
      * Used by get_line_positions() and draw()
      */
@@ -361,7 +361,7 @@ export abstract class Font {
     /**
      * Converts marked up text to glyphs
      *
-     * Corresponds to KiCAD's FONT::drawMarkup, which doesn't actually draw,
+     * Corresponds to KiCad's FONT::drawMarkup, which doesn't actually draw,
      * just converts to glyphs.
      *
      * Used by string_boundary_limits(), draw_single_line_text(), and
@@ -465,9 +465,9 @@ export abstract class Font {
 
     /** Breaks text up into words, accounting for markup.
      *
-     * Corresponds to KiCAD's FONT::wordbreakMarkup
+     * Corresponds to KiCad's FONT::wordbreakMarkup
      *
-     * As per KiCAD, a word can represent an actual word or a run of text
+     * As per KiCad, a word can represent an actual word or a run of text
      * with subscript, superscript, or overbar applied.
      *
      * Used by SCH_TEXTBOX & PCB_TEXTBOX
