@@ -16,6 +16,7 @@ import {
 import type { SchematicTheme } from "../../kicad";
 import * as schematic_items from "../../kicad/schematic";
 import { LibText, SchField, SchText, StrokeFont } from "../../kicad/text";
+import { StrokePainter } from "../base/painter";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import { BaseSchematicPainter, SchematicItemPainter } from "./painters/base";
 import {
@@ -92,7 +93,11 @@ class PolylinePainter extends SchematicItemPainter {
             return;
         }
 
-        this.gfx.line(new Polyline(pl.pts, width, color));
+        const draw_line = (lines: Vec2[]) => {
+            this.gfx.line(lines, width, color);
+        };
+
+        StrokePainter.line(pl.pts, width, pl.stroke_params, draw_line);
     }
 
     #fill(layer: ViewLayer, pl: schematic_items.Polyline) {

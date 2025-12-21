@@ -17,6 +17,8 @@ import {
     EmbeddedFile,
     expand_text_vars,
     unescape_string,
+    type HasStrokeParams,
+    StrokeParams,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 
@@ -271,7 +273,7 @@ export class Fill {
     }
 }
 
-export class GraphicItem {
+export class GraphicItem implements HasStrokeParams {
     parent?: LibSymbol | SchematicSymbol;
     private = false;
     stroke?: Stroke;
@@ -280,6 +282,16 @@ export class GraphicItem {
 
     constructor(parent?: LibSymbol | SchematicSymbol) {
         this.parent = parent;
+    }
+
+    get stroke_params(): StrokeParams {
+        // TODO
+        // get StrokeParams from project settings
+        return {
+            stroke: this.stroke ?? Stroke.default_value(),
+            dashed_line_gap_ratio: 3,
+            dashed_line_dash_ratio: 12,
+        };
     }
 
     static common_expr_defs = [
