@@ -220,9 +220,13 @@ enum KiCanvasSourceType {
 class KiCanvasSourceElement extends CustomElement {
     constructor() {
         super();
+    }
+
+    override connectedCallback() {
         this.ariaHidden = "true";
         this.hidden = true;
         this.style.display = "none";
+        super.connectedCallback();
     }
 
     is_inline_source(): boolean {
