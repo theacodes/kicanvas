@@ -248,4 +248,21 @@ export abstract class Viewer extends EventTarget {
         this.viewport.camera.bbox = this.selected.grow(10);
         this.draw();
     }
+
+    flip_view() {
+        const flip = !this.viewport.camera.flipped;
+
+        this.viewport.camera.flipped = flip;
+
+        for (const layer of this.layers.in_order()) {
+            if (layer.graphics) {
+                layer.graphics.renderer.state.flipped = flip;
+            }
+        }
+
+        // We need redraw some items because some items are not flippable
+        // TODO: it re-paint all items and is inefficient
+        this.paint();
+        this.draw();
+    }
 }

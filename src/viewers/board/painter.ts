@@ -171,6 +171,9 @@ abstract class NetNameItemPainter extends BoardItemPainter {
         text_attr.size = new Vec2(netname_font_size, netname_font_size);
         text_attr.stroke_width = netname_font_size / 8;
 
+        // Mirror the text if the board is flipped.
+        text_attr.mirrored = this.gfx.state.flipped;
+
         StrokeFont.default().draw(this.gfx, net_name, text_center, text_attr);
     }
 
