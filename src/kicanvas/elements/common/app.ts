@@ -21,6 +21,7 @@ import {
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import type { Viewer } from "../../../viewers/base/viewer";
 import type { Project, ProjectPage } from "../../project";
+import { KCBoardViewerElement } from "../kc-board/viewer";
 
 // import dependent elements so they're registered before use.
 import "./help-panel";
@@ -102,7 +103,6 @@ export abstract class KCViewerAppElement<
         // Handle download button.
         delegate(this.renderRoot, "kc-ui-button", "click", (e) => {
             const target = e.target as KCUIButtonElement;
-            console.log("button", target);
             switch (target.name) {
                 case "download":
                     if (this.project.active_page) {
@@ -110,6 +110,9 @@ export abstract class KCViewerAppElement<
                             this.project.active_page.filename,
                         );
                     }
+                    break;
+                case "flip_view":
+                    this.#viewer_elm.viewer.flip_view();
                     break;
                 default:
                     console.warn("Unknown button", e);
@@ -190,8 +193,8 @@ export abstract class KCViewerAppElement<
         const controlslist = parseFlagAttribute(
             this.controlslist ?? "",
             controls == "none"
-                ? { fullscreen: false, download: false }
-                : { fullscreen: true, download: true },
+                ? { fullscreen: false, download: false, flipview: false }
+                : { fullscreen: true, download: true, flipview: true },
         );
 
         this.#viewer_elm = this.make_viewer_element();
@@ -222,6 +225,21 @@ export abstract class KCViewerAppElement<
                     name="download"
                     title="download"
                     icon="download"
+                    variant="toolbar-alt">
+                </kc-ui-button>`,
+            );
+        }
+
+        if (
+            controlslist["flipview"] &&
+            this.#viewer_elm instanceof KCBoardViewerElement
+        ) {
+            top_toolbar_buttons.push(
+                html`<kc-ui-button
+                    slot="right"
+                    name="flip_view"
+                    title="flip view"
+                    icon="flip"
                     variant="toolbar-alt">
                 </kc-ui-button>`,
             );

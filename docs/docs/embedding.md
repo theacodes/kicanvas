@@ -144,7 +144,9 @@ This example shows how to use `<kicanvas-source>` along with inline KiCad data. 
     - `nooverlay` - don't show the "click or tap to interact" overlay.
     - `nofullscreen` - don't show the fullscreen button. ⚠️
     - `nodownload` - don't show the download button.
-    - `download` - show the download button when used with controls="none". ⚠️
+    - `download` - show the download button when used with controls="none".
+    - `noflipview` - don't show the flip board button.
+    - `flipview` - show the flip board button when used with controls="none".
     - `nosymbols` - don't show the schematic symbols panel. ⚠️
     - `nofootprints` - don't show the board footprints panel. ⚠️
     - `noobjects` - don't show the board objects panel. ⚠️

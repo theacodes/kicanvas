@@ -333,6 +333,7 @@ export class RenderState {
         public fill: Color = Color.black,
         public stroke: Color = Color.black,
         public stroke_width: number = 0,
+        public flipped: boolean = false,
     ) {}
 
     copy() {
@@ -341,6 +342,7 @@ export class RenderState {
             this.fill?.copy(),
             this.stroke?.copy(),
             this.stroke_width,
+            this.flipped,
         );
     }
 }
@@ -392,6 +394,14 @@ export class RenderStateStack {
 
     set stroke_width(n: number) {
         this.top.stroke_width = n;
+    }
+
+    get flipped(): boolean {
+        return this.top.flipped;
+    }
+
+    set flipped(f: boolean) {
+        this.top.flipped = f;
     }
 
     /**

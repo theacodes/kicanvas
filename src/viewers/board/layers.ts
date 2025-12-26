@@ -190,6 +190,16 @@ function is_copper(name: string) {
     return name.endsWith(".Cu");
 }
 
+export function is_manufacturing_layer(name: string) {
+    return (
+        name === LayerNames.edge_cuts ||
+        name === LayerNames.margin ||
+        name.startsWith("F.") ||
+        name.startsWith("B.") ||
+        name.endsWith(".Cu")
+    );
+}
+
 export function* copper_layers_between(
     start_layer_name: string,
     end_layer_name: string,
