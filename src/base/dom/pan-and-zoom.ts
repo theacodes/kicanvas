@@ -200,13 +200,7 @@ export class PanAndZoom {
             1 / this.camera.zoom,
         );
 
-        let center = this.camera.center.add(delta);
-
-        if (this.bounds) {
-            center = this.bounds.constrain_point(center);
-        }
-
-        this.camera.center.set(center);
+        this.camera.translate(delta);
 
         if (this.callback) {
             this.callback();

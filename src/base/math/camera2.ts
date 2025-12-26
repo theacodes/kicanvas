@@ -24,21 +24,30 @@ export class Camera2 {
      * @param {Vec2} center - The point at which the camera's view is centered
      * @param {number} zoom - Scale factor, increasing numbers zoom the camera in.
      * @param {number|Angle} rotation - Rotation (roll) in radians.
+     * @param {boolean} flipped - Flip viewer horizontally. Keep it same as `RenderState.flipped`.
      */
     constructor(
         public viewport_size: Vec2 = new Vec2(0, 0),
         public center: Vec2 = new Vec2(0, 0),
         public zoom: number = 1,
         public rotation: Angle = new Angle(0),
+        public flipped: boolean = false,
     ) {}
 
     /**
      * Relative translation
      * @param v
      */
-    translate(v: Vec2) {
-        this.center.x += v.x;
-        this.center.y += v.y;
+    translate(v: Vec2, bound?: BBox) {
+        const new_pos = this.center.add(
+            new Vec2(this.flipped ? -v.x : v.x, v.y),
+        );
+
+        if (bound) {
+            new_pos.set(bound.constrain_point(new_pos));
+        }
+
+        this.center.set(new_pos);
     }
 
     /**
@@ -57,16 +66,21 @@ export class Camera2 {
         const my = this.viewport_size.y / 2;
         const dx = this.center.x - this.center.x * this.zoom;
         const dy = this.center.y - this.center.y * this.zoom;
-        const left = -(this.center.x - mx) + dx;
+        const left = this.flipped
+            ? -(this.center.x + mx) + dx
+            : -(this.center.x - mx) + dx;
         const top = -(this.center.y - my) + dy;
-        return Matrix3.translation(left, top)
+        const scale = this.flipped ? -1 : 1;
+        return Matrix3.identity()
+            .scale_self(scale, 1)
+            .translate_self(left, top)
             .rotate_self(this.rotation)
             .scale_self(this.zoom, this.zoom);
     }
 
     /**
      * Bounding box representing the camera's view
-     * */
+     */
     get bbox(): BBox {
         const m = this.matrix.inverse();
         const start = m.transform(new Vec2(0, 0));
