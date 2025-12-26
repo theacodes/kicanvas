@@ -26,6 +26,7 @@ import {
     ViewLayer,
     copper_layers_between,
     virtual_layer_for,
+    is_manufacturing_layer,
 } from "./layers";
 import type { BoardTheme } from "../../kicad";
 
@@ -837,6 +838,10 @@ class GrTextPainter extends BoardItemPainter {
         edatext.apply_at(t.at);
 
         edatext.attributes.color = layer.color;
+
+        if (!is_manufacturing_layer(layer.name) && this.gfx.state.flipped) {
+            // TODO: donot flip text in non-manufacturing layers
+        }
 
         this.gfx.state.push();
         StrokeFont.default().draw(

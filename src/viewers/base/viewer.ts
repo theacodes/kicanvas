@@ -146,6 +146,8 @@ export abstract class Viewer extends EventTarget {
         const camera = this.viewport.camera.matrix;
         const should_dim = this.layers.is_any_layer_highlighted();
 
+        // TODO: donot flip drawing sheet and grid
+
         for (const layer of this.layers.in_display_order()) {
             if (layer.visible && layer.graphics) {
                 let alpha = layer.opacity;
