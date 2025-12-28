@@ -146,6 +146,8 @@ export abstract class Viewer extends EventTarget {
         const camera = this.viewport.camera.matrix;
         const should_dim = this.layers.is_any_layer_highlighted();
 
+        // TODO: donot flip drawing sheet and grid
+
         for (const layer of this.layers.in_display_order()) {
             if (layer.visible && layer.graphics) {
                 let alpha = layer.opacity;
@@ -246,6 +248,23 @@ export abstract class Viewer extends EventTarget {
             return;
         }
         this.viewport.camera.bbox = this.selected.grow(10);
+        this.draw();
+    }
+
+    flip_view() {
+        const flip = !this.viewport.camera.flipped;
+
+        this.viewport.camera.flipped = flip;
+
+        for (const layer of this.layers.in_order()) {
+            if (layer.graphics) {
+                layer.graphics.renderer.state.flipped = flip;
+            }
+        }
+
+        // We need redraw some items because some items are not flippable
+        // TODO: it re-paint all items and is inefficient
+        this.paint();
         this.draw();
     }
 }

@@ -26,6 +26,7 @@ import {
     ViewLayer,
     copper_layers_between,
     virtual_layer_for,
+    is_manufacturing_layer,
 } from "./layers";
 import type { BoardTheme } from "../../kicad";
 
@@ -170,6 +171,9 @@ abstract class NetNameItemPainter extends BoardItemPainter {
         text_attr.bold = true;
         text_attr.size = new Vec2(netname_font_size, netname_font_size);
         text_attr.stroke_width = netname_font_size / 8;
+
+        // Mirror the text if the board is flipped.
+        text_attr.mirrored = this.gfx.state.flipped;
 
         StrokeFont.default().draw(this.gfx, net_name, text_center, text_attr);
     }
@@ -834,6 +838,10 @@ class GrTextPainter extends BoardItemPainter {
         edatext.apply_at(t.at);
 
         edatext.attributes.color = layer.color;
+
+        if (!is_manufacturing_layer(layer.name) && this.gfx.state.flipped) {
+            // TODO: donot flip text in non-manufacturing layers
+        }
 
         this.gfx.state.push();
         StrokeFont.default().draw(
