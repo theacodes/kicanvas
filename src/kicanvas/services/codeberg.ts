@@ -22,15 +22,15 @@ export class GetBlobResponse {
     url: string;
 }
 
-export class CodeBerg {
+export class Codeberg {
     static readonly host_name = "codeberg.org";
     static readonly html_base_url = "https://codeberg.org/";
     static readonly base_url = "https://codeberg.org/api/v1/";
     static readonly accept_header = "application/json";
 
     static parse_url(url: string | URL) {
-        url = new URL(url, CodeBerg.html_base_url);
-        if (url.hostname !== CodeBerg.host_name) {
+        url = new URL(url, Codeberg.html_base_url);
+        if (url.hostname !== Codeberg.host_name) {
             return null;
         }
 
@@ -80,7 +80,7 @@ export class CodeBerg {
         params?: Record<string, string>,
         data?: unknown,
     ): Promise<string> {
-        const url = new URL(path, CodeBerg.base_url);
+        const url = new URL(path, Codeberg.base_url);
 
         if (params) {
             const url_params = new URLSearchParams(params).toString();
@@ -90,7 +90,7 @@ export class CodeBerg {
         const request = new Request(url, {
             method: data ? "POST" : "GET",
             headers: {
-                Accept: CodeBerg.accept_header,
+                Accept: Codeberg.accept_header,
             },
             body: data ? JSON.stringify(data) : undefined,
         });
@@ -106,7 +106,7 @@ export class CodeBerg {
         params?: Record<string, string>,
         data?: unknown,
     ): Promise<T> {
-        const text = await CodeBerg.request(path, params, data);
+        const text = await Codeberg.request(path, params, data);
         try {
             return JSON.parse(text) as T;
         } catch (error) {

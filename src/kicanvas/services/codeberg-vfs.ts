@@ -6,10 +6,10 @@
 import { base64_decode } from "../../base/base64";
 import { initiate_download } from "../../base/dom/download";
 import { extension } from "../../base/paths";
-import { CodeBerg, GetBlobResponse, RepoContentResponse } from "./codeberg";
+import { Codeberg, GetBlobResponse, RepoContentResponse } from "./codeberg";
 import { VirtualFileSystem } from "./vfs";
 
-export class CodeBergFileSystem extends VirtualFileSystem {
+export class CodebergFileSystem extends VirtualFileSystem {
     static readonly kicad_extensions = ["kicad_pcb", "kicad_pro", "kicad_sch"];
 
     constructor(private files_to_urls: Map<string, URL>) {
@@ -18,11 +18,11 @@ export class CodeBergFileSystem extends VirtualFileSystem {
 
     public static async fromURLs(
         ...urls: (string | URL)[]
-    ): Promise<CodeBergFileSystem | null> {
+    ): Promise<CodebergFileSystem | null> {
         const files_to_urls = new Map<string, URL>();
 
         for (const url of urls) {
-            const info = CodeBerg.parse_url(url);
+            const info = Codeberg.parse_url(url);
             if (!info) {
                 continue;
             }
@@ -31,7 +31,7 @@ export class CodeBergFileSystem extends VirtualFileSystem {
             // https://codeberg.org/api/swagger#/repository/repoGetContents
             const api_url = `repos/${info.owner}/${info.repo}/contents/${info.path}`;
 
-            let files = await CodeBerg.request_json<
+            let files = await Codeberg.request_json<
                 RepoContentResponse | RepoContentResponse[]
             >(api_url);
 
@@ -45,7 +45,7 @@ export class CodeBergFileSystem extends VirtualFileSystem {
                 }
 
                 if (
-                    !CodeBergFileSystem.kicad_extensions.includes(
+                    !CodebergFileSystem.kicad_extensions.includes(
                         extension(file.name),
                     )
                 ) {
@@ -61,7 +61,7 @@ export class CodeBergFileSystem extends VirtualFileSystem {
             return null;
         }
 
-        return new CodeBergFileSystem(files_to_urls);
+        return new CodebergFileSystem(files_to_urls);
     }
 
     override *list(): Generator<string> {
@@ -75,7 +75,7 @@ export class CodeBergFileSystem extends VirtualFileSystem {
         }
 
         // API: https://codeberg.org/api/swagger#/repository/GetBlob
-        const blob = await CodeBerg.request_json<GetBlobResponse>(url.pathname);
+        const blob = await Codeberg.request_json<GetBlobResponse>(url.pathname);
 
         if (blob.encoding !== "base64") {
             throw new Error(`Unsupported encoding: ${blob.encoding}`);
