@@ -141,6 +141,7 @@ export class SchematicSymbolPainter extends SchematicItemPainter {
         }
 
         this.view_painter.current_symbol = undefined;
+        this.view_painter.current_symbol_transform = undefined;
     }
 }
 
