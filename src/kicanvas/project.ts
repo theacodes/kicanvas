@@ -195,6 +195,8 @@ export class Project extends EventTarget implements IDisposable {
 
         // If we found a root page, we can build out the list of pages by
         // walking through paths_to_sheet with the root as page one.
+        // Only add unique schematic files - if a sheet is instantiated multiple
+        // times, use the first instance's path and page number.
         let pages = [];
 
         if (root) {
@@ -208,14 +210,26 @@ export class Project extends EventTarget implements IDisposable {
             );
             pages.push(this.#root_schematic_page);
 
+            // Track which schematic files we've already added to avoid duplicates
+            // from multi-instance sheets (reusable hierarchical blocks)
+            const seen_files = new Set<string>([root.filename]);
+
             for (const [path, sheet] of paths_to_sheet_instances.entries()) {
+                const filename = sheet.sheet.sheetfile!;
+
+                // Skip if we've already added this schematic file
+                if (seen_files.has(filename)) {
+                    continue;
+                }
+                seen_files.add(filename);
+
                 pages.push(
                     new ProjectPage(
                         this,
                         "schematic",
-                        sheet.sheet.sheetfile!,
+                        filename,
                         path,
-                        sheet.sheet.sheetname ?? sheet.sheet.sheetfile!,
+                        sheet.sheet.sheetname ?? filename,
                         sheet.instance.page ?? "",
                     ),
                 );
