@@ -30,6 +30,7 @@ export class NotFoundError extends BaseAPIError {
 }
 
 export class GitHub {
+    static readonly host_name = "github.com";
     static readonly html_base_url = "https://github.com";
     static readonly base_url = "https://api.github.com/";
     static readonly api_version = "2022-11-28";
@@ -51,6 +52,10 @@ export class GitHub {
      */
     static parse_url(url: string | URL) {
         url = new URL(url, GitHub.html_base_url);
+        if (url.hostname != GitHub.host_name) {
+            return null;
+        }
+
         const path_parts = url.pathname.split("/");
 
         if (path_parts.length < 3) {
