@@ -15,6 +15,8 @@ import {
 } from "../../base/web-components";
 import { KCUIElement } from "../../kc-ui";
 import kc_ui_styles from "../../kc-ui/kc-ui.css";
+import type { BoardViewer } from "../../viewers/board/viewer";
+import type { SchematicViewer } from "../../viewers/schematic/viewer";
 import { Project } from "../project";
 import {
     FetchFileSystem,
@@ -104,7 +106,10 @@ class KiCanvasEmbedElement extends KCUIElement {
         });
     }
 
-    async #setup_events() {}
+    async #setup_events() {
+        //Setup the deep link handler
+        window.addEventListener('hashchange', handleDeepLink);
+    }
 
     async #load_src() {
         const url_src = [];
@@ -198,13 +203,47 @@ class KiCanvasEmbedElement extends KCUIElement {
 
         const focus_overlay =
             (this.controls ?? "none") == "none" ||
-            this.controlslist?.includes("nooverlay")
+                this.controlslist?.includes("nooverlay")
                 ? null
                 : html`<kc-ui-focus-overlay></kc-ui-focus-overlay>`;
 
         return html`<main>
             ${this.#schematic_app} ${this.#board_app} ${focus_overlay}
         </main>`;
+    }
+
+
+    async deepLinkSelect(filename: string, reference: string) {
+        //We assure the filetype
+        console.log("Active Page:", this.#project.active_page);
+        let page = this.#project.page_by_name(filename);
+        switch (page?.type) {
+            case "pcb":
+                this.#project.set_active_page(page);
+                const boardView = this.#board_app.viewer as BoardViewer;
+                boardView.resolve_loaded(false); //This fixes the viewer reload bug where you cant select element if coming from the same viewer as the loaded Barrier isnt renewed
+                await boardView.loaded;
+                boardView.select(reference);
+                boardView.zoom_to_selection();
+                break;
+
+            case "schematic":
+                this.#project.set_active_page(page);
+                const schView = this.#schematic_app.viewer as SchematicViewer;
+                schView.resolve_loaded(false);//This fixes the viewer reload bug where you cant select element if coming from the same viewer as the loaded Barrier isnt renewed
+                await schView.loaded;
+                schView.select(reference);
+                schView.zoom_to_selection();
+                break;
+
+            default:
+                console.log("Unknown file type");
+                break;
+        }
+
+
+
+
     }
 }
 
@@ -331,3 +370,27 @@ document.body.appendChild(
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&family=Nunito:wght@300;400;500;600;700&display=swap"
         crossorigin="anonymous" />`,
 );
+
+function handleDeepLink() {
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        const regex = /^(?<id>[^:]+):(?<file>[^:]+):(?<reference>[^:]+)$/;
+        const match = hash.match(regex);
+        if (match && match.groups) {
+            const { id, file, reference } = match.groups;
+            console.log("ID:", id, " File:", file, " Reference:", reference);
+            const element = document.getElementById(id as string) as KiCanvasEmbedElement; //this should get us the kicanvas element
+            if (element instanceof KiCanvasEmbedElement) { //If embed element exists trigger its select
+                console.log(element);
+                element.scrollIntoView({ behavior: 'smooth' });
+                element.deepLinkSelect(file as string, reference as string); //Sends 
+            } else {
+                console.log("Element is not a kicanvasEmbedElement");
+            }
+        } else {
+            console.log("Invalid format");
+        }
+
+    }
+    return null;
+}
