@@ -5,29 +5,7 @@
 */
 
 import { basename } from "../../base/paths";
-
-export class BaseAPIError extends Error {
-    constructor(
-        public override name: string,
-        public url: string,
-        public description: string,
-        public response?: Response,
-    ) {
-        super(`GitHub${name}: ${url}: ${description}`);
-    }
-}
-
-export class UnknownError extends BaseAPIError {
-    constructor(url: string, description: string, response: Response) {
-        super(`NotFoundError`, url, description, response);
-    }
-}
-
-export class NotFoundError extends BaseAPIError {
-    constructor(url: string, response: Response) {
-        super(`NotFoundError`, url, "not found", response);
-    }
-}
+import { request_error_handler } from "./api-error";
 
 export class GitHub {
     static readonly host_name = "github.com";
@@ -108,7 +86,7 @@ export class GitHub {
         });
 
         const response = await fetch(request);
-        await this.handle_server_error(response);
+        await request_error_handler(response);
 
         this.last_response = response;
 
@@ -124,23 +102,6 @@ export class GitHub {
             return await response.json();
         } else {
             return await response.text();
-        }
-    }
-
-    async handle_server_error(response: Response) {
-        switch (response.status) {
-            case 200:
-                return;
-            case 404: {
-                throw new NotFoundError(response.url, response);
-            }
-            case 500: {
-                throw new UnknownError(
-                    response.url,
-                    await response.text(),
-                    response,
-                );
-            }
         }
     }
 
