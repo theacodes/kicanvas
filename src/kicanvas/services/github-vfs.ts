@@ -21,7 +21,9 @@ export class GitHubFileSystem extends VirtualFileSystem {
         super();
     }
 
-    public static async fromURLs(...urls: (string | URL)[]) {
+    public static async fromURLs(
+        ...urls: (string | URL)[]
+    ): Promise<GitHubFileSystem | null> {
         // Handles URLs like this:
         // https://github.com/wntrblm/Helium/blob/main/hardware/board/board.kicad_sch
 
@@ -79,6 +81,11 @@ export class GitHubFileSystem extends VirtualFileSystem {
                     files_to_urls.set(name, download_url);
                 }
             }
+        }
+
+        if (files_to_urls.size == 0) {
+            // no valid URL and files, return null.
+            return null;
         }
 
         return new GitHubFileSystem(files_to_urls);

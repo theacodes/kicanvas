@@ -5,31 +5,10 @@
 */
 
 import { basename } from "../../base/paths";
-
-export class BaseAPIError extends Error {
-    constructor(
-        public override name: string,
-        public url: string,
-        public description: string,
-        public response?: Response,
-    ) {
-        super(`GitHub${name}: ${url}: ${description}`);
-    }
-}
-
-export class UnknownError extends BaseAPIError {
-    constructor(url: string, description: string, response: Response) {
-        super(`NotFoundError`, url, description, response);
-    }
-}
-
-export class NotFoundError extends BaseAPIError {
-    constructor(url: string, response: Response) {
-        super(`NotFoundError`, url, "not found", response);
-    }
-}
+import { request_error_handler } from "./api-error";
 
 export class GitHub {
+    static readonly host_name = "github.com";
     static readonly html_base_url = "https://github.com";
     static readonly base_url = "https://api.github.com/";
     static readonly api_version = "2022-11-28";
@@ -51,6 +30,10 @@ export class GitHub {
      */
     static parse_url(url: string | URL) {
         url = new URL(url, GitHub.html_base_url);
+        if (url.hostname != GitHub.host_name) {
+            return null;
+        }
+
         const path_parts = url.pathname.split("/");
 
         if (path_parts.length < 3) {
@@ -103,7 +86,7 @@ export class GitHub {
         });
 
         const response = await fetch(request);
-        await this.handle_server_error(response);
+        await request_error_handler(response);
 
         this.last_response = response;
 
@@ -119,23 +102,6 @@ export class GitHub {
             return await response.json();
         } else {
             return await response.text();
-        }
-    }
-
-    async handle_server_error(response: Response) {
-        switch (response.status) {
-            case 200:
-                return;
-            case 404: {
-                throw new NotFoundError(response.url, response);
-            }
-            case 500: {
-                throw new UnknownError(
-                    response.url,
-                    await response.text(),
-                    response,
-                );
-            }
         }
     }
 

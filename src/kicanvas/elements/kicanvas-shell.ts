@@ -11,8 +11,8 @@ import { CSS, attribute, html, query } from "../../base/web-components";
 import { KCUIElement, KCUIIconElement } from "../../kc-ui";
 import { sprites_url } from "../icons/sprites";
 import { Project } from "../project";
-import { GitHub } from "../services/github";
 import { GitHubFileSystem } from "../services/github-vfs";
+import { CodebergFileSystem } from "../services/codeberg-vfs";
 import { FetchFileSystem, type VirtualFileSystem } from "../services/vfs";
 import { KCBoardAppElement } from "./kc-board/app";
 import { KCSchematicAppElement } from "./kc-schematic/app";
@@ -82,7 +82,11 @@ class KiCanvasShellElement extends KCUIElement {
 
     override initialContentCallback() {
         const url_params = new URLSearchParams(document.location.search);
-        const github_paths = url_params.getAll("github");
+
+        const urls = [
+            ...url_params.getAll("github"),
+            ...url_params.getAll("repo"),
+        ];
 
         later(async () => {
             if (this.src) {
@@ -91,8 +95,12 @@ class KiCanvasShellElement extends KCUIElement {
                 return;
             }
 
-            if (github_paths.length) {
-                const vfs = await GitHubFileSystem.fromURLs(...github_paths);
+            if (urls.length) {
+                const vfs = await this.load_repo(...urls);
+                if (!vfs) {
+                    return;
+                }
+
                 await this.setup_project(vfs);
                 return;
             }
@@ -104,15 +112,18 @@ class KiCanvasShellElement extends KCUIElement {
 
         this.link_input.addEventListener("input", async (e) => {
             const link = this.link_input.value;
-            if (!GitHub.parse_url(link)) {
+            const vfs = await this.load_repo(link);
+
+            if (!vfs) {
+                // TODO: show error message: invaild URL
+                console.error(`Invalid URL: ${link}`);
                 return;
             }
 
-            const vfs = await GitHubFileSystem.fromURLs(link);
             await this.setup_project(vfs);
 
             const location = new URL(window.location.href);
-            location.searchParams.set("github", link);
+            location.searchParams.set("repo", link);
             window.history.pushState(null, "", location);
         });
 
@@ -121,6 +132,15 @@ class KiCanvasShellElement extends KCUIElement {
                 await this.setup_project(vfs);
             });
         });
+    }
+
+    private async load_repo(
+        ...url: string[]
+    ): Promise<VirtualFileSystem | null> {
+        return (
+            (await GitHubFileSystem.fromURLs(...url)) ??
+            (await CodebergFileSystem.fromURLs(...url))
+        );
     }
 
     private async setup_project(vfs: VirtualFileSystem) {
@@ -174,7 +194,7 @@ class KiCanvasShellElement extends KCUIElement {
                     <input
                         name="link"
                         type="text"
-                        placeholder="Paste a GitHub link..."
+                        placeholder="Paste a GitHub/Codeberg link..."
                         autofocus />
                     <p>
                         or drag & drop your KiCad files, or<button
