@@ -56,6 +56,8 @@ export const DefaultValues = {
     pin_name_offset: 0.508, // 20 mils
 };
 
+export type SchematicDrawing = Polyline | Text | Circle | Image;
+
 export class KicadSch {
     project?: Project;
     version: number;
@@ -75,7 +77,7 @@ export class KicadSch {
     hierarchical_labels: HierarchicalLabel[] = [];
     symbols = new Map<string, SchematicSymbol>();
     no_connects: NoConnect[] = [];
-    drawings: (Polyline | Text)[] = [];
+    drawings: SchematicDrawing[] = [];
     images: Image[] = [];
     sheet_instances?: SheetInstances;
     symbol_instances?: SymbolInstances;
@@ -116,7 +118,6 @@ export class KicadSch {
                     "hierarchical_label",
                     T.item(HierarchicalLabel, this),
                 ),
-                // images
                 P.mapped_collection(
                     "symbols",
                     "symbol",
@@ -127,6 +128,7 @@ export class KicadSch {
                 P.collection("drawings", "rectangle", T.item(Rectangle, this)),
                 P.collection("drawings", "arc", T.item(Arc, this)),
                 P.collection("drawings", "text", T.item(Text, this)),
+                P.collection("drawings", "circle", T.item(Circle, this)),
                 P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
                 P.item("symbol_instances", SymbolInstances),
