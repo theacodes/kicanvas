@@ -13,6 +13,7 @@ import paper_sch_src from "./files/paper.kicad_sch";
 import wires_sch_src from "./files/wires.kicad_sch";
 import labels_sch_src from "./files/labels.kicad_sch";
 import drawings_sch_src from "./files/drawings.kicad_sch";
+import drawings_kicad9_sch_src from "./files/drawings_kicad9.kicad_sch";
 import symbols_sch_src from "./files/symbols.kicad_sch";
 import symbols_kicad8_sch_src from "./files/symbols_kicad8.kicad_sch";
 
@@ -312,6 +313,25 @@ suite("kicad.schematic.KicadSch(): schematic parsing", function () {
         });
 
         assert.equal(sch.images.length, 1);
+    });
+
+    test("with kicad9 drawings", function () {
+        const sch = new schematic.KicadSch(
+            "test.kicad_sch",
+            drawings_kicad9_sch_src,
+        );
+
+        assert.equal(sch.drawings.length, 1);
+
+        const circle1 = sch.drawings[0] as schematic.Circle;
+        assert_deep_partial(circle1, {
+            center: { x: 0, y: 0 },
+            radius: 5.08,
+            stroke: {
+                width: 0.25,
+                type: "solid",
+            },
+        });
     });
 
     test("with library symbols", function () {

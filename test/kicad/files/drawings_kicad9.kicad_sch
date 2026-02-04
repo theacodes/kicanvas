@@ -1,0 +1,26 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "5efcc5ba-dc52-4033-83ee-2f99ed02f6eb")
+	(paper "A4")
+	(lib_symbols)
+	(circle
+		(center 0 0)
+		(radius 5.08)
+		(stroke
+			(width 0.25)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 1281e40f-f1db-465e-8de5-84a912042e35)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
