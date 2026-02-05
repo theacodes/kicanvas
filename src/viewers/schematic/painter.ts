@@ -22,6 +22,7 @@ import { BaseSchematicPainter, SchematicItemPainter } from "./painters/base";
 import {
     GlobalLabelPainter,
     HierarchicalLabelPainter,
+    DirectiveLabelPainter,
     NetLabelPainter,
 } from "./painters/label";
 import { PinPainter } from "./painters/pin";
@@ -623,6 +624,7 @@ export class SchematicPainter extends BaseSchematicPainter {
             new PropertyPainter(this, gfx),
             new SchematicSymbolPainter(this, gfx),
             new NetLabelPainter(this, gfx),
+            new DirectiveLabelPainter(this, gfx),
             new GlobalLabelPainter(this, gfx),
             new HierarchicalLabelPainter(this, gfx),
             new SchematicSheetPainter(this, gfx),

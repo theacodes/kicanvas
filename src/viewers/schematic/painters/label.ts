@@ -6,6 +6,7 @@
 
 import { Color } from "../../../base/color";
 import { Angle, Vec2 } from "../../../base/math";
+import * as shapes from "../../../graphics/shapes";
 import * as schematic_items from "../../../kicad/schematic";
 import { SchText, StrokeFont } from "../../../kicad/text";
 import { LayerNames, ViewLayer } from "../layers";
@@ -23,6 +24,7 @@ import { SchematicItemPainter } from "./base";
  * - SCH_PAINTER::draw( const SCH_LABEL )
  * - SCH_PAINTER::draw( const SCH_HIERLABEL )
  * - SCH_PAINTER::draw( const SCH_TEXT )
+ * - SCH_PAINTER::draw( const SCH_DIRECTIVE_LABEL (netclassflag) )
  *
  */
 
@@ -341,5 +343,138 @@ export class HierarchicalLabelPainter extends LabelPainter {
         });
 
         return pts;
+    }
+}
+
+export class DirectiveLabelPainter extends SchematicItemPainter {
+    override classes: any[] = [schematic_items.DirectiveLabel];
+
+    override layers_for(item: schematic_items.DirectiveLabel) {
+        return [LayerNames.label];
+    }
+
+    override paint(layer: ViewLayer, item: schematic_items.DirectiveLabel) {
+        this.paint_shape(layer, item);
+        for (const prop of item.properties) {
+            this.paint_property(layer, prop);
+        }
+    }
+
+    private paint_shape(
+        layer: ViewLayer,
+        item: schematic_items.DirectiveLabel,
+    ) {
+        const color = Color.from_css("#ff0000");
+        const pin_length = item.length;
+        const symbol_size = 20 * 0.0254;
+
+        this.gfx.state.push();
+        this.gfx.state.matrix.translate_self(
+            item.at.position.x,
+            item.at.position.y,
+        );
+
+        this.gfx.state.matrix.rotate_self(Angle.from_degrees(item.at.rotation));
+
+        this.gfx.state.stroke = color;
+
+        // see also: SCH_DIRECTIVE_LABEL::CreateGraphicShape
+        // https://gitlab.com/kicad/code/kicad/-/blob/master/eeschema/sch_label.cpp#L1789
+        const shape = item.shape;
+        if (shape === "dot") {
+            const shape_size = symbol_size * 0.7;
+
+            this.gfx.line([
+                new Vec2(0, 0),
+                new Vec2(0, -(pin_length - shape_size)),
+            ]);
+            this.gfx.circle(
+                new shapes.Circle(new Vec2(0, -pin_length), shape_size, color),
+            );
+        } else if (shape === "round") {
+            const shape_size = symbol_size;
+            const center = new Vec2(0, -pin_length);
+            const width = this.gfx.state.stroke_width;
+
+            this.gfx.line([
+                new Vec2(0, 0),
+                new Vec2(0, -(pin_length - shape_size)),
+            ]);
+            this.gfx.arc(
+                new shapes.Arc(
+                    center,
+                    shape_size,
+                    new Angle(0),
+                    new Angle(Math.PI * 2),
+                    width,
+                    color,
+                ),
+            );
+        } else if (shape === "diamond") {
+            const shape_size = symbol_size;
+
+            const origin_pts = [
+                new Vec2(0, 0),
+                new Vec2(0, pin_length - shape_size),
+                new Vec2(-2 * shape_size, pin_length),
+                new Vec2(0, pin_length + shape_size),
+                new Vec2(2 * shape_size, pin_length),
+                new Vec2(0, pin_length - shape_size),
+                new Vec2(0, 0),
+            ];
+
+            // Convert points to KiCad coordinate system
+            const pts = origin_pts.map((pt) => {
+                return new Vec2(pt.x, -pt.y);
+            });
+
+            this.gfx.line(pts);
+        } else if (shape === "rectangle") {
+            const shape_size = symbol_size * 0.8;
+
+            const origin_pts = [
+                new Vec2(0, 0),
+                new Vec2(0, pin_length - shape_size),
+                new Vec2(-2 * shape_size, pin_length - shape_size),
+                new Vec2(-2 * shape_size, pin_length + shape_size),
+                new Vec2(2 * shape_size, pin_length + shape_size),
+                new Vec2(2 * shape_size, pin_length - shape_size),
+                new Vec2(0, pin_length - shape_size),
+                new Vec2(0, 0),
+            ];
+
+            const pts = origin_pts.map((pt) => {
+                return new Vec2(pt.x, -pt.y);
+            });
+
+            this.gfx.line(pts);
+
+            // else: unreachable
+        }
+
+        this.gfx.state.pop();
+    }
+
+    private paint_property(layer: ViewLayer, prop: schematic_items.Property) {
+        const schtext = new SchText(prop.shown_text);
+        schtext.apply_at(prop.at);
+        schtext.apply_effects(prop.effects);
+
+        if (prop.at.rotation == 0 || prop.at.rotation == 180) {
+            schtext.text_angle.degrees = 0;
+        } else if (prop.at.rotation == 90 || prop.at.rotation == 270) {
+            schtext.text_angle.degrees = 90;
+        }
+
+        this.gfx.state.push();
+
+        StrokeFont.default().draw(
+            this.gfx,
+            schtext.shown_text,
+            schtext.text_pos,
+            schtext.attributes,
+        );
+
+        this.gfx.state.pop();
     }
 }
