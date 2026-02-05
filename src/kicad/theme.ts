@@ -120,12 +120,14 @@ export interface SchematicTheme extends BaseTheme {
     label_global: Color;
     label_hier: Color;
     label_local: Color;
+    netclass_flag: Color;
     no_connect: Color;
     note: Color;
     pin: Color;
     pin_name: Color;
     pin_number: Color;
     reference: Color;
+    rule_area: Color;
     shadow: Color;
     sheet: Color;
     sheet_background: Color;

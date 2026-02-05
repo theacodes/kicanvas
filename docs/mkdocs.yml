@@ -24,6 +24,8 @@ markdown_extensions:
     - pymdownx.superfences
     - pymdownx.magiclink
     - md_in_html
+    - pymdownx.tasklist:
+          custom_checkbox: true
 nav:
     - "Home": home.md
     - "Standalone App": index.md

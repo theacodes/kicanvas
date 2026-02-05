@@ -349,6 +349,14 @@ export class HierarchicalLabelPainter extends LabelPainter {
 export class DirectiveLabelPainter extends SchematicItemPainter {
     override classes: any[] = [schematic_items.DirectiveLabel];
 
+    get default_shape_color() {
+        return this.theme.netclass_flag;
+    }
+
+    get default_property_color() {
+        return this.theme.netclass_flag;
+    }
+
     override layers_for(item: schematic_items.DirectiveLabel) {
         return [LayerNames.label];
     }
@@ -364,7 +372,10 @@ export class DirectiveLabelPainter extends SchematicItemPainter {
         layer: ViewLayer,
         item: schematic_items.DirectiveLabel,
     ) {
-        const color = Color.from_css("#ff0000");
+        const color = item.effects.font.color.is_transparent_black
+            ? this.default_shape_color
+            : item.effects.font.color;
+
         const pin_length = item.length;
         const symbol_size = 20 * 0.0254;
 
@@ -456,6 +467,10 @@ export class DirectiveLabelPainter extends SchematicItemPainter {
     }
 
     private paint_property(layer: ViewLayer, prop: schematic_items.Property) {
+        const color = prop.effects.font.color.is_transparent_black
+            ? this.default_property_color
+            : prop.effects.font.color;
+
         const schtext = new SchText(prop.shown_text);
         schtext.apply_at(prop.at);
         schtext.apply_effects(prop.effects);
@@ -468,6 +483,8 @@ export class DirectiveLabelPainter extends SchematicItemPainter {
 
         this.gfx.state.push();
 
+        this.gfx.state.stroke = color;
+        this.gfx.state.fill = color;
         StrokeFont.default().draw(
             this.gfx,
             schtext.shown_text,

@@ -119,33 +119,31 @@ class RuleAreaPainter extends SchematicItemPainter {
         return [LayerNames.notes];
     }
 
-    paint(layer: ViewLayer, rule_area: schematic_items.RuleArea) {
-        const pts = [
-            ...rule_area.polyline.pts,
-            rule_area.polyline.pts[0]!.copy(),
-        ];
+    paint(layer: ViewLayer, item: schematic_items.RuleArea) {
+        const pts = [...item.polyline.pts, item.polyline.pts[0]!.copy()];
 
         // fill polyline
-        const fill_color = this.determine_fill(layer, rule_area.polyline);
+        const fill_color = this.determine_fill(layer, item.polyline);
         if (fill_color) {
             this.gfx.polygon(new Polygon(pts, fill_color));
         }
 
         // polyline outline
-        const { width, color } = this.determine_stroke(
-            layer,
-            rule_area.polyline,
-        );
+        const outline_width =
+            item.polyline.stroke?.width || this.gfx.state.stroke_width;
 
-        if (width && color) {
+        const outline_color =
+            item.polyline.stroke?.color || this.theme.rule_area;
+
+        if (outline_width && outline_color) {
             const draw_line = (lines: Vec2[]) => {
-                this.gfx.line(lines, width, color);
+                this.gfx.line(lines, outline_width, outline_color);
             };
 
             StrokePainter.line(
                 pts,
-                width,
-                rule_area.polyline.stroke_params,
+                outline_width,
+                item.polyline.stroke_params,
                 draw_line,
             );
         }
