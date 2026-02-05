@@ -112,6 +112,46 @@ class PolylinePainter extends SchematicItemPainter {
     }
 }
 
+class RuleAreaPainter extends SchematicItemPainter {
+    classes = [schematic_items.RuleArea];
+
+    layers_for(item: schematic_items.RuleArea) {
+        return [LayerNames.notes];
+    }
+
+    paint(layer: ViewLayer, rule_area: schematic_items.RuleArea) {
+        const pts = [
+            ...rule_area.polyline.pts,
+            rule_area.polyline.pts[0]!.copy(),
+        ];
+
+        // fill polyline
+        const fill_color = this.determine_fill(layer, rule_area.polyline);
+        if (fill_color) {
+            this.gfx.polygon(new Polygon(pts, fill_color));
+        }
+
+        // polyline outline
+        const { width, color } = this.determine_stroke(
+            layer,
+            rule_area.polyline,
+        );
+
+        if (width && color) {
+            const draw_line = (lines: Vec2[]) => {
+                this.gfx.line(lines, width, color);
+            };
+
+            StrokePainter.line(
+                pts,
+                width,
+                rule_area.polyline.stroke_params,
+                draw_line,
+            );
+        }
+    }
+}
+
 class WirePainter extends SchematicItemPainter {
     classes = [schematic_items.Wire];
 
@@ -610,6 +650,7 @@ export class SchematicPainter extends BaseSchematicPainter {
         this.painter_list = [
             new RectanglePainter(this, gfx),
             new PolylinePainter(this, gfx),
+            new RuleAreaPainter(this, gfx),
             new WirePainter(this, gfx),
             new BusPainter(this, gfx),
             new BusEntryPainter(this, gfx),
