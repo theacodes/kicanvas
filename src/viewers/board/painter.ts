@@ -16,7 +16,7 @@ import { Circle, Color, Polygon, Polyline, Renderer } from "../../graphics";
 import { StrokeParams } from "../../kicad/common.ts";
 import * as board_items from "../../kicad/board";
 import { EDAText, StrokeFont, TextAttributes } from "../../kicad/text";
-import { DocumentPainter, ItemPainter } from "../base/painter";
+import { DocumentPainter, ItemPainter, StrokePainter } from "../base/painter";
 import { ViewLayerNames } from "../base/view-layers";
 import {
     CopperVirtualLayerNames,
@@ -48,102 +48,17 @@ abstract class BoardItemPainter extends ItemPainter {
 }
 
 abstract class GraphicItemPainter extends BoardItemPainter {
-    /** Split a polyline into multiple lines and draw it. */
     protected styled_line(
         lines: Vec2[],
         width: number,
         color: Color,
         stroke_style: StrokeParams,
     ) {
-        // reference implementation:
-        // https://gitlab.com/kicad/code/kicad/-/blob/master/common/stroke_params.cpp#L48
-        // https://gitlab.com/kicad/code/develop/-/blob/master/pcbnew/pcb_painter.cpp#L2236
-
-        const stroke_type = stroke_style.stroke;
-
-        // solid line
-        if (stroke_type.type === "solid" || stroke_type.type === "default") {
+        const draw_line = (lines: Vec2[]) => {
             this.gfx.line(lines, width, color);
-            return;
-        }
+        };
 
-        // dot, dash, dash_dot, dash_dot_dot
-        for (const [start, end] of GraphicItemPainter.windowed2_iter(lines)) {
-            this.styled_line_helper(start, end!, width, color, stroke_style);
-        }
-    }
-
-    private styled_line_helper(
-        start: Vec2,
-        end: Vec2,
-        width: number,
-        color: Color,
-        stroke_style: StrokeParams,
-    ) {
-        const line_vec = end.sub(start);
-        const line_len = line_vec.magnitude;
-        const line_dir_vec = line_vec.normalize();
-
-        const dot_len = StrokeParams.dot_length(width);
-        const gap_len = StrokeParams.gap_length(width, stroke_style);
-        const dash_len = StrokeParams.dash_length(width, stroke_style);
-
-        // Generate line pattern
-        let line_pattern: number[] = [];
-        switch (stroke_style.stroke.type) {
-            case "dash":
-                line_pattern = [dash_len, gap_len];
-                break;
-            case "dot":
-                line_pattern = [dot_len, gap_len];
-                break;
-            case "dash_dot":
-                line_pattern = [dash_len, gap_len, dot_len, gap_len];
-                break;
-            case "dash_dot_dot":
-                line_pattern = [
-                    dash_len,
-                    gap_len,
-                    dot_len,
-                    gap_len,
-                    dot_len,
-                    gap_len,
-                ];
-                break;
-            default:
-                // Unreachable
-                return;
-        }
-
-        // Draw lines
-        let draw_len = 0.0;
-        let pattern_index = 0;
-        while (draw_len < line_len) {
-            const pattern = line_pattern[pattern_index]!;
-
-            const segment_len = Math.min(pattern, line_len - draw_len);
-
-            if (pattern_index % 2 === 0 && segment_len > 0) {
-                const seg_start = start.add(line_dir_vec.multiply(draw_len));
-                const seg_end = seg_start.add(
-                    line_dir_vec.multiply(segment_len),
-                );
-
-                this.gfx.line([seg_start, seg_end], width, color);
-            }
-
-            draw_len += segment_len;
-            pattern_index = (pattern_index + 1) % line_pattern.length;
-        }
-    }
-
-    /** [1, 2, 3, 4, 5] -> [(1, 2), (2, 3), (3, 4), (4, 5), ...] */
-    private static *windowed2_iter<T>(
-        items: T[],
-    ): Generator<[T, T | undefined]> {
-        for (let i = 0; i < items.length - 1; i++) {
-            yield [items[i]!, items[i + 1]!];
-        }
+        StrokePainter.line(lines, width, stroke_style, draw_line);
     }
 }
 

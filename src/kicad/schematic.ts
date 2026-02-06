@@ -17,6 +17,8 @@ import {
     EmbeddedFile,
     expand_text_vars,
     unescape_string,
+    type HasStrokeParams,
+    StrokeParams,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
 
@@ -78,6 +80,8 @@ export class KicadSch {
     symbols = new Map<string, SchematicSymbol>();
     no_connects: NoConnect[] = [];
     drawings: SchematicDrawing[] = [];
+    rule_areas: RuleArea[] = [];
+    netclass_flags: DirectiveLabel[] = [];
     images: Image[] = [];
     sheet_instances?: SheetInstances;
     symbol_instances?: SymbolInstances;
@@ -129,6 +133,12 @@ export class KicadSch {
                 P.collection("drawings", "arc", T.item(Arc, this)),
                 P.collection("drawings", "text", T.item(Text, this)),
                 P.collection("drawings", "circle", T.item(Circle, this)),
+                P.collection("rule_areas", "rule_area", T.item(RuleArea, this)),
+                P.collection(
+                    "netclass_flags",
+                    "netclass_flag",
+                    T.item(DirectiveLabel, this),
+                ),
                 P.collection("images", "image", T.item(Image)),
                 P.item("sheet_instances", SheetInstances),
                 P.item("symbol_instances", SymbolInstances),
@@ -205,10 +215,12 @@ export class KicadSch {
         yield* this.junctions;
         yield* this.net_labels;
         yield* this.global_labels;
+        yield* this.netclass_flags;
         yield* this.hierarchical_labels;
         yield* this.no_connects;
         yield* this.symbols.values();
         yield* this.drawings;
+        yield* this.rule_areas;
         yield* this.images;
         yield* this.sheets;
     }
@@ -271,7 +283,7 @@ export class Fill {
     }
 }
 
-export class GraphicItem {
+export class GraphicItem implements HasStrokeParams {
     parent?: LibSymbol | SchematicSymbol;
     private = false;
     stroke?: Stroke;
@@ -280,6 +292,16 @@ export class GraphicItem {
 
     constructor(parent?: LibSymbol | SchematicSymbol) {
         this.parent = parent;
+    }
+
+    get stroke_params(): StrokeParams {
+        // TODO
+        // get StrokeParams from project settings
+        return {
+            stroke: this.stroke ?? Stroke.default_value(),
+            dashed_line_gap_ratio: 3,
+            dashed_line_dash_ratio: 12,
+        };
     }
 
     static common_expr_defs = [
@@ -773,6 +795,33 @@ export class HierarchicalLabel extends Label {
     }
 }
 
+export class DirectiveLabel extends Label {
+    shape: LabelShapes;
+    length: number;
+
+    properties: Property[] = [];
+
+    constructor(
+        expr: Parseable,
+        public parent: SchematicSheet,
+    ) {
+        // For some reasons,
+        // kicad source code use directive label to represent "netclass_flag".
+        super();
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("netclass_flag"),
+                ...Label.common_expr_defs,
+                P.pair("shape", T.string),
+                P.pair("length", T.number),
+                P.collection("properties", "property", T.item(Property, this)),
+            ),
+        );
+    }
+}
+
 export class LibSymbols {
     symbols: LibSymbol[] = [];
     #symbols_by_name: Map<string, LibSymbol> = new Map();
@@ -1155,6 +1204,24 @@ export class PinAlternate {
                 P.positional("name"),
                 P.positional("type", T.string),
                 P.positional("shaped", T.string),
+            ),
+        );
+    }
+}
+
+export class RuleArea {
+    polyline: Polyline;
+
+    constructor(
+        expr: Parseable,
+        public parent: KicadSch,
+    ) {
+        Object.assign(
+            this,
+            parse_expr(
+                expr,
+                P.start("rule_area"),
+                P.item("polyline", Polyline),
             ),
         );
     }

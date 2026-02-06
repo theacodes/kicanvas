@@ -16,11 +16,13 @@ import {
 import type { SchematicTheme } from "../../kicad";
 import * as schematic_items from "../../kicad/schematic";
 import { LibText, SchField, SchText, StrokeFont } from "../../kicad/text";
+import { StrokePainter } from "../base/painter";
 import { LayerNames, LayerSet, ViewLayer } from "./layers";
 import { BaseSchematicPainter, SchematicItemPainter } from "./painters/base";
 import {
     GlobalLabelPainter,
     HierarchicalLabelPainter,
+    DirectiveLabelPainter,
     NetLabelPainter,
 } from "./painters/label";
 import { PinPainter } from "./painters/pin";
@@ -92,7 +94,11 @@ class PolylinePainter extends SchematicItemPainter {
             return;
         }
 
-        this.gfx.line(new Polyline(pl.pts, width, color));
+        const draw_line = (lines: Vec2[]) => {
+            this.gfx.line(lines, width, color);
+        };
+
+        StrokePainter.line(pl.pts, width, pl.stroke_params, draw_line);
     }
 
     #fill(layer: ViewLayer, pl: schematic_items.Polyline) {
@@ -103,6 +109,44 @@ class PolylinePainter extends SchematicItemPainter {
         }
 
         this.gfx.polygon(new Polygon(pl.pts, color));
+    }
+}
+
+class RuleAreaPainter extends SchematicItemPainter {
+    classes = [schematic_items.RuleArea];
+
+    layers_for(item: schematic_items.RuleArea) {
+        return [LayerNames.notes];
+    }
+
+    paint(layer: ViewLayer, item: schematic_items.RuleArea) {
+        const pts = [...item.polyline.pts, item.polyline.pts[0]!.copy()];
+
+        // fill polyline
+        const fill_color = this.determine_fill(layer, item.polyline);
+        if (fill_color) {
+            this.gfx.polygon(new Polygon(pts, fill_color));
+        }
+
+        // polyline outline
+        const outline_width =
+            item.polyline.stroke?.width || this.gfx.state.stroke_width;
+
+        const outline_color =
+            item.polyline.stroke?.color || this.theme.rule_area;
+
+        if (outline_width && outline_color) {
+            const draw_line = (lines: Vec2[]) => {
+                this.gfx.line(lines, outline_width, outline_color);
+            };
+
+            StrokePainter.line(
+                pts,
+                outline_width,
+                item.polyline.stroke_params,
+                draw_line,
+            );
+        }
     }
 }
 
@@ -604,6 +648,7 @@ export class SchematicPainter extends BaseSchematicPainter {
         this.painter_list = [
             new RectanglePainter(this, gfx),
             new PolylinePainter(this, gfx),
+            new RuleAreaPainter(this, gfx),
             new WirePainter(this, gfx),
             new BusPainter(this, gfx),
             new BusEntryPainter(this, gfx),
@@ -618,6 +663,7 @@ export class SchematicPainter extends BaseSchematicPainter {
             new PropertyPainter(this, gfx),
             new SchematicSymbolPainter(this, gfx),
             new NetLabelPainter(this, gfx),
+            new DirectiveLabelPainter(this, gfx),
             new GlobalLabelPainter(this, gfx),
             new HierarchicalLabelPainter(this, gfx),
             new SchematicSheetPainter(this, gfx),
