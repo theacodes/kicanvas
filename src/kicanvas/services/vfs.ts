@@ -8,43 +8,85 @@ import { initiate_download } from "../../base/dom/download";
 import { basename } from "../../base/paths";
 
 /**
- * Virtual file system abstract class.
+ * Virtual file system interface.
  *
  * This is the interface used by <kc-kicanvas-shell> to find and load files.
  * It's implemented using Drag and Drop and GitHub to provide a common interface
  * for interacting and loading files.
  */
-export abstract class VirtualFileSystem {
-    public abstract list(): Generator<string>;
-    public abstract get(name: string): Promise<File>;
-    public abstract has(name: string): Promise<boolean>;
-    public abstract download(name: string): Promise<void>;
+export interface IFileSystem {
+    /**
+     * List all files in the file system
+     */
+    list(): Generator<string>;
 
-    public *list_matches(r: RegExp) {
-        for (const filename of this.list()) {
-            if (filename.match(r)) {
-                yield filename;
-            }
+    /**
+     * Get a file from the file system
+     */
+    get(name: string): Promise<File>;
+
+    /**
+     * Return true if current file list has `name`
+     */
+    has(name: string): Promise<boolean>;
+
+    /**
+     * Download a file from the file system. This is used by the "Download" button
+     */
+    download(name: string): Promise<void>;
+}
+
+/**
+ * Merge two virtual file systems into one
+ */
+export class MergedFileSystem implements IFileSystem {
+    private fs_list: IFileSystem[];
+
+    constructor(fs: (IFileSystem | null)[]) {
+        this.fs_list = fs.filter((f) => f !== null);
+    }
+
+    *list() {
+        for (const fs of this.fs_list) {
+            yield* fs.list();
         }
     }
 
-    public *list_ext(ext: string) {
-        if (!ext.startsWith(".")) {
-            ext = `.${ext}`;
-        }
-
-        for (const filename of this.list()) {
-            if (filename.endsWith(ext)) {
-                yield filename;
+    async has(name: string): Promise<boolean> {
+        for (const fs of this.fs_list) {
+            if (await fs.has(name)) {
+                return true;
             }
         }
+
+        return false;
+    }
+
+    async get(name: string): Promise<File> {
+        for (const fs of this.fs_list) {
+            if (await fs.has(name)) {
+                return await fs.get(name);
+            }
+        }
+
+        throw new Error(`File ${name} not found`);
+    }
+
+    async download(name: string) {
+        for (const fs of this.fs_list) {
+            if (await fs.has(name)) {
+                return await fs.download(name);
+            }
+        }
+
+        throw new Error(`File ${name} not found`);
     }
 }
 
 /**
  * Virtual file system for URLs via Fetch
  */
-export class FetchFileSystem extends VirtualFileSystem {
+export class FetchFileSystem implements IFileSystem {
     private urls: Map<string, URL> = new Map();
     private resolver!: (name: string) => URL;
 
@@ -72,8 +114,6 @@ export class FetchFileSystem extends VirtualFileSystem {
         urls: (string | URL)[],
         resolve_file: ((name: string) => URL) | null = null,
     ) {
-        super();
-
         this.resolver = resolve_file ?? this.#default_resolver;
 
         for (const item of urls) {
@@ -81,15 +121,15 @@ export class FetchFileSystem extends VirtualFileSystem {
         }
     }
 
-    public override *list() {
+    *list() {
         yield* this.urls.keys();
     }
 
-    public override async has(name: string) {
+    async has(name: string) {
         return Promise.resolve(this.urls.has(name));
     }
 
-    public override async get(name: string): Promise<File> {
+    async get(name: string): Promise<File> {
         const url = this.#resolve(name);
 
         if (!url) {
@@ -110,7 +150,7 @@ export class FetchFileSystem extends VirtualFileSystem {
         return new File([blob], name);
     }
 
-    public async download(name: string) {
+    async download(name: string) {
         initiate_download(await this.get(name));
     }
 }
@@ -118,10 +158,8 @@ export class FetchFileSystem extends VirtualFileSystem {
 /**
  * Virtual file system for HTML drag and drop (DataTransfer)
  */
-export class DragAndDropFileSystem extends VirtualFileSystem {
-    constructor(private items: FileSystemFileEntry[]) {
-        super();
-    }
+export class DragAndDropFileSystem implements IFileSystem {
+    constructor(private items: FileSystemFileEntry[]) {}
 
     static async fromDataTransfer(dt: DataTransfer) {
         let items: FileSystemEntry[] = [];
@@ -160,13 +198,13 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         return new DragAndDropFileSystem(items as FileSystemFileEntry[]);
     }
 
-    public override *list() {
+    *list() {
         for (const entry of this.items) {
             yield entry.name;
         }
     }
 
-    public override async has(name: string): Promise<boolean> {
+    async has(name: string): Promise<boolean> {
         for (const entry of this.items) {
             if (entry.name == name) {
                 return true;
@@ -175,7 +213,7 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         return false;
     }
 
-    public override async get(name: string): Promise<File> {
+    async get(name: string): Promise<File> {
         let file_entry: FileSystemFileEntry | null = null;
         for (const entry of this.items) {
             if (entry.name == name) {
@@ -193,7 +231,7 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
         });
     }
 
-    public async download(name: string) {
+    async download(name: string) {
         initiate_download(await this.get(name));
     }
 }
@@ -201,22 +239,20 @@ export class DragAndDropFileSystem extends VirtualFileSystem {
 /**
  * Virtual file system for local files
  */
-export class LocalFileSystem extends VirtualFileSystem {
-    constructor(private files: File[]) {
-        super();
-    }
+export class LocalFileSystem implements IFileSystem {
+    constructor(private files: File[]) {}
 
-    override *list() {
+    *list() {
         for (const entry of this.files) {
             yield entry.name;
         }
     }
 
-    override async has(name: string): Promise<boolean> {
+    async has(name: string): Promise<boolean> {
         return this.files.find((f) => f.name == name) !== undefined;
     }
 
-    override async get(name: string): Promise<File> {
+    async get(name: string): Promise<File> {
         const file = this.files.find((f) => f.name == name);
         if (file) {
             return file;
@@ -225,55 +261,7 @@ export class LocalFileSystem extends VirtualFileSystem {
         }
     }
 
-    override async download(name: string) {
+    async download(name: string) {
         initiate_download(await this.get(name));
-    }
-}
-
-/**
- * Merge two virtual file systems into one
- */
-export class MergedFileSystem extends VirtualFileSystem {
-    private fs_list: VirtualFileSystem[];
-
-    constructor(fs: (VirtualFileSystem | null)[]) {
-        super();
-        this.fs_list = fs.filter((f) => f !== null);
-    }
-
-    override *list() {
-        for (const fs of this.fs_list) {
-            yield* fs.list();
-        }
-    }
-
-    override async has(name: string): Promise<boolean> {
-        for (const fs of this.fs_list) {
-            if (await fs.has(name)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    override async get(name: string): Promise<File> {
-        for (const fs of this.fs_list) {
-            if (await fs.has(name)) {
-                return await fs.get(name);
-            }
-        }
-
-        throw new Error(`File ${name} not found`);
-    }
-
-    override async download(name: string) {
-        for (const fs of this.fs_list) {
-            if (await fs.has(name)) {
-                return await fs.download(name);
-            }
-        }
-
-        throw new Error(`File ${name} not found`);
     }
 }

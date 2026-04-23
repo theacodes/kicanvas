@@ -20,7 +20,7 @@ import {
     FetchFileSystem,
     LocalFileSystem,
     MergedFileSystem,
-    VirtualFileSystem,
+    type IFileSystem,
 } from "../services/vfs";
 import type { KCBoardAppElement } from "./kc-board/app";
 import type { KCSchematicAppElement } from "./kc-schematic/app";
@@ -159,7 +159,7 @@ class KiCanvasEmbedElement extends KCUIElement {
         await this.#setup_project(vfs);
     }
 
-    async #setup_project(vfs: VirtualFileSystem) {
+    async #setup_project(vfs: IFileSystem) {
         this.loaded = false;
         this.loading = true;
 

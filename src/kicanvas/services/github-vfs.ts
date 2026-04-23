@@ -7,7 +7,7 @@
 import { initiate_download } from "../../base/dom/download";
 import { basename, dirname, extension } from "../../base/paths";
 import { GitHub, GitHubUserContent } from "./github";
-import { VirtualFileSystem } from "./vfs";
+import { type IFileSystem } from "./vfs";
 
 const kicad_extensions = ["kicad_pcb", "kicad_pro", "kicad_sch"];
 const gh_user_content = new GitHubUserContent();
@@ -16,10 +16,8 @@ const gh = new GitHub();
 /**
  * Virtual file system for GitHub.
  */
-export class GitHubFileSystem extends VirtualFileSystem {
-    constructor(private files_to_urls: Map<string, URL>) {
-        super();
-    }
+export class GitHubFileSystem implements IFileSystem {
+    constructor(private files_to_urls: Map<string, URL>) {}
 
     public static async fromURLs(
         ...urls: (string | URL)[]
@@ -91,11 +89,11 @@ export class GitHubFileSystem extends VirtualFileSystem {
         return new GitHubFileSystem(files_to_urls);
     }
 
-    public override *list() {
+    *list() {
         yield* this.files_to_urls.keys();
     }
 
-    public override get(name: string): Promise<File> {
+    async get(name: string) {
         const url = this.files_to_urls.get(name);
 
         if (!url) {
@@ -105,11 +103,11 @@ export class GitHubFileSystem extends VirtualFileSystem {
         return gh_user_content.get(url);
     }
 
-    public override has(name: string) {
+    async has(name: string) {
         return Promise.resolve(this.files_to_urls.has(name));
     }
 
-    public override async download(name: string) {
+    async download(name: string) {
         // Note: we can't just use the GitHub URL to download since the anchor
         // tag method used by initiate_download() only works for same-origin
         // or data: urls, so this actually fetch()s the file and then initiates

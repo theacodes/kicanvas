@@ -15,12 +15,12 @@ import type {
     SchematicSheet,
     SchematicSheetInstance,
 } from "../kicad/schematic";
-import type { VirtualFileSystem } from "./services/vfs";
+import type { IFileSystem } from "./services/vfs";
 
 const log = new Logger("kicanvas:project");
 
 export class Project extends EventTarget implements IDisposable {
-    #fs: VirtualFileSystem;
+    #fs: IFileSystem;
     #files_by_name: Map<string, KicadPCB | KicadSch | null> = new Map();
     #pages_by_path: Map<string, ProjectPage> = new Map();
     #root_schematic_page?: ProjectPage;
@@ -33,7 +33,7 @@ export class Project extends EventTarget implements IDisposable {
         this.#pages_by_path.clear();
     }
 
-    public async load(fs: VirtualFileSystem) {
+    public async load(fs: IFileSystem) {
         log.info(`Loading project from ${fs.constructor.name}`);
 
         this.settings = new ProjectSettings();

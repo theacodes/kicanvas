@@ -6,11 +6,11 @@
 
 import {
     DragAndDropFileSystem,
-    VirtualFileSystem,
+    type IFileSystem,
 } from "../../kicanvas/services/vfs";
 
 export class DropTarget {
-    constructor(elm: HTMLElement, callback: (fs: VirtualFileSystem) => void) {
+    constructor(elm: HTMLElement, callback: (fs: IFileSystem) => void) {
         elm.addEventListener(
             "dragenter",
             (e) => {
