@@ -88,6 +88,9 @@ class KiCanvasShellElement extends KCUIElement {
             ...url_params.getAll("repo"),
         ];
 
+        // Only load the first URL
+        const url = urls[0];
+
         later(async () => {
             if (this.src) {
                 const vfs = new FetchFileSystem([this.src]);
@@ -95,8 +98,8 @@ class KiCanvasShellElement extends KCUIElement {
                 return;
             }
 
-            if (urls.length) {
-                const vfs = await this.load_repo(...urls);
+            if (url) {
+                const vfs = await this.load_repo(url);
                 if (!vfs) {
                     return;
                 }
@@ -134,10 +137,10 @@ class KiCanvasShellElement extends KCUIElement {
         });
     }
 
-    private async load_repo(...url: string[]): Promise<IFileSystem | null> {
+    private async load_repo(url: string): Promise<IFileSystem | null> {
         return (
-            (await GitHubFileSystem.fromURLs(...url)) ??
-            (await CodebergFileSystem.fromURLs(...url))
+            (await GitHubFileSystem.fromURLs(url)) ??
+            (await CodebergFileSystem.fromURLs(url))
         );
     }
 

@@ -21,64 +21,60 @@ export class GitHubFileSystem implements IFileSystem {
 
     async setup() {}
     public static async fromURLs(
-        ...urls: (string | URL)[]
+        url: string | URL,
     ): Promise<GitHubFileSystem | null> {
         // Handles URLs like this:
         // https://github.com/wntrblm/Helium/blob/main/hardware/board/board.kicad_sch
 
         const files_to_urls = new Map();
 
-        for (const url of urls) {
-            const info = GitHub.parse_url(url);
+        const info = GitHub.parse_url(url);
 
-            if (!info || !info.owner || !info.repo) {
-                continue;
-            }
+        if (!info || !info.owner || !info.repo) {
+            return null;
+        }
 
-            // Link to the root of a repo, treat it as tree using HEAD
-            if (info.type == "root") {
-                info.ref = "HEAD";
+        // Link to the root of a repo, treat it as tree using HEAD
+        if (info.type == "root") {
+            info.ref = "HEAD";
+            info.type = "tree";
+        }
+
+        // Link to a single file.
+        if (info.type == "blob") {
+            if (["kicad_sch", "kicad_pcb"].includes(extension(info.path!))) {
+                const guc_url = gh_user_content.convert_url(url);
+                const name = basename(guc_url);
+                files_to_urls.set(name, guc_url);
+            } else {
+                // Link to non-kicad file, try using the containing directory.
                 info.type = "tree";
+                info.path = dirname(info.path!);
             }
+        }
 
-            // Link to a single file.
-            if (info.type == "blob") {
+        // Link to a directory.
+        if (info.type == "tree") {
+            // Get a list of files in the directory.
+            const gh_file_list = (await gh.repos_contents(
+                info.owner,
+                info.repo,
+                info.path ?? "",
+                info.ref,
+            )) as Record<string, string>[];
+
+            for (const gh_file of gh_file_list) {
+                const name = gh_file["name"];
+                const download_url = gh_file["download_url"];
                 if (
-                    ["kicad_sch", "kicad_pcb"].includes(extension(info.path!))
+                    !name ||
+                    !download_url ||
+                    !kicad_extensions.includes(extension(name))
                 ) {
-                    const guc_url = gh_user_content.convert_url(url);
-                    const name = basename(guc_url);
-                    files_to_urls.set(name, guc_url);
-                } else {
-                    // Link to non-kicad file, try using the containing directory.
-                    info.type = "tree";
-                    info.path = dirname(info.path!);
+                    continue;
                 }
-            }
 
-            // Link to a directory.
-            if (info.type == "tree") {
-                // Get a list of files in the directory.
-                const gh_file_list = (await gh.repos_contents(
-                    info.owner,
-                    info.repo,
-                    info.path ?? "",
-                    info.ref,
-                )) as Record<string, string>[];
-
-                for (const gh_file of gh_file_list) {
-                    const name = gh_file["name"];
-                    const download_url = gh_file["download_url"];
-                    if (
-                        !name ||
-                        !download_url ||
-                        !kicad_extensions.includes(extension(name))
-                    ) {
-                        continue;
-                    }
-
-                    files_to_urls.set(name, download_url);
-                }
+                files_to_urls.set(name, download_url);
             }
         }
 
