@@ -19,6 +19,7 @@ const gh = new GitHub();
 export class GitHubFileSystem implements IFileSystem {
     constructor(private files_to_urls: Map<string, URL>) {}
 
+    async setup() {}
     public static async fromURLs(
         ...urls: (string | URL)[]
     ): Promise<GitHubFileSystem | null> {

@@ -146,6 +146,7 @@ class KiCanvasShellElement extends KCUIElement {
         this.loading = true;
 
         try {
+            await vfs.setup();
             await this.project.load(vfs);
             this.project.set_active_page(this.project.first_page);
             this.loaded = true;

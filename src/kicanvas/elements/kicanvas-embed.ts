@@ -164,6 +164,7 @@ class KiCanvasEmbedElement extends KCUIElement {
         this.loading = true;
 
         try {
+            await vfs.setup();
             await this.#project.load(vfs);
 
             this.loaded = true;

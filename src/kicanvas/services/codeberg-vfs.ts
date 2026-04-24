@@ -12,6 +12,7 @@ import { type IFileSystem } from "./vfs";
 export class CodebergFileSystem implements IFileSystem {
     static readonly kicad_extensions = ["kicad_pcb", "kicad_pro", "kicad_sch"];
 
+    async setup() {}
     constructor(private files_to_urls: Map<string, URL>) {}
 
     public static async fromURLs(
