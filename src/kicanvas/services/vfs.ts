@@ -131,7 +131,7 @@ export abstract class FileSystemBase implements IFileSystem {
             return;
         }
 
-        const entries = await this.enumrate(dir);
+        const entries = await this.enumerate(dir);
         this.entries.set(dir, { path: dir, type: "visited-directory" });
 
         for (const it of entries) {
@@ -150,7 +150,7 @@ export abstract class FileSystemBase implements IFileSystem {
     /**
      * Enumerate files at `base_dir`. (default: empty)
      */
-    protected abstract enumrate(base_dir: string): Promise<FileEntry[]>;
+    protected abstract enumerate(base_dir: string): Promise<FileEntry[]>;
 }
 
 /**
@@ -224,7 +224,7 @@ export class LocalFileSystemBase extends FileSystemBase {
         return file;
     }
 
-    async enumrate(base_dir: string): Promise<FileEntry[]> {
+    async enumerate(base_dir: string): Promise<FileEntry[]> {
         // All files are already provided by the constructor.
         return [];
     }
@@ -301,7 +301,7 @@ export class FetchFileSystem extends FileSystemBase {
         return new File([blob], path);
     }
 
-    async enumrate(base_dir: string): Promise<FileEntry[]> {
+    async enumerate(base_dir: string): Promise<FileEntry[]> {
         return Array.from(this.urls.keys()).map((path) => ({
             path,
             type: "file",

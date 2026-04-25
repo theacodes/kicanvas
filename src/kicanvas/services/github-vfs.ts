@@ -51,7 +51,7 @@ export class GitHubFileSystem extends FileSystemBase {
         return await gh_user_content.get(download_url);
     }
 
-    override async enumrate(cur_dir: string): Promise<FileEntry[]> {
+    override async enumerate(cur_dir: string): Promise<FileEntry[]> {
         if (this.single_file) {
             // single file, return all files directly
             return Array.from(this.download_urls.keys()).map((v) => ({
