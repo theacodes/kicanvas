@@ -35,12 +35,11 @@ export class GitHubFileSystem extends FileSystemBase {
         if (single_file) {
             // Handles URLs like this:
             // https://github.com/wntrblm/Helium/blob/main/hardware/board/board.kicad_sch
+            // In single-file mode, just store file basename
             const guc_url = gh_user_content.convert_url(url);
             const name = basename(guc_url);
             this.download_urls.set(name, guc_url);
         }
-
-        console.log(url, gh_repo);
     }
 
     override async load_file(path: string): Promise<File> {

@@ -5,6 +5,7 @@
 */
 
 import { basename } from "../../base/paths";
+import { is_array } from "../../base/types";
 import { request_error_handler } from "./api-error";
 
 export class GitHubURLInfo {
@@ -140,9 +141,16 @@ export class GitHub {
     ) {
         // https://docs.github.com/en/rest/repos/contents
         // <api_base>/repos/{owner}/{repo}/contents/{path}
-        return (await this.request(`repos/${owner}/${repo}/contents/${path}`, {
-            ref: ref ?? "",
-        })) as GithubContentResponse[];
+        const result = await this.request(
+            `repos/${owner}/${repo}/contents/${path}`,
+            {
+                ref: ref ?? "",
+            },
+        );
+
+        return is_array(result)
+            ? (result as GithubContentResponse[])
+            : [result as GithubContentResponse];
     }
 }
 

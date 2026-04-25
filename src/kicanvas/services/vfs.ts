@@ -67,7 +67,7 @@ export abstract class FileSystemBase implements IFileSystem {
     // root.kicad_pcb -> { name: "root.kicad_pcb", type: "file" }
     // subdir -> { name: "subdir", type: "directory" }
     // subdir/qwq1.kicad_sch -> { name: "subdir/qwq1.kicad_sch", type: "file" }
-    // subdir/qwq2.kicad_sch -> { name: "subdir/qwq1.kicad_sch", type: "file" }
+    // subdir/qwq2.kicad_sch -> { name: "subdir/qwq2.kicad_sch", type: "file" }
     private entries: Map<string, FileEntryCache>;
 
     constructor(entries: Map<string, FileEntry> = new Map()) {
@@ -96,12 +96,8 @@ export abstract class FileSystemBase implements IFileSystem {
     }
 
     async has(name: string) {
-        if (this.entries.has(name)) {
-            return true;
-        }
-
         const dir = dirname(name);
-        if (!this.entries.has(dir)) {
+        if (!this.entries.has(dir) && !this.entries.has(name)) {
             return false;
         }
 
