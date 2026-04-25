@@ -21,3 +21,31 @@ export function basename(path: string | URL) {
 export function extension(path: string) {
     return path.split(".").at(-1) ?? "";
 }
+
+/**
+ * Path.join and normalize the result,
+ * It DOES NOT check relative path or absolute path.
+ * + `('', '/qwq')` -> `qwq`
+ * + `('///', '/qwq/', 'file')` -> `qwq/file`
+ */
+export function normalize_join(...parts: string[]): string {
+    return parts
+        .flatMap((p) => p.split("/"))
+        .filter((s) => s !== "")
+        .join("/");
+}
+
+/**
+ * Return relative path of `absolute` based on `parent`.
+ * + `('qwq/abc', 'qwq/abc/def/file')` -> `def/file`
+ */
+export function based_on(parent: string, absolute: string): string {
+    if (parent === absolute) {
+        return "";
+    }
+    const base = normalize_join(parent);
+    const prefix = base.length > 0 ? base + "/" : "";
+    return absolute.startsWith(prefix)
+        ? absolute.slice(prefix.length)
+        : absolute;
+}

@@ -5,7 +5,13 @@
 */
 
 import { initiate_download } from "../../base/dom/download";
-import { basename, dirname, extension } from "../../base/paths";
+import {
+    based_on,
+    basename,
+    dirname,
+    extension,
+    normalize_join,
+} from "../../base/paths";
 
 /**
  * Virtual file system interface.
@@ -34,9 +40,17 @@ export interface IFileSystem {
 /**
  * File entry, directory or file
  */
-export interface FileEntry {
-    name: string;
+export class FileEntry {
+    path: string;
     type: "file" | "directory";
+}
+
+/**
+ * File entry, additional type for mark visited items
+ */
+class FileEntryCache {
+    path: string;
+    type: "file" | "directory" | "visited-directory";
 }
 
 /**
@@ -51,10 +65,10 @@ export abstract class FileSystemBase implements IFileSystem {
     //     + qwq2.kicad_sch
     // stored as
     // root.kicad_pcb -> { name: "root.kicad_pcb", type: "file" }
-    // subdir -> { name: "subdir", type: "directory" }   <-- optional
+    // subdir -> { name: "subdir", type: "directory" }
     // subdir/qwq1.kicad_sch -> { name: "subdir/qwq1.kicad_sch", type: "file" }
     // subdir/qwq2.kicad_sch -> { name: "subdir/qwq1.kicad_sch", type: "file" }
-    private entries: Map<string, FileEntry>;
+    private entries: Map<string, FileEntryCache>;
 
     constructor(entries: Map<string, FileEntry> = new Map()) {
         this.entries = entries;
@@ -82,8 +96,16 @@ export abstract class FileSystemBase implements IFileSystem {
     }
 
     async has(name: string) {
-        // load entries on current directory
+        if (this.entries.has(name)) {
+            return true;
+        }
+
         const dir = dirname(name);
+        if (!this.entries.has(dir)) {
+            return false;
+        }
+
+        // load entries on current directory
         await this.walk(dir);
 
         // check if the file exists and is a file
@@ -105,34 +127,22 @@ export abstract class FileSystemBase implements IFileSystem {
     }
 
     /**
-     * Walk through directories to find file entry,
-     * and update entries cache.
+     * Walk through directories and update `this.entries`
      */
     private async walk(dir: string): Promise<void> {
-        const queue: string[] = [dir];
+        if (this.entries.get(dir)?.type === "visited-directory") {
+            // visited directory, skip it.
+            return;
+        }
 
-        while (queue.length > 0) {
-            const dir = queue.shift()!;
+        const entries = await this.enumrate(dir);
+        this.entries.set(dir, { path: dir, type: "visited-directory" });
 
-            if (this.entries.has(dir)) {
+        for (const it of entries) {
+            if (it.type === "file" && !FileSystemBase.is_kicad_file(it.path)) {
                 continue;
             }
-
-            const entries = await this.enumrate(dir);
-            this.entries.set(dir, { name: dir, type: "directory" });
-
-            for (const entry of entries) {
-                if (entry.name.startsWith(dir) && entry.type === "directory") {
-                    // walking into subdirectory
-                    queue.push(entry.name);
-                }
-
-                // cache the result
-                const full_path =
-                    dir.length === 0 ? entry.name : `${dir}/${entry.name}`;
-                const abs_entry = { name: full_path, type: entry.type };
-                this.entries.set(full_path, abs_entry);
-            }
+            this.entries.set(it.path, it);
         }
     }
 
@@ -227,7 +237,7 @@ export class LocalFileSystemBase extends FileSystemBase {
         const result = new Map<string, FileEntry>();
 
         for (const path of files.keys()) {
-            result.set(path, { name: path, type: "file" });
+            result.set(path, { path: path, type: "file" });
         }
 
         return result;
@@ -296,8 +306,8 @@ export class FetchFileSystem extends FileSystemBase {
     }
 
     async enumrate(base_dir: string): Promise<FileEntry[]> {
-        return Array.from(this.urls.keys()).map((name) => ({
-            name,
+        return Array.from(this.urls.keys()).map((path) => ({
+            path,
             type: "file",
         }));
     }
@@ -330,7 +340,7 @@ export class DragAndDropFileSystem extends LocalFileSystemBase {
                 DragAndDropFileSystem.is_kicad_file(entry.name)
             ) {
                 const file = await DragAndDropFileSystem.load(entry);
-                file_map.set(entry.fullPath, file);
+                file_map.set(normalize_join(entry.fullPath), file);
             }
         }
 
@@ -338,13 +348,11 @@ export class DragAndDropFileSystem extends LocalFileSystemBase {
 
         // deduce the common base directory
         const lcp = DragAndDropFileSystem.lcp(Array.from(file_map.keys()));
-
-        // get base directory only
-        const prefix = lcp.slice(0, lcp.lastIndexOf("/") + 1);
-
-        return new DragAndDropFileSystem(
-            new Map([...file_map].map(([p, f]) => [p.slice(prefix.length), f])),
+        const res = new Map(
+            [...file_map].map(([p, f]) => [based_on(lcp, p), f]),
         );
+
+        return new DragAndDropFileSystem(res);
     }
 
     private static lcp(str: string[]): string {

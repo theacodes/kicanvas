@@ -7,6 +7,26 @@
 import { basename } from "../../base/paths";
 import { request_error_handler } from "./api-error";
 
+export class GitHubURLInfo {
+    owner: string;
+    repo: string;
+    type: string;
+    ref?: string;
+    path?: string;
+}
+
+export class GithubContentResponse {
+    download_url: string;
+    git_url: string;
+    html_url: string;
+    name: string;
+    path: string;
+    sha: string;
+    size: number;
+    type: string;
+    url: string;
+}
+
 export class GitHub {
     static readonly host_name = "github.com";
     static readonly html_base_url = "https://github.com";
@@ -28,7 +48,7 @@ export class GitHub {
     /**
      * Parse an html (user-facing) URL
      */
-    static parse_url(url: string | URL) {
+    static parse_url(url: string | URL): GitHubURLInfo | null {
         url = new URL(url, GitHub.html_base_url);
         if (url.hostname != GitHub.host_name) {
             return null;
@@ -41,6 +61,9 @@ export class GitHub {
         }
 
         const [, owner, repo, ...parts] = path_parts;
+        if (!owner || !repo) {
+            return null;
+        }
 
         let type;
         let ref;
@@ -54,6 +77,10 @@ export class GitHub {
             }
         } else {
             type = "root";
+        }
+
+        if (!type) {
+            return null;
         }
 
         return {
@@ -111,9 +138,11 @@ export class GitHub {
         path: string,
         ref?: string,
     ) {
-        return await this.request(`repos/${owner}/${repo}/contents/${path}`, {
+        // https://docs.github.com/en/rest/repos/contents
+        // <api_base>/repos/{owner}/{repo}/contents/{path}
+        return (await this.request(`repos/${owner}/${repo}/contents/${path}`, {
             ref: ref ?? "",
-        });
+        })) as GithubContentResponse[];
     }
 }
 
