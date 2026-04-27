@@ -24,7 +24,7 @@ export interface IFileSystem {
     /** List all files */
     list(): Generator<string>;
 
-    /** Initialize it */
+    /** Initialize it. Call this function befoce using VFS */
     setup(): Promise<void>;
 
     /** Get a file */

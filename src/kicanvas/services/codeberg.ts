@@ -22,13 +22,20 @@ export class GetBlobResponse {
     url: string;
 }
 
+export class CodebergRepoInfo {
+    owner: string;
+    repo: string;
+    ref: string;
+    path: string;
+}
+
 export class Codeberg {
     static readonly host_name = "codeberg.org";
     static readonly html_base_url = "https://codeberg.org/";
     static readonly base_url = "https://codeberg.org/api/v1/";
     static readonly accept_header = "application/json";
 
-    static parse_url(url: string | URL) {
+    static parse_url(url: string | URL): CodebergRepoInfo | null {
         url = new URL(url, Codeberg.html_base_url);
         if (url.hostname !== Codeberg.host_name) {
             return null;
@@ -41,6 +48,9 @@ export class Codeberg {
         }
 
         const [, owner, repo, ...parts] = path_parts;
+        if (!owner || !repo) {
+            return null;
+        }
 
         let ref, path;
         if (parts.length > 0) {

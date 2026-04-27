@@ -42,7 +42,7 @@ export class GitHubFileSystem extends FileSystemBase {
         }
     }
 
-    override async load_file(path: string): Promise<File> {
+    async load_file(path: string): Promise<File> {
         const download_url = this.download_urls.get(path);
         if (!download_url) {
             throw new Error(`File ${path} not found!`);
@@ -51,7 +51,7 @@ export class GitHubFileSystem extends FileSystemBase {
         return await gh_user_content.get(download_url);
     }
 
-    override async enumerate(cur_dir: string): Promise<FileEntry[]> {
+    async enumerate(cur_dir: string): Promise<FileEntry[]> {
         if (this.single_file) {
             // single file, return all files directly
             return Array.from(this.download_urls.keys()).map((v) => ({
