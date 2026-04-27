@@ -352,20 +352,29 @@ export class DragAndDropFileSystem extends LocalFileSystemBase {
     }
 
     private static lcp(str: string[]): string {
-        const beg = str[0] ?? "";
-        return str.reduce((common, path) => {
-            let i = 0;
+        if (str.length === 0) {
+            return "";
+        }
 
-            while (
-                i < common.length &&
-                i < path.length &&
-                common[i] === path[i]
-            ) {
+        // split dirname only
+        const str_arr = str.map((s) =>
+            s.split("/").filter(Boolean).slice(0, -1),
+        );
+
+        const fst = str_arr[0]!;
+        let p_len = fst.length;
+        for (const s of str_arr.slice(1)) {
+            let i = 0;
+            while (i < p_len && i < s.length && fst[i] === s[i]) {
                 i += 1;
             }
+            p_len = i;
+            if (p_len === 0) {
+                break;
+            }
+        }
 
-            return common.slice(0, i);
-        }, beg);
+        return fst.slice(0, p_len).join("/");
     }
 
     private static async load(entry: FileSystemFileEntry): Promise<File> {
