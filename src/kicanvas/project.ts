@@ -54,12 +54,12 @@ export class Project extends EventTarget implements IDisposable {
 
         // 'Recursively' resolve all schematics until none remain
         let load_new = true;
-        const skipped_files: string[] = [];
+        const loaded_files: string[] = [];
         while (load_new) {
             load_new = false;
 
-            const loaded_file = Array.from(this.schematics());
-            for (const sch of loaded_file) {
+            const pending = [];
+            for (const sch of this.schematics()) {
                 const base_dir = dirname(sch.filename);
                 for (const subsch of sch.sheets) {
                     if (!subsch.sheetfile) {
@@ -67,29 +67,26 @@ export class Project extends EventTarget implements IDisposable {
                     }
 
                     const new_file = normalize_join(base_dir, subsch.sheetfile);
-
-                    const loaded = loaded_file.map((s) => s.filename);
-                    if (
-                        loaded.includes(new_file) ||
-                        skipped_files.includes(new_file)
-                    ) {
+                    if (loaded_files.includes(new_file)) {
                         // file loaded or skipped
                         continue;
                     }
 
                     load_new = true;
+                    loaded_files.push(new_file);
 
                     if (await this.#fs.has(new_file)) {
                         // load file, it changes this.#files_by_name and causes calling
                         // this.schematics() will return a new result.
-                        await this.#load_file(new_file);
+                        pending.push(this.#load_file(new_file));
                     } else {
                         // skip non-existent files to allow loading an incomplete schematics
-                        skipped_files.push(new_file);
                         log.warn(`file "${new_file}" is not existed, skip it.`);
                     }
                 }
             }
+
+            await Promise.all(pending);
         }
 
         this.#determine_schematic_hierarchy();
