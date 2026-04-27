@@ -29,6 +29,10 @@ export class CodebergFileSystem extends FileSystemBase {
         // API: https://codeberg.org/api/swagger#/repository/GetBlob
         const blob = await Codeberg.request_json<GetBlobResponse>(url.pathname);
 
+        if (blob.content.length === 0) {
+            throw new Error(`Blob returns empty when loading file ${path}`);
+        }
+
         if (blob.encoding !== "base64") {
             throw new Error(`Unsupported encoding: ${blob.encoding}`);
         }
