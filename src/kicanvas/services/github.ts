@@ -55,7 +55,7 @@ export class GitHub {
             return null;
         }
 
-        const path_parts = url.pathname.split("/");
+        const path_parts = url.pathname.split("/").map((s) => decodeURI(s));
 
         if (path_parts.length < 3) {
             return null;

@@ -18,8 +18,12 @@ export function basename(path: string | URL) {
     return path.split("/").at(-1)!;
 }
 
-export function extension(path: string) {
-    return path.split(".").at(-1) ?? "";
+export function extension(path: string): string {
+    const res = path.split(".");
+    if (res.length <= 1) {
+        return "";
+    }
+    return res.at(-1)!;
 }
 
 /**

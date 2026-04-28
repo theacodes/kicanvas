@@ -73,7 +73,8 @@ export class GitHubFileSystem extends FileSystemBase {
         const result: FileEntry[] = [];
         for (const it of contents) {
             if (it.type === "file" && GitHubFileSystem.is_kicad_file(it.name)) {
-                const file_path = based_on(base_dir, it.path);
+                const path = decodeURI(it.path);
+                const file_path = based_on(base_dir, path);
 
                 this.download_urls.set(file_path, new URL(it.download_url));
 
@@ -82,9 +83,12 @@ export class GitHubFileSystem extends FileSystemBase {
                     path: file_path,
                 });
             } else if (it.type === "dir") {
+                const path = decodeURI(it.path);
+                const dir_path = based_on(base_dir, path);
+
                 result.push({
                     type: "directory",
-                    path: based_on(base_dir, it.path),
+                    path: dir_path,
                 });
             }
         }
@@ -110,12 +114,15 @@ export class GitHubFileSystem extends FileSystemBase {
         // If it's one file just load one file.
         let single_file = false;
         if (info.type === "blob") {
-            if (["kicad_sch", "kicad_pcb"].includes(extension(info.path!))) {
+            const ext_name = extension(info.path!);
+            if (["kicad_sch", "kicad_pcb"].includes(ext_name)) {
                 single_file = true;
             } else {
                 // Link to non-kicad file, try using the containing directory.
                 info.type = "tree";
-                info.path = dirname(info.path!);
+                if (ext_name.length !== 0) {
+                    info.path = dirname(info.path!);
+                }
             }
         }
 

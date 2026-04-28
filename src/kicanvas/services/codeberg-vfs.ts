@@ -65,7 +65,8 @@ export class CodebergFileSystem extends FileSystemBase {
                 it.type === "file" &&
                 CodebergFileSystem.is_kicad_file(it.name)
             ) {
-                const file_path = based_on(base_dir, it.path);
+                const path = decodeURI(it.path);
+                const file_path = based_on(base_dir, path);
 
                 this.download_urls.set(file_path, new URL(it.git_url));
 
@@ -74,9 +75,12 @@ export class CodebergFileSystem extends FileSystemBase {
                     path: file_path,
                 });
             } else if (it.type === "dir") {
+                const path = decodeURI(it.path);
+                const dir_path = based_on(base_dir, path);
+
                 result.push({
                     type: "directory",
-                    path: based_on(base_dir, it.path),
+                    path: dir_path,
                 });
             }
         }
