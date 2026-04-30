@@ -24,10 +24,24 @@ The above example shows the most basic usage of the `<kicanvas-embed>` element. 
 
 ## Installation
 
+### Pre-compiled
+
 During alpha, the best way to install KiCanvas is to [download the bundled kicanvas.js](/kicanvas/kicanvas.js), copy it into your project, and include it with a script tag:
 
 ```html
 <script type="module" src="/kicanvas.js"></script>
+```
+
+### Package installation
+
+```bash
+npm install --save https://github.com/theacodes/kicanvas
+```
+
+Ensure the package is imported somewhere like `main.ts` to enable the custom web elements.
+
+```typescript
+import "kicanvas";
 ```
 
 ## Examples
