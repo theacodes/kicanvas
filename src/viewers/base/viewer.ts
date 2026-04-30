@@ -125,10 +125,12 @@ export abstract class Viewer extends EventTarget {
 
     public abstract load(src: any): Promise<void>;
 
-    protected resolve_loaded(value: boolean) {
+    public resolve_loaded(value: boolean) {
         if (value) {
             this.loaded.open();
             this.dispatchEvent(new KiCanvasLoadEvent());
+        } else { //To enable reload awaiting
+            this.loaded = new Barrier();
         }
     }
 

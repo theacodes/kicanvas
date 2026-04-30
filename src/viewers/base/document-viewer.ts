@@ -74,16 +74,14 @@ export abstract class DocumentViewer<
             log.info("Positioning camera");
             this.zoom_to_page();
 
-            // Mark the viewer as loaded and notify event listeners
-            this.resolve_loaded(true);
-
-            // Deselect any selected items.
+            // Deselect any selected items before marking as loaded to not cause a bug when changing page and selecting item
             if (this.selected) {
                 this.selected = null;
             }
-
             // Draw
             this.draw();
+            // Mark the viewer as loaded and notify event listeners
+            this.resolve_loaded(true);
         });
     }
 
@@ -152,7 +150,7 @@ export abstract class DocumentViewer<
                 `Unable to select item ${item}, could not find an object that matched.`,
             );
         }
-
+        console.log("Reference found and loadded")
         this.selected = item ?? null;
     }
 }
