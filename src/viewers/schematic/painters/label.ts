@@ -57,8 +57,13 @@ export class LabelPainter extends SchematicItemPainter {
         );
 
         this.gfx.state.push();
-        this.gfx.state.stroke = this.color;
-        this.gfx.state.fill = this.color;
+        // KiCad uses a zero-alpha font color to select the label's theme
+        // color. Preserve that fallback, but honor explicitly colored labels.
+        const color = l.effects.font.color.a
+            ? l.effects.font.color
+            : this.color;
+        this.gfx.state.stroke = color;
+        this.gfx.state.fill = color;
 
         StrokeFont.default().draw(
             this.gfx,
