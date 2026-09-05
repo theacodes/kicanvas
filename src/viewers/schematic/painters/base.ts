@@ -13,13 +13,13 @@ import type { SchematicPainter } from "../painter";
 import type { SymbolTransform } from "./symbol";
 
 export abstract class BaseSchematicPainter extends DocumentPainter {
-    override theme: SchematicTheme;
+    declare theme: SchematicTheme;
     current_symbol?: schematic_items.SchematicSymbol;
     current_symbol_transform?: SymbolTransform;
 }
 
 export abstract class SchematicItemPainter extends ItemPainter {
-    override view_painter: SchematicPainter;
+    declare view_painter: SchematicPainter;
 
     override get theme(): SchematicTheme {
         return this.view_painter.theme;

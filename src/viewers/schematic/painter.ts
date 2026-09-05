@@ -158,9 +158,11 @@ class WirePainter extends SchematicItemPainter {
     }
 
     paint(layer: ViewLayer, w: schematic_items.Wire) {
-        this.gfx.line(
-            new Polyline(w.pts, this.gfx.state.stroke_width, this.theme.wire),
-        );
+        // KiCad uses a zero-alpha stroke color for the default wire color.
+        // Preserve the theme in that case, but honor explicitly colored wires.
+        const color = w.stroke?.color?.a ? w.stroke.color : this.theme.wire;
+
+        this.gfx.line(new Polyline(w.pts, this.gfx.state.stroke_width, color));
     }
 }
 
@@ -641,7 +643,7 @@ class SchematicSheetPainter extends SchematicItemPainter {
 }
 
 export class SchematicPainter extends BaseSchematicPainter {
-    override theme: SchematicTheme;
+    declare theme: SchematicTheme;
 
     constructor(gfx: Renderer, layers: LayerSet, theme: SchematicTheme) {
         super(gfx, layers, theme);
