@@ -37,7 +37,10 @@ export class WebGL2Renderer extends Renderer {
      * Create and configure the WebGL2 context.
      */
     override async setup() {
-        const gl = this.canvas.getContext("webgl2", { alpha: false });
+        const gl = this.canvas.getContext("webgl2", {
+            alpha: false,
+            stencil: true,
+        });
 
         if (gl == null) {
             throw new Error("Unable to create WebGL2 context");
@@ -54,7 +57,10 @@ export class WebGL2Renderer extends Renderer {
 
         gl.clearColor(...this.background_color.to_array());
         gl.clearDepth(0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clearStencil(0);
+        gl.clear(
+            gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT,
+        );
 
         this.update_canvas_size();
 
@@ -98,7 +104,11 @@ export class WebGL2Renderer extends Renderer {
         // Update canvas size and projection matrix if needed
         this.update_canvas_size();
 
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(
+            this.gl.COLOR_BUFFER_BIT |
+                this.gl.DEPTH_BUFFER_BIT |
+                this.gl.STENCIL_BUFFER_BIT,
+        );
     }
 
     override start_layer(name: string, depth = 0) {
