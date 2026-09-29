@@ -26,6 +26,7 @@ import { Color } from "../../base/color";
 import type { IDisposable } from "../../base/disposable";
 import { Matrix3, Vec2 } from "../../base/math";
 import { Circle, Polygon, Polyline } from "../shapes";
+import { split_bridged_polygon } from "../polygon-rings";
 import { Buffer, ShaderProgram, VertexArray } from "./helpers";
 import polygon_frag_shader_src from "./polygon.frag.glsl";
 import polygon_vert_shader_src from "./polygon.vert.glsl";
@@ -436,6 +437,8 @@ export class PolygonSet implements IDisposable {
     position_buf: Buffer;
     color_buf: Buffer;
     vertex_count: number;
+    #stencil_ranges: { start: number; outer_count: number; count: number }[] =
+        [];
 
     /**
      * Load the shader program required to render this primitive.
@@ -501,10 +504,36 @@ export class PolygonSet implements IDisposable {
      */
     set(polygons: Polygon[]) {
         let total_vertex_data_length = 0;
+        const contours: Polygon[] = [];
+        this.#stencil_ranges = [];
 
         for (const polygon of polygons) {
-            Tesselator.triangulate_polygon(polygon);
-            total_vertex_data_length += polygon.vertices?.length ?? 0;
+            const rings = polygon.vertices
+                ? [polygon.points]
+                : split_bridged_polygon(polygon.points);
+            const start = total_vertex_data_length / 2;
+            let outer_count = 0;
+
+            for (const [index, ring] of rings.entries()) {
+                // Holes are triangulated separately, avoiding earcut's costly
+                // bridge search on copper planes with thousands of cutouts.
+                const contour =
+                    rings.length === 1
+                        ? polygon
+                        : new Polygon(ring, polygon.color);
+                Tesselator.triangulate_polygon(contour);
+                contours.push(contour);
+                total_vertex_data_length += contour.vertices.length;
+                if (index === 0) outer_count = contour.vertices.length / 2;
+            }
+
+            if (rings.length > 1) {
+                this.#stencil_ranges.push({
+                    start,
+                    outer_count,
+                    count: total_vertex_data_length / 2 - start,
+                });
+            }
         }
 
         const total_vertices = total_vertex_data_length / 2;
@@ -514,7 +543,7 @@ export class PolygonSet implements IDisposable {
 
         let vertex_data_idx = 0;
         let color_data_idx = 0;
-        for (const polygon of polygons) {
+        for (const polygon of contours) {
             if (polygon.vertices == null) {
                 continue;
             }
@@ -543,7 +572,63 @@ export class PolygonSet implements IDisposable {
             return;
         }
         this.vao.bind();
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertex_count);
+        const gl = this.gl;
+        if (!this.#stencil_ranges.length) {
+            gl.drawArrays(gl.TRIANGLES, 0, this.vertex_count);
+            return;
+        }
+
+        const depth_test = gl.isEnabled(gl.DEPTH_TEST);
+        const depth_write = gl.getParameter(gl.DEPTH_WRITEMASK) as boolean;
+        const color_write = gl.getParameter(gl.COLOR_WRITEMASK) as boolean[];
+        let start = 0;
+
+        for (const range of this.#stencil_ranges) {
+            // Keep adjacent ordinary polygons in one draw call.
+            if (range.start > start) {
+                gl.drawArrays(gl.TRIANGLES, start, range.start - start);
+            }
+
+            gl.enable(gl.STENCIL_TEST);
+            gl.stencilMask(0xff);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+            gl.disable(gl.DEPTH_TEST);
+            gl.depthMask(false);
+            gl.colorMask(false, false, false, false);
+
+            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+            gl.drawArrays(gl.TRIANGLES, range.start, range.outer_count);
+            // Replace with zero, rather than invert, so overlapping holes
+            // remain empty. This mask belongs only to the current polygon.
+            gl.stencilFunc(gl.ALWAYS, 0, 0xff);
+            gl.drawArrays(
+                gl.TRIANGLES,
+                range.start + range.outer_count,
+                range.count - range.outer_count,
+            );
+
+            if (depth_test) gl.enable(gl.DEPTH_TEST);
+            gl.depthMask(depth_write);
+            gl.colorMask(
+                color_write[0]!,
+                color_write[1]!,
+                color_write[2]!,
+                color_write[3]!,
+            );
+            gl.stencilFunc(gl.EQUAL, 1, 0xff);
+            // Clear the mask on both depth pass and fail while shading the
+            // exterior. Occluded copper must not leak into the next polygon.
+            gl.stencilOp(gl.KEEP, gl.ZERO, gl.ZERO);
+            gl.drawArrays(gl.TRIANGLES, range.start, range.outer_count);
+            gl.disable(gl.STENCIL_TEST);
+
+            start = range.start + range.count;
+        }
+
+        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+        if (start < this.vertex_count) {
+            gl.drawArrays(gl.TRIANGLES, start, this.vertex_count - start);
+        }
     }
 }
 

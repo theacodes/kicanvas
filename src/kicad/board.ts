@@ -20,8 +20,8 @@ import {
     type HasUniqueID,
     type HasStrokeParams,
 } from "./common";
-import { P, T, parse_expr, type Parseable } from "./parser";
-import type { List } from "./tokenizer";
+import { P, T, parse_expr, parse_expr_into, type Parseable } from "./parser";
+import { listify_blob, type List } from "./tokenizer";
 
 export type Drawing =
     | GrLine
@@ -58,55 +58,94 @@ export class KicadPCB {
 
     constructor(
         public filename: string,
-        expr: Parseable,
+        expr: Parseable | undefined,
     ) {
-        Object.assign(
-            this,
-            parse_expr(
-                expr,
-                P.start("kicad_pcb"),
-                P.pair("version", T.number),
-                P.pair("generator", T.string),
-                P.pair("generator_version", T.string),
-                P.object(
-                    "general",
-                    {},
-                    P.pair("thickness", T.number),
-                    P.pair("legacy_teardrops", T.boolean),
-                ),
-                P.item("paper", Paper),
-                P.item("title_block", TitleBlock),
-                P.list("layers", T.item(Layer)),
-                P.item("setup", Setup),
-                P.mapped_collection(
-                    "properties",
-                    "property",
-                    (p: Property) => p.name,
-                    T.item(Property, this),
-                ),
-                P.collection("nets", "net", T.item(Net)),
-                P.collection(
-                    "footprints",
-                    "footprint",
-                    T.item(Footprint, this),
-                ),
-                P.collection("zones", "zone", T.item(Zone, this)),
-                P.collection("segments", "segment", T.item(LineSegment, this)),
-                P.collection("segments", "arc", T.item(ArcSegment, this)),
-                P.collection("vias", "via", T.item(Via, this)),
-                P.collection("drawings", "dimension", T.item(Dimension, this)),
-                P.collection("drawings", "gr_line", T.item(GrLine, this)),
-                P.collection("drawings", "gr_circle", T.item(GrCircle, this)),
-                P.collection("drawings", "gr_arc", T.item(GrArc, this)),
-                P.collection("drawings", "gr_poly", T.item(GrPoly, this)),
-                P.collection("drawings", "gr_rect", T.item(GrRect, this)),
-                P.collection("drawings", "gr_text", T.item(GrText, this)),
-                P.collection("groups", "group", T.item(Group)),
-                P.pair("embedded_fonts", T.boolean),
-                P.list("embedded_files", T.item(EmbeddedFile)),
-            ),
-        );
+        if (expr !== undefined) {
+            parse_expr_into(this, expr, ...this.#expression_definitions());
+            this.#finish_parsing();
+        }
+    }
 
+    static async from_blob(filename: string, blob: Blob) {
+        const pcb = new KicadPCB(filename, undefined);
+        const definitions = pcb.#expression_definitions().slice(1);
+        let first = true;
+        let batch: List = [];
+
+        for await (const element of listify_blob(blob)) {
+            if (first) {
+                first = false;
+                if (element !== "kicad_pcb") {
+                    throw new Error(
+                        `Expression must start with kicad_pcb, but found ${element}`,
+                    );
+                }
+                continue;
+            }
+
+            batch.push(element);
+            if (batch.length >= 1024) {
+                parse_expr_into(pcb, batch, ...definitions);
+                batch = [];
+            }
+        }
+
+        if (first) {
+            throw new Error(
+                "Expression must start with kicad_pcb, but was empty",
+            );
+        }
+
+        if (batch.length) {
+            parse_expr_into(pcb, batch, ...definitions);
+        }
+
+        pcb.#finish_parsing();
+        return pcb;
+    }
+
+    #expression_definitions() {
+        return [
+            P.start("kicad_pcb"),
+            P.pair("version", T.number),
+            P.pair("generator", T.string),
+            P.pair("generator_version", T.string),
+            P.object(
+                "general",
+                {},
+                P.pair("thickness", T.number),
+                P.pair("legacy_teardrops", T.boolean),
+            ),
+            P.item("paper", Paper),
+            P.item("title_block", TitleBlock),
+            P.list("layers", T.item(Layer)),
+            P.item("setup", Setup),
+            P.mapped_collection(
+                "properties",
+                "property",
+                (p: Property) => p.name,
+                T.item(Property, this),
+            ),
+            P.collection("nets", "net", T.item(Net)),
+            P.collection("footprints", "footprint", T.item(Footprint, this)),
+            P.collection("zones", "zone", T.item(Zone, this)),
+            P.collection("segments", "segment", T.item(LineSegment, this)),
+            P.collection("segments", "arc", T.item(ArcSegment, this)),
+            P.collection("vias", "via", T.item(Via, this)),
+            P.collection("drawings", "dimension", T.item(Dimension, this)),
+            P.collection("drawings", "gr_line", T.item(GrLine, this)),
+            P.collection("drawings", "gr_circle", T.item(GrCircle, this)),
+            P.collection("drawings", "gr_arc", T.item(GrArc, this)),
+            P.collection("drawings", "gr_poly", T.item(GrPoly, this)),
+            P.collection("drawings", "gr_rect", T.item(GrRect, this)),
+            P.collection("drawings", "gr_text", T.item(GrText, this)),
+            P.collection("groups", "group", T.item(Group)),
+            P.pair("embedded_fonts", T.boolean),
+            P.list("embedded_files", T.item(EmbeddedFile)),
+        ];
+    }
+
+    #finish_parsing() {
         // sort the array by net_number
         this.nets.sort((a, b) => a.number - b.number);
     }
@@ -875,6 +914,7 @@ export class Footprint implements HasUniqueID {
     embedded_fonts: boolean = false;
     embedded_files: EmbeddedFile[] = [];
     net_tie_pad_groups?: string;
+    duplicate_pad_numbers_are_jumpers = false;
     #bbox: BBox;
 
     constructor(
@@ -933,6 +973,7 @@ export class Footprint implements HasUniqueID {
                 P.collection("zones", "zone", T.item(Zone, this)),
                 P.collection("models", "model", T.item(Model)),
                 P.collection("pads", "pad", T.item(Pad, this)),
+                P.pair("duplicate_pad_numbers_are_jumpers", T.boolean),
                 P.pair("embedded_fonts", T.boolean),
                 P.list("embedded_files", T.item(EmbeddedFile)),
             ),
@@ -1434,13 +1475,18 @@ export class Poly extends GraphicItem {
         // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_footprint_polygon
         // But it is used in the kicad code, it just converts the arc to a polyline
         // https://gitlab.com/kicad/code/kicad/-/blob/master/libs/kimath/src/geometry/shape_line_chain.cpp#L1613
-        this.#polyline_pts = this.pts.flatMap((pt) => {
+        this.#polyline_pts = new Array<Vec2>(this.pts.length);
+        let point_index = 0;
+        for (const pt of this.pts) {
             if (pt instanceof Vec2) {
-                return [pt];
+                this.#polyline_pts[point_index++] = pt;
             } else {
-                return pt.arc.to_polyline();
+                for (const point of pt.arc.to_polyline()) {
+                    this.#polyline_pts[point_index++] = point;
+                }
             }
-        });
+        }
+        this.#polyline_pts.length = point_index;
     }
 
     get polyline() {

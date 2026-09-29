@@ -244,6 +244,14 @@ export class Arc {
 function arc_center_from_three_points(start: Vec2, mid: Vec2, end: Vec2): Vec2 {
     const sqrt_1_2 = Math.SQRT1_2;
     const center = new Vec2(0, 0);
+
+    if (start.equals(end)) {
+        // KiCad represents a 360 degree arc with identical start/end points and a point on
+        // the opposite side of the circle. Handle it before calculating slopes so neither
+        // the zero-length chord nor floating-point rounding can produce NaN.
+        return start.add(mid).multiply(0.5);
+    }
+
     const y_delta_21 = mid.y - start.y;
     let x_delta_21 = mid.x - start.x;
     const y_delta_32 = end.y - mid.y;
@@ -277,19 +285,11 @@ function arc_center_from_three_points(start: Vec2, mid: Vec2, end: Vec2): Vec2 {
         slope_b * new Vec2(0.5 / y_delta_32, 0.5 / x_delta_32).magnitude;
 
     if (slope_a == slope_b) {
-        if (start == end) {
-            // This is a special case for a 360 degrees arc.  In this case, the center is halfway between
-            // the midpoint and either end point
-            center.x = (start.x + mid.x) / 2.0;
-            center.y = (start.y + mid.y) / 2.0;
-            return center;
-        } else {
-            // If the points are colinear, the center is at infinity, so offset
-            // the slope by a minimal amount
-            // Warning: This will induce a small error in the center location
-            slope_a += Number.EPSILON;
-            slope_b -= Number.EPSILON;
-        }
+        // If the points are colinear, the center is at infinity, so offset
+        // the slope by a minimal amount
+        // Warning: This will induce a small error in the center location
+        slope_a += Number.EPSILON;
+        slope_b -= Number.EPSILON;
     }
 
     // Prevent divide by zero error

@@ -43,6 +43,49 @@ type PropertyDefinition = {
     fn: TypeProcessor;
 };
 
+function preview(value: ListOrAtom, depth = 0): string {
+    if (!Array.isArray(value)) return String(value).slice(0, 80);
+    if (depth >= 2) return "(...)";
+    const head = value.slice(0, 4).map((item) => preview(item, depth + 1));
+    return `(${head.join(" ")}${value.length > 4 ? " ..." : ""})`.slice(0, 240);
+}
+
+let pending_warnings:
+    | Map<string, { message: string; count: number }>
+    | undefined;
+
+function warn_unknown(context: string, element: ListOrAtom) {
+    // Nested parsers share the current synchronous batch. Keep only a short
+    // first example, then flush counts before the next async parsing batch.
+    if (!pending_warnings) {
+        pending_warnings = new Map();
+        queueMicrotask(() => {
+            const warnings = pending_warnings!;
+            pending_warnings = undefined;
+            for (const { message, count } of warnings.values()) {
+                log.warn(
+                    count === 1
+                        ? message
+                        : `${message} (${count} occurrences; first shown)`,
+                );
+            }
+        });
+    }
+    const field = Array.isArray(element)
+        ? preview(element[0] ?? [])
+        : typeof element;
+    const key = `${context}:${field}`;
+    const warning = pending_warnings.get(key);
+    if (warning) {
+        warning.count++;
+    } else {
+        pending_warnings.set(key, {
+            message: `${context}: ${preview(element)}`,
+            count: 1,
+        });
+    }
+}
+
 /**
  * Type processors.
  * They transform an extracted value from the s-expr into the appropriate
@@ -178,7 +221,12 @@ export const P = {
             name: name,
             accepts: [name],
             fn: (obj: Obj, name: string, e: ListOrAtom) => {
-                return (e as List[]).slice(1).map((n) => typefn(obj, name, n));
+                const values = e as List;
+                const result = new Array(values.length - 1);
+                for (let i = 1; i < values.length; i++) {
+                    result[i - 1] = typefn(obj, name, values[i]!);
+                }
+                return result;
             },
         };
     },
@@ -323,7 +371,11 @@ export const P = {
 
 export type Parseable = string | List;
 
-export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
+export function parse_expr_into(
+    out: Record<string, any>,
+    expr: string | List,
+    ...defs: PropertyDefinition[]
+) {
     if (is_string(expr)) {
         log.info(`Parsing expression with ${expr.length} chars`);
         expr = listify(expr);
@@ -350,23 +402,23 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
         }
     }
 
+    let offset = 0;
     if (start_def) {
         const acceptable_start_strings = as_array(start_def.name);
         const first = expr.at(0) as string;
 
         if (!acceptable_start_strings.includes(first)) {
             throw new Error(
-                `Expression must start with ${start_def.name}, but found ${first} in ${expr}`,
+                `Expression must start with ${start_def.name}, but found ${preview(expr[0] ?? [])} in ${preview(expr)}`,
             );
         }
 
-        expr = expr.slice(1);
+        offset = 1;
     }
 
-    const out: Record<string, any> = {};
-
     n = 0;
-    for (const element of expr) {
+    for (let i = offset; i < expr.length; i++) {
+        const element = expr[i]!;
         let def: PropertyDefinition | null = null;
 
         // bare string value can be an atom
@@ -379,8 +431,9 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
             def = defs_map.get(n);
 
             if (!def) {
-                log.warn(
-                    `Bare element ${element} is undefined at position ${n} in expression ${expr}`,
+                warn_unknown(
+                    `Bare element at position ${n} in ${start_def?.name ?? "list"}`,
+                    element,
                 );
                 continue;
             }
@@ -394,8 +447,9 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
         }
 
         if (!def) {
-            log.warn(
-                `No definition found for element ${element} in expression ${expr}`,
+            warn_unknown(
+                `No definition found in ${start_def?.name ?? "list"}`,
+                element,
             );
             continue;
         }
@@ -406,4 +460,8 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
     }
 
     return out;
+}
+
+export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
+    return parse_expr_into({}, expr, ...defs);
 }

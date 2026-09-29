@@ -124,8 +124,11 @@ export class Project extends EventTarget implements IDisposable {
             return this.#files_by_name.get(filename);
         }
 
-        const text = await this.#get_file_text(filename);
-        const doc = new document_class(filename, text);
+        const file = await this.#fs.get(filename);
+        const doc =
+            document_class === KicadPCB
+                ? await KicadPCB.from_blob(filename, file)
+                : new document_class(filename, await file.text());
         doc.project = this;
 
         this.#files_by_name.set(filename, doc);

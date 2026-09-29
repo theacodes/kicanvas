@@ -262,7 +262,10 @@ class TraceArcPainter extends NetNameItemPainter {
         }
 
         const arc = Arc.from_three_points(a.start, a.mid, a.end, a.width);
-        const points = arc.to_polyline();
+        // Collinear points in imported tracks put the circle center at infinity.
+        const points = Number.isFinite(arc.radius)
+            ? arc.to_polyline()
+            : [a.start, a.end];
         this.gfx.line(new Polyline(points, arc.width, layer.color));
     }
 }
