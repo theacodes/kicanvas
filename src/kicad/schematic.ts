@@ -21,6 +21,7 @@ import {
     StrokeParams,
 } from "./common";
 import { P, T, parse_expr, type Parseable } from "./parser";
+import { listify } from "./tokenizer";
 
 /* Default values for various things found in schematics
  * From EESchema's default_values.h, converted from mils to mm. */
@@ -93,6 +94,23 @@ export class KicadSch {
         public filename: string,
         expr: Parseable,
     ) {
+        if (typeof expr === "string") {
+            expr = listify(expr);
+        }
+        if (expr.length === 1 && Array.isArray(expr[0])) {
+            expr = expr[0];
+        }
+        // Clipboard fragments contain library symbols and schematic items
+        // without the document wrapper or a sheet UUID.
+        const is_fragment =
+            expr[0] === "lib_symbols" ||
+            (Array.isArray(expr[0]) && expr[0][0] === "lib_symbols");
+        if (is_fragment) {
+            expr = [
+                "kicad_sch",
+                ...(expr[0] === "lib_symbols" ? [expr] : expr),
+            ];
+        }
         Object.assign(
             this,
             parse_expr(
@@ -148,6 +166,9 @@ export class KicadSch {
             ),
         );
 
+        if (is_fragment) {
+            this.uuid ??= crypto.randomUUID();
+        }
         this.update_hierarchical_data();
     }
 
