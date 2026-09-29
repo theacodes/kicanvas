@@ -151,6 +151,74 @@ suite("kicad.tokenizer.tokenize(): s-expression tokenizer", function () {
 });
 
 suite("kicad.tokenizer.listify()", function () {
+    function chunked_blob(source: string, chunk_size: number) {
+        const bytes = new TextEncoder().encode(source);
+        return new (class extends Blob {
+            override stream() {
+                let offset = 0;
+                return new ReadableStream<Uint8Array<ArrayBuffer>>({
+                    pull(controller) {
+                        if (offset >= bytes.length) {
+                            controller.close();
+                            return;
+                        }
+                        controller.enqueue(
+                            bytes.slice(offset, offset + chunk_size),
+                        );
+                        offset += chunk_size;
+                    },
+                });
+            }
+        })([bytes]);
+    }
+
+    async function read_blob(blob: Blob) {
+        const parsed = [];
+        for await (const element of tokenizer.listify_blob(blob)) {
+            parsed.push(element);
+        }
+        return parsed;
+    }
+
+    test("preserves token values across arbitrary byte boundaries", async function () {
+        const source = String.raw`(root
+            (xy -0 +42 -12.345 0.00001 1. 12345678901234567890)
+            (values 0x00_FF 0xabc +3V3 1e3 123abc 1-2 a_b D+)
+            (data |KLUv/aCvzgcAAAAQ 6x84OPr6+j7y 0+6li2sAAAAASU/VORK5CYII=)
+            (label "中文😀(铜箔)\nline\\end\"quoted")
+            bare)`;
+        const expected = tokenizer.listify(source)[0];
+        for (const size of [1, 2, 3, 7, 64, 1024]) {
+            const actual = await read_blob(chunked_blob(source, size));
+            assert.deepEqual(actual, expected, `chunk size ${size}`);
+            assert.isTrue(Object.is((actual[1] as tokenizer.List)[1], -0));
+        }
+    });
+
+    test("still rejects invalid or incomplete streamed expressions", async function () {
+        const cases = [
+            "",
+            ")",
+            "bare",
+            "(root",
+            '(root "unterminated)',
+            "(root (nested)",
+            "(root) (second)",
+            "(root) extra",
+            "(root bad?atom)",
+            "(root 12?34)",
+        ];
+        for (const source of cases) {
+            let error: unknown;
+            try {
+                await read_blob(chunked_blob(source, 3));
+            } catch (caught) {
+                error = caught;
+            }
+            assert.instanceOf(error, Error, source);
+        }
+    });
+
     test("with simple lists", function () {
         const cases: [string, any[]][] = [
             ["(1 2 3)", [[1, 2, 3]]],

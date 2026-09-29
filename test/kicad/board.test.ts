@@ -73,6 +73,31 @@ suite("kicad.board.KicadPCB(): board parsing", function () {
         assert.closeTo(arc.arc.center.y, 0, 0.000001);
         assert.closeTo(arc.arc.radius, 0.48, 0.000001);
         assert.closeTo(arc.arc.arc_angle.degrees, 360, 0.000001);
+        assert.isAbove(poly.polyline.length, 32);
+        for (const point of poly.polyline) {
+            assert.closeTo(Math.hypot(point.x, point.y), 0.48, 0.000001);
+        }
+    });
+
+    test("keeps polygon points in order when expanding arcs", function () {
+        const poly = new board.Poly(`(polygon (pts
+            (xy -2 0)
+            (arc (start -1 0) (mid 0 -1) (end 1 0))
+            (xy 2 0)))`);
+        const points = poly.polyline;
+        assert.isAbove(points.length, 10);
+        assert.strictEqual(points[0], poly.pts[0]);
+        assert.strictEqual(points.at(-1), poly.pts[2]);
+        assert.closeTo(points[1]!.x, -1, 0.000001);
+        assert.closeTo(points[1]!.y, 0, 0.000001);
+        assert.closeTo(points.at(-2)!.x, 1, 0.000001);
+        assert.closeTo(points.at(-2)!.y, 0, 0.000001);
+        for (const point of points.slice(1, -1)) {
+            assert.closeTo(Math.hypot(point.x, point.y), 1, 0.000001);
+            assert.isAtMost(point.y, 0.000001);
+        }
+        assert.lengthOf(poly.pts, 3);
+        assert.notStrictEqual(points, poly.pts);
     });
 
     test("with empty pcb file", function () {

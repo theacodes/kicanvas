@@ -269,6 +269,14 @@ export function listify(src: string): List {
 }
 
 function tokenize_bare_value(value: string): Token {
+    // Coordinates and expression names account for most PCB tokens. Avoid
+    // constructing a generator for these common, unambiguous values.
+    if (/^[+-]?\d+(?:\.\d*)?$/.test(value)) {
+        return new Token(Token.NUMBER, Number(value));
+    }
+    if (/^[A-Za-z][A-Za-z0-9_]*$/.test(value)) {
+        return new Token(Token.ATOM, value);
+    }
     const tokens = Array.from(tokenize(value));
 
     if (tokens.length !== 1) {
@@ -285,10 +293,10 @@ function tokenize_bare_value(value: string): Token {
  *
  * Chromium can not create strings larger than roughly 512 MiB. KiCad boards
  * can exceed that limit, so File.text() can not be used for every board. This
- * tokenizer keeps only the current token in memory while decoding the Blob in
- * chunks.
+ * tokenizer buffers tokens for one decoded chunk and carries an unfinished
+ * token across chunk boundaries.
  */
-async function* tokenize_blob(input: Blob): AsyncGenerator<Token> {
+async function* tokenize_blob(input: Blob): AsyncGenerator<Token[]> {
     const reader = input.stream().getReader();
     const decoder = new TextDecoder();
     let pending = "";
@@ -313,14 +321,19 @@ async function* tokenize_blob(input: Blob): AsyncGenerator<Token> {
     }
 
     for await (const chunk of decoded_chunks()) {
+        // Cross the async boundary once per chunk, rather than once for every
+        // parenthesis, coordinate, and atom in a large board.
+        const tokens: Token[] = [];
         for (const c of chunk) {
             if (in_string) {
                 if (!escaping && c === '"') {
-                    yield new Token(
-                        Token.STRING,
-                        pending
-                            .replaceAll("\\n", "\n")
-                            .replaceAll("\\\\", "\\"),
+                    tokens.push(
+                        new Token(
+                            Token.STRING,
+                            pending
+                                .replaceAll("\\n", "\n")
+                                .replaceAll("\\\\", "\\"),
+                        ),
                     );
                     pending = "";
                     in_string = false;
@@ -337,7 +350,7 @@ async function* tokenize_blob(input: Blob): AsyncGenerator<Token> {
 
             if (pending) {
                 if (c === ")" || is_whitespace(c)) {
-                    yield tokenize_bare_value(pending);
+                    tokens.push(tokenize_bare_value(pending));
                     pending = "";
                 } else {
                     pending += c;
@@ -346,15 +359,16 @@ async function* tokenize_blob(input: Blob): AsyncGenerator<Token> {
             }
 
             if (c === "(") {
-                yield new Token(Token.OPEN);
+                tokens.push(new Token(Token.OPEN));
             } else if (c === ")") {
-                yield new Token(Token.CLOSE);
+                tokens.push(new Token(Token.CLOSE));
             } else if (c === '"') {
                 in_string = true;
             } else if (!is_whitespace(c)) {
                 pending = c;
             }
         }
+        yield tokens;
     }
 
     if (in_string) {
@@ -362,7 +376,7 @@ async function* tokenize_blob(input: Blob): AsyncGenerator<Token> {
     }
 
     if (pending) {
-        yield tokenize_bare_value(pending);
+        yield [tokenize_bare_value(pending)];
     }
 }
 
@@ -379,50 +393,54 @@ export async function* listify_blob(
     let root_open = false;
     let root_closed = false;
 
-    for await (const token of tokenize_blob(src)) {
-        if (token.type === Token.OPEN) {
-            if (root_closed) {
-                throw new Error("Unexpected expression after root expression");
-            }
+    for await (const tokens of tokenize_blob(src)) {
+        for (const token of tokens) {
+            if (token.type === Token.OPEN) {
+                if (root_closed) {
+                    throw new Error(
+                        "Unexpected expression after root expression",
+                    );
+                }
 
-            if (!root_open) {
-                root_open = true;
-            } else {
-                stack.push([]);
-            }
-            continue;
-        }
-
-        if (token.type === Token.CLOSE) {
-            if (!root_open) {
-                throw new Error("Unexpected closing parenthesis");
-            }
-
-            if (stack.length === 0) {
-                root_open = false;
-                root_closed = true;
+                if (!root_open) {
+                    root_open = true;
+                } else {
+                    stack.push([]);
+                }
                 continue;
             }
 
-            const completed = stack.pop()!;
+            if (token.type === Token.CLOSE) {
+                if (!root_open) {
+                    throw new Error("Unexpected closing parenthesis");
+                }
+
+                if (stack.length === 0) {
+                    root_open = false;
+                    root_closed = true;
+                    continue;
+                }
+
+                const completed = stack.pop()!;
+                const parent = stack.at(-1);
+                if (parent) {
+                    parent.push(completed);
+                } else {
+                    yield completed;
+                }
+                continue;
+            }
+
+            if (!root_open) {
+                throw new Error("Expected a root expression");
+            }
+
             const parent = stack.at(-1);
             if (parent) {
-                parent.push(completed);
+                parent.push(token.value);
             } else {
-                yield completed;
+                yield token.value;
             }
-            continue;
-        }
-
-        if (!root_open) {
-            throw new Error("Expected a root expression");
-        }
-
-        const parent = stack.at(-1);
-        if (parent) {
-            parent.push(token.value);
-        } else {
-            yield token.value;
         }
     }
 

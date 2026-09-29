@@ -1475,13 +1475,18 @@ export class Poly extends GraphicItem {
         // https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_footprint_polygon
         // But it is used in the kicad code, it just converts the arc to a polyline
         // https://gitlab.com/kicad/code/kicad/-/blob/master/libs/kimath/src/geometry/shape_line_chain.cpp#L1613
-        this.#polyline_pts = this.pts.flatMap((pt) => {
+        this.#polyline_pts = new Array<Vec2>(this.pts.length);
+        let point_index = 0;
+        for (const pt of this.pts) {
             if (pt instanceof Vec2) {
-                return [pt];
+                this.#polyline_pts[point_index++] = pt;
             } else {
-                return pt.arc.to_polyline();
+                for (const point of pt.arc.to_polyline()) {
+                    this.#polyline_pts[point_index++] = point;
+                }
             }
-        });
+        }
+        this.#polyline_pts.length = point_index;
     }
 
     get polyline() {

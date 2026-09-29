@@ -7,10 +7,88 @@
 import { assert } from "chai";
 
 import { Vec2 } from "../../src/base/math";
-import { P, T, parse_expr } from "../../src/kicad/parser";
+import { P, T, log, parse_expr } from "../../src/kicad/parser";
 import { listify, type List } from "../../src/kicad/tokenizer";
 
 suite("kicad.parser.parse_expr(): s-expression parser", function () {
+    test("converts lists without modifying the input expression", function () {
+        const values: List = ["values", 1, "skip", 3];
+        const expr: List = ["root", ["factor", 2], values];
+        Object.freeze(values);
+        Object.freeze(expr);
+        const result = parse_expr(
+            expr,
+            P.start("root"),
+            P.pair("factor", T.number),
+            P.list("values", (obj, name, value) =>
+                typeof value === "number" ? obj["factor"] * value : undefined,
+            ),
+        );
+        assert.deepEqual(result["values"], [2, undefined, 6]);
+        assert.notStrictEqual(result["values"], values);
+        assert.deepEqual(expr, [
+            "root",
+            ["factor", 2],
+            ["values", 1, "skip", 3],
+        ]);
+    });
+
+    test("summarizes repeated warnings and resets between parsing batches", async function () {
+        await Promise.resolve();
+        const messages: string[] = [];
+        const original_warn = log.warn;
+        log.warn = (message: string) => messages.push(message);
+        try {
+            for (let i = 0; i < 20; i++) {
+                parse_expr(["first", ["future_field", i]], P.start("first"));
+            }
+            parse_expr(["second", ["future_field", 1]], P.start("second"));
+            await Promise.resolve();
+            assert.lengthOf(messages, 2);
+            assert.include(messages[0]!, "first");
+            assert.include(messages[0]!, "(future_field 0)");
+            assert.include(messages[0]!, "20 occurrences");
+            assert.include(messages[1]!, "second");
+
+            parse_expr(["first", ["future_field", 9]], P.start("first"));
+            await Promise.resolve();
+            assert.lengthOf(messages, 3);
+            assert.include(messages[2]!, "(future_field 9)");
+            assert.notInclude(messages[2]!, "occurrences");
+        } finally {
+            log.warn = original_warn;
+        }
+    });
+
+    test("bounds diagnostic previews without traversing large nested data", async function () {
+        await Promise.resolve();
+        const messages: string[] = [];
+        const original_warn = log.warn;
+        log.warn = (message: string) => messages.push(message);
+        try {
+            const large: List = ["points", ["nested", ["deeper", "value"]]];
+            Object.defineProperty(large, 100_000, {
+                get() {
+                    throw new Error("Diagnostic traversed omitted data");
+                },
+            });
+            parse_expr(
+                ["root", ["future_field", "x".repeat(10_000), large]],
+                P.start("root"),
+            );
+            await Promise.resolve();
+            assert.lengthOf(messages, 1);
+            assert.isBelow(messages[0]!.length, 400);
+            assert.include(messages[0]!, "future_field");
+            assert.throws(
+                () => parse_expr([large], P.start("root")),
+                "Expression must start with root",
+            );
+        } finally {
+            log.warn = original_warn;
+        }
+    });
+
     test(".start()", function () {
         const res = parse_expr(listify("thing 1 2"), P.start("thing"));
         assert.deepEqual(res, {});
