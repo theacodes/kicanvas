@@ -26,6 +26,55 @@ import shape_polygon_arc_pcb_src from "./files/shape_polygon_arc.kicad_pcb";
 import { first } from "../../src/base/iterator";
 
 suite("kicad.board.KicadPCB(): board parsing", function () {
+    test("streams pcb files from a Blob", async function () {
+        const pcb = await board.KicadPCB.from_blob(
+            "test.kicad_pcb",
+            new Blob([empty_pcb_src]),
+        );
+
+        assert.equal(pcb.version, 20211014);
+        assert.equal(pcb.generator, "pcbnew");
+        assert.equal(pcb.layers.length, 29);
+        assert.equal(pcb.nets.length, 1);
+    });
+
+    test("streams collections across parser batches", async function () {
+        const nets = Array.from(
+            { length: 1100 },
+            (_, i) => `(net ${i} "net-${i}")`,
+        ).join("\n");
+        const pcb = await board.KicadPCB.from_blob(
+            "test.kicad_pcb",
+            new Blob([`(kicad_pcb (version 20260206) ${nets})`]),
+        );
+
+        assert.equal(pcb.nets.length, 1100);
+        assert.deepInclude(pcb.nets[1099], {
+            number: 1099,
+            name: "net-1099",
+        });
+    });
+
+    test("with a full-circle polygon arc", function () {
+        const poly = new board.FpPoly(`
+            (fp_poly
+                (pts
+                    (arc
+                        (start 0 -0.48)
+                        (mid 0 0.48)
+                        (end 0 -0.48)))
+                (stroke (width 0) (type default))
+                (fill yes)
+                (layer "F.Cu")))`);
+
+        const arc = poly.pts[0] as board.PolyArc;
+        assert.instanceOf(arc, board.PolyArc);
+        assert.closeTo(arc.arc.center.x, 0, 0.000001);
+        assert.closeTo(arc.arc.center.y, 0, 0.000001);
+        assert.closeTo(arc.arc.radius, 0.48, 0.000001);
+        assert.closeTo(arc.arc.arc_angle.degrees, 360, 0.000001);
+    });
+
     test("with empty pcb file", function () {
         const pcb = new board.KicadPCB("test.kicad_pcb", empty_pcb_src);
 

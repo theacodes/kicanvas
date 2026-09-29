@@ -177,4 +177,23 @@ suite("kicad.tokenizer.listify()", function () {
             assert.deepEqual(l, expected);
         }
     });
+
+    test("streams a Blob one top-level expression at a time", async function () {
+        const long_string = `start(${"x".repeat(70_000)})end`;
+        const source = `(root (name "${long_string}") (value 42) bare)`;
+        const parsed = [];
+
+        for await (const element of tokenizer.listify_blob(
+            new Blob([source]),
+        )) {
+            parsed.push(element);
+        }
+
+        assert.deepEqual(parsed, [
+            "root",
+            ["name", long_string],
+            ["value", 42],
+            "bare",
+        ]);
+    });
 });

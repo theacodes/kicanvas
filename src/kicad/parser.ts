@@ -323,7 +323,11 @@ export const P = {
 
 export type Parseable = string | List;
 
-export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
+export function parse_expr_into(
+    out: Record<string, any>,
+    expr: string | List,
+    ...defs: PropertyDefinition[]
+) {
     if (is_string(expr)) {
         log.info(`Parsing expression with ${expr.length} chars`);
         expr = listify(expr);
@@ -362,8 +366,6 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
 
         expr = expr.slice(1);
     }
-
-    const out: Record<string, any> = {};
 
     n = 0;
     for (const element of expr) {
@@ -406,4 +408,8 @@ export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
     }
 
     return out;
+}
+
+export function parse_expr(expr: string | List, ...defs: PropertyDefinition[]) {
+    return parse_expr_into({}, expr, ...defs);
 }
