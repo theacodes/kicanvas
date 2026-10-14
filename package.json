@@ -39,6 +39,7 @@
         "build:font": "node scripts/build-font.js",
         "build:sprites": "node scripts/build-sprites.js",
         "build": "tsc -p tsconfig.json && node scripts/build.js",
+        "package": "npm run build && node scripts/package.js",
         "clean": "rm -rf build && rm -rf debug/kicanvas"
     },
     "repository": {

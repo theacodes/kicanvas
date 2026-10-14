@@ -1,4 +1,5 @@
 build/
+site/
 node_modules/
 dist/
 www/kicanvas
