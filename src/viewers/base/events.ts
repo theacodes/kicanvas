@@ -44,12 +44,25 @@ export class KiCanvasMouseMoveEvent extends KiCanvasEvent<MouseMoveDetails> {
     }
 }
 
+/**
+ * Dispatched after the viewer renders a frame, e.g. after panning or zooming.
+ * Used by DOM overlays that need to stay aligned with the canvas.
+ */
+export class KiCanvasDrawEvent extends KiCanvasEvent<null> {
+    static readonly type = "kicanvas:draw";
+
+    constructor() {
+        super(KiCanvasDrawEvent.type, null);
+    }
+}
+
 // Event maps for type safe addEventListener.
 
 export interface KiCanvasEventMap {
     [KiCanvasLoadEvent.type]: KiCanvasLoadEvent;
     [KiCanvasSelectEvent.type]: KiCanvasSelectEvent;
     [KiCanvasMouseMoveEvent.type]: KiCanvasMouseMoveEvent;
+    [KiCanvasDrawEvent.type]: KiCanvasDrawEvent;
 }
 
 declare global {

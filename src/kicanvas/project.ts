@@ -16,6 +16,7 @@ import type {
     SchematicSheet,
     SchematicSheetInstance,
 } from "../kicad/schematic";
+import { ReviewStore } from "./review/review";
 import type { IFileSystem } from "./services/vfs";
 
 const log = new Logger("kicanvas:project");
@@ -28,6 +29,7 @@ export class Project extends EventTarget implements IDisposable {
 
     public loaded: Barrier = new Barrier();
     public settings: ProjectSettings = new ProjectSettings();
+    public review: ReviewStore = new ReviewStore();
 
     public dispose() {
         this.#files_by_name.clear();

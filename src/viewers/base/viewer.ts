@@ -11,6 +11,7 @@ import { no_self_recursion } from "../../base/functions";
 import { BBox, Vec2 } from "../../base/math";
 import { Color, Polygon, Polyline, Renderer } from "../../graphics";
 import {
+    KiCanvasDrawEvent,
     KiCanvasLoadEvent,
     KiCanvasMouseMoveEvent,
     KiCanvasSelectEvent,
@@ -160,6 +161,8 @@ export abstract class Viewer extends EventTarget {
                 depth += 0.01;
             }
         }
+
+        this.dispatchEvent(new KiCanvasDrawEvent());
     }
 
     public draw() {

@@ -27,6 +27,8 @@ import { KCBoardViewerElement } from "../kc-board/viewer";
 import "./help-panel";
 import "./preferences-panel";
 import "./project-panel";
+import "./review-layer";
+import "./review-panel";
 import "./viewer-bottom-toolbar";
 
 interface ViewerElement extends HTMLElement {
@@ -160,6 +162,14 @@ export abstract class KCViewerAppElement<
 
     protected make_post_activities() {
         return [
+            // Review comments
+            html`<kc-ui-activity
+                slot="activities"
+                name="Review"
+                icon="rate_review">
+                <kc-review-panel></kc-review-panel>
+            </kc-ui-activity>`,
+
             // Preferences
             html`<kc-ui-activity
                 slot="activities"
@@ -254,9 +264,16 @@ export abstract class KCViewerAppElement<
             bottom_toolbar = html`<kc-viewer-bottom-toolbar></kc-viewer-bottom-toolbar>`;
         }
 
+        // Review markup tools are only offered in the full UI.
+        const review_layer =
+            controls == "full"
+                ? html`<kc-review-layer></kc-review-layer>`
+                : null;
+
         return html`<kc-ui-split-view vertical>
             <kc-ui-view class="grow">
-                ${top_toolbar} ${this.#viewer_elm} ${bottom_toolbar}
+                ${top_toolbar} ${this.#viewer_elm} ${review_layer}
+                ${bottom_toolbar}
             </kc-ui-view>
             ${resizer} ${this.#activity_bar}
         </kc-ui-split-view>`;

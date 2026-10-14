@@ -104,7 +104,7 @@ class KiCanvasShellElement extends KCUIElement {
                     return;
                 }
 
-                await this.setup_project(vfs);
+                await this.setup_project(vfs, url);
                 return;
             }
 
@@ -123,7 +123,7 @@ class KiCanvasShellElement extends KCUIElement {
                 return;
             }
 
-            await this.setup_project(vfs);
+            await this.setup_project(vfs, link);
 
             const location = new URL(window.location.href);
             location.searchParams.set("repo", link);
@@ -144,13 +144,17 @@ class KiCanvasShellElement extends KCUIElement {
         );
     }
 
-    private async setup_project(vfs: IFileSystem) {
+    private async setup_project(vfs: IFileSystem, source_url?: string) {
         this.loaded = false;
         this.loading = true;
 
         try {
             await vfs.setup();
             await this.project.load(vfs);
+            this.project.review.attach(
+                source_url ?? this.src ?? null,
+                Array.from(vfs.list()).sort(),
+            );
             this.project.set_active_page(this.project.first_page);
             this.loaded = true;
         } catch (e) {
