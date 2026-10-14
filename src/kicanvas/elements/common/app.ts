@@ -21,6 +21,8 @@ import {
 import { KiCanvasSelectEvent } from "../../../viewers/base/events";
 import type { Viewer } from "../../../viewers/base/viewer";
 import type { Project, ProjectPage } from "../../project";
+import { Preferences } from "../../preferences";
+import themes from "../../themes";
 import { KCBoardViewerElement } from "../kc-board/viewer";
 
 // import dependent elements so they're registered before use.
@@ -116,10 +118,26 @@ export abstract class KCViewerAppElement<
                 case "flip_view":
                     this.#viewer_elm.viewer.flip_view();
                     break;
+                case "toggle_theme":
+                    this.#toggle_theme();
+                    break;
                 default:
                     console.warn("Unknown button", e);
             }
         });
+    }
+
+    /**
+     * Swap between KiCanvas' dark theme and KiCad's own default colors.
+     * This is a global preference, so it applies to both the schematic and
+     * board viewers.
+     */
+    #toggle_theme() {
+        const prefs = Preferences.INSTANCE;
+        prefs.theme = themes.by_name(
+            prefs.theme.name == "kicad" ? "witchhazel" : "kicad",
+        );
+        prefs.save();
     }
 
     protected abstract on_viewer_select(
@@ -203,8 +221,18 @@ export abstract class KCViewerAppElement<
         const controlslist = parseFlagAttribute(
             this.controlslist ?? "",
             controls == "none"
-                ? { fullscreen: false, download: false, flipview: false }
-                : { fullscreen: true, download: true, flipview: true },
+                ? {
+                      fullscreen: false,
+                      download: false,
+                      flipview: false,
+                      theme: false,
+                  }
+                : {
+                      fullscreen: true,
+                      download: true,
+                      flipview: true,
+                      theme: true,
+                  },
         );
 
         this.#viewer_elm = this.make_viewer_element();
@@ -250,6 +278,18 @@ export abstract class KCViewerAppElement<
                     name="flip_view"
                     title="flip view"
                     icon="flip"
+                    variant="toolbar-alt">
+                </kc-ui-button>`,
+            );
+        }
+
+        if (controlslist["theme"]) {
+            top_toolbar_buttons.push(
+                html`<kc-ui-button
+                    slot="right"
+                    name="toggle_theme"
+                    title="switch between KiCad colors and dark theme"
+                    icon="contrast"
                     variant="toolbar-alt">
                 </kc-ui-button>`,
             );

@@ -4,9 +4,10 @@
     Full text available at: https://opensource.org/licenses/MIT
 */
 
+import { listen } from "../../../base/events";
 import { css, html, query } from "../../../base/web-components";
 import { KCUIElement } from "../../../kc-ui";
-import { Preferences } from "../../preferences";
+import { Preferences, PreferencesChangeEvent } from "../../preferences";
 import themes from "../../themes";
 
 const prefs = Preferences.INSTANCE;
@@ -62,6 +63,12 @@ export class KCPreferencesPanel extends KCUIElement {
     private theme_control!: HTMLSelectElement;
 
     override initialContentCallback() {
+        this.addDisposable(
+            listen(prefs, PreferencesChangeEvent.type, () => {
+                this.theme_control.value = prefs.theme.name;
+            }),
+        );
+
         this.renderRoot.addEventListener("input", (e) => {
             const target = e.target as HTMLInputElement;
 
