@@ -113,21 +113,24 @@ class KiCanvasShellElement extends KCUIElement {
             });
         });
 
-        this.link_input.addEventListener("input", async (e) => {
-            const link = this.link_input.value;
-            const vfs = await this.load_repo(link);
-
-            if (!vfs) {
-                // TODO: show error message: invaild URL
-                console.error(`Invalid URL: ${link}`);
-                return;
+        // Only open the link once it's complete: when it's pasted (or dropped)
+        // into the box, or when Enter is pressed. Loading on every keystroke
+        // sends a GitHub request for each partial URL.
+        this.link_input.addEventListener("input", (e) => {
+            const input_type = (e as InputEvent).inputType;
+            if (
+                input_type == "insertFromPaste" ||
+                input_type == "insertFromDrop"
+            ) {
+                this.open_link(this.link_input.value);
             }
+        });
 
-            await this.setup_project(vfs, link);
-
-            const location = new URL(window.location.href);
-            location.searchParams.set("repo", link);
-            window.history.pushState(null, "", location);
+        this.link_input.addEventListener("keydown", (e) => {
+            if (e.key == "Enter") {
+                e.preventDefault();
+                this.open_link(this.link_input.value);
+            }
         });
 
         this.open_file_button.addEventListener("click", async (e) => {
@@ -135,6 +138,36 @@ class KiCanvasShellElement extends KCUIElement {
                 await this.setup_project(vfs);
             });
         });
+    }
+
+    #link_request = 0;
+
+    private async open_link(link: string) {
+        link = link.trim();
+        if (!link || this.loading) {
+            return;
+        }
+
+        // Ignore this request if a newer one starts while it's resolving.
+        const request = ++this.#link_request;
+        const vfs = await this.load_repo(link);
+        if (request != this.#link_request) {
+            return;
+        }
+
+        if (!vfs) {
+            // TODO: show error message: invaild URL
+            console.error(`Invalid URL: ${link}`);
+            return;
+        }
+
+        await this.setup_project(vfs, link);
+
+        if (this.loaded) {
+            const location = new URL(window.location.href);
+            location.searchParams.set("repo", link);
+            window.history.pushState(null, "", location);
+        }
     }
 
     private async load_repo(url: string): Promise<IFileSystem | null> {

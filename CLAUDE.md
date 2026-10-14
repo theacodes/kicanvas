@@ -16,6 +16,8 @@ touched. This makes it possible to merge upstream updates later.
 
 ## Running and checking
 
+- `npm run package` builds the app and puts a ready-to-upload static site in
+  `site/` (ignored by git). Upload the contents of `site/` to any web host.
 - `npm install`, then `npm run serve`, then open
   `http://localhost:8001/?github=<repo or folder URL>`. The page rebuilds
   automatically when files change.
@@ -112,6 +114,36 @@ Review JSON format (`format: "kicanvas-review"`, `version: 1`, `units: "mm"`):
   toggle.
 - Files: `src/kicanvas/elements/common/app.ts`,
   `src/kicanvas/elements/common/preferences-panel.ts`.
+
+### v1.1: static site packaging (branch `kicanvas_DU_v1_1`)
+
+- New: `scripts/package.js`, run with `npm run package`, which builds first.
+  It copies the standalone app into `site/` with this layout: `index.html`
+  (from `docs/overrides/standalone.html`, with the icon paths made relative and
+  a `<title>` added), `kicanvas/kicanvas.js`, `styles/standalone.css`,
+  `images/kicanvas.png`, `images/github-mark-white.svg` and `icon.png`. All
+  paths are relative, so the site works from a sub-folder of a domain.
+- `package.json` has the new `package` script, and `.gitignore` now ignores
+  `site/`.
+- Why: the fork is hosted on the maintainer's own domain instead of GitHub
+  Pages. `docs/docs/CNAME` still says `kicanvas.org`, which only matters for
+  GitHub Pages.
+- When testing locally on Windows, don't use `python -m http.server`: it
+  truncates the 500 kB `kicanvas.js` download, which leaves a blank page. Use
+  any other static server.
+
+### v1.1: intro page link box (branch `kicanvas_DU_v1_1`)
+
+- Upstream loaded the project on every `input` event, so typing a link by
+  hand sent a GitHub API request for each partial URL. That wastes the
+  60 requests per hour that GitHub allows without logging in, and the loads
+  could race each other.
+- Now `KiCanvasShellElement.open_link()` runs only when a link is pasted or
+  dropped (`inputType` is `insertFromPaste` or `insertFromDrop`) or when Enter
+  is pressed. It ignores the request if a project is already loading, ignores
+  stale results, and adds `?repo=` to the address only after a successful
+  load.
+- File: `src/kicanvas/elements/kicanvas-shell.ts`.
 
 ## Ideas and next steps
 
